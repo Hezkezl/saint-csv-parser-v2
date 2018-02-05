@@ -6,6 +6,13 @@ ___
 
 ## Usage
 
+- `git clone https://github.com/viion/saint-csv-parser-v2.git`
+- `cd saint-csv-parser-v2`
+- `composer install`
+- `php bin/console app:parse:csv <Parser>`
+
+## Building your own parser
+
 To use this tool you need to write a CSV Parsing file. Once you have cloned the repository make a new folder in the parsers, eg:
 
 - `src/Parsers/MyAwesomeParser`
