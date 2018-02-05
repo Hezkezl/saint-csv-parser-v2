@@ -48,7 +48,7 @@ This will run your `parse()` function. here is where the meat of your data will 
 
 ## Functions
 
-**getCsvFile(<filename>)**
+**getCsvFile([filename])**
 
 Get a CSV file based on its exact filename, eg:
 
@@ -66,7 +66,7 @@ foreach($itemCsv->data as $id => $row) {
 }
 ```
 
-**at(<id>)**
+**at([id])**
 
 If you are extending to other files and need a row at a specific id, you can use `at()`, eg:
 
@@ -74,7 +74,7 @@ If you are extending to other files and need a row at a specific id, you can use
 $memberType = $contentMemberTypeCsv->at($conditions['ContentMemberType']);
 ```
 
-**find(<column>, <value>)**
+**find([column], [value])**
 
 If you need to find a row(s) to a specific value, you can use `find()`, eg:
 
@@ -82,7 +82,7 @@ If you need to find a row(s) to a specific value, you can use `find()`, eg:
 $conditions = $contentFinderConditionCsv->find('InstanceContent', $id);
 ```
 
-**dump(filename, data)**
+**dump([filename], [data])**
 
 Save data to the cache directory as `dump_<filename>`, eg:
 
