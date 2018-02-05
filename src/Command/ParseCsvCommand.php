@@ -4,7 +4,7 @@ namespace App\Command;
 
 use App\Kernel;
 use App\Parsers\CsvParse;
-use App\Parsers\XIVDB\InstanceContent;
+use App\Parsers\XIVDB\XIVDBInstanceContent;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -35,7 +35,15 @@ class ParseCsvCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('<info>Starting CSV Parser</info>');
+        $output->writeln([
+            '<info>Starting CSV Parser</info>',
+            '<info>- MEMORY: '. ini_get('memory_limit') .'</info>',
+            '<info>- START: '. date('Y-m-d H:i:s') .'</info>',
+            '<info>- PARSER: '. $input->getArgument('csv_parser') .'</info>',
+        ]);
+
+
+        $stopWatchStart = microtime(true);
 
         // get provided parser
         $parserName = $input->getArgument('csv_parser');
@@ -46,7 +54,7 @@ class ParseCsvCommand extends Command
             return;
         }
 
-        /** @var InstanceContent $parser */
+        /** @var XIVDBInstanceContent $parser */
         $parser = new $parserClass();
         $parser
             ->setOutput($output)
@@ -54,8 +62,13 @@ class ParseCsvCommand extends Command
             ->init()
             ->parse();
 
+        $stopWatchFinish = microtime(true);
+        $stopWatchDuration = round($stopWatchFinish-$stopWatchStart, 3);
+
         $output->writeln([
-            '','Finished!',''
+            '',
+            '<info>Finished!</info>',
+            '<info>- Duration: '. $stopWatchDuration .' seconds</info>'
         ]);
     }
 }

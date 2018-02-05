@@ -14,7 +14,7 @@ use Symfony\Component\Console\Helper\ProgressBar;
  * Parse InstanceContent
  * - must implement "ParseInterface"
  */
-class InstanceContent implements ParseInterface
+class XIVDB_InstanceContent implements ParseInterface
 {
     use CsvParseTrait;
 
@@ -37,7 +37,6 @@ class InstanceContent implements ParseInterface
         $progress = new ProgressBar($this->output, $instanceContent->total);
 
         // loop through instances
-        $data = [];
         foreach($instanceContent->data as $id => $row) {
             // ---
             $progress->advance();
@@ -63,7 +62,7 @@ class InstanceContent implements ParseInterface
 
 
             // store
-            $data[] = [
+            $this->data[] = [
                 'id' => $id,
                 'level' => $conditions['ClassJobLevel{Required}'],
                 'level_sync' => $conditions['ClassJobLevel{Sync}'],
@@ -81,7 +80,7 @@ class InstanceContent implements ParseInterface
         $progress->finish();
 
         // save
-        $this->dump('InstanceContentJson', json_encode($data, JSON_PRETTY_PRINT));
+        $this->dump('InstanceContentJson', json_encode($this->data, JSON_PRETTY_PRINT));
 
         // build sql - HAX
         $sql = [];

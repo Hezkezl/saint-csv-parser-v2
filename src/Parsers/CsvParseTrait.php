@@ -81,11 +81,28 @@ trait CsvParseTrait
         return $parser;
     }
 
-    public function dump($filename, $data)
+    public $data = [];
+    public $chunks = 1;
+    public $chunksMax = 200;
+
+    public function dump($filename, $data = false)
     {
+        $data = $data ? $data : $this->data;
+
         $cache = $this->projectDirectory . getenv('CACHE_DIRECTORY');
         $filename = "{$cache}/dump_{$filename}";
 
         file_put_contents($filename, $data);
+    }
+
+    public function dumpChunks($filename, $force = false)
+    {
+        if (!$force && count($this->data) < $this->chunksMax) {
+            return;
+        }
+
+        $this->dump("{$filename}_chunk{$this->chunks}", implode("", $this->data));
+        $this->chunks++;
+        $this->data = [];
     }
 }
