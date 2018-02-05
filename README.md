@@ -4,7 +4,7 @@ A microservice for parsing SaintCoinach CSV files
 
 ___
 
-### Usage
+## Usage
 
 To use this tool you need to write a CSV Parsing file. Once you have cloned the repository make a new folder in the parsers, eg:
 
@@ -46,7 +46,7 @@ Now you can run:
 
 This will run your `parse()` function. here is where the meat of your data will be.
 
-#### Functions
+## Functions
 
 **getCsvFile(<filename>)**
 
@@ -90,6 +90,8 @@ Save data to the cache directory as `dump_<filename>`, eg:
 $this->dump('InstanceContentJson', json_encode($data, JSON_PRETTY_PRINT));
 ```
 ___
+
+## notes
 
 Fetches data from:
 
