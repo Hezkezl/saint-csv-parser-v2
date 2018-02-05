@@ -12,7 +12,7 @@ To use this tool you need to write a CSV Parsing file. Once you have cloned the 
 
 In here you will want to make a PHP file for the type of content you want to parse, eg:
 
-- `Item.php`
+- `MyItemParser.php`
 
 Populate the file with the skeleton code:
 
