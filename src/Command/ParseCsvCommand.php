@@ -2,9 +2,7 @@
 
 namespace App\Command;
 
-use App\Kernel;
 use App\Parsers\CsvParse;
-use App\Parsers\XIVDB\XIVDBInstanceContent;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -54,7 +52,6 @@ class ParseCsvCommand extends Command
             return;
         }
 
-        /** @var XIVDBInstanceContent $parser */
         $parser = new $parserClass();
         $parser
             ->setOutput($output)

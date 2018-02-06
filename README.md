@@ -96,6 +96,12 @@ Save data to the cache directory as `dump_<filename>`, eg:
 ```php
 $this->dump('InstanceContentJson', json_encode($data, JSON_PRETTY_PRINT));
 ```
+
+
+## Clear cache
+
+- `php bin/console app:parse:clear-cache`
+
 ___
 
 ## notes
