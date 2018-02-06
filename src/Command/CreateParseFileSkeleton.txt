@@ -1,0 +1,49 @@
+<?php
+
+namespace App\Parsers\{AUTO_FOLDER};
+
+use App\Parsers\CsvParseTrait;
+use App\Parsers\ParseInterface;
+use Symfony\Component\Console\Helper\ProgressBar;
+
+/**
+ * {AUTO_FOLDER}:{AUTO_FILENAME}
+ */
+class {AUTO_FILENAME} implements ParseInterface
+{
+    use CsvParseTrait;
+
+    public function parse()
+    {
+        $this->output->writeln('<comment>{AUTO_FOLDER}:{AUTO_FILENAME}</comment>');
+
+        // grab CSV files we want to use
+        $items = $this->getCsvFile('Item');
+
+        // (optional) start a progress bar
+        $progress = new ProgressBar($this->output, $items->total);
+
+        // loop through data
+        foreach($items->data as $id => $item) {
+            // (optional) increment progress bar
+            $progress->advance();
+
+            //
+            // Your parse code here
+            //
+
+            // add to array
+            $this->data[] = [
+                'id' => $item['id'],
+                'name' => $item['Name'],
+            ];
+        }
+
+        // (optional) finish progress bar
+        $progress->finish();
+
+        // save data
+        $this->dump('SaveFilename', $this->data);
+        $this->output->writeln('Finished!');
+    }
+}

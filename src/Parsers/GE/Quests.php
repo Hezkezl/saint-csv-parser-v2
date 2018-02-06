@@ -6,7 +6,7 @@ use App\Parsers\CsvParseTrait;
 use App\Parsers\ParseInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 
-class GE_Quests implements ParseInterface
+class Quests implements ParseInterface
 {
     use CsvParseTrait;
 

@@ -14,7 +14,7 @@ use Symfony\Component\Console\Helper\ProgressBar;
  * Parse InstanceContent
  * - must implement "ParseInterface"
  */
-class XIVDB_InstanceContent implements ParseInterface
+class InstanceContent implements ParseInterface
 {
     use CsvParseTrait;
 
@@ -84,7 +84,7 @@ class XIVDB_InstanceContent implements ParseInterface
 
         // build sql - HAX
         $sql = [];
-        foreach($data as $row) {
+        foreach($this->data as $row) {
             $id = $row['id'];
             unset($row['id']);
 

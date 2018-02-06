@@ -2,7 +2,6 @@
 
 namespace App\Command;
 
-use App\Parsers\CsvParse;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -10,15 +9,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ParseCsvCommand extends Command
 {
-    /** @var CsvParse */
-    private $csvParse;
     private $projectDirectory;
 
-    public function __construct(CsvParse $csvParse, string $projectDirectory, $name = null)
+    public function __construct(string $projectDirectory, $name = null)
     {
-        $this->csvParse = $csvParse;
         $this->projectDirectory = $projectDirectory;
-
         parent::__construct($name);
     }
 
@@ -31,6 +26,9 @@ class ParseCsvCommand extends Command
         ;
     }
 
+    /**
+     * todo - refactor the logic in here into a managed file service
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln([
@@ -40,19 +38,51 @@ class ParseCsvCommand extends Command
             '<info>- PARSER: '. $input->getArgument('csv_parser') .'</info>',
         ]);
 
-
         $stopWatchStart = microtime(true);
 
-        // get provided parser
-        $parserName = $input->getArgument('csv_parser');
-        $parserClass = $this->csvParse->get($parserName);
+        // grab project and fiename
+        [$project, $filename] = explode(':', $input->getArgument('csv_parser'));
 
-        if (!$parserClass) {
-            $output->writeln("<error>Could not find a parser for: {$parserName}</error>");
+
+        // get a list of parsers
+        $root = $this->projectDirectory . '/src/Parsers';
+        $directories = array_diff(scandir($root), ['..', '.']);
+        $projectPath = false;
+        foreach($directories as $directory) {
+            if ($directory != $project) {
+                continue;
+            }
+
+            $path = "{$root}/{$directory}";
+
+            if ($directory == $project && is_dir($path)) {
+                $projectPath = $path;
+                break;
+            }
+        }
+
+        if (empty($projectPath)) {
+            $output->writeln("<error>Could not find the project folder: {$project} in src/Parsers");die;
+        }
+
+        $parserFile = "{$projectPath}/{$filename}.php";
+        if (!is_file($parserFile)) {
+            $output->writeln("<error>Could not find parsing file: {$projectPath}/{$filename}.php");die;
+        }
+        require_once $parserFile;
+
+        $classname = "\App\Parsers\\". $project ."\\". $filename;
+        $output->writeln("Intializing parsing class: {$classname}");
+
+        // create class
+        $parser = new $classname();
+
+        if (!$parser) {
+            $output->writeln("<error>Could not create class from parse file: {$filename}</error>");
             return;
         }
 
-        $parser = new $parserClass();
+        // run parser
         $parser
             ->setOutput($output)
             ->setProjectDirectory($this->projectDirectory)

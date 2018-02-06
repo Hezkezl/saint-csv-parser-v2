@@ -88,6 +88,7 @@ trait CsvParseTrait
     public function dump($filename, $data = false)
     {
         $data = $data ? $data : $this->data;
+        $data = is_array($data) ? json_encode($data) : $data;
 
         $cache = $this->projectDirectory . getenv('CACHE_DIRECTORY');
         $filename = "{$cache}/dump_{$filename}";
