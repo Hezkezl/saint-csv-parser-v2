@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Parsers\{AUTO_FOLDER};
+namespace App\Parsers\Example;
 
 use App\Parsers\CsvParseDataHandlerTrait;
 use App\Parsers\CsvParseTrait;
@@ -9,9 +9,9 @@ use App\Parsers\ParseInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 
 /**
- * {AUTO_FOLDER}:{AUTO_FILENAME}
+ * Example:ItemCategories
  */
-class {AUTO_FILENAME} extends ParseHandler implements ParseInterface
+class ItemCategories extends ParseHandler implements ParseInterface
 {
     use CsvParseTrait;
     use CsvParseDataHandlerTrait;

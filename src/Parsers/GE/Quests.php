@@ -56,7 +56,7 @@ class Quests implements ParseInterface
         $patch = '4.2';
 
         // grab quest CSV file
-        $questCsv = $this->getCsvFile('Quest');
+        $questCsv = $this->csv('Quest');
 
         // start a progress bar
         $progress = new ProgressBar($this->output, $questCsv->total);

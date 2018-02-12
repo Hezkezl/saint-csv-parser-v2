@@ -18,8 +18,8 @@ class Achievement implements ParseInterface
             '------------------------------------------------------',
         ]);
 
-        $achievementCsv = $this->getCsvFile('Achievement');
-        $achievementCategoryCsv = $this->getCsvFile('AchievementCategory');
+        $achievementCsv = $this->csv('Achievement');
+        $achievementCategoryCsv = $this->csv('AchievementCategory');
 
         // start a progress bar
         $progress = new ProgressBar($this->output, $achievementCsv->total);

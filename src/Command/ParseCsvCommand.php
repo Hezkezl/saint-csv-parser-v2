@@ -32,10 +32,11 @@ class ParseCsvCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln([
-            '<info>Starting CSV Parser</info>',
-            '<info>- MEMORY: '. ini_get('memory_limit') .'</info>',
-            '<info>- START: '. date('Y-m-d H:i:s') .'</info>',
-            '<info>- PARSER: '. $input->getArgument('csv_parser') .'</info>',
+            '<comment>Starting CSV Parser</comment>',
+            '- MEMORY: '. ini_get('memory_limit'),
+            '- START: '. date('Y-m-d H:i:s'),
+            '- PARSER: '. $input->getArgument('csv_parser'),
+            '',
         ]);
 
         $stopWatchStart = microtime(true);
@@ -93,9 +94,11 @@ class ParseCsvCommand extends Command
         $stopWatchDuration = round($stopWatchFinish-$stopWatchStart, 3);
 
         $output->writeln([
-            '',
+            '','',
             '<info>Finished!</info>',
-            '<info>- Duration: '. $stopWatchDuration .' seconds</info>'
+            '<comment>Duration: '. $stopWatchDuration .' seconds</comment>',
+            '<comment>Find your data in the /output folder</comment>',
+            '',
         ]);
     }
 }

@@ -28,9 +28,9 @@ class InstanceContent implements ParseInterface
 
         // grab CSV files we want to use
         /** @var ParseWrapper $csv */
-        $instanceContent = $this->getCsvFile('InstanceContent');
-        $contentFinderCondition = $this->getCsvFile('ContentFinderCondition');
-        $contentMemberType = $this->getCsvFile('ContentMemberType');
+        $instanceContent = $this->csv('InstanceContent');
+        $contentFinderCondition = $this->csv('ContentFinderCondition');
+        $contentMemberType = $this->csv('ContentMemberType');
 
 
         // start a progress bar

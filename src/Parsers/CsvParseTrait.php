@@ -52,7 +52,7 @@ trait CsvParseTrait
         return $this;
     }
 
-    public function getCsvFile($content): ParseWrapper
+    public function csv($content): ParseWrapper
     {
         $cache = $this->projectDirectory . getenv('CACHE_DIRECTORY');
         $filename = "{$cache}/{$content}.csv";

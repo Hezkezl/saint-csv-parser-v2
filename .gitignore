@@ -1,5 +1,7 @@
 cache/*
+output/*
 !cache/.gitkeep
+!output/.gitkeep
 .idea
 
 ###> symfony/framework-bundle ###
