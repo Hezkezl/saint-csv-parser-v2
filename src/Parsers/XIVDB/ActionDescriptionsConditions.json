@@ -1,0 +1,20 @@
+[
+    "Deals unaspected damage with a potency of 30 to target and all enemies nearby it.\r\n[START_SPAN style=\"color:#00cc22;\"]Additional Effect:[END_SPAN] [START_SPAN style=\"color:#ffff66;\"]Bind[END_SPAN]\r\n[START_SPAN style=\"color:#00cc22;\"]Duration:[END_SPAN] 20s",
+    {
+        "condition": {
+            "left": "class_job_level",
+            "operator": ">=",
+            "right": 58
+        },
+        "true": {
+            "condition": {
+                "left": "class_job_id",
+                "operator": "==",
+                "right": 27
+            },
+            "true": "[START_SPAN style=\"color:#00cc22;\"]Dreadwyrm Trance Effect:[END_SPAN] Removes [START_SPAN style=\"color:#ffff66;\"]Bind[END_SPAN] effect, increases potency by 40, and reduces MP cost",
+            "false": ""
+        },
+        "false": ""
+    }
+]
