@@ -12,19 +12,17 @@ class ActionDescriptionsConditions
     {
         $description = str_ireplace(['<','>'], ['##<','>##'], $description);
 
-        print_r("\n\n". $description . "\n\n");
+        #print_r("\n\n". $description . "\n\n");
 
         $lines = explode('##', $description);
         $lines = array_values(array_filter($lines));
 
-        $indent = 0;
+        $linesSimple = $lines;
+
         foreach($lines as $i => $line) {
             $ifOpen = substr($line, 0, 3) === '<If';
             $ifClose = substr($line, 0, 4) === '</If';
             $ifElse = $line === '<Else/>';
-
-            $indent = $ifOpen ? $indent += 1 : $indent;
-            $indent = $ifClose ? $indent -= 1 : $indent;
 
             // convert if open condition
             if ($ifOpen) {
@@ -38,14 +36,39 @@ class ActionDescriptionsConditions
             $lines[$i] = $line;
         }
 
+        $indent = 0;
+        foreach($linesSimple as $i => $line) {
+            $ifOpen = substr($line, 0, 3) === '<If';
+            $ifClose = substr($line, 0, 4) === '</If';
+            $ifElse = $line === '<Else/>';
+
+            // convert if open condition
+            if ($ifOpen) {
+                $line = $this->conditionConverterSimple($line);
+                $indent++;
+            } elseif ($ifClose) {
+                $line = '}';
+                $indent--;
+            } elseif ($ifElse) {
+                $line = '} else {';
+            }
+
+            if ($ifElse) {
+                $indent--;
+            }
+
+            $line = str_pad($line, (4 * $indent + strlen($line)), ' ', STR_PAD_LEFT);
+            $linesSimple[$i] = $line;
+        }
+
         // ------------------------------------------
 
-        print_r($lines);
+        #print_r($lines);
 
         $codestring = implode("\n", $lines);
+        $codestringSimple = implode("\n", $linesSimple);
 
         try {
-
             $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
             $logic = $parser->parse($codestring);
 
@@ -58,18 +81,23 @@ class ActionDescriptionsConditions
             return false;
         }
 
-        print_r($json);
-
+        #print_r($json);
+        #print_r(json_encode($json) . PHP_EOL);
 
         file_put_contents(
             __DIR__ .'/ActionDescriptionsConditions.json',
-            json_encode($json, JSON_PRETTY_PRINT)
+            json_encode($json) . PHP_EOL,
+            FILE_APPEND
         );
 
-        die;
+        file_put_contents(
+            __DIR__ .'/ActionDescriptionsConditions_simple.txt',
+            $codestringSimple . PHP_EOL . PHP_EOL,
+            FILE_APPEND
+        );
+
         return $description;
     }
-
 
     private function format($json)
     {
@@ -176,6 +204,41 @@ class ActionDescriptionsConditions
 
         return sprintf(
             '<?php if ($%s %s %s) { ?>',
+            $s->left,
+            $s->op,
+            $s->right
+        );
+    }
+
+    /**
+     * Convert conditions
+     */
+    private function conditionConverterSimple($line)
+    {
+        preg_match_all('/\<If\((?P<condition>\w+)\((?P<parameter>\w+)\((?P<x>\d+)\),(?P<y>\d+)\)\)>/', $line, $matches);
+
+        $statement = (Object)[
+            'condition' => $matches['condition'][0],
+            'parameter' => $matches['parameter'][0],
+            'x' => $matches['x'][0],
+            'y' => $matches['y'][0]
+        ];
+
+        $conditions = [
+            'GreaterThanOrEqualTo' => '>=',
+            'LessThanOrEqualTo' => '<=',
+            'NotEqual' => '!=',
+            'Equal' => '==',
+        ];
+
+        $s = (Object)[
+            'left'  => $this->getPlayerParameterContext($statement->parameter, $statement->x),
+            'op'    => $conditions[$statement->condition],
+            'right' => $statement->y,
+        ];
+
+        return sprintf(
+            'if: %s%s%s {',
             $s->left,
             $s->op,
             $s->right
