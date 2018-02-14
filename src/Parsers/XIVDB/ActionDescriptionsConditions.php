@@ -17,8 +17,6 @@ class ActionDescriptionsConditions
         $lines = explode('##', $description);
         $lines = array_values(array_filter($lines));
 
-        $linesSimple = $lines;
-
         foreach($lines as $i => $line) {
             $ifOpen = substr($line, 0, 3) === '<If';
             $ifClose = substr($line, 0, 4) === '</If';
@@ -34,31 +32,6 @@ class ActionDescriptionsConditions
             }
 
             $lines[$i] = $line;
-        }
-
-        $indent = 0;
-        foreach($linesSimple as $i => $line) {
-            $ifOpen = substr($line, 0, 3) === '<If';
-            $ifClose = substr($line, 0, 4) === '</If';
-            $ifElse = $line === '<Else/>';
-
-            // convert if open condition
-            if ($ifOpen) {
-                $line = $this->conditionConverterSimple($line);
-                $indent++;
-            } elseif ($ifClose) {
-                $line = '}';
-                $indent--;
-            } elseif ($ifElse) {
-                $line = '} else {';
-            }
-
-            if ($ifElse) {
-                $indent--;
-            }
-
-            $line = str_pad($line, (4 * $indent + strlen($line)), ' ', STR_PAD_LEFT);
-            $linesSimple[$i] = $line;
         }
 
         // ------------------------------------------
@@ -210,40 +183,6 @@ class ActionDescriptionsConditions
         );
     }
 
-    /**
-     * Convert conditions
-     */
-    private function conditionConverterSimple($line)
-    {
-        preg_match_all('/\<If\((?P<condition>\w+)\((?P<parameter>\w+)\((?P<x>\d+)\),(?P<y>\d+)\)\)>/', $line, $matches);
-
-        $statement = (Object)[
-            'condition' => $matches['condition'][0],
-            'parameter' => $matches['parameter'][0],
-            'x' => $matches['x'][0],
-            'y' => $matches['y'][0]
-        ];
-
-        $conditions = [
-            'GreaterThanOrEqualTo' => '>=',
-            'LessThanOrEqualTo' => '<=',
-            'NotEqual' => '!=',
-            'Equal' => '==',
-        ];
-
-        $s = (Object)[
-            'left'  => $this->getPlayerParameterContext($statement->parameter, $statement->x),
-            'op'    => $conditions[$statement->condition],
-            'right' => $statement->y,
-        ];
-
-        return sprintf(
-            'if: %s%s%s {',
-            $s->left,
-            $s->op,
-            $s->right
-        );
-    }
 
     /**
      * List of PlayerParameters
