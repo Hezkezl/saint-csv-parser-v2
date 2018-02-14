@@ -21,25 +21,20 @@ class ActionDescriptions extends ParseHandler implements ParseInterface
         $ActionTransientCsv = $this->csv('ActionTransient');
         $this->output->writeln(['','']);
 
-        if (file_exists(__DIR__ .'/ActionDescriptionsConditions.json')) {
-            unlink(__DIR__ .'/ActionDescriptionsConditions.json');
-        }
-
-        if (file_exists(__DIR__ .'/ActionDescriptionsConditions_simple.txt')) {
-            unlink(__DIR__ .'/ActionDescriptionsConditions_simple.txt');
-        }
-
         // loop through data
         foreach($ActionTransientCsv->data as $id => $desc) {
             $this->output->writeln("Action: {$id}");
 
+            // skip blank descriptions
             if (empty($desc['Description'])) {
                 continue;
             }
 
+            // get formatter, format description
             $formatter = new ActionDescriptionFormatter();
             $description = $formatter->format($desc['Description']);
 
+            // save to output
             $this->save('ActionDescriptions', [
                 'id' => $desc['id'],
                 'description' => $description,
