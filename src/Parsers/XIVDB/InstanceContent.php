@@ -60,7 +60,6 @@ class InstanceContent implements ParseInterface
             // get id of content member type
             $memberType = $contentMemberType->at($conditions['ContentMemberType']);
 
-
             // store
             $this->data[] = [
                 'id' => $id,
@@ -74,6 +73,8 @@ class InstanceContent implements ParseInterface
                 'healers_per_party' => $memberType['TanksPerParty'],
                 'melees_per_party' => $memberType['TanksPerParty'],
                 'ranged_per_party' => $memberType['TanksPerParty'],
+
+                'banner' => $conditions['Icon'],
             ];
         }
 
