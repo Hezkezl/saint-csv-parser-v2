@@ -30,11 +30,12 @@ class SmallIconConverter extends ParseHandler implements ParseInterface
         // loop through data
         foreach($ItemCsv->data as $id => $item)
         {
+            // Skip shit with no name or icon
             if (!$item['Name'] || !$item['Icon']) {
                 continue;
             }
 
-            // build item icon path
+            // build icon and hq icon input folder paths
             $itemIcon = $this->getInputFolder() .'/icons/'. $this->iconize($item['Icon']);
             $itemIconHq = $this->getInputFolder() .'/icons/'. $this->iconize($item['Icon'], true);
 
@@ -43,30 +44,33 @@ class SmallIconConverter extends ParseHandler implements ParseInterface
                 continue;
             }
 
+            // inform console what item we're copying
             $this->output->writeln("Item: <comment>{$item['Name']}</comment>");
 
-            // filename format
+            // build output filenames for icon + hq icon
             $iconFileName = "{$outputDirectory}/{$item['Name']}_Icon.png";
             $iconFileNameHq = "{$outputDirectory}/{$item['Name']}_HQ_Icon.png";
 
+            // console output
             $this->output->writeln(
                 sprintf(
-                    '- copy <info>%s</info> to <info>%s</info>',
-                    $itemIcon, $iconFileName
+                    '- copy <info>%s</info> to <info>%s</info>', $itemIcon, $iconFileName
                 )
             );
 
+            // copy the input icon to the output filename
             copy($itemIcon, $iconFileName);
 
             // if hq exists, copy that
             if (file_exists($itemIconHq)) {
+                //console output
                 $this->output->writeln(
                     sprintf(
-                        '- copy <info>%s</info> to <info>%s</info>',
-                        $itemIconHq, $itemIconHq
+                        '- copy <info>%s</info> to <info>%s</info>', $itemIconHq, $itemIconHq
                     )
                 );
 
+                // copy the input icon to the output filename
                 copy($itemIconHq, $iconFileNameHq);
             }
         }
