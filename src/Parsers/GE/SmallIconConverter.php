@@ -63,17 +63,17 @@ class SmallIconConverter extends ParseHandler implements ParseInterface
             copy($itemIcon, $iconFileName);
 
             // if hq exists, copy that
-            if (file_exists($itemIconHq)) {
-                //console output
-                $this->output->writeln(
-                    sprintf(
-                        '- copy <info>%s</info> to <info>%s</info>', $itemIconHq, $itemIconHq
-                    )
-                );
+            //if (file_exists($itemIconHq)) {
+            //    //console output
+            //    $this->output->writeln(
+            //        sprintf(
+            //            '- copy <info>%s</info> to <info>%s</info>', $itemIconHq, $itemIconHq
+            //        )
+            //    );
 
-                // copy the input icon to the output filename
-                copy($itemIconHq, $iconFileNameHq);
-            }
+            //    // copy the input icon to the output filename
+            //    copy($itemIconHq, $iconFileNameHq);
+            //}
         }
     }
 
