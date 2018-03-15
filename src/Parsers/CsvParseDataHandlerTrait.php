@@ -14,6 +14,16 @@ trait CsvParseDataHandlerTrait
         ]
     ];
 
+    public function getInputFolder()
+    {
+        return $this->projectDirectory . getenv('INPUT_DIRECTORY');
+    }
+
+    public function getOutputFolder()
+    {
+        return $this->projectDirectory . getenv('OUTPUT_DIRECTORY');
+    }
+
     /**
      * Set the maximum chunk size
      */
