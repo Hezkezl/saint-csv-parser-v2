@@ -126,7 +126,32 @@ $this->data[] = "ItemName {$item->Name}";
 // $this->save( FILENAME , CHUNK SIZE , OVERRIDE DATA)
 $this->dump('ItemNames.txt');  
 ```  
-  
+ 
+**$this->io->XXX*
+
+Access the Symfony Console Input/Output commands, this can provide feedback and information to the output, you can find detailed documentation here: https://symfony.com/doc/current/console/style.html
+
+The useful bits:
+
+- `$this->io->progressStart(X);` Start a progress bar with X amount
+- `$this->io->progressAdvance();` Advance the progress bar by 1
+- `$this->io->progressFinish();` Complete the progress bar
+- `$this->io->text("hello world");` Write some text
+- `$this->io->section("My Awesome Section");` Write a section heading
+
+Tables:
+
+```
+$this->io->table(
+	[ 'heading 1', 'heading 2', 'heading 3' ],
+	[
+		[ 'data 1', 'data 2', 'data 3' ],
+		[ 'data 1', 'data 2', 'data 3' ],
+		[ 'data 1', 'data 2', 'data 3' ],
+	]
+);
+```
+
   
 ## Clear cache  
   
