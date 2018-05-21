@@ -17,15 +17,20 @@ class Collectable implements ParseInterface
     // Doesn't work atm
     const WIKI_FORMAT = '
         {{Collectable
-        {id}
-        {ClassJob}
-        {ClassJobLevel}
-        {RewardCurrency}
-        {RequiredItem0}
-        {Quantity0}
-        {CollectabilityHighBonus0}
-        {CollectabilityBonus0}
-        {CollectabilityBase0}
+        |Index = {id}
+        |Class = {Job}
+        |Level = {ClassJobLevel}
+        |Reward = {RewardCurrency}
+        |Name = {RequiredItem0}
+        |Quantity = {Quantity0}
+        |Bonus2 = {CollectabilityHighBonus0}
+        |Bonus1 = {CollectabilityBonus0}
+        |Base = {CollectabilityBase0}
+        |Exp Modifier = {ExpModifier0}
+        |Base Scrip = {RewardScrips0}
+        |Bonus Multiplier = {BonusMultiplier0}
+        |Class Level Max = {ClassJobLevelMax0}
+        |Stars = {Stars0}
         }}';
 
 
@@ -56,7 +61,7 @@ class Collectable implements ParseInterface
             // create a collectible
             $collectible = [
                 'id' => $item['id'],
-                'ClassJob' => $item['ClassJob'],
+                'Job' => $item['ClassJob'],
                 'ClassJobLevel' => $item['ClassJobLevel'],
                 'RewardCurrency' => $item['Reward{Currency}'],
                 'RequiredItem0' => $item['RequiredItem[0]'],
@@ -64,7 +69,7 @@ class Collectable implements ParseInterface
                 'CollectabilityHighBonus0' => $item['Collectability{HighBonus}[0]'],
                 'CollectabilityBonus0' => $item['Collectability{Bonus}[0]'],
                 'CollectabilityBase0' => $item['Collectability{Base}[0]'],
-                'Expmodifier0' => $item['ExpModifier[0]'],
+                'ExpModifier0' => $item['ExpModifier[0]'],
                 'RewardScrips0' => $item['Reward{Scrips}[0]'],
                 'BonusMultiplier0' => $item['BonusMultiplier[0]'],
                 'ClassJobLevelMax0' => $item['ClassJobLevel{Max}[0]'],
