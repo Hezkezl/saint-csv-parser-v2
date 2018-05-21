@@ -5,7 +5,6 @@ namespace App\Parsers\XIVDB;
 use App\Parsers\CsvParseTrait;
 use App\Parsers\ParseInterface;
 use App\Parsers\ParseWrapper;
-use Symfony\Component\Console\Helper\ProgressBar;
 
 /**
  * This updates XIVDB Instance Content levels
@@ -20,27 +19,18 @@ class InstanceContent implements ParseInterface
 
     public function parse()
     {
-        $this->output->writeln([
-            '------------------------------------------------------',
-            '<comment>Parsing InstanceContent Data</comment>',
-            '------------------------------------------------------',
-        ]);
-
         // grab CSV files we want to use
         /** @var ParseWrapper $csv */
         $instanceContent = $this->csv('InstanceContent');
         $contentFinderCondition = $this->csv('ContentFinderCondition');
         $contentMemberType = $this->csv('ContentMemberType');
 
-
         // start a progress bar
-        $progress = new ProgressBar($this->output, $instanceContent->total);
+        $this->io->progressStart($instanceContent->total);
 
         // loop through instances
         foreach($instanceContent->data as $id => $row) {
-            // ---
-            $progress->advance();
-            $this->output->write('  --  '. $row['Name']);
+            $this->io->progressAdvance();
 
             // skip ones without a name
             if (empty($row['Name'])) {
@@ -78,10 +68,10 @@ class InstanceContent implements ParseInterface
             ];
         }
 
-        $progress->finish();
+        $this->io->progressFinish();
 
         // save
-        $this->dump('InstanceContentJson', json_encode($this->data, JSON_PRETTY_PRINT));
+        $this->save('InstanceContentJson');
 
         // build sql - HAX
         $sql = [];
@@ -96,7 +86,7 @@ class InstanceContent implements ParseInterface
             $sql[] = 'UPDATE xiv_instances SET '. implode(',', $row) . " WHERE id = {$id};";
         }
 
-        $this->dump('InstanceContentSql', implode("\n", $sql));
+        $this->save('InstanceContentSql');
 
     }
 }

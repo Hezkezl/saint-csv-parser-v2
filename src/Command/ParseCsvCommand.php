@@ -2,10 +2,13 @@
 
 namespace App\Command;
 
+use App\Parsers\Example\ItemCategories;
+use App\Parsers\Hello\World;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 class ParseCsvCommand extends Command
 {
@@ -26,26 +29,28 @@ class ParseCsvCommand extends Command
         ;
     }
 
-    /**
-     * todo - refactor the logic in here into a managed file service
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln([
-            '<comment>Starting CSV Parser</comment>',
-            '- MEMORY: '. ini_get('memory_limit'),
-            '- START: '. date('Y-m-d H:i:s'),
-            '- PARSER: '. $input->getArgument('csv_parser'),
-            '',
-        ]);
+        $io = new SymfonyStyle($input, $output);
+
+        $io->title('SaintCoinach CSV Parser');
+        $io->table(
+            ['MEMORY LIMIT', 'START TIME', 'PARSER'],
+            [
+                [
+                    ini_get('memory_limit'),
+                    date('Y-m-d H:i:s'),
+                    $input->getArgument('csv_parser')
+                ]
+            ]
+        );
 
         $stopWatchStart = microtime(true);
 
         // grab project and fiename
         [$project, $filename] = explode(':', $input->getArgument('csv_parser'));
 
-
-        // get a list of parsers
+        // get a list of parsers for supplied project
         $root = $this->projectDirectory . '/src/Parsers';
         $directories = array_diff(scandir($root), ['..', '.']);
         $projectPath = false;
@@ -62,30 +67,38 @@ class ParseCsvCommand extends Command
             }
         }
 
+        // check project path
         if (empty($projectPath)) {
-            $output->writeln("<error>Could not find the project folder: {$project} in src/Parsers");die;
+            $io->error("Could not find the project folder: {$project} in src/Parsers");
+            return;
         }
 
+        // build parser path
         $parserFile = "{$projectPath}/{$filename}.php";
         if (!is_file($parserFile)) {
-            $output->writeln("<error>Could not find parsing file: {$projectPath}/{$filename}.php");die;
+            $io->error("Could not find parsing file: {$projectPath}/{$filename}.php");
+            return;
         }
+
+        // include parser
         require_once $parserFile;
 
-        $classname = "\App\Parsers\\". $project ."\\". $filename;
-        $output->writeln("Intializing parsing class: {$classname}");
+        // build class
+        $parserClassName = "\App\Parsers\\". $project ."\\". $filename;
+        $io->text("RUN :: {$parserClassName}");
 
-        // create class
-        $parser = new $classname();
+        // create class (World set here for auto-complete)
+        /** @var World $parser */
+        $parser = new $parserClassName();
 
         if (!$parser) {
-            $output->writeln("<error>Could not create class from parse file: {$filename}</error>");
+            $io->error("Could not create class from parse file: {$filename} via: {$parserClassName}");
             return;
         }
 
         // run parser
         $parser
-            ->setOutput($output)
+            ->setInputOutput($input, $output)
             ->setProjectDirectory($this->projectDirectory)
             ->init()
             ->parse();
@@ -93,8 +106,8 @@ class ParseCsvCommand extends Command
         $stopWatchFinish = microtime(true);
         $stopWatchDuration = round($stopWatchFinish-$stopWatchStart, 3);
 
-        $output->writeln([
-            '','',
+        $io->text([
+            '',
             '<info>Finished!</info>',
             '<comment>Duration: '. $stopWatchDuration .' seconds</comment>',
             '<comment>Find your data in the /output folder</comment>',

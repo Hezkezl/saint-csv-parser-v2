@@ -2,20 +2,15 @@
 
 namespace App\Parsers\GE;
 
-use App\Parsers\CsvParseDataHandlerTrait;
 use App\Parsers\CsvParseTrait;
-use App\Parsers\ParseHandler;
 use App\Parsers\ParseInterface;
-use Symfony\Component\Console\Helper\ProgressBar;
 
 /**
- * GE:Collectable
+ * php bin/console app:parse:csv GE:Collectable
  */
-class Collectable extends ParseHandler implements ParseInterface
+class Collectable implements ParseInterface
 {
     use CsvParseTrait;
-    use CsvParseDataHandlerTrait;
-
 
     // the wiki format we shall use
     //{{Collectable|Class=Carpenter|Name=Adamantite Spear|Level=58|Scrip=Blue|Base=3200|Base Scrip=58|Base EXP=137088|Bonus1=4500|Bonus2=5800+}}
@@ -38,28 +33,28 @@ class Collectable extends ParseHandler implements ParseInterface
     {
         // grab CSV files we want to use
         $MasterpieceCsv = $this->csv('MasterpieceSupplyDuty');
-        $MultiplierCsv = $this->csv('MasterpieceSupplyMultiplier');
-        $ParamgrowCsv = $this->csv('Paramgrow');
+        $MultiplierCsv = $this->csv('MasterpieceSupplyMultiplier'); // not used atm
+        $ParamGrowCsv = $this->csv('ParamGrow');
 
         // (optional) start a progress bar
-        $progress = new ProgressBar($this->output, $MasterpieceCsv->total);
+        $this->io->progressStart($MasterpieceCsv->total);
 
         // loop through data
         foreach($MasterpieceCsv->data as $id => $item) {
             // (optional) increment progress bar
-            $progress->advance();
+            $this->io->progressAdvance();
 
             // grab paramgrow (exp value) for this item
             // doesn't seem to work atm T_T
-            $Paramgrow = $ParamgrowCsv->at($item['id']);
+            $Paramgrow = $ParamGrowCsv->at($item['id']);
 
             // skip ones without a name
             if (empty($item['RequiredItem[0]'])) {
                 continue;
             }
 
-            // Save some data
-            $this->save('Collectability.txt', [
+            // create a collectible
+            $collectible = [
                 'id' => $item['id'],
                 'ClassJob' => $item['ClassJob'],
                 'ClassJobLevel' => $item['ClassJobLevel'],
@@ -145,15 +140,17 @@ class Collectable extends ParseHandler implements ParseInterface
                 'ClassJobLevelMax7' => $item['ClassJobLevel{Max}[7]'],
                 'Stars7' => $item['Stars[7]'],
                 'ExpToNext' => $Paramgrow['ExpToNext'],
-            ]);
+            ];
 
-            // format using Gamer Escape Formater and add to data array
-            // allegedly. This doesn't work atm.
-            $this->item[] = GeFormatter::format(self::WIKI_FORMAT, $item);
-
+            // format our collectible and add it to our dataset
+            $this->data[] = GeFormatter::format(self::WIKI_FORMAT, $collectible);
         }
 
-        // (optional) finish progress bar
-        $progress->finish();
+        // End progress bar
+        $this->io->progressFinish();
+
+        // Save our data
+        $this->io->text('Saving ...');
+        $this->save('Collectability.txt');
     }
 }

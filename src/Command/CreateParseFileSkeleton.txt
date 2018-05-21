@@ -2,19 +2,15 @@
 
 namespace App\Parsers\{AUTO_FOLDER};
 
-use App\Parsers\CsvParseDataHandlerTrait;
 use App\Parsers\CsvParseTrait;
-use App\Parsers\ParseHandler;
 use App\Parsers\ParseInterface;
-use Symfony\Component\Console\Helper\ProgressBar;
 
 /**
- * {AUTO_FOLDER}:{AUTO_FILENAME}
+ * php bin/console app:parse:csv {AUTO_FOLDER}:{AUTO_FILENAME}
  */
-class {AUTO_FILENAME} extends ParseHandler implements ParseInterface
+class {AUTO_FILENAME} implements ParseInterface
 {
     use CsvParseTrait;
-    use CsvParseDataHandlerTrait;
 
     public function parse()
     {
@@ -23,12 +19,11 @@ class {AUTO_FILENAME} extends ParseHandler implements ParseInterface
         $ItemUiCategoryCsv = $this->csv('ItemUICategory');
 
         // (optional) start a progress bar
-        $progress = new ProgressBar($this->output, $ItemCsv->total);
+        $this->io->progressStart($ItemCsv->total);
 
         // loop through data
-        foreach($ItemCsv->data as $id => $item) {
-            // (optional) increment progress bar
-            $progress->advance();
+        foreach ($ItemCsv->data as $id => $item) {
+            $this->io->progressAdvance();
 
             //
             // Your parse code here
@@ -38,7 +33,7 @@ class {AUTO_FILENAME} extends ParseHandler implements ParseInterface
             $itemUiCategory = $ItemUiCategoryCsv->at($item['ItemUICategory']);
 
             // Save some data
-            $this->save('ItemDescriptions', [
+            $this->data[] = json_encode([
                 'id' => $item['id'],
                 'name' => $item['Name'],
                 'description' => $item['Description'],
@@ -51,6 +46,10 @@ class {AUTO_FILENAME} extends ParseHandler implements ParseInterface
         }
 
         // (optional) finish progress bar
-        $progress->finish();
+        $this->io->progressFinish();
+
+        // save
+        $this->io->text('Saving data ...');
+        $this->save('XIVDB_ItemCategories.txt');
     }
 }

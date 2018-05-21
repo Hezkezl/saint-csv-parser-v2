@@ -46,27 +46,18 @@ class Quests implements ParseInterface
 
     public function parse()
     {
-        $this->output->writeln([
-            '------------------------------------------------------',
-            '<comment>Parsing Quest Data</comment>',
-            '------------------------------------------------------',
-        ]);
-
         // i should pull this from xivdb :D
         $patch = '4.2';
 
         // grab quest CSV file
         $questCsv = $this->csv('Quest');
 
-        // start a progress bar
-        $progress = new ProgressBar($this->output, $questCsv->total);
+        $this->io->progressStart($questCsv->total);
 
         // loop through quest data
         foreach($questCsv->data as $id => $quest) {
             // ---------------------------------------------------------
-            // advance the progress bar and output the quest name
-            $progress->advance();
-            $this->output->write('  --  '. $quest['Name']);
+            $this->io->progressAdvance();
 
             // skip ones without a name
             if (empty($quest['Name'])) {
@@ -81,13 +72,16 @@ class Quests implements ParseInterface
 
             // format using GamerEscape Formater and add to data array
             $this->data[] = GeFormatter::format(self::WIKI_FORMAT, $data);
-
-            // dump chunks (will save if the chunk count amount has reached)
-            $this->dumpChunks('GeQuestWiki');
         }
 
-        // dump any remaining chunks (hence 'true' on end)
-        $this->dumpChunks('GeQuestWiki', true);
-        $progress->finish();
+        // save our data to the filename: GeQuestWiki.txt
+        $this->io->progressFinish();
+        $this->io->text('Saving ...');
+        $info = $this->save('GeQuestWiki.txt');
+
+        $this->io->table(
+            [ 'Filename', 'Data Count', 'File Size' ],
+            $info
+        );
     }
 }

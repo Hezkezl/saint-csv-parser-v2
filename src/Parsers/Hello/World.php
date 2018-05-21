@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Parsers\Example;
+namespace App\Parsers\Hello;
 
 use App\Parsers\CsvParseTrait;
 use App\Parsers\ParseInterface;
 
 /**
- * Example:ItemCategories
+ * Hello:World
  */
-class ItemCategories implements ParseInterface
+class World implements ParseInterface
 {
     use CsvParseTrait;
 
@@ -33,7 +33,7 @@ class ItemCategories implements ParseInterface
             $itemUiCategory = $ItemUiCategoryCsv->at($item['ItemUICategory']);
 
             // Save some data
-            $this->save('ItemDescriptions', [
+            $this->data[] = json_encode([
                 'id' => $item['id'],
                 'name' => $item['Name'],
                 'description' => $item['Description'],

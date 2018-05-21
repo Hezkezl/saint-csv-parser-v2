@@ -11,10 +11,9 @@ use Symfony\Component\Console\Helper\ProgressBar;
 /**
  * GE:SmallIconConverter
  */
-class SmallIconConverter extends ParseHandler implements ParseInterface
+class SmallIconConverter implements ParseInterface
 {
     use CsvParseTrait;
-    use CsvParseDataHandlerTrait;
 
     public function parse()
     {
@@ -46,14 +45,14 @@ class SmallIconConverter extends ParseHandler implements ParseInterface
             }
 
             // inform console what item we're copying
-            $this->output->writeln("Item: <comment>{$item['Name']}</comment>");
+            $this->io->text("Item: <comment>{$item['Name']}</comment>");
 
             // build output filenames for icon + hq icon
             $iconFileName = "{$outputDirectory}/{$item['Name']}_Icon.png";
             $iconFileNameHq = "{$outputDirectory}/{$item['Name']}_HQ_Icon.png";
 
             // console output
-            $this->output->writeln(
+            $this->io->text(
                 sprintf(
                     '- copy <info>%s</info> to <info>%s</info>', $itemIcon, $iconFileName
                 )
@@ -65,7 +64,7 @@ class SmallIconConverter extends ParseHandler implements ParseInterface
             // if hq exists, copy that
             //if (file_exists($itemIconHq)) {
             //    //console output
-            //    $this->output->writeln(
+            //    $this->io->text(
             //        sprintf(
             //            '- copy <info>%s</info> to <info>%s</info>', $itemIconHq, $itemIconHq
             //        )
