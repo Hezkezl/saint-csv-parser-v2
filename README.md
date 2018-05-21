@@ -32,7 +32,13 @@ Generated file: /path/to/repo/src/Parsers/Hello/World.php
 Run as command: php bin/console app:parse:csv Hello:World  
 ```  
   
-This will generate the file `World.php` in the folder `src/Parser/Hello`. This is where your code will live.  
+This will generate the file `World.php` in the folder `src/Parser/Hello`. This is where your code will live.
+
+Following this principle you could do:
+
+- `php bin/console app:parse:create AwesomeProject AchievementPoints` 
+    - Filename: `src/Parser/AwesomeProject/AchievementPoints.php` 
+    - Command: `php bin/console app:parse:csv AwesomeProject:AchievementPoints`
   
 You can test run your parser straight away by running:  
   
@@ -62,10 +68,8 @@ To begin editing your parser, open up the file:
   
 - **src/Parsers/{PROJECT}/{PARSER FILENAME}.php**  eg: **src/Parsers/Hello/World.php**  
   
-Some skeleton code is included to get you started  
+Some skeleton code is included to get you started.
 
-  
-  
 ## Functions  
   
 **$this->csv([filename])**  
