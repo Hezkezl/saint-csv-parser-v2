@@ -90,7 +90,7 @@ trait CsvParseTrait
         $data = $data ? $data : $this->data;
         $data = is_array($data) ? json_encode($data) : $data;
 
-        $cache = $this->projectDirectory . getenv('CACHE_DIRECTORY');
+        $cache = $this->projectDirectory . getenv('OUTPUT_DIRECTORY');
         $filename = "{$cache}/dump_{$filename}";
 
         file_put_contents($filename, $data);
