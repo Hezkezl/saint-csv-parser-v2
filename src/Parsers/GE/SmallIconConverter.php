@@ -19,7 +19,7 @@ class SmallIconConverter extends ParseHandler implements ParseInterface
     public function parse()
     {
         // ensure output directory exists
-        $outputDirectory = $this->getOutputFolder() . '/icons';
+        $outputDirectory = $this->getOutputFolder() . '/icon';
         if (!is_dir($outputDirectory)) {
             mkdir($outputDirectory, 0777, true);
         }
@@ -31,13 +31,14 @@ class SmallIconConverter extends ParseHandler implements ParseInterface
         foreach($ItemCsv->data as $id => $item)
         {
             // Skip shit with no name or icon
+            $item['Name']  = strip_tags($item['Name']);
             if (!$item['Name'] || !$item['Icon']) {
                 continue;
             }
 
             // build icon and hq icon input folder paths
-            $itemIcon = $this->getInputFolder() .'/icons/'. $this->iconize($item['Icon']);
-            $itemIconHq = $this->getInputFolder() .'/icons/'. $this->iconize($item['Icon'], true);
+            $itemIcon = $this->getInputFolder() .'/icon/'. $this->iconize($item['Icon']);
+            $itemIconHq = $this->getInputFolder() .'/icon/'. $this->iconize($item['Icon'], true);
 
             // if icon doesn't exist (not in the input folder icon list), then skip
             if (!file_exists($itemIcon)) {
@@ -62,17 +63,17 @@ class SmallIconConverter extends ParseHandler implements ParseInterface
             copy($itemIcon, $iconFileName);
 
             // if hq exists, copy that
-            if (file_exists($itemIconHq)) {
-                //console output
-                $this->output->writeln(
-                    sprintf(
-                        '- copy <info>%s</info> to <info>%s</info>', $itemIconHq, $itemIconHq
-                    )
-                );
+            //if (file_exists($itemIconHq)) {
+            //    //console output
+            //    $this->output->writeln(
+            //        sprintf(
+            //            '- copy <info>%s</info> to <info>%s</info>', $itemIconHq, $itemIconHq
+            //        )
+            //    );
 
-                // copy the input icon to the output filename
-                copy($itemIconHq, $iconFileNameHq);
-            }
+            //    // copy the input icon to the output filename
+            //    copy($itemIconHq, $iconFileNameHq);
+            //}
         }
     }
 
