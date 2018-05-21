@@ -6,6 +6,11 @@ class GeFormatter
 {
     public static function format($format, $data)
     {
+        // sort keys by their length so long ones are formatted before smaller ones
+        // this prevents keys such as "Job" affecting "ClassJobLevel"
+        $keys = array_map('strlen', array_keys($data));
+        array_multisort($keys, SORT_DESC, $data);
+
         // set format
         $format = str_ireplace(array_keys($data), $data, $format);
         $format = str_ireplace('    ', null, $format);
