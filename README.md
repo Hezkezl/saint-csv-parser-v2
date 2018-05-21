@@ -89,7 +89,7 @@ Loop through data:
   
 ```php  
 foreach ($itemCsv->data as $id => $row) {  
-    $this->output->write('Item Name: '. $row['Name']);
+    $this->io->write('Item Name: '. $row['Name']);
 }  
 ```  
   
