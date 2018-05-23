@@ -2,28 +2,24 @@
 
 namespace App\Parsers\XIVDB;
 
-use App\Parsers\CsvParseDataHandlerTrait;
 use App\Parsers\CsvParseTrait;
-use App\Parsers\ParseHandler;
 use App\Parsers\ParseInterface;
 
 /**
  * XIVDB:ActionDescriptions
  */
-class ActionDescriptions extends ParseHandler implements ParseInterface
+class ActionDescriptions implements ParseInterface
 {
     use CsvParseTrait;
-    use CsvParseDataHandlerTrait;
 
     public function parse()
     {
         // grab CSV files we want to use
         $ActionTransientCsv = $this->csv('ActionTransient');
-        $this->output->writeln(['','']);
 
         // loop through data
         foreach($ActionTransientCsv->data as $id => $desc) {
-            $this->output->writeln("Action: {$id}");
+            $this->io->text("Action: {$id}");
 
             // skip blank descriptions
             if (empty($desc['Description'])) {

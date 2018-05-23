@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Parsers\Example;
+namespace App\Parsers\XIVDB;
 
 use App\Parsers\CsvParseTrait;
 use App\Parsers\ParseInterface;
 
 /**
- * Example:ItemCategories
+ * php bin/console app:parse:csv XIVDB:WorldServers
  */
-class ItemCategories implements ParseInterface
+class WorldServers implements ParseInterface
 {
     use CsvParseTrait;
 
@@ -33,7 +33,7 @@ class ItemCategories implements ParseInterface
             $itemUiCategory = $ItemUiCategoryCsv->at($item['ItemUICategory']);
 
             // Save some data
-            $this->save('ItemDescriptions', [
+            $this->data[] = json_encode([
                 'id' => $item['id'],
                 'name' => $item['Name'],
                 'description' => $item['Description'],
