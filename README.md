@@ -36,9 +36,9 @@ This will generate the file `World.php` in the folder `src/Parser/Hello`. This i
 
 Following this principle you could do:
 
-- `php bin/console app:parse:create AwesomeProject AchievementPoints` 
-    - Filename: `src/Parser/AwesomeProject/AchievementPoints.php` 
-    - Command: `php bin/console app:parse:csv AwesomeProject:AchievementPoints`
+- `php bin/console app:parse:create`, follow the onscreen instructions, it will ask you for a project name and a parse name, for example:
+    - Project: AwesomeProject, Parser: AchievementPoints: `src/Parser/AwesomeProject/AchievementPoints.php` 
+        - Command: `php bin/console app:parse:csv AwesomeProject:AchievementPoints`
   
 You can test run your parser straight away by running:  
   
