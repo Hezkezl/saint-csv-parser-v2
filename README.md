@@ -21,24 +21,25 @@ To use this tool you need to write a CSV Parsing file. The concept works around 
   
 Start by creating a parser file, open up Command Prompt and `cd` into the repository, then run the command:  
   
-- `php bin/console app:parse:create Hello World`  
+- `php bin/console app:parse:create`  
 ```  
-$ php bin/console app:parse:create Hello World  
-  
-Creating Parse File  
-- Folder: Hello  
-- Filename: World  
-Generated file: /path/to/repo/src/Parsers/Hello/World.php  
-Run as command: php bin/console app:parse:csv Hello:World  
+$ php bin/console app:parse:create
+
+SaintCoinach Parse Creator
+==========================
+
+ What is your projects name? Eg: XIVDB:
+ > Hello
+
+ What would the parse be named? Eg: AchievementPoints:
+ > World
+
+
+ Generated file: /Users/josh.freeman/Misc/saint-csv-parser-v2/src/Parsers/Hello/World.php
+ Run as command: php bin/console app:parse:csv Hello:World
 ```  
   
 This will generate the file `World.php` in the folder `src/Parser/Hello`. This is where your code will live.
-
-Following this principle you could do:
-
-- `php bin/console app:parse:create`, follow the onscreen instructions, it will ask you for a project name and a parse name, for example:
-    - Project: AwesomeProject, Parser: AchievementPoints: `src/Parser/AwesomeProject/AchievementPoints.php` 
-        - Command: `php bin/console app:parse:csv AwesomeProject:AchievementPoints`
   
 You can test run your parser straight away by running:  
   
