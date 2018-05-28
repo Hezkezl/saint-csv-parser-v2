@@ -1,0 +1,2490 @@
+[
+    {
+        "id": 6541,
+        "name_en": "Message Book Stand"
+    },
+    {
+        "id": 17470,
+        "name_en": "Inferno Jacket"
+    },
+    {
+        "id": 20640,
+        "name_en": "Ballroom Etiquette - Intellectual Diversions"
+    },
+    {
+        "id": 21838,
+        "name_en": "Sake Set"
+    },
+    {
+        "id": 21902,
+        "name_en": "Red Hare Horn"
+    },
+    {
+        "id": 21915,
+        "name_en": "Wind-up Magnai"
+    },
+    {
+        "id": 22367,
+        "name_en": "Faerie Tale Prince's Circlet"
+    },
+    {
+        "id": 22368,
+        "name_en": "Faerie Tale Prince's Vest"
+    },
+    {
+        "id": 22369,
+        "name_en": "Faerie Tale Prince's Gloves"
+    },
+    {
+        "id": 22370,
+        "name_en": "Faerie Tale Prince's Slops"
+    },
+    {
+        "id": 22371,
+        "name_en": "Faerie Tale Prince's Boots"
+    },
+    {
+        "id": 22372,
+        "name_en": "Faerie Tale Princess's Tiara"
+    },
+    {
+        "id": 22373,
+        "name_en": "Faerie Tale Princess's Dress"
+    },
+    {
+        "id": 22374,
+        "name_en": "Faerie Tale Princess's Gloves"
+    },
+    {
+        "id": 22375,
+        "name_en": "Faerie Tale Princess's Long Skirt"
+    },
+    {
+        "id": 22376,
+        "name_en": "Faerie Tale Princess's Heels"
+    },
+    {
+        "id": 22460,
+        "name_en": "Ballroom Etiquette - Secrets of the Fist"
+    },
+    {
+        "id": 22520,
+        "name_en": "Dodo Message Book Stand"
+    },
+    {
+        "id": 22521,
+        "name_en": "Crystal Tower Striker"
+    },
+    {
+        "id": 22525,
+        "name_en": "Namazu Koban"
+    },
+    {
+        "id": 22526,
+        "name_en": "Whale-class Bow"
+    },
+    {
+        "id": 22527,
+        "name_en": "Whale-class Bridge"
+    },
+    {
+        "id": 22528,
+        "name_en": "Whale-class Pressure Hull"
+    },
+    {
+        "id": 22529,
+        "name_en": "Whale-class Stern"
+    },
+    {
+        "id": 22530,
+        "name_en": "Solid-brick Interior Wall"
+    },
+    {
+        "id": 22531,
+        "name_en": "Unfinished Wood Flooring"
+    },
+    {
+        "id": 22533,
+        "name_en": "Odder Otter Cottage Walls"
+    },
+    {
+        "id": 22534,
+        "name_en": "Odder Otter House Walls"
+    },
+    {
+        "id": 22535,
+        "name_en": "Odder Otter Mansion Walls"
+    },
+    {
+        "id": 22536,
+        "name_en": "Merry Mog Bed"
+    },
+    {
+        "id": 22537,
+        "name_en": "Mellow Mog Lamp"
+    },
+    {
+        "id": 22543,
+        "name_en": "Sewing Baskets"
+    },
+    {
+        "id": 22544,
+        "name_en": "Season Seven Lone Wolf Trophy"
+    },
+    {
+        "id": 22545,
+        "name_en": "Stuffed Tsukuyomi"
+    },
+    {
+        "id": 22546,
+        "name_en": "Falcons Banner"
+    },
+    {
+        "id": 22547,
+        "name_en": "Ravens Banner"
+    },
+    {
+        "id": 22548,
+        "name_en": "Disordered Wardrobe"
+    },
+    {
+        "id": 22549,
+        "name_en": "Laundry Basket"
+    },
+    {
+        "id": 22550,
+        "name_en": "Leather Bags"
+    },
+    {
+        "id": 22551,
+        "name_en": "Cozy Leather Shoes"
+    },
+    {
+        "id": 22552,
+        "name_en": "Assorted Candles"
+    },
+    {
+        "id": 22553,
+        "name_en": "Glade Bachelor's Chest"
+    },
+    {
+        "id": 22554,
+        "name_en": "Portable Stepladder"
+    },
+    {
+        "id": 22555,
+        "name_en": "Glade Partition Door"
+    },
+    {
+        "id": 22556,
+        "name_en": "Oasis Partition Door"
+    },
+    {
+        "id": 22557,
+        "name_en": "Wine Glass"
+    },
+    {
+        "id": 22558,
+        "name_en": "Bar Counter"
+    },
+    {
+        "id": 22559,
+        "name_en": "Bar Stool"
+    },
+    {
+        "id": 22560,
+        "name_en": "Trouser Hanger"
+    },
+    {
+        "id": 22562,
+        "name_en": "Sumptuous Dimension Castle Vase"
+    },
+    {
+        "id": 22563,
+        "name_en": "Imposing Dimension Castle Vase"
+    },
+    {
+        "id": 22564,
+        "name_en": "Stuffed Namazu"
+    },
+    {
+        "id": 22567,
+        "name_en": "Basket of Steamed Buns"
+    },
+    {
+        "id": 22568,
+        "name_en": "Miniature Iloh"
+    },
+    {
+        "id": 22569,
+        "name_en": "Southern Kitchen"
+    },
+    {
+        "id": 22570,
+        "name_en": "Hingan Cleaning Supplies"
+    },
+    {
+        "id": 22572,
+        "name_en": "Fool's Threshold"
+    },
+    {
+        "id": 22573,
+        "name_en": "Ame-zaiku Set"
+    },
+    {
+        "id": 22574,
+        "name_en": "Jellyfish Lamp"
+    },
+    {
+        "id": 22575,
+        "name_en": "Curry Plate"
+    },
+    {
+        "id": 22576,
+        "name_en": "Mosquito Moogle"
+    },
+    {
+        "id": 22577,
+        "name_en": "Monster Toss Machine"
+    },
+    {
+        "id": 22578,
+        "name_en": "Cuff-a-Cur Machine"
+    },
+    {
+        "id": 22580,
+        "name_en": "Picnic Set"
+    },
+    {
+        "id": 22584,
+        "name_en": "Namazu Effigy"
+    },
+    {
+        "id": 22585,
+        "name_en": "Namazu Material Supplier Permit"
+    },
+    {
+        "id": 22586,
+        "name_en": "Namazu Junkmonger Permit"
+    },
+    {
+        "id": 22587,
+        "name_en": "Namazu Mender Permit"
+    },
+    {
+        "id": 22588,
+        "name_en": "Namazu Manservant Permit"
+    },
+    {
+        "id": 22589,
+        "name_en": "Dahlia Bulbs"
+    },
+    {
+        "id": 22590,
+        "name_en": "Red Dahlias"
+    },
+    {
+        "id": 22591,
+        "name_en": "Blue Dahlias"
+    },
+    {
+        "id": 22592,
+        "name_en": "Yellow Dahlias"
+    },
+    {
+        "id": 22593,
+        "name_en": "Green Dahlias"
+    },
+    {
+        "id": 22594,
+        "name_en": "Orange Dahlias"
+    },
+    {
+        "id": 22595,
+        "name_en": "Purple Dahlias"
+    },
+    {
+        "id": 22596,
+        "name_en": "White Dahlias"
+    },
+    {
+        "id": 22597,
+        "name_en": "Black Dahlias"
+    },
+    {
+        "id": 22598,
+        "name_en": "Rainbow Dahlias"
+    },
+    {
+        "id": 22616,
+        "name_en": "Red Malachite"
+    },
+    {
+        "id": 22617,
+        "name_en": "Skystone"
+    },
+    {
+        "id": 22618,
+        "name_en": "Dawn Dust"
+    },
+    {
+        "id": 22619,
+        "name_en": "Mondite"
+    },
+    {
+        "id": 22620,
+        "name_en": "Lava Rock"
+    },
+    {
+        "id": 22621,
+        "name_en": "Steppe Mica"
+    },
+    {
+        "id": 22622,
+        "name_en": "Steppe Rock Salt"
+    },
+    {
+        "id": 22623,
+        "name_en": "Steppe Coal"
+    },
+    {
+        "id": 22624,
+        "name_en": "Pure White Silex"
+    },
+    {
+        "id": 22625,
+        "name_en": "Steppe Copper Ore"
+    },
+    {
+        "id": 22626,
+        "name_en": "Steppe Geode"
+    },
+    {
+        "id": 22627,
+        "name_en": "Raw Azimite"
+    },
+    {
+        "id": 22628,
+        "name_en": "Steppe Clay"
+    },
+    {
+        "id": 22629,
+        "name_en": "Steppe Whetstone"
+    },
+    {
+        "id": 22630,
+        "name_en": "Steppe Soapstone"
+    },
+    {
+        "id": 22631,
+        "name_en": "Steppe Spring Water"
+    },
+    {
+        "id": 22632,
+        "name_en": "Steppe Iron Ore"
+    },
+    {
+        "id": 22633,
+        "name_en": "Flat Stone"
+    },
+    {
+        "id": 22634,
+        "name_en": "Steppe Cinnabar"
+    },
+    {
+        "id": 22635,
+        "name_en": "Steppe Jade"
+    },
+    {
+        "id": 22636,
+        "name_en": "Crystal-clear Rock Salt"
+    },
+    {
+        "id": 22637,
+        "name_en": "Ultramarine Ore"
+    },
+    {
+        "id": 22638,
+        "name_en": "Steppe Slab"
+    },
+    {
+        "id": 22639,
+        "name_en": "Steppe Mudstone Whetstone"
+    },
+    {
+        "id": 22640,
+        "name_en": "Steppe Obsidian"
+    },
+    {
+        "id": 22641,
+        "name_en": "Vibrant Steppe Glowstone"
+    },
+    {
+        "id": 22642,
+        "name_en": "Azim Strawberry"
+    },
+    {
+        "id": 22643,
+        "name_en": "Scarlet Flax"
+    },
+    {
+        "id": 22644,
+        "name_en": "Duskglow Cocoon"
+    },
+    {
+        "id": 22645,
+        "name_en": "Straight Shoot"
+    },
+    {
+        "id": 22646,
+        "name_en": "Steppe Sedge"
+    },
+    {
+        "id": 22647,
+        "name_en": "Steppe Safflower"
+    },
+    {
+        "id": 22648,
+        "name_en": "Verdant Branch"
+    },
+    {
+        "id": 22649,
+        "name_en": "Dry Branch"
+    },
+    {
+        "id": 22650,
+        "name_en": "Steppe Rattan Lumber"
+    },
+    {
+        "id": 22651,
+        "name_en": "Steppe Vine"
+    },
+    {
+        "id": 22652,
+        "name_en": "Yol Feather"
+    },
+    {
+        "id": 22653,
+        "name_en": "Steppe Candyfruit"
+    },
+    {
+        "id": 22654,
+        "name_en": "Edible Bud"
+    },
+    {
+        "id": 22655,
+        "name_en": "Grazing Grass"
+    },
+    {
+        "id": 22656,
+        "name_en": "Steppe Onion"
+    },
+    {
+        "id": 22657,
+        "name_en": "Fava Beans"
+    },
+    {
+        "id": 22658,
+        "name_en": "Steppe Hay"
+    },
+    {
+        "id": 22659,
+        "name_en": "Steppe Tea Leaves"
+    },
+    {
+        "id": 22660,
+        "name_en": "Steppe Wildgrass"
+    },
+    {
+        "id": 22661,
+        "name_en": "Steppe Radish"
+    },
+    {
+        "id": 22662,
+        "name_en": "Fragrant Steppe Herb"
+    },
+    {
+        "id": 22663,
+        "name_en": "Fibrous Melon"
+    },
+    {
+        "id": 22664,
+        "name_en": "Sturdy Vine"
+    },
+    {
+        "id": 22665,
+        "name_en": "Ripe Steppe Fruit"
+    },
+    {
+        "id": 22666,
+        "name_en": "Steppe Flatweed"
+    },
+    {
+        "id": 22667,
+        "name_en": "Fragrant Steppe Wildgrass"
+    },
+    {
+        "id": 22668,
+        "name_en": "Sunshell"
+    },
+    {
+        "id": 22669,
+        "name_en": "Steppe Barramundi"
+    },
+    {
+        "id": 22670,
+        "name_en": "Water Fan"
+    },
+    {
+        "id": 22671,
+        "name_en": "Arrowhead Snail"
+    },
+    {
+        "id": 22672,
+        "name_en": "Invisible Catfish"
+    },
+    {
+        "id": 22673,
+        "name_en": "Khaal Crab"
+    },
+    {
+        "id": 22674,
+        "name_en": "Fish Offering"
+    },
+    {
+        "id": 22675,
+        "name_en": "Fatty Eel"
+    },
+    {
+        "id": 22676,
+        "name_en": "Crimson Copperfish"
+    },
+    {
+        "id": 22677,
+        "name_en": "Zagas A'khaal"
+    },
+    {
+        "id": 22678,
+        "name_en": "Gigas Catfish"
+    },
+    {
+        "id": 22679,
+        "name_en": "Rainbow Killifish"
+    },
+    {
+        "id": 22680,
+        "name_en": "Steppe Sweetfish"
+    },
+    {
+        "id": 22681,
+        "name_en": "Greasy Strangler"
+    },
+    {
+        "id": 22682,
+        "name_en": "Grass Shrimp"
+    },
+    {
+        "id": 22683,
+        "name_en": "Flagon Clam"
+    },
+    {
+        "id": 22684,
+        "name_en": "Moon Oyster"
+    },
+    {
+        "id": 22685,
+        "name_en": "Leatherscale"
+    },
+    {
+        "id": 22686,
+        "name_en": "Dusk Scallop"
+    },
+    {
+        "id": 22687,
+        "name_en": "Spikefish"
+    },
+    {
+        "id": 22688,
+        "name_en": "Nhaama's Claw"
+    },
+    {
+        "id": 22689,
+        "name_en": "Spearhead Snail"
+    },
+    {
+        "id": 22690,
+        "name_en": "Granite Hardscale"
+    },
+    {
+        "id": 22691,
+        "name_en": "Plump Trout"
+    },
+    {
+        "id": 22692,
+        "name_en": "Appleseed"
+    },
+    {
+        "id": 22693,
+        "name_en": "Crawling Cog"
+    },
+    {
+        "id": 22694,
+        "name_en": "Happi Component Materials"
+    },
+    {
+        "id": 22695,
+        "name_en": "Altar Component Materials"
+    },
+    {
+        "id": 22696,
+        "name_en": "Mikoshi Frippery Materials"
+    },
+    {
+        "id": 22697,
+        "name_en": "Ceremonial Bow Component Materials"
+    },
+    {
+        "id": 22698,
+        "name_en": "Effigy Component Materials"
+    },
+    {
+        "id": 22699,
+        "name_en": "Finery Component Materials"
+    },
+    {
+        "id": 22700,
+        "name_en": "Ritual Component Materials"
+    },
+    {
+        "id": 22701,
+        "name_en": "Brazier Component Materials"
+    },
+    {
+        "id": 22702,
+        "name_en": "Uchiwa Component Materials"
+    },
+    {
+        "id": 22703,
+        "name_en": "Trinket Component Materials"
+    },
+    {
+        "id": 22704,
+        "name_en": "Catfish Lure Component Materials"
+    },
+    {
+        "id": 22705,
+        "name_en": "Azim Steppe Souvenir Component Materials"
+    },
+    {
+        "id": 22706,
+        "name_en": "Hingan Ritual Paraphernalia Materials"
+    },
+    {
+        "id": 22707,
+        "name_en": "Dzo Shear Component Materials"
+    },
+    {
+        "id": 22708,
+        "name_en": "Buuz Cooking Paraphernalia Materials"
+    },
+    {
+        "id": 22709,
+        "name_en": "Mol Tea Ceremony Paraphernalia Materials"
+    },
+    {
+        "id": 22710,
+        "name_en": "Stable Supply Materials"
+    },
+    {
+        "id": 22711,
+        "name_en": "Drum Part Materials"
+    },
+    {
+        "id": 22712,
+        "name_en": "Confetti-making Tool Materials"
+    },
+    {
+        "id": 22713,
+        "name_en": "Substitute Offering Materials"
+    },
+    {
+        "id": 22714,
+        "name_en": "Steeping Accessory Materials"
+    },
+    {
+        "id": 22715,
+        "name_en": "Pristine Fruit Figurine Materials"
+    },
+    {
+        "id": 22716,
+        "name_en": "Land Diving Gear Materials"
+    },
+    {
+        "id": 22717,
+        "name_en": "Culinary Knife Component Materials"
+    },
+    {
+        "id": 22718,
+        "name_en": "Generous Gift Materials"
+    },
+    {
+        "id": 22719,
+        "name_en": "Korrigan Doll Materials"
+    },
+    {
+        "id": 22720,
+        "name_en": "Happi Components"
+    },
+    {
+        "id": 22721,
+        "name_en": "Altar Components"
+    },
+    {
+        "id": 22722,
+        "name_en": "Mikoshi Frippery"
+    },
+    {
+        "id": 22723,
+        "name_en": "Ceremonial Bow Components"
+    },
+    {
+        "id": 22724,
+        "name_en": "Effigy Components"
+    },
+    {
+        "id": 22725,
+        "name_en": "Finery Components"
+    },
+    {
+        "id": 22726,
+        "name_en": "Ritual Implement Components"
+    },
+    {
+        "id": 22727,
+        "name_en": "Brazier Components"
+    },
+    {
+        "id": 22728,
+        "name_en": "Uchiwa Components"
+    },
+    {
+        "id": 22729,
+        "name_en": "Trinket Components"
+    },
+    {
+        "id": 22730,
+        "name_en": "Catfish Lure Components"
+    },
+    {
+        "id": 22731,
+        "name_en": "Azim Steppe Souvenir Components"
+    },
+    {
+        "id": 22732,
+        "name_en": "Hingan Ritual Paraphernalia"
+    },
+    {
+        "id": 22733,
+        "name_en": "Dzo Shear Components"
+    },
+    {
+        "id": 22734,
+        "name_en": "Buuz Cooking Paraphernalia"
+    },
+    {
+        "id": 22735,
+        "name_en": "Mol Tea Ceremony Paraphernalia"
+    },
+    {
+        "id": 22736,
+        "name_en": "Stable Supplies"
+    },
+    {
+        "id": 22737,
+        "name_en": "Drum Parts"
+    },
+    {
+        "id": 22738,
+        "name_en": "Confetti-making Tools"
+    },
+    {
+        "id": 22739,
+        "name_en": "Substitute Offering"
+    },
+    {
+        "id": 22740,
+        "name_en": "Steeping Accessory"
+    },
+    {
+        "id": 22741,
+        "name_en": "Pristine Fruit Figurine"
+    },
+    {
+        "id": 22742,
+        "name_en": "Land Diving Gear"
+    },
+    {
+        "id": 22743,
+        "name_en": "Culinary Knife Component"
+    },
+    {
+        "id": 22744,
+        "name_en": "Generous Gift"
+    },
+    {
+        "id": 22745,
+        "name_en": "Korrigan Doll"
+    },
+    {
+        "id": 22748,
+        "name_en": "Bonewicca Protector's Helm"
+    },
+    {
+        "id": 22749,
+        "name_en": "Bonewicca Protector's Coat"
+    },
+    {
+        "id": 22750,
+        "name_en": "Bonewicca Protector's Gauntlets"
+    },
+    {
+        "id": 22751,
+        "name_en": "Bonewicca Protector's Trousers"
+    },
+    {
+        "id": 22752,
+        "name_en": "Bonewicca Protector's Sabatons"
+    },
+    {
+        "id": 22753,
+        "name_en": "Bonewicca Protector's Belt"
+    },
+    {
+        "id": 22754,
+        "name_en": "Bonewicca Skinner's Visor"
+    },
+    {
+        "id": 22755,
+        "name_en": "Bonewicca Skinner's Mail"
+    },
+    {
+        "id": 22756,
+        "name_en": "Bonewicca Skinner's Gloves"
+    },
+    {
+        "id": 22757,
+        "name_en": "Bonewicca Skinner's Trousers"
+    },
+    {
+        "id": 22758,
+        "name_en": "Bonewicca Skinner's Sabatons"
+    },
+    {
+        "id": 22759,
+        "name_en": "Bonewicca Skinner's Belt"
+    },
+    {
+        "id": 22760,
+        "name_en": "Bonewicca Wildling's Helm"
+    },
+    {
+        "id": 22761,
+        "name_en": "Bonewicca Wildling's Jacket"
+    },
+    {
+        "id": 22762,
+        "name_en": "Bonewicca Wildling's Gauntlets"
+    },
+    {
+        "id": 22763,
+        "name_en": "Bonewicca Wildling's Sarouel"
+    },
+    {
+        "id": 22764,
+        "name_en": "Bonewicca Wildling's Greaves"
+    },
+    {
+        "id": 22765,
+        "name_en": "Bonewicca Wildling's Belt"
+    },
+    {
+        "id": 22766,
+        "name_en": "Bonewicca Tracker's Helm"
+    },
+    {
+        "id": 22767,
+        "name_en": "Bonewicca Tracker's Coat"
+    },
+    {
+        "id": 22768,
+        "name_en": "Bonewicca Tracker's Gauntlets"
+    },
+    {
+        "id": 22769,
+        "name_en": "Bonewicca Tracker's Trousers"
+    },
+    {
+        "id": 22770,
+        "name_en": "Bonewicca Tracker's Sabatons"
+    },
+    {
+        "id": 22771,
+        "name_en": "Bonewicca Tracker's Belt"
+    },
+    {
+        "id": 22772,
+        "name_en": "Bonewicca Shadow's Visor"
+    },
+    {
+        "id": 22773,
+        "name_en": "Bonewicca Shadow's Chestpiece"
+    },
+    {
+        "id": 22774,
+        "name_en": "Bonewicca Shadow's Gauntlets"
+    },
+    {
+        "id": 22775,
+        "name_en": "Bonewicca Shadow's Trousers"
+    },
+    {
+        "id": 22776,
+        "name_en": "Bonewicca Shadow's Sabatons"
+    },
+    {
+        "id": 22777,
+        "name_en": "Bonewicca Shadow's Belt"
+    },
+    {
+        "id": 22778,
+        "name_en": "Bonewicca Soother's Mask"
+    },
+    {
+        "id": 22779,
+        "name_en": "Bonewicca Soother's Chestpiece"
+    },
+    {
+        "id": 22780,
+        "name_en": "Bonewicca Soother's Gauntlets"
+    },
+    {
+        "id": 22781,
+        "name_en": "Bonewicca Soother's Trousers"
+    },
+    {
+        "id": 22782,
+        "name_en": "Bonewicca Soother's Sabatons"
+    },
+    {
+        "id": 22783,
+        "name_en": "Bonewicca Soother's Belt"
+    },
+    {
+        "id": 22784,
+        "name_en": "Bonewicca Whisperer's Mask"
+    },
+    {
+        "id": 22785,
+        "name_en": "Bonewicca Whisperer's Jacket"
+    },
+    {
+        "id": 22786,
+        "name_en": "Bonewicca Whisperer's Gauntlets"
+    },
+    {
+        "id": 22787,
+        "name_en": "Bonewicca Whisperer's Sarouel"
+    },
+    {
+        "id": 22788,
+        "name_en": "Bonewicca Whisperer's Greaves"
+    },
+    {
+        "id": 22789,
+        "name_en": "Bonewicca Whisperer's Belt"
+    },
+    {
+        "id": 22790,
+        "name_en": "Bonewicca Earring of Fending"
+    },
+    {
+        "id": 22791,
+        "name_en": "Bonewicca Earring of Slaying"
+    },
+    {
+        "id": 22792,
+        "name_en": "Bonewicca Earring of Aiming"
+    },
+    {
+        "id": 22793,
+        "name_en": "Bonewicca Earring of Healing"
+    },
+    {
+        "id": 22794,
+        "name_en": "Bonewicca Earring of Casting"
+    },
+    {
+        "id": 22795,
+        "name_en": "Bonewicca Necklace of Fending"
+    },
+    {
+        "id": 22796,
+        "name_en": "Bonewicca Necklace of Slaying"
+    },
+    {
+        "id": 22797,
+        "name_en": "Bonewicca Necklace of Aiming"
+    },
+    {
+        "id": 22798,
+        "name_en": "Bonewicca Necklace of Healing"
+    },
+    {
+        "id": 22799,
+        "name_en": "Bonewicca Necklace of Casting"
+    },
+    {
+        "id": 22800,
+        "name_en": "Bonewicca Bangle of Fending"
+    },
+    {
+        "id": 22801,
+        "name_en": "Bonewicca Bangle of Slaying"
+    },
+    {
+        "id": 22802,
+        "name_en": "Bonewicca Bangle of Aiming"
+    },
+    {
+        "id": 22803,
+        "name_en": "Bonewicca Bangle of Healing"
+    },
+    {
+        "id": 22804,
+        "name_en": "Bonewicca Bangle of Casting"
+    },
+    {
+        "id": 22805,
+        "name_en": "Bonewicca Ring of Fending"
+    },
+    {
+        "id": 22806,
+        "name_en": "Bonewicca Ring of Slaying"
+    },
+    {
+        "id": 22807,
+        "name_en": "Bonewicca Ring of Aiming"
+    },
+    {
+        "id": 22808,
+        "name_en": "Bonewicca Ring of Healing"
+    },
+    {
+        "id": 22809,
+        "name_en": "Bonewicca Ring of Casting"
+    },
+    {
+        "id": 22810,
+        "name_en": "Ivalician Ark Knight's Helm"
+    },
+    {
+        "id": 22811,
+        "name_en": "Ivalician Ark Knight's Surcoat"
+    },
+    {
+        "id": 22812,
+        "name_en": "Ivalician Ark Knight's Gauntlets"
+    },
+    {
+        "id": 22813,
+        "name_en": "Ivalician Ark Knight's Bottoms"
+    },
+    {
+        "id": 22814,
+        "name_en": "Ivalician Ark Knight's Greaves"
+    },
+    {
+        "id": 22815,
+        "name_en": "Ivalician Ark Knight's Belt"
+    },
+    {
+        "id": 22816,
+        "name_en": "Ivalician Uhlan's Bandana"
+    },
+    {
+        "id": 22817,
+        "name_en": "Ivalician Uhlan's Jacket"
+    },
+    {
+        "id": 22818,
+        "name_en": "Ivalician Uhlan's Fingerless Gloves"
+    },
+    {
+        "id": 22819,
+        "name_en": "Ivalician Uhlan's Trousers"
+    },
+    {
+        "id": 22820,
+        "name_en": "Ivalician Uhlan's Greaves"
+    },
+    {
+        "id": 22821,
+        "name_en": "Ivalician Uhlan's Belt"
+    },
+    {
+        "id": 22822,
+        "name_en": "Ivalician Shikari's Bandana"
+    },
+    {
+        "id": 22823,
+        "name_en": "Ivalician Shikari's Jacket"
+    },
+    {
+        "id": 22824,
+        "name_en": "Ivalician Shikari's Fingerless Gloves"
+    },
+    {
+        "id": 22825,
+        "name_en": "Ivalician Shikari's Trousers"
+    },
+    {
+        "id": 22826,
+        "name_en": "Ivalician Shikari's Greaves"
+    },
+    {
+        "id": 22827,
+        "name_en": "Ivalician Shikari's Belt"
+    },
+    {
+        "id": 22828,
+        "name_en": "Ivalician Archer's Headband"
+    },
+    {
+        "id": 22829,
+        "name_en": "Ivalician Archer's Jacket"
+    },
+    {
+        "id": 22830,
+        "name_en": "Ivalician Archer's Gloves"
+    },
+    {
+        "id": 22831,
+        "name_en": "Ivalician Archer's Bottoms"
+    },
+    {
+        "id": 22832,
+        "name_en": "Ivalician Archer's Boots"
+    },
+    {
+        "id": 22833,
+        "name_en": "Ivalician Archer's Belt"
+    },
+    {
+        "id": 22834,
+        "name_en": "Ivalician Thief's Headband"
+    },
+    {
+        "id": 22835,
+        "name_en": "Ivalician Thief's Jacket"
+    },
+    {
+        "id": 22836,
+        "name_en": "Ivalician Thief's Gloves"
+    },
+    {
+        "id": 22837,
+        "name_en": "Ivalician Thief's Bottoms"
+    },
+    {
+        "id": 22838,
+        "name_en": "Ivalician Thief's Boots"
+    },
+    {
+        "id": 22839,
+        "name_en": "Ivalician Thief's Belt"
+    },
+    {
+        "id": 22840,
+        "name_en": "Ivalician Chemist's Monocle"
+    },
+    {
+        "id": 22841,
+        "name_en": "Ivalician Chemist's Robe"
+    },
+    {
+        "id": 22842,
+        "name_en": "Ivalician Chemist's Gloves"
+    },
+    {
+        "id": 22843,
+        "name_en": "Ivalician Chemist's Bottoms"
+    },
+    {
+        "id": 22844,
+        "name_en": "Ivalician Chemist's Shoes"
+    },
+    {
+        "id": 22845,
+        "name_en": "Ivalician Chemist's Belt"
+    },
+    {
+        "id": 22846,
+        "name_en": "Ivalician Arithmetician's Monocle"
+    },
+    {
+        "id": 22847,
+        "name_en": "Ivalician Arithmetician's Robe"
+    },
+    {
+        "id": 22848,
+        "name_en": "Ivalician Arithmetician's Gloves"
+    },
+    {
+        "id": 22849,
+        "name_en": "Ivalician Arithmetician's Bottoms"
+    },
+    {
+        "id": 22850,
+        "name_en": "Ivalician Arithmetician's Shoes"
+    },
+    {
+        "id": 22851,
+        "name_en": "Ivalician Arithmetician's Belt"
+    },
+    {
+        "id": 22852,
+        "name_en": "Tsukuyomi's Longsword"
+    },
+    {
+        "id": 22853,
+        "name_en": "Tsukuyomi's Crescents"
+    },
+    {
+        "id": 22854,
+        "name_en": "Tsukuyomi's Greataxe"
+    },
+    {
+        "id": 22855,
+        "name_en": "Tsukuyomi's Lance"
+    },
+    {
+        "id": 22856,
+        "name_en": "Tsukuyomi's Greatbow"
+    },
+    {
+        "id": 22857,
+        "name_en": "Tsukuyomi's Kunai"
+    },
+    {
+        "id": 22858,
+        "name_en": "Tsukuyomi's Odachi"
+    },
+    {
+        "id": 22859,
+        "name_en": "Tsukuyomi's Revolver"
+    },
+    {
+        "id": 22860,
+        "name_en": "Tsukuyomi's Cane"
+    },
+    {
+        "id": 22861,
+        "name_en": "Tsukuyomi's Rod"
+    },
+    {
+        "id": 22862,
+        "name_en": "Tsukuyomi's Grimoire"
+    },
+    {
+        "id": 22863,
+        "name_en": "Tsukuyomi's Codex"
+    },
+    {
+        "id": 22864,
+        "name_en": "Tsukuyomi's Ephemeris"
+    },
+    {
+        "id": 22865,
+        "name_en": "Tsukuyomi's Chokuto"
+    },
+    {
+        "id": 22866,
+        "name_en": "Tsukuyomi's Rapier"
+    },
+    {
+        "id": 22867,
+        "name_en": "Tsukuyomi's Shield"
+    },
+    {
+        "id": 22884,
+        "name_en": "Nightsteel Saw"
+    },
+    {
+        "id": 22885,
+        "name_en": "Nightsteel Cross-pein Hammer"
+    },
+    {
+        "id": 22886,
+        "name_en": "Nightsteel Raising Hammer"
+    },
+    {
+        "id": 22887,
+        "name_en": "Nightsteel Lapidary Hammer"
+    },
+    {
+        "id": 22888,
+        "name_en": "Nightsteel Round Knife"
+    },
+    {
+        "id": 22889,
+        "name_en": "Silvergrace Needle"
+    },
+    {
+        "id": 22890,
+        "name_en": "Nightsteel Alembic"
+    },
+    {
+        "id": 22891,
+        "name_en": "Nightsteel Frypan"
+    },
+    {
+        "id": 22892,
+        "name_en": "Nightsteel Pickaxe"
+    },
+    {
+        "id": 22893,
+        "name_en": "Nightsteel Hatchet"
+    },
+    {
+        "id": 22894,
+        "name_en": "Black Willow Fishing Rod"
+    },
+    {
+        "id": 22895,
+        "name_en": "Nightsteel Claw Hammer"
+    },
+    {
+        "id": 22896,
+        "name_en": "Nightsteel File"
+    },
+    {
+        "id": 22897,
+        "name_en": "Pair Of Nightsteel Pliers"
+    },
+    {
+        "id": 22898,
+        "name_en": "Silvergrace Grinding Wheel"
+    },
+    {
+        "id": 22899,
+        "name_en": "Nightsteel Awl"
+    },
+    {
+        "id": 22900,
+        "name_en": "Black Willow Spinning Wheel"
+    },
+    {
+        "id": 22901,
+        "name_en": "Nightsteel Mortar"
+    },
+    {
+        "id": 22902,
+        "name_en": "Nightsteel Culinary Knife"
+    },
+    {
+        "id": 22903,
+        "name_en": "Nightsteel Sledgehammer"
+    },
+    {
+        "id": 22904,
+        "name_en": "Nightsteel Scythe"
+    },
+    {
+        "id": 22905,
+        "name_en": "Onishi Kasa"
+    },
+    {
+        "id": 22906,
+        "name_en": "Onishi Dogi"
+    },
+    {
+        "id": 22907,
+        "name_en": "Onishi Tekko"
+    },
+    {
+        "id": 22908,
+        "name_en": "Onishi Momohiki"
+    },
+    {
+        "id": 22909,
+        "name_en": "Onishi Zori"
+    },
+    {
+        "id": 22910,
+        "name_en": "Yamashi Kasa"
+    },
+    {
+        "id": 22911,
+        "name_en": "Yamashi Dogi"
+    },
+    {
+        "id": 22912,
+        "name_en": "Yamashi Tekko"
+    },
+    {
+        "id": 22913,
+        "name_en": "Yamashi Momohiki"
+    },
+    {
+        "id": 22914,
+        "name_en": "Yamashi Zori"
+    },
+    {
+        "id": 22915,
+        "name_en": "Onishi Obi"
+    },
+    {
+        "id": 22916,
+        "name_en": "Silvergrace Earrings of Crafting"
+    },
+    {
+        "id": 22917,
+        "name_en": "Black Willow Necklace of Crafting"
+    },
+    {
+        "id": 22918,
+        "name_en": "Black Willow Armillae of Crafting"
+    },
+    {
+        "id": 22919,
+        "name_en": "Black Willow Ring of Crafting"
+    },
+    {
+        "id": 22920,
+        "name_en": "Yamashi Obi"
+    },
+    {
+        "id": 22921,
+        "name_en": "Silvergrace Earrings of Gathering"
+    },
+    {
+        "id": 22922,
+        "name_en": "Slothskin Necklace of Gathering"
+    },
+    {
+        "id": 22923,
+        "name_en": "Slothskin Armillae of Gathering"
+    },
+    {
+        "id": 22924,
+        "name_en": "Slothskin Ring of Gathering"
+    },
+    {
+        "id": 23001,
+        "name_en": "Quaintrelle's Ruffled Dress"
+    },
+    {
+        "id": 23002,
+        "name_en": "Quaintrelle's Ruffled Skirt"
+    },
+    {
+        "id": 23013,
+        "name_en": "Doman Liege's Dogi"
+    },
+    {
+        "id": 23014,
+        "name_en": "Doman Liege's Kote"
+    },
+    {
+        "id": 23015,
+        "name_en": "Doman Liege's Kyakui"
+    },
+    {
+        "id": 23016,
+        "name_en": "Doman Liege's Kyahan"
+    },
+    {
+        "id": 23017,
+        "name_en": "Endless Summer Glasses"
+    },
+    {
+        "id": 23018,
+        "name_en": "Endless Summer Top"
+    },
+    {
+        "id": 23019,
+        "name_en": "Endless Summer Bottom"
+    },
+    {
+        "id": 23020,
+        "name_en": "Lunar Kamuy Fife"
+    },
+    {
+        "id": 23022,
+        "name_en": "Mikoshi Flute"
+    },
+    {
+        "id": 23025,
+        "name_en": "Magitek Conveyor Identification Key"
+    },
+    {
+        "id": 23026,
+        "name_en": "Wind-up Tsukuyomi"
+    },
+    {
+        "id": 23030,
+        "name_en": "Wind-up Sadu"
+    },
+    {
+        "id": 23031,
+        "name_en": "Construct 8"
+    },
+    {
+        "id": 23032,
+        "name_en": "Monkey King"
+    },
+    {
+        "id": 23034,
+        "name_en": "Clockwork Lantern"
+    },
+    {
+        "id": 23035,
+        "name_en": "Attendee #777"
+    },
+    {
+        "id": 23036,
+        "name_en": "Wind-up Zhloe"
+    },
+    {
+        "id": 23037,
+        "name_en": "Lunar Barding"
+    },
+    {
+        "id": 23043,
+        "name_en": "Lunar Totem"
+    },
+    {
+        "id": 23047,
+        "name_en": "Qitian Dasheng Card"
+    },
+    {
+        "id": 23051,
+        "name_en": "Tsukuyomi Card"
+    },
+    {
+        "id": 23052,
+        "name_en": "Yiazmat Card"
+    },
+    {
+        "id": 23053,
+        "name_en": "Gosetsu Card"
+    },
+    {
+        "id": 23054,
+        "name_en": "Shrieker"
+    },
+    {
+        "id": 23055,
+        "name_en": "White Goldfish"
+    },
+    {
+        "id": 23056,
+        "name_en": "Firelight Goldfish"
+    },
+    {
+        "id": 23057,
+        "name_en": "Hookstealer"
+    },
+    {
+        "id": 23058,
+        "name_en": "Sapphire Fan"
+    },
+    {
+        "id": 23059,
+        "name_en": "The Archbishop"
+    },
+    {
+        "id": 23060,
+        "name_en": "Bondsplitter"
+    },
+    {
+        "id": 23061,
+        "name_en": "The Undecided"
+    },
+    {
+        "id": 23062,
+        "name_en": "Diamond-eye"
+    },
+    {
+        "id": 23063,
+        "name_en": "Rising Dragon"
+    },
+    {
+        "id": 23064,
+        "name_en": "The Gambler"
+    },
+    {
+        "id": 23065,
+        "name_en": "The Winter Queen"
+    },
+    {
+        "id": 23066,
+        "name_en": "Rakshasa"
+    },
+    {
+        "id": 23067,
+        "name_en": "Bokuden"
+    },
+    {
+        "id": 23068,
+        "name_en": "Hagoromo Koi"
+    },
+    {
+        "id": 23069,
+        "name_en": "The Word of God"
+    },
+    {
+        "id": 23070,
+        "name_en": "Yat Khan"
+    },
+    {
+        "id": 23071,
+        "name_en": "Curefish"
+    },
+    {
+        "id": 23072,
+        "name_en": "Lake Sphairai"
+    },
+    {
+        "id": 23073,
+        "name_en": "Warmscale Pleco"
+    },
+    {
+        "id": 23074,
+        "name_en": "Shirogane Clam"
+    },
+    {
+        "id": 23075,
+        "name_en": "Illuminati Mask"
+    },
+    {
+        "id": 23097,
+        "name_en": "Grand Chair"
+    },
+    {
+        "id": 23098,
+        "name_en": "Red Dahlia Corsage"
+    },
+    {
+        "id": 23099,
+        "name_en": "Blue Dahlia Corsage"
+    },
+    {
+        "id": 23100,
+        "name_en": "Yellow Dahlia Corsage"
+    },
+    {
+        "id": 23101,
+        "name_en": "Green Dahlia Corsage"
+    },
+    {
+        "id": 23102,
+        "name_en": "Orange Dahlia Corsage"
+    },
+    {
+        "id": 23103,
+        "name_en": "Purple Dahlia Corsage"
+    },
+    {
+        "id": 23104,
+        "name_en": "White Dahlia Corsage"
+    },
+    {
+        "id": 23105,
+        "name_en": "Black Dahlia Corsage"
+    },
+    {
+        "id": 23106,
+        "name_en": "Rainbow Dahlia Corsage"
+    },
+    {
+        "id": 23107,
+        "name_en": "Ornate Onishi Kasa"
+    },
+    {
+        "id": 23108,
+        "name_en": "Ornate Onishi Dogi"
+    },
+    {
+        "id": 23109,
+        "name_en": "Ornate Onishi Tekko"
+    },
+    {
+        "id": 23110,
+        "name_en": "Ornate Onishi Momohiki"
+    },
+    {
+        "id": 23111,
+        "name_en": "Ornate Onishi Zori"
+    },
+    {
+        "id": 23112,
+        "name_en": "Ornate Yamashi Kasa"
+    },
+    {
+        "id": 23113,
+        "name_en": "Ornate Yamashi Dogi"
+    },
+    {
+        "id": 23114,
+        "name_en": "Ornate Yamashi Tekko"
+    },
+    {
+        "id": 23115,
+        "name_en": "Ornate Yamashi Momohiki"
+    },
+    {
+        "id": 23116,
+        "name_en": "Ornate Yamashi Zori"
+    },
+    {
+        "id": 23117,
+        "name_en": "Season Seven Pack Wolf Voucher A"
+    },
+    {
+        "id": 23118,
+        "name_en": "Season Seven Pack Wolf Voucher B"
+    },
+    {
+        "id": 23119,
+        "name_en": "Season Seven Pack Wolf Voucher C"
+    },
+    {
+        "id": 23124,
+        "name_en": "Safeguard System Identification Key"
+    },
+    {
+        "id": 23143,
+        "name_en": "Gyr Abanian Remedies"
+    },
+    {
+        "id": 23144,
+        "name_en": "Anti-shark Harpoon"
+    },
+    {
+        "id": 23145,
+        "name_en": "Coerthan Cold-weather Gear"
+    },
+    {
+        "id": 23146,
+        "name_en": "Sui-no-Sato Special"
+    },
+    {
+        "id": 23147,
+        "name_en": "Cloud Pearl"
+    },
+    {
+        "id": 23148,
+        "name_en": "Pinch of Active Ingredients"
+    },
+    {
+        "id": 23149,
+        "name_en": "Harpoon Head"
+    },
+    {
+        "id": 23150,
+        "name_en": "Phial of Thermal Fluid"
+    },
+    {
+        "id": 23151,
+        "name_en": "Shisui Jewel"
+    },
+    {
+        "id": 23152,
+        "name_en": "Cloudkin Feather"
+    },
+    {
+        "id": 23153,
+        "name_en": "Gyr Abanian Remedy Components"
+    },
+    {
+        "id": 23154,
+        "name_en": "Harpoon Components"
+    },
+    {
+        "id": 23155,
+        "name_en": "Cold-weather Gear Components"
+    },
+    {
+        "id": 23156,
+        "name_en": "Sui-no-Sato Special Components"
+    },
+    {
+        "id": 23157,
+        "name_en": "Cloud Pearl Components"
+    },
+    {
+        "id": 23158,
+        "name_en": "Raw Medicinal Materials"
+    },
+    {
+        "id": 23159,
+        "name_en": "Raw Harpoon Materials"
+    },
+    {
+        "id": 23160,
+        "name_en": "Raw Cold-weather Gear Materials"
+    },
+    {
+        "id": 23161,
+        "name_en": "Raw Sui-no-Sato Special Materials"
+    },
+    {
+        "id": 23162,
+        "name_en": "Raw Cloud Pearl Materials"
+    },
+    {
+        "id": 23165,
+        "name_en": "Aetherpool Grip"
+    },
+    {
+        "id": 23167,
+        "name_en": "Super-Potion"
+    },
+    {
+        "id": 23168,
+        "name_en": "Super-Ether"
+    },
+    {
+        "id": 23169,
+        "name_en": "Dubious Dirt"
+    },
+    {
+        "id": 23170,
+        "name_en": "Odd Herb"
+    },
+    {
+        "id": 23171,
+        "name_en": "Fishy Fish"
+    },
+    {
+        "id": 23172,
+        "name_en": "Elixir Mixing Paraphernalia Materials"
+    },
+    {
+        "id": 23173,
+        "name_en": "Elixir Mixing Paraphernalia"
+    },
+    {
+        "id": 23174,
+        "name_en": "Gougan Coin"
+    },
+    {
+        "id": 23176,
+        "name_en": "Doyen's Clan Mark Log"
+    },
+    {
+        "id": 23178,
+        "name_en": "Stormsap"
+    },
+    {
+        "id": 23179,
+        "name_en": "Hawk's Eye"
+    },
+    {
+        "id": 23180,
+        "name_en": "Hardened Veteran Tree Sap"
+    },
+    {
+        "id": 23181,
+        "name_en": "Kingcraft Demimateria"
+    },
+    {
+        "id": 23182,
+        "name_en": "Duskglow Aethersand"
+    },
+    {
+        "id": 23183,
+        "name_en": "Hawk's Eye Sand"
+    },
+    {
+        "id": 23184,
+        "name_en": "Veteran Tree Sap"
+    },
+    {
+        "id": 23185,
+        "name_en": "Konpeito"
+    },
+    {
+        "id": 23186,
+        "name_en": "Banh Xeo"
+    },
+    {
+        "id": 23187,
+        "name_en": "Matcha"
+    },
+    {
+        "id": 23188,
+        "name_en": "Ema Datshi"
+    },
+    {
+        "id": 23189,
+        "name_en": "Millking's Claw Hammer"
+    },
+    {
+        "id": 23190,
+        "name_en": "Forgeking's File"
+    },
+    {
+        "id": 23191,
+        "name_en": "Hammerking's Pliers"
+    },
+    {
+        "id": 23192,
+        "name_en": "Gemking's Grinding Wheel"
+    },
+    {
+        "id": 23193,
+        "name_en": "Hideking's Awl"
+    },
+    {
+        "id": 23194,
+        "name_en": "Boltking's Spinning Wheel"
+    },
+    {
+        "id": 23195,
+        "name_en": "Cauldronking's Mortar"
+    },
+    {
+        "id": 23196,
+        "name_en": "Galleyking's Culinary Knife"
+    },
+    {
+        "id": 23197,
+        "name_en": "Mineking's Sledgehammer"
+    },
+    {
+        "id": 23198,
+        "name_en": "Fieldking's Scythe"
+    },
+    {
+        "id": 23199,
+        "name_en": "Handking's Tool Belt"
+    },
+    {
+        "id": 23200,
+        "name_en": "Handking's Earring"
+    },
+    {
+        "id": 23201,
+        "name_en": "Handking's Necklace"
+    },
+    {
+        "id": 23202,
+        "name_en": "Handking's Armillae"
+    },
+    {
+        "id": 23203,
+        "name_en": "Handking's Ring"
+    },
+    {
+        "id": 23204,
+        "name_en": "Landking's Survival Belt"
+    },
+    {
+        "id": 23205,
+        "name_en": "Landking's Earring"
+    },
+    {
+        "id": 23206,
+        "name_en": "Landking's Necklace"
+    },
+    {
+        "id": 23207,
+        "name_en": "Landking's Armillae"
+    },
+    {
+        "id": 23208,
+        "name_en": "Landking's Ring"
+    },
+    {
+        "id": 23209,
+        "name_en": "Celestial Kimono Remnant"
+    },
+    {
+        "id": 23210,
+        "name_en": "Resistance Token"
+    },
+    {
+        "id": 23220,
+        "name_en": "Yanxian Soil"
+    },
+    {
+        "id": 23221,
+        "name_en": "Yanxian Verbena"
+    },
+    {
+        "id": 23222,
+        "name_en": "Marine Wax Ester"
+    },
+    {
+        "id": 23226,
+        "name_en": "Endless Summer Sandals"
+    },
+    {
+        "id": 23230,
+        "name_en": "Journeyman Salvager Permit"
+    },
+    {
+        "id": 23231,
+        "name_en": "Augmented Nightsteel Sword"
+    },
+    {
+        "id": 23232,
+        "name_en": "Augmented Nightsteel Claws"
+    },
+    {
+        "id": 23233,
+        "name_en": "Augmented Nightsteel Battleaxe"
+    },
+    {
+        "id": 23234,
+        "name_en": "Augmented Black Willow Spear"
+    },
+    {
+        "id": 23235,
+        "name_en": "Augmented Black Willow Greatbow"
+    },
+    {
+        "id": 23236,
+        "name_en": "Augmented Nightsteel Daggers"
+    },
+    {
+        "id": 23237,
+        "name_en": "Augmented Nightsteel Greatsword"
+    },
+    {
+        "id": 23238,
+        "name_en": "Augmented Nightsteel Blunderbuss"
+    },
+    {
+        "id": 23239,
+        "name_en": "Augmented Black Willow Cane"
+    },
+    {
+        "id": 23240,
+        "name_en": "Augmented Silvergrace Rod"
+    },
+    {
+        "id": 23241,
+        "name_en": "Augmented Silvergrace Grimoire"
+    },
+    {
+        "id": 23242,
+        "name_en": "Augmented Silvergrace Codex"
+    },
+    {
+        "id": 23243,
+        "name_en": "Augmented Silvergrace Planisphere"
+    },
+    {
+        "id": 23244,
+        "name_en": "Augmented Nightsteel Katana"
+    },
+    {
+        "id": 23245,
+        "name_en": "Augmented Silvergrace Rapier"
+    },
+    {
+        "id": 23246,
+        "name_en": "Augmented Nightsteel Shield"
+    },
+    {
+        "id": 23247,
+        "name_en": "Augmented Nightsteel Helm of Fending"
+    },
+    {
+        "id": 23248,
+        "name_en": "Augmented Nightsteel Armor of Fending"
+    },
+    {
+        "id": 23249,
+        "name_en": "Augmented Nightsteel Gauntlets of Fending"
+    },
+    {
+        "id": 23250,
+        "name_en": "Augmented True Linen Skirt of Fending"
+    },
+    {
+        "id": 23251,
+        "name_en": "Augmented Nightsteel Sabatons of Fending"
+    },
+    {
+        "id": 23252,
+        "name_en": "Augmented Slothskin Belt of Fending"
+    },
+    {
+        "id": 23253,
+        "name_en": "Augmented Nightsteel Helm of Maiming"
+    },
+    {
+        "id": 23254,
+        "name_en": "Augmented Nightsteel Mail of Maiming"
+    },
+    {
+        "id": 23255,
+        "name_en": "Augmented Nightsteel Gauntlets of Maiming"
+    },
+    {
+        "id": 23256,
+        "name_en": "Augmented True Linen Breeches of Maiming"
+    },
+    {
+        "id": 23257,
+        "name_en": "Augmented Nightsteel Greaves of Maiming"
+    },
+    {
+        "id": 23258,
+        "name_en": "Augmented Slothskin Belt of Maiming"
+    },
+    {
+        "id": 23259,
+        "name_en": "Augmented Silvergrace Halfmask of Striking"
+    },
+    {
+        "id": 23260,
+        "name_en": "Augmented True Linen Coat of Striking"
+    },
+    {
+        "id": 23261,
+        "name_en": "Augmented True Linen Halfgloves of Striking"
+    },
+    {
+        "id": 23262,
+        "name_en": "Augmented True Linen Trousers of Striking"
+    },
+    {
+        "id": 23263,
+        "name_en": "Augmented Slothskin Boots of Striking"
+    },
+    {
+        "id": 23264,
+        "name_en": "Augmented Slothskin Belt of Striking"
+    },
+    {
+        "id": 23265,
+        "name_en": "Augmented True Linen Cap of Aiming"
+    },
+    {
+        "id": 23266,
+        "name_en": "Augmented True Linen Jacket of Aiming"
+    },
+    {
+        "id": 23267,
+        "name_en": "Augmented Slothskin Gloves of Aiming"
+    },
+    {
+        "id": 23268,
+        "name_en": "Augmented True Linen Breeches of Aiming"
+    },
+    {
+        "id": 23269,
+        "name_en": "Augmented Slothskin Boots of Aiming"
+    },
+    {
+        "id": 23270,
+        "name_en": "Augmented Slothskin Belt of Aiming"
+    },
+    {
+        "id": 23271,
+        "name_en": "Augmented True Linen Cap of Scouting"
+    },
+    {
+        "id": 23272,
+        "name_en": "Augmented True Linen Jacket of Scouting"
+    },
+    {
+        "id": 23273,
+        "name_en": "Augmented Slothskin Gloves of Scouting"
+    },
+    {
+        "id": 23274,
+        "name_en": "Augmented True Linen Breeches of Scouting"
+    },
+    {
+        "id": 23275,
+        "name_en": "Augmented Slothskin Thighboots of Scouting"
+    },
+    {
+        "id": 23276,
+        "name_en": "Augmented Slothskin Belt of Scouting"
+    },
+    {
+        "id": 23277,
+        "name_en": "Augmented True Linen Hat of Healing"
+    },
+    {
+        "id": 23278,
+        "name_en": "Augmented True Linen Robe of Healing"
+    },
+    {
+        "id": 23279,
+        "name_en": "Augmented True Linen Gloves of Healing"
+    },
+    {
+        "id": 23280,
+        "name_en": "Augmented True Linen Breeches of Healing"
+    },
+    {
+        "id": 23281,
+        "name_en": "Augmented Slothskin Boots of Healing"
+    },
+    {
+        "id": 23282,
+        "name_en": "Augmented Slothskin Belt of Healing"
+    },
+    {
+        "id": 23283,
+        "name_en": "Augmented True Linen Hat of Casting"
+    },
+    {
+        "id": 23284,
+        "name_en": "Augmented True Linen Robe of Casting"
+    },
+    {
+        "id": 23285,
+        "name_en": "Augmented True Linen Gloves of Casting"
+    },
+    {
+        "id": 23286,
+        "name_en": "Augmented True Linen Breeches of Casting"
+    },
+    {
+        "id": 23287,
+        "name_en": "Augmented Slothskin Boots of Casting"
+    },
+    {
+        "id": 23288,
+        "name_en": "Augmented Slothskin Belt of Casting"
+    },
+    {
+        "id": 23289,
+        "name_en": "Augmented Silvergrace Earring of Fending"
+    },
+    {
+        "id": 23290,
+        "name_en": "Augmented Silvergrace Earring of Slaying"
+    },
+    {
+        "id": 23291,
+        "name_en": "Augmented Silvergrace Earring of Aiming"
+    },
+    {
+        "id": 23292,
+        "name_en": "Augmented Silvergrace Earring of Casting"
+    },
+    {
+        "id": 23293,
+        "name_en": "Augmented Silvergrace Earring of Healing"
+    },
+    {
+        "id": 23294,
+        "name_en": "Augmented Black Willow Necklace of Fending"
+    },
+    {
+        "id": 23295,
+        "name_en": "Augmented Black Willow Necklace of Slaying"
+    },
+    {
+        "id": 23296,
+        "name_en": "Augmented Black Willow Necklace of Aiming"
+    },
+    {
+        "id": 23297,
+        "name_en": "Augmented Black Willow Necklace of Casting"
+    },
+    {
+        "id": 23298,
+        "name_en": "Augmented Black Willow Necklace of Healing"
+    },
+    {
+        "id": 23299,
+        "name_en": "Augmented Black Willow Armillae of Fending"
+    },
+    {
+        "id": 23300,
+        "name_en": "Augmented Black Willow Armillae of Slaying"
+    },
+    {
+        "id": 23301,
+        "name_en": "Augmented Black Willow Armillae of Aiming"
+    },
+    {
+        "id": 23302,
+        "name_en": "Augmented Black Willow Armillae of Casting"
+    },
+    {
+        "id": 23303,
+        "name_en": "Augmented Black Willow Armillae of Healing"
+    },
+    {
+        "id": 23304,
+        "name_en": "Augmented Silvergrace Ring of Fending"
+    },
+    {
+        "id": 23305,
+        "name_en": "Augmented Silvergrace Ring of Slaying"
+    },
+    {
+        "id": 23306,
+        "name_en": "Augmented Silvergrace Ring of Aiming"
+    },
+    {
+        "id": 23307,
+        "name_en": "Augmented Silvergrace Ring of Casting"
+    },
+    {
+        "id": 23308,
+        "name_en": "Augmented Silvergrace Ring of Healing"
+    },
+    {
+        "id": 23315,
+        "name_en": "Ambient Wind Chime Orchestrion Roll"
+    },
+    {
+        "id": 23316,
+        "name_en": "Ambient Abyss Orchestrion Roll"
+    },
+    {
+        "id": 23317,
+        "name_en": "Victory or Death Orchestrion Roll"
+    },
+    {
+        "id": 23321,
+        "name_en": "The Ancient City Orchestrion Roll"
+    },
+    {
+        "id": 23322,
+        "name_en": "Gates of the Moon Orchestrion Roll"
+    },
+    {
+        "id": 23323,
+        "name_en": "Earth, Wind, and Water Orchestrion Roll"
+    },
+    {
+        "id": 23324,
+        "name_en": "Black and White Orchestrion Roll"
+    },
+    {
+        "id": 23325,
+        "name_en": "Seven Hundred Seventy-Seven Whiskers Orchestrion Roll"
+    },
+    {
+        "id": 23326,
+        "name_en": "World Map Orchestrion Roll"
+    },
+    {
+        "id": 23327,
+        "name_en": "A Chapel Orchestrion Roll"
+    },
+    {
+        "id": 23328,
+        "name_en": "The Mystery of Giruvegan Orchestrion Roll"
+    },
+    {
+        "id": 23329,
+        "name_en": "Apoplexy Orchestrion Roll"
+    },
+    {
+        "id": 23330,
+        "name_en": "Flash of Steel Orchestrion Roll"
+    },
+    {
+        "id": 23331,
+        "name_en": "Nightbloom Orchestrion Roll"
+    },
+    {
+        "id": 23332,
+        "name_en": "Wayward Daughter Orchestrion Roll"
+    },
+    {
+        "id": 23333,
+        "name_en": "Rise of the White Raven (Orchestral Version) Orchestrion Roll"
+    },
+    {
+        "id": 23334,
+        "name_en": "Revenge Twofold (Orchestral Version) Orchestrion Roll"
+    },
+    {
+        "id": 23335,
+        "name_en": "Oblivion (Orchestral Version) Orchestrion Roll"
+    },
+    {
+        "id": 23336,
+        "name_en": "Faded Copy of Under the Moonlight"
+    },
+    {
+        "id": 23337,
+        "name_en": "Faded Copy of Ambient Abyss"
+    },
+    {
+        "id": 23339,
+        "name_en": "Second Edition Moonfire Faire"
+    },
+    {
+        "id": 23340,
+        "name_en": "Authentic Evercold Shaved Ice"
+    },
+    {
+        "id": 23341,
+        "name_en": "Authentic Rising Balloon"
+    },
+    {
+        "id": 23360,
+        "name_en": "Namazu Bell"
+    },
+    {
+        "id": 23364,
+        "name_en": "Ballroom Etiquette - The Yol Dance"
+    },
+    {
+        "id": 23367,
+        "name_en": "Ballroom Etiquette - Stimulating Soliloquies"
+    },
+    {
+        "id": 23370,
+        "name_en": "Modern Aesthetics - Fashionably Feathered"
+    },
+    {
+        "id": 23371,
+        "name_en": "Oroniri Cloth"
+    },
+    {
+        "id": 23372,
+        "name_en": "Dotharli Cloth"
+    },
+    {
+        "id": 23373,
+        "name_en": "Quaintrelle's Hat"
+    },
+    {
+        "id": 23374,
+        "name_en": "Quaintrelle's Dress Shoes"
+    },
+    {
+        "id": 23375,
+        "name_en": "Cloth Cointe Quaint"
+    },
+    {
+        "id": 23376,
+        "name_en": "Leather Cointe Quaint"
+    },
+    {
+        "id": 23380,
+        "name_en": "Endless Summer Coffer"
+    },
+    {
+        "id": 23382,
+        "name_en": "Thavnairian Rain"
+    }
+]

@@ -6,6 +6,7 @@
         "ext-iconv": "*",
         "league/csv": "^9.1",
         "nikic/php-parser": "^3.1",
+        "paquettg/php-html-parser": "^1.7",
         "symfony/console": "^4.0",
         "symfony/flex": "^1.0",
         "symfony/framework-bundle": "^4.0",

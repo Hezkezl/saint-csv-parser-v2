@@ -5,10 +5,9 @@ input/*
 !output/.gitkeep
 !input/.gitkeep
 .idea
-
+src/Parsers/Icons/imgs/*.png
 ###> symfony/framework-bundle ###
 .env
 /public/bundles/
 /var/
-/vendor/
 ###< symfony/framework-bundle ###
