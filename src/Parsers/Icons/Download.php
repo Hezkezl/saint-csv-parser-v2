@@ -16,11 +16,13 @@ class Download implements ParseInterface
     public function parse()
     {
         $dom = new Dom;
-        $iconData = json_decode(file_get_contents(__DIR__ .'/IconData.json'));
+        $list = json_decode(file_get_contents(__DIR__ .'/IconData.json'));
         $baseUrl  = 'https://eu.finalfantasyxiv.com/lodestone/playguide/db/item/?patch=&db_search_category=item&category2=&q={ITEM_NAME}';
+        $total = count($list);
         
-        foreach ($iconData as $icon) {
-            $this->io->section("{$icon->id} {$icon->name_en}");
+        foreach ($list as $i => $icon) {
+            $current = ($i + 1);
+            $this->io->section("{$current}/{$total} - {$icon->id} {$icon->name_en}");
             
             // grab search results
             $this->io->text('Getting search html ...');
@@ -52,6 +54,10 @@ class Download implements ParseInterface
                     // grab icon
                     $iconUrl = $dom->find('.db-view__item__icon__item_image')[0]->getAttribute('src');
                     $this->io->text('Icon url = '. $iconUrl);
+                    
+                    if (!is_dir(__DIR__.'/imgs/')) {
+                        mkdir(__DIR__.'/imgs/', 0777, true);
+                    }
                     
                     // download
                     $this->io->text('Downloading ...');
