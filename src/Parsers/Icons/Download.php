@@ -48,6 +48,11 @@ class Download implements ParseInterface
                 if ($name === $icon->name_en) {
                     // grab content html
                     $this->io->text('Parsing content page: '. $link);
+                    
+                    if (!$link) {
+                        break;
+                    }
+                    
                     $contentHtml = file_get_contents($link);
                     $dom->load($contentHtml);
                     
