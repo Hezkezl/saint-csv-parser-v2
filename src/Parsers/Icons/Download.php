@@ -67,7 +67,7 @@ class Download implements ParseInterface
                     // download
                     $this->io->text('Downloading ...');
                     $iconData = file_get_contents($iconUrl);
-                    $filename = __DIR__.'/imgs/'. $icon->name_en .'.png';
+                    $filename = __DIR__.'/imgs/'. $icon->name_en .' Icon.png';
                     file_put_contents($filename, $iconData);
                     $this->io->text('Saved to: '. $filename);
                     break;
