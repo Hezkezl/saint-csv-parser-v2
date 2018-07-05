@@ -1,90 +1,202 @@
 [
   {
-    "id": 22565,
-    "name_en": "Season Eight Lone Wolf Trophy"
+    "id": 22532,
+    "name_en": "Odder Otter Hanging Andon Lamp"
   },
   {
-    "id": 22868,
-    "name_en": "Curtana Ultima"
+    "id": 22538,
+    "name_en": "Odder Otter Dining Table"
   },
   {
-    "id": 22869,
-    "name_en": "Sphairai Ultima"
+    "id": 22539,
+    "name_en": "Odder Otter Screen"
   },
   {
-    "id": 22870,
-    "name_en": "Bravura Ultima"
+    "id": 22540,
+    "name_en": "Odder Otter Chair"
   },
   {
-    "id": 22871,
-    "name_en": "Gae Bolg Ultima"
+    "id": 22541,
+    "name_en": "Odder Otter Wall Lantern"
   },
   {
-    "id": 22872,
-    "name_en": "Artemis Bow Ultima"
+    "id": 22566,
+    "name_en": "Empyrean Shrine"
   },
   {
-    "id": 22873,
-    "name_en": "Yoshimitsu Ultima"
+    "id": 22579,
+    "name_en": "Odder Otter Bench"
   },
   {
-    "id": 22874,
-    "name_en": "Deathbringer Ultima"
+    "id": 22581,
+    "name_en": "Miniature Heaven-on-High"
   },
   {
-    "id": 22875,
-    "name_en": "Ferdinand Ultima"
+    "id": 22582,
+    "name_en": "Odder Otter Andon Lamp"
   },
   {
-    "id": 22876,
-    "name_en": "Thyrus Ultima"
+    "id": 22977,
+    "name_en": "Empyrean Blade"
   },
   {
-    "id": 22877,
-    "name_en": "Stardust Rod Ultima"
+    "id": 22978,
+    "name_en": "Empyrean Fists"
   },
   {
-    "id": 22878,
-    "name_en": "The Veil of Wiyu Ultima"
+    "id": 22979,
+    "name_en": "Empyrean War Axe"
   },
   {
-    "id": 22879,
-    "name_en": "Omnilex Ultima"
+    "id": 22980,
+    "name_en": "Empyrean Partisan"
   },
   {
-    "id": 22880,
-    "name_en": "Atlas Ultima"
+    "id": 22981,
+    "name_en": "Empyrean Greatbow"
   },
   {
-    "id": 22881,
-    "name_en": "Amakura Ultima"
+    "id": 22982,
+    "name_en": "Empyrean Daggers"
   },
   {
-    "id": 22882,
-    "name_en": "Needle Ultima"
+    "id": 22983,
+    "name_en": "Empyrean Greatsword"
   },
   {
-    "id": 22883,
-    "name_en": "Holy Shield Ultima"
+    "id": 22984,
+    "name_en": "Empyrean Revolver"
   },
   {
-    "id": 23120,
-    "name_en": "Season Eight Pack Wolf Voucher A"
+    "id": 22985,
+    "name_en": "Empyrean Cane"
   },
   {
-    "id": 23121,
-    "name_en": "Season Eight Pack Wolf Voucher B"
+    "id": 22986,
+    "name_en": "Empyrean Rod"
   },
   {
-    "id": 23122,
-    "name_en": "Season Eight Pack Wolf Voucher C"
+    "id": 22987,
+    "name_en": "Empyrean Grimoire"
   },
   {
-    "id": 23123,
-    "name_en": "Prototype Conveyor Identification Key"
+    "id": 22988,
+    "name_en": "Empyrean Codex"
   },
   {
-    "id": 23175,
-    "name_en": "Ultima Totem"
+    "id": 22989,
+    "name_en": "Empyrean Ephemeris"
+  },
+  {
+    "id": 22990,
+    "name_en": "Empyrean Tachi"
+  },
+  {
+    "id": 22991,
+    "name_en": "Empyrean Rapier"
+  },
+  {
+    "id": 22992,
+    "name_en": "Empyrean Shield"
+  },
+  {
+    "id": 22993,
+    "name_en": "Empyrean Earring"
+  },
+  {
+    "id": 22994,
+    "name_en": "Empyrean Necklace"
+  },
+  {
+    "id": 22995,
+    "name_en": "Empyrean Bracelet"
+  },
+  {
+    "id": 22996,
+    "name_en": "Empyrean Ring"
+  },
+  {
+    "id": 23023,
+    "name_en": "Dodo Horn"
+  },
+  {
+    "id": 23024,
+    "name_en": "Juedi Horn"
+  },
+  {
+    "id": 23029,
+    "name_en": "Wind-up Cirina"
+  },
+  {
+    "id": 23033,
+    "name_en": "Frilled Dragon"
+  },
+  {
+    "id": 23044,
+    "name_en": "Wanyudo & Katasharin Card"
+  },
+  {
+    "id": 23045,
+    "name_en": "Hatamoto Card"
+  },
+  {
+    "id": 23048,
+    "name_en": "Hiruko Card"
+  },
+  {
+    "id": 23163,
+    "name_en": "Empyrean Potion"
+  },
+  {
+    "id": 23166,
+    "name_en": "Empyrean Aetherpool Grip"
+  },
+  {
+    "id": 23177,
+    "name_en": "Empyrean Reliquary"
+  },
+  {
+    "id": 23223,
+    "name_en": "Silver-haloed Sack"
+  },
+  {
+    "id": 23224,
+    "name_en": "Gold-haloed Sack"
+  },
+  {
+    "id": 23225,
+    "name_en": "Platinum-haloed Sack"
+  },
+  {
+    "id": 23227,
+    "name_en": "Empyrean Pine Log"
+  },
+  {
+    "id": 23228,
+    "name_en": "Empyrean Clay"
+  },
+  {
+    "id": 23318,
+    "name_en": "Far East of Eorzea Orchestrion Roll"
+  },
+  {
+    "id": 23319,
+    "name_en": "Parting Ways Orchestrion Roll"
+  },
+  {
+    "id": 23320,
+    "name_en": "Revolutions Orchestrion Roll"
+  },
+  {
+    "id": 23365,
+    "name_en": "Ballroom Etiquette - Excessive Petticoats"
+  },
+  {
+    "id": 23369,
+    "name_en": "Modern Aesthetics - Gyr Abanian Plait"
+  },
+  {
+    "id": 23381,
+    "name_en": "Rising Token"
   }
 ]
