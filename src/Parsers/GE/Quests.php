@@ -19,9 +19,11 @@ class Quests implements ParseInterface
         |Level = {level}
         {requiredclass}
         |Required Affiliation =
-        |Quest Number = {instancecontent1}{instancecontent2}{instancecontent3}
-        {prevquest1}{prevquest2}{prevquest3}
+        |Quest Number ={instancecontent1}{instancecontent2}{instancecontent3}
+
+        |Required Quests = {prevquest1}{prevquest2}{prevquest3}
         |Unlocks Quests =
+
         |Objectives =
         {objectives}
         |Description =
@@ -55,10 +57,11 @@ class Quests implements ParseInterface
         // i should pull this from xivdb :D
         $patch = '4.3';
 
-        // grab quest CSV file
+        // grab CSV files
         $questCsv = $this->csv('Quest');
-        //$genreCsv = $this->csv('JournalGenre');
-        //$journalCsv = $this->csv('JournalCategory');
+        $ENpcResidentCsv = $this->csv('ENpcResident');
+        $ItemCsv = $this->csv('Item');
+        $EmoteCsv = $this->csv('Emote');
 
         $this->io->progressStart($questCsv->total);
 
@@ -92,11 +95,12 @@ class Quests implements ParseInterface
             // Loop through guaranteed QuestRewards and display the item
             $questRewards = [];
             foreach(range(0,5) as $i) {
-                if ($quest["Item{Reward}[0][{$i}]"] > 0) {
-                    $string = "\n\n|QuestReward ". ($i+1) ." = ". $quest["Item{Reward}[0][{$i}]"];
+                $guaranteeditemname = $ItemCsv->at($quest["Item{Reward}[0][{$i}]"])['Name'];
+                if ($quest["ItemCount{Reward}[0][{$i}]"] > 0) {
+                    $string = "\n\n|QuestReward ". ($i+1) ." = ". $guaranteeditemname;
 
-                    if ($quest["Item{Reward}[0][{$i}]"] > 1) {
-                        $string .= "\n|QuestReward ". ($i+1) ." Count = ". $quest["Item{Reward}[0][{$i}]"] . "\n";
+                    if ($quest["ItemCount{Reward}[0][{$i}]"] > 1) {
+                        $string .= "\n|QuestReward ". ($i+1) ." Count = ". $quest["ItemCount{Reward}[0][{$i}]"] ."\n";
                     }
 
                     $questRewards[] = $string;
@@ -107,8 +111,9 @@ class Quests implements ParseInterface
             // Loop through catalyst rewards and display them as QuestReward 6 - QuestReward 8
             $catalystRewards = [];
             foreach(range(0,2) as $i) {
+                $guaranteedcatalystname = $ItemCsv->at($quest["Item{Catalyst}[{$i}]"])['Name'];
                 if ($quest["ItemCount{Catalyst}[{$i}]"] > 1) {
-                    $string = "\n|QuestReward ". (6+$i) ." = ". $quest["Item{Catalyst}[{$i}]"];
+                    $string = "\n|QuestReward ". (6+$i) ." = ". $guaranteedcatalystname;
 
                     if ($quest["ItemCount{Catalyst}[{$i}]"] > 1) {
                         $string .= "\n|QuestReward ". (6+$i) ." Count = ". $quest["ItemCount{Catalyst}[{$i}]"] ."\n";
@@ -122,18 +127,19 @@ class Quests implements ParseInterface
             // Loop through optional quest rewards and display them, as QuestRewardOption #
             $questoptionRewards = [];
             foreach(range(0,4) as $i) {
+                $optionalitemname = $ItemCsv->at($quest["Item{Reward}[1][{$i}]"])['Name'];
                 // if optional item count is greater than zero, show the reward. If count is greater than 1,
                 // show the count. If reward is HQ, show HQ. Otherwise do nothing.
 
-                if ($quest["ItemCount{Reward}[0][{$i}]"] > 0) {
-                    $string = "\n|QuestRewardOption ". ($i+1) ." = ". $quest["Item{Reward}[0][{$i}]"];
+                if ($quest["ItemCount{Reward}[1][{$i}]"] > 0) {
+                    $string = "\n|QuestRewardOption ". ($i+1) ." = ". $optionalitemname;
 
-                    if ($quest["ItemCount{Reward}[0][{$i}]"] > 1) {
-                        $string .= "\n|QuestRewardOption ". ($i+1) ." Count = ". $quest["ItemCount{Reward}[0][{$i}]"];
+                    if ($quest["ItemCount{Reward}[1][{$i}]"] > 1) {
+                        $string .= "\n|QuestRewardOption ". ($i+1) ." Count = ". $quest["ItemCount{Reward}[1][{$i}]"] ."\n";
                     }
 
                     if ($quest["IsHQ{Reward}[1][{$i}]"] == "True") {
-                        $string .= "\n|QuestRewardOption ". ($i+1) ." HQ = x";
+                        $string .= "\n|QuestRewardOption ". ($i+1) ." HQ = x\n";
                     }
 
                     $questoptionRewards[] = $string;
@@ -144,7 +150,8 @@ class Quests implements ParseInterface
             // don't display QuestReward 10 if no "Emote" is rewarded
             $guaranteedreward7 = false;
             if ($quest['Emote{Reward}']) {
-                $string = "\n|QuestReward 10 = ". $quest['Emote{Reward}'];
+                $emoterewardname = $EmoteCsv->at($quest["Emote{Reward}"])['Name'];
+                $string = "\n|QuestReward 10 = ". $emoterewardname;
                 $guaranteedreward7 = $string;
             }
 
@@ -176,19 +183,19 @@ class Quests implements ParseInterface
                 $guaranteedreward11 = $string;
             }
 
-            // don't display the event icon if it's 000000. If it's not, then show it in html comment
+            // don't display the event icon if it's 0/blank. If it's not, then show it in html comment
             $eventicon = false;
-            if ($quest['Icon{Special}'] == "ui/icon/000000/000000.tex") {
+            if ($quest['Icon{Special}'] == 0) {
             } else {
                 $string = "\n|Event = <!-- ". $quest['Icon{Special}'] ." -->";
                 $eventicon = $string;
             }
 
-            // don't display the "SmallIcon" if it's 000000. If it's not, then show it in html comment
+            // don't display the "SmallIcon" if it's 0/blank. If it's not, then show it in html comment
             $smallimage = false;
-            if ($quest['Icon'] == "ui/icon/000000/000000.tex") {
+            if ($quest['Icon'] == 0) {
             } else {
-                $string = "\n|SmallImage = ". $quest['Icon'] ." Image.png <!-- ". $quest['Icon'] ." -->";
+                $string = "\n|SmallImage = ". $quest['Name'] ." Image.png <!-- ". $quest['Icon'] ." -->";
                 $smallimage = $string;
             }
 
@@ -245,6 +252,37 @@ class Quests implements ParseInterface
                 $gilreward = $string;
             }
 
+            $genreCsv = $this->csv('JournalGenre');
+            $categoryCsv = $this->csv('JournalCategory');
+            $sectionCsv = $this->csv('JournalSection');
+
+            // if section = Sidequests, then show Section, Subtype and Subtype2, otherwise show
+            // Section, Type, and Subtype (making assumption that Type is obsolete with sidequests
+            // due to Type and Subtype being identical in the dats for those)
+            $types = false;
+            $genre = $genreCsv->at($quest['JournalGenre'])['Name'];
+            $categorynumber = $genreCsv->at($genre)['JournalCategory'];
+            $category = $categoryCsv->at($categorynumber)['Name'];
+            $sectionnumber = $categoryCsv->at($categorynumber)['JournalSection'];
+            $section = $sectionCsv->at($sectionnumber)['Name'];
+            // Slight cheat here, forcing Type = Sidequest for Sidequests. We shouldn't do that!
+            if ($section == "Sidequests") {
+                $string = "\n|Type = Sidequest";
+                // Sidequests using Subtype show correct in-game Journal
+                // Otherwise they would show things like 'Dravanian Hinterlands Sidequest'
+                // instead of 'Dravanian Sidequests'. Saving in code just in case.
+                // Line below not needed anymore.
+                // $string .= "\n|Subtype = $quest->journal_genre";
+                $string .= "\n|Subtype = $genre";
+                $string .= "\n|Subtype2 = ". $quest['PlaceName'];
+                $types = $string;
+            } else {
+                $string = "\n|Section = $section";
+                $string .= "\n|Type = $genre";
+                $string .= "\n|Subtype = $category";
+                $types = $string;
+            }
+
             // Show Repeatable as 'Yes' for instantly repeatable quests, or 'Daily' for dailies, or none
             $repeatable = false;
             if (($quest['IsRepeatable'] == "True") && ($quest['RepeatIntervalType'] == "1")) {
@@ -255,23 +293,33 @@ class Quests implements ParseInterface
                 $repeatable = $string;
             }
 
-            //-------------------------------------------------------------------------------------------------------------------------------------------------------------
-            //-------------------------------------------------------------------------------------------------------------------------------------------------------------
-            //-------------------------------------------------------------------------------------------------------------------------------------------------------------
-            //-------------------------------------------------------------------------------------------------------------------------------------------------------------
-            //-------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+            //---------------------------------------------------------------
+            // CONVERT RAW DATA TO ACTUAL NAMES
+            //---------------------------------------------------------------
+
+            // item reward name
+            //$ItemCsv->at($quest['Item{Reward}[0][0]'])['Name'];
+
+            // npc start + finish name
+            $questgiver = $ENpcResidentCsv->at($quest['ENpcResident{Start}'])['Singular'];
+
+            // prev quest name
+            $questCsv->at($quest['PreviousQuest[0]'])['Name'];
+
+
             //-------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
             $data = [
                 '{patch}' => $patch,
                 '{name}' => $quest['Name'],
+                '{types}' => $types,
                 //'{questicontype}' => $npcIconAvailable,
                 //'{genre}' => $quest['journal_genre,']
                 //'{category}' => $genre ? $genre->journal_category : '',
                 //'{section}' => $category ? $category->journal_section : '',
                 //'{subtype2}' => $quest['place_name,']
-                //'{types}' => $types,
                 '{eventicon}' => $eventicon,
                 '{smallimage}' => $smallimage,
                 '{level}' => $quest['ClassJobLevel[0]'],
@@ -283,7 +331,7 @@ class Quests implements ParseInterface
                 '{instancecontent1}' => $quest['InstanceContent[0]'] ? "|Dungeon Requirement = ". $quest['InstanceContent[0]'] : "",
                 '{instancecontent2}' => $quest['InstanceContent[1]'] ? ", ". $quest['InstanceContent[1]'] : "",
                 '{instancecontent3}' => $quest['InstanceContent[2]'] ? ", ". $quest['InstanceContent[2]'] : "",
-                '{prevquest1}' => $quest['PreviousQuest[0]'] ? ", ". $quest['PreviousQuest[0]'] : "",
+                '{prevquest1}' => $quest['PreviousQuest[0]'] ?  $quest['PreviousQuest[0]'] : "",
                 '{prevquest2}' => $quest['PreviousQuest[1]'] ? ", ". $quest['PreviousQuest[1]'] : "",
                 '{prevquest3}' => $quest['PreviousQuest[2]'] ? ", ". $quest['PreviousQuest[2]'] : "",
                 '{gilreward}' => $gilreward,
@@ -299,7 +347,8 @@ class Quests implements ParseInterface
                 '{guaranteeditem10}' => $guaranteedreward10,
                 '{guaranteeditem11}' => $guaranteedreward11,
                 '{questoptionrewards}' => $questoptionRewards,
-                '{questgiver}' => ucwords(strtolower($quest['ENpcResident{Start}'])),
+                //'{questgiver}' => ucwords(strtolower($quest['ENpcResident{Start}'])),
+                '{questgiver}' => $questgiver,
                 //'{journal}' => implode("\n", $journal),
                 //'{objectives}' => implode("\n",  $objectives),
                 //'{dialogue}' => implode("\n", $dialogue),
