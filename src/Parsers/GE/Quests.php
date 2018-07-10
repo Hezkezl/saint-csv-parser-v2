@@ -21,15 +21,15 @@ class Quests implements ParseInterface
         |Required Affiliation =
         |Quest Number ={instancecontent1}{instancecontent2}{instancecontent3}
 
-        |Required Quests = {prevquest1}{prevquest2}{prevquest3}
+        |Required Quests ={prevquest1}{prevquest2}{prevquest3}
         |Unlocks Quests =
 
         |Objectives =
         {objectives}
         |Description =
         
-        |EXPReward ={gilreward}{sealsreward}
-        {tomestones}{relations}{instanceunlock}{questrewards}{catalystrewards}{guaranteeditem7}{guaranteeditem8}{guaranteeditem9}{guaranteeditem10}{guaranteeditem11}{questoptionrewards}
+        |EXPReward = {expreward}{gilreward}{sealsreward}
+        {tomestones}{relations}{instanceunlock}{questrewards}{catalystrewards}{guaranteeditem7}{guaranteeditem8}{guaranteeditem9}{guaranteeditem11}{questoptionrewards}
         |Issuing NPC = {questgiver}
         |NPC Location =
         
@@ -62,6 +62,13 @@ class Quests implements ParseInterface
         $ENpcResidentCsv = $this->csv('ENpcResident');
         $ItemCsv = $this->csv('Item');
         $EmoteCsv = $this->csv('Emote');
+        $JournalGenreCsv = $this->csv('JournalGenre');
+        $JournalCategoryCsv = $this->csv('JournalCategory');
+        $JournalSectionCsv = $this->csv('JournalSection');
+        $PlaceNameCsv = $this->csv('PlaceName');
+        $ClassJobCsv = $this->csv('ClassJob');
+        $ActionCsv = $this->csv('Action');
+        $OtherRewardCsv = $this->csv('QuestRewardOther');
 
         $this->io->progressStart($questCsv->total);
 
@@ -75,14 +82,13 @@ class Quests implements ParseInterface
             if (empty($quest['Name'])) {
                 continue;
             }
-            // ---------------------------------------------------------
 
-            //-------------------------------------------------------------------------------------------------------------------------------------------------------------
-            //-------------------------------------------------------------------------------------------------------------------------------------------------------------
-            //-------------------------------------------------------------------------------------------------------------------------------------------------------------
-            //-------------------------------------------------------------------------------------------------------------------------------------------------------------
-            //-------------------------------------------------------------------------------------------------------------------------------------------------------------
-            //-------------------------------------------------------------------------------------------------------------------------------------------------------------
+            //---------------------------------------------------------------------------------
+            //---------------------------------------------------------------------------------
+            //---------------------------------------------------------------------------------
+            //---------------------------------------------------------------------------------
+            //---------------------------------------------------------------------------------
+            //---------------------------------------------------------------------------------
 
             // change tomestone name to wiki switch template depending on name
             // converts number in tomestone_reward to name, then changes name
@@ -138,7 +144,7 @@ class Quests implements ParseInterface
                         $string .= "\n|QuestRewardOption ". ($i+1) ." Count = ". $quest["ItemCount{Reward}[1][{$i}]"] ."\n";
                     }
 
-                    if ($quest["IsHQ{Reward}[1][{$i}]"] == "True") {
+                    if ($quest["IsHQ{Reward}[1][{$i}]"] === "True") {
                         $string .= "\n|QuestRewardOption ". ($i+1) ." HQ = x\n";
                     }
 
@@ -158,28 +164,40 @@ class Quests implements ParseInterface
             // don't display QuestReward 11 if no "Action" is rewarded
             $guaranteedreward8 = false;
             if ($quest['Action{Reward}']) {
-                $string = "\n|QuestReward 11 = ". $quest['Action{Reward}'];
+                $ActionRewardName = $ActionCsv->at($quest['Action{Reward}'])['Name'];
+                $string = "\n|QuestReward 11 = ". $ActionRewardName;
                 $guaranteedreward8 = $string;
             }
 
-            // don't display QuestReward 12 if no "General Action 0" is rewarded
-            $guaranteedreward9 = false;
-            if ($quest['GeneralAction{Reward}[0]']) {
-                $string = "\n|QuestReward 12 = ". $quest['GeneralAction{Reward}[0]'];
-                $guaranteedreward9 = $string;
+            // don't display QuestReward 12 or 13 if no "General Action 0/1" is rewarded
+            $guaranteedreward9 = [];
+            foreach(range(0,1) as $i) {
+                if ($quest["GeneralAction{Reward}[{$i}]"] > 0){
+                    $GeneralActionRewardName = $ActionCsv->at($quest["GeneralAction{Reward}[{$i}]"])['Name'];
+                    $string = "\n|QuestReward ". ($i+12) ." = ". $GeneralActionRewardName;
+                    $guaranteedreward9[] = $string;
+                }
             }
+            $guaranteedreward9 = implode("\n", $guaranteedreward9);
+
+            //if ($quest['GeneralAction{Reward}[0]']) {
+                //$GeneralActionRewardName = $ActionCsv->at($quest['GeneralAction{Reward}[0]'])['Name'];
+                //$string = "\n|QuestReward 12 = ". $GeneralActionRewardName;
+                //$guaranteedreward9 = $string;
+            //}
 
             // don't display QuestReward 13 if no "General Action 1" is rewarded
-            $guaranteedreward10 = false;
-            if ($quest['GeneralAction{Reward}[1]']) {
-                $string = "\n|QuestReward 13 = ". $quest['GeneralAction{Reward}[1]'];
-                $guaranteedreward10 = $string;
-            }
+            //$guaranteedreward10 = false;
+            //if ($quest['GeneralAction{Reward}[1]']) {
+                //$string = "\n|QuestReward 13 = ". $quest['GeneralAction{Reward}[1]'];
+                //$guaranteedreward10 = $string;
+            //}
 
             // don't display QuestReward 14 if no "Other Reward" is rewarded
             $guaranteedreward11 = false;
             if ($quest['Other{Reward}']) {
-                $string = "\n|QuestReward 14 = ". $quest['Other{Reward}'];
+                $OtherRewardName = $OtherRewardCsv->at($quest['Other{Reward}'])['Name'];
+                $string = "\n|QuestReward 14 = ". $OtherRewardName;
                 $guaranteedreward11 = $string;
             }
 
@@ -187,7 +205,7 @@ class Quests implements ParseInterface
             $eventicon = false;
             if ($quest['Icon{Special}'] == 0) {
             } else {
-                $string = "\n|Event = <!-- ". $quest['Icon{Special}'] ." -->";
+                $string = "\n|Event = <!-- ui/icon/080000/". $quest['Icon{Special}'] .".tex -->";
                 $eventicon = $string;
             }
 
@@ -195,7 +213,7 @@ class Quests implements ParseInterface
             $smallimage = false;
             if ($quest['Icon'] == 0) {
             } else {
-                $string = "\n|SmallImage = ". $quest['Name'] ." Image.png <!-- ". $quest['Icon'] ." -->";
+                $string = "\n|SmallImage = ". $quest['Name'] ." Image.png <!-- ui/icon/1000000/". $quest['Icon'] .".tex -->";
                 $smallimage = $string;
             }
 
@@ -208,7 +226,7 @@ class Quests implements ParseInterface
 
             // don't display 'Beast Tribe Reputation Required' if equal to "None", otherwise show it
             $reputation = false;
-            if ($quest['BeastReputationRank'] == "None") {
+            if ($quest['BeastReputationRank'] === "None") {
             } else {
                 $string = "\n|Required Reputation = ". $quest['BeastReputationRank'];
                 $reputation = $string;
@@ -237,9 +255,9 @@ class Quests implements ParseInterface
 
             // don't display required class if equal to adventurer
             $requiredclass = false;
-            if ($quest['ClassJob{Required}'] == "adventurer") {
+            if ($ClassJobCsv->at($quest['ClassJob{Required}'])['Name{English}'] === "Adventurer") {
             } else {
-                $string = "\n|Required Class = ". ucwords(strtolower($quest['ClassJob{Required}']));
+                $string = "\n|Required Class = ". $ClassJobCsv->at($quest['ClassJob{Required}'])['Name{English}'];
                 $requiredclass = $string;
             }
 
@@ -251,10 +269,6 @@ class Quests implements ParseInterface
                 $string = "\n|GilReward =";
                 $gilreward = $string;
             }
-
-            $JournalGenreCsv = $this->csv('JournalGenre');
-            $JournalCategoryCsv = $this->csv('JournalCategory');
-            $JournalSectionCsv = $this->csv('JournalSection');
 
             //In Quest.csv, take the raw number from Index:JournalGenre and convert it into an actual Name by
             //looking inside the JournalGenre.csv file and returning the Index:Name for its entry.
@@ -268,58 +282,60 @@ class Quests implements ParseInterface
             //Take the same row from $JournalGenreName (JournalGenre.csv) and, using the information found at
             //the 'JournalCategory' index for $JournalGenreName, return the 'Name' index for that number from the
             //JournalCategory.csv file.
-            $JournalGenreCategoryName = $JournalCategoryCsv->at($JournalGenreRow['JournalCategory'])['Name'];
+            $JournalCategoryName = $JournalCategoryCsv->at($JournalGenreRow['JournalCategory'])['Name'];
             //^^^ Lominsan Sidequests
 
             //Stores entire row of JournalGenreCategory in $JournalGenreCategory
-            $JournalGenreCategoryRow = $JournalCategoryCsv->at($JournalGenreRow['JournalCategory']);
+            $JournalCategoryRow = $JournalCategoryCsv->at($JournalGenreRow['JournalCategory']);
             //^^^ 29,"Lominsan Sidequests",3,1,3
 
             //Take the same row from $JournalGenreCategory (JournalCategory.csv) and, using the information found at
             //the 'JournalSection' index for $JournalGenreCategory, return the 'Name' index for that number from the
             //JournalSection.csv file.
-            $JournalSectionName = $JournalSectionCsv->at($JournalGenreCategoryRow['JournalSection'])['Name'];
+            $JournalSectionName = $JournalSectionCsv->at($JournalCategoryRow['JournalSection'])['Name'];
             //^^^ Sidequests
 
-            $JournalCategoryRow = $JournalSectionCsv->at($JournalGenreCategoryRow['JournalSection']);
+            $JournalSectionRow = $JournalSectionCsv->at($JournalCategoryRow['JournalSection']);
             //^^^ 3,"Sidequests",True,True
 
-            echo "JournalGenreName: {$JournalGenreName}\nJournalGenreCategoryName: {$JournalGenreCategoryName}\nJournalSectionName:{$JournalSectionName}\n\n\n\n\n\n";
-
-            //$sectionnumber = $JournalCategoryCsv->at($JournalGenreCategory)['JournalSection'];
-            //$section = $JournalSectionCsv->at($sectionnumber)['Name'];
-
-            $section = false;
             // if section = Sidequests, then show Section, Subtype and Subtype2, otherwise show
             // Section, Type, and Subtype (making assumption that Type is obsolete with sidequests
             // due to Type and Subtype being identical in the dats for those)
             // Slight cheat here, forcing Type = Sidequest for Sidequests. We shouldn't do that!
-            if ($section == "Sidequests") {
-                $string = "\n|Type = Sidequest";
-                // Sidequests using Subtype show correct in-game Journal
-                // Otherwise they would show things like 'Dravanian Hinterlands Sidequest'
-                // instead of 'Dravanian Sidequests'. Saving in code just in case.
 
-                $string .= "\n|Subtype = $JournalGenreName";
-                $string .= "\n|Subtype2 = ". $quest['PlaceName'];
+            if ($JournalSectionName == "Main Scenario (ARR/Heavensward)" || "Main Scenario (Stormblood)" || "Chronicles of a New Era") {
+                $string = "\n|Section = ". $JournalSectionName;
+                $string .= "\n|Type = ". $JournalCategoryName;
+                $string .= "\n|Subtype = MSQ Test";
+                $types = $string;
+            } elseif ($JournalSectionName === "Sidequests" && $JournalCategoryName != "Side Story Quests") {
+                $QuestPlaceName = $PlaceNameCsv->at($quest['PlaceName'])['Name'];
+                $string = "\n|Type = ". $JournalSectionName;
+                $string .= "\n|Subtype = ". $JournalCategoryName;
+                $string .= "\n|Subtype2 = ". $QuestPlaceName;
+                $string .= "\n|Section = Sidequests not Side Story Test";
                 $types = $string;
             } else {
-                $string = "\n|Section = $section";
+                $string = "\n|Section = ". $JournalSectionName;
                 $string .= "\n|Type = $JournalGenreName";
                 $string .= "\n|Subtype = $JournalSectionName";
+                $string .= "\n|Subtype2 = Everything Else";
                 $types = $string;
             }
 
             // Show Repeatable as 'Yes' for instantly repeatable quests, or 'Daily' for dailies, or none
             $repeatable = false;
-            if (($quest['IsRepeatable'] == "True") && ($quest['RepeatIntervalType'] == "1")) {
+            if (($quest['IsRepeatable'] === "True") && ($quest['RepeatIntervalType'] == 1)) {
                 $string = "\n|Repeatable = Daily";
                 $repeatable = $string;
-            } elseif (($quest['IsRepeatable'] == "True") && ($quest['RepeatIntervalType'] == "0")) {
+            } elseif (($quest['IsRepeatable'] === "True") && ($quest['RepeatIntervalType'] == 0)) {
                 $string = "\n|Repeatable = Yes";
                 $repeatable = $string;
             }
 
+            $prevquest1 = $questCsv->at($quest['PreviousQuest[0]'])['Name'];
+            $prevquest2 = $questCsv->at($quest['PreviousQuest[1]'])['Name'];
+            $prevquest3 = $questCsv->at($quest['PreviousQuest[2]'])['Name'];
 
             //---------------------------------------------------------------
             // CONVERT RAW DATA TO ACTUAL NAMES
@@ -335,7 +351,7 @@ class Quests implements ParseInterface
             $questCsv->at($quest['PreviousQuest[0]'])['Name'];
 
 
-            //-------------------------------------------------------------------------------------------------------------------------------------------------------------
+            //---------------------------------------------------------------------------------
 
 
             $data = [
@@ -358,9 +374,13 @@ class Quests implements ParseInterface
                 '{instancecontent1}' => $quest['InstanceContent[0]'] ? "|Dungeon Requirement = ". $quest['InstanceContent[0]'] : "",
                 '{instancecontent2}' => $quest['InstanceContent[1]'] ? ", ". $quest['InstanceContent[1]'] : "",
                 '{instancecontent3}' => $quest['InstanceContent[2]'] ? ", ". $quest['InstanceContent[2]'] : "",
-                '{prevquest1}' => $quest['PreviousQuest[0]'] ?  $quest['PreviousQuest[0]'] : "",
-                '{prevquest2}' => $quest['PreviousQuest[1]'] ? ", ". $quest['PreviousQuest[1]'] : "",
-                '{prevquest3}' => $quest['PreviousQuest[2]'] ? ", ". $quest['PreviousQuest[2]'] : "",
+                //'{prevquest1}' => $quest['PreviousQuest[0]'] ?  $quest['PreviousQuest[0]'] : "",
+                //'{prevquest2}' => $quest['PreviousQuest[1]'] ? ", ". $quest['PreviousQuest[1]'] : "",
+                //'{prevquest3}' => $quest['PreviousQuest[2]'] ? ", ". $quest['PreviousQuest[2]'] : "",
+                '{prevquest1}' => $prevquest1 ? $prevquest1 : "",
+                '{prevquest2}' => $prevquest2 ? ", ". $prevquest2 : "",
+                '{prevquest3}' => $prevquest3 ? ", ". $prevquest3 : "",
+                '{expreward}' => $this->getQuestExp($quest),
                 '{gilreward}' => $gilreward,
                 '{sealsreward}' => $sealsreward,
                 '{tomestones}' => $quest['TomestoneCount{Reward}'] ? $tomestoneList[$quest['Tomestone{Reward}']] . $quest['TomestoneCount{Reward}'] : '',
@@ -371,7 +391,6 @@ class Quests implements ParseInterface
                 '{guaranteeditem7}' => $guaranteedreward7,
                 '{guaranteeditem8}' => $guaranteedreward8,
                 '{guaranteeditem9}' => $guaranteedreward9,
-                '{guaranteeditem10}' => $guaranteedreward10,
                 '{guaranteeditem11}' => $guaranteedreward11,
                 '{questoptionrewards}' => $questoptionRewards,
                 //'{questgiver}' => ucwords(strtolower($quest['ENpcResident{Start}'])),
@@ -380,6 +399,11 @@ class Quests implements ParseInterface
                 //'{objectives}' => implode("\n",  $objectives),
                 //'{dialogue}' => implode("\n", $dialogue),
             ];
+
+//            echo "
+//JournalGenreName:         {$JournalGenreName}
+//JournalGenreCategoryName: {$JournalGenreCategoryName}
+//JournalSectionName:       {$JournalSectionName}\n\n";
 
             // format using GamerEscape Formater and add to data array
             $this->data[] = GeFormatter::format(self::WIKI_FORMAT, $data);
@@ -394,5 +418,35 @@ class Quests implements ParseInterface
             [ 'Filename', 'Data Count', 'File Size' ],
             $info
         );
+    }
+
+    private function getQuestExp($quest)
+    {
+        $paramGrow  = $this->csv("ParamGrow")->at($quest['ClassJobLevel[0]']);
+
+        // Base EXP (1-49)
+        $EXP = $quest['ExpFactor'] * $paramGrow['QuestExpModifier'] * (45 + (5 * $quest['ClassJobLevel[0]'])) / 100;
+
+        // Quest lv 50
+        if (in_array($quest['ClassJobLevel[0]'], [50])) {
+            $EXP = $EXP + ((400 * ($quest['ExpFactor'] / 100)) + (($quest['ClassJobLevel[0]'] - 50) * (400 * ($quest['ExpFactor'] / 100))));
+        }
+
+        // Quest lv 51
+        else if (in_array($quest['ClassJobLevel[0]'], [51])) {
+            $EXP = $EXP + ((800 * ($quest['ExpFactor'] / 100)) + (($quest['ClassJobLevel[0]'] - 50) * (400 * ($quest['ExpFactor'] / 100))));
+        }
+
+        // Quest lv 52-59
+        else if (in_array($quest['ClassJobLevel[0]'], [52,53,54,55,56,57,58,59])) {
+            $EXP = $EXP + ((2000  * ($quest['ExpFactor'] / 100)) + (($quest['ClassJobLevel[0]'] - 52) * (2000  * ($quest['ExpFactor'] / 100))));
+        }
+
+        // Quest EXP 60-69
+        else if (in_array($quest['ClassJobLevel[0]'], [60,61,62,63,64,65,66,67,68,69])) {
+            $EXP = $EXP + ((37125  * ($quest['ExpFactor'] / 100)) + (($quest['ClassJobLevel[0]'] - 60) * (3375  * ($quest['ExpFactor'] / 100))));
+        }
+
+        return $EXP;
     }
 }
