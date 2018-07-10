@@ -14,6 +14,8 @@ trait CsvParseTrait
     public $projectDirectory;
     /** @var array */
     public $data = [];
+    /** @var array */
+    public $internal = [];
     /** @var \stdClass */
     public $ex;
 
@@ -50,6 +52,10 @@ trait CsvParseTrait
      */
     public function csv($content): ParseWrapper
     {
+        if (isset($this->internal[$content])) {
+            return $this->internal[$content];
+        }
+        
         $cache = $this->projectDirectory . getenv('CACHE_DIRECTORY');
         $filename = "{$cache}/{$content}.csv";
 
@@ -78,6 +84,8 @@ trait CsvParseTrait
         file_put_contents($filename.'.columns', json_encode($parser->columns, JSON_PRETTY_PRINT));
         file_put_contents($filename.'.offsets', json_encode($parser->offsets, JSON_PRETTY_PRINT));
         file_put_contents($filename.'.data', json_encode($parser->data, JSON_PRETTY_PRINT));
+        
+        $this->internal[$content] = $parser;
 
         return $parser;
     }
