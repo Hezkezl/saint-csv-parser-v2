@@ -252,34 +252,61 @@ class Quests implements ParseInterface
                 $gilreward = $string;
             }
 
-            $genreCsv = $this->csv('JournalGenre');
-            $categoryCsv = $this->csv('JournalCategory');
-            $sectionCsv = $this->csv('JournalSection');
+            $JournalGenreCsv = $this->csv('JournalGenre');
+            $JournalCategoryCsv = $this->csv('JournalCategory');
+            $JournalSectionCsv = $this->csv('JournalSection');
 
+            //In Quest.csv, take the raw number from Index:JournalGenre and convert it into an actual Name by
+            //looking inside the JournalGenre.csv file and returning the Index:Name for its entry.
+            $JournalGenreName = $JournalGenreCsv->at($quest['JournalGenre'])['Name'];
+            //^^^ La Noscean Sidequests
+
+            //Stores entire row of JournalGenre in $JournalGenre
+            $JournalGenreRow = $JournalGenreCsv->at($quest['JournalGenre']);
+            //^^^ 53,61411,29,"La Noscean Sidequests"
+
+            //Take the same row from $JournalGenreName (JournalGenre.csv) and, using the information found at
+            //the 'JournalCategory' index for $JournalGenreName, return the 'Name' index for that number from the
+            //JournalCategory.csv file.
+            $JournalGenreCategoryName = $JournalCategoryCsv->at($JournalGenreRow['JournalCategory'])['Name'];
+            //^^^ Lominsan Sidequests
+
+            //Stores entire row of JournalGenreCategory in $JournalGenreCategory
+            $JournalGenreCategoryRow = $JournalCategoryCsv->at($JournalGenreRow['JournalCategory']);
+            //^^^ 29,"Lominsan Sidequests",3,1,3
+
+            //Take the same row from $JournalGenreCategory (JournalCategory.csv) and, using the information found at
+            //the 'JournalSection' index for $JournalGenreCategory, return the 'Name' index for that number from the
+            //JournalSection.csv file.
+            $JournalSectionName = $JournalSectionCsv->at($JournalGenreCategoryRow['JournalSection'])['Name'];
+            //^^^ Sidequests
+
+            $JournalCategoryRow = $JournalSectionCsv->at($JournalGenreCategoryRow['JournalSection']);
+            //^^^ 3,"Sidequests",True,True
+
+            echo "JournalGenreName: {$JournalGenreName}\nJournalGenreCategoryName: {$JournalGenreCategoryName}\nJournalSectionName:{$JournalSectionName}\n\n\n\n\n\n";
+
+            //$sectionnumber = $JournalCategoryCsv->at($JournalGenreCategory)['JournalSection'];
+            //$section = $JournalSectionCsv->at($sectionnumber)['Name'];
+
+            $section = false;
             // if section = Sidequests, then show Section, Subtype and Subtype2, otherwise show
             // Section, Type, and Subtype (making assumption that Type is obsolete with sidequests
             // due to Type and Subtype being identical in the dats for those)
-            $types = false;
-            $genre = $genreCsv->at($quest['JournalGenre'])['Name'];
-            $categorynumber = $genreCsv->at($genre)['JournalCategory'];
-            $category = $categoryCsv->at($categorynumber)['Name'];
-            $sectionnumber = $categoryCsv->at($categorynumber)['JournalSection'];
-            $section = $sectionCsv->at($sectionnumber)['Name'];
             // Slight cheat here, forcing Type = Sidequest for Sidequests. We shouldn't do that!
             if ($section == "Sidequests") {
                 $string = "\n|Type = Sidequest";
                 // Sidequests using Subtype show correct in-game Journal
                 // Otherwise they would show things like 'Dravanian Hinterlands Sidequest'
                 // instead of 'Dravanian Sidequests'. Saving in code just in case.
-                // Line below not needed anymore.
-                // $string .= "\n|Subtype = $quest->journal_genre";
-                $string .= "\n|Subtype = $genre";
+
+                $string .= "\n|Subtype = $JournalGenreName";
                 $string .= "\n|Subtype2 = ". $quest['PlaceName'];
                 $types = $string;
             } else {
                 $string = "\n|Section = $section";
-                $string .= "\n|Type = $genre";
-                $string .= "\n|Subtype = $category";
+                $string .= "\n|Type = $JournalGenreName";
+                $string .= "\n|Subtype = $JournalSectionName";
                 $types = $string;
             }
 
