@@ -13,8 +13,8 @@ class Quests implements ParseInterface
 {
     use CsvParseTrait;
 
-    // the wiki format we shall use
-    const WIKI_FORMAT = '
+    // the wiki output format / template we shall use
+    const WIKI_FORMAT = 'http://ffxiv.gamerescape.com/wiki/{name}?action=edit
         {{ARR Infobox Quest
         |Patch = {patch}
         |Index = {id}
@@ -26,15 +26,13 @@ class Quests implements ParseInterface
         |Required Affiliation =
         |Quest Number ={instancecontent1}{instancecontent2}{instancecontent3}
 
-        |Required Quests ={prevquest1}{prevquest2}{prevquest3}
+        |Required Quests ={prevquestspace1}{prevquest2}{prevquest3}
         |Unlocks Quests =
 
         |Objectives =
         {objectives}
-        |Description =
         {expreward}{gilreward}{sealsreward}
-        {tomestones}{relations}{instanceunlock}{questrewards}{catalystrewards}{guaranteeditem7}{guaranteeditem8}{guaranteeditem9}{guaranteeditem11}{questoptionrewards}
-        {trait}
+        {tomestones}{relations}{instanceunlock}{questrewards}{catalystrewards}{guaranteeditem7}{guaranteeditem8}{guaranteeditem9}{guaranteeditem11}{questoptionrewards}{trait}
         |Issuing NPC = {questgiver}
         |NPC Location =
         
@@ -42,9 +40,10 @@ class Quests implements ParseInterface
         |Mobs Involved =
         |Items Involved =
         
+        |Description =
         |Journal =
         {journal}
-        
+
         |Strategy =
         |Walkthrough =
         |Dialogue =
@@ -84,12 +83,11 @@ class Quests implements ParseInterface
 
         // loop through quest data
         foreach($questCsv->data as $id => $quest) {
-            //print_r(array_keys($quest));die;
             // ---------------------------------------------------------
             $this->io->progressAdvance();
 
             // skip ones without a name
-            if (empty($quest['Name'])) {
+            if (empty($quest['Name']) || $quest['Name'] === "Testdfghjkl;") {
                 continue;
             }
 
@@ -379,6 +377,7 @@ class Quests implements ParseInterface
 
             //Show the Previous Quest(s) correct Name by looking them up.
             $prevquest1 = $questCsv->at($quest['PreviousQuest[0]'])['Name'];
+            $prevquestspace1 = $questCsv->at($quest['PreviousQuest[0]'])['Name'];
             $prevquest2 = $questCsv->at($quest['PreviousQuest[1]'])['Name'];
             $prevquest3 = $questCsv->at($quest['PreviousQuest[2]'])['Name'];
 
@@ -394,16 +393,18 @@ class Quests implements ParseInterface
             $objectives = [];
             $dialogue = [];
             $journal =[];
+
             if (!empty($quest['Id'])) {
                 $folder = substr(explode('_', $quest['Id'])[1], 0, 3);
                 $textdata = $this->csv("quest/{$folder}/{$quest['Id']}");
+                //print_r($textdata);die;
 
                 foreach($textdata->data as $i => $entry) {
                     // grab files to a friendlier variable name
-                    $id = $entry['id'];
+                    //$id = $entry['id'];
                     $command = $entry['unknown_1'];
                     $text = $entry['unknown_2'];
-                    
+
                     // get the text group from the command
                     $textgroup = $this->getTextGroup($i, $command);
 
@@ -461,6 +462,7 @@ class Quests implements ParseInterface
                 '{instancecontent1}' => $InstanceContent1 ? "\n|Dungeon Requirement = ". $InstanceContent1: "",
                 '{instancecontent2}' => $InstanceContent2 ? ", ". $InstanceContent2 : "",
                 '{instancecontent3}' => $InstanceContent3 ? ", ". $InstanceContent3 : "",
+                '{prevquestspace1}' => $prevquestspace1 ? " ". $prevquestspace1 : "",
                 '{prevquest1}' => $prevquest1 ? $prevquest1 : "",
                 '{prevquest2}' => $prevquest2 ? ", ". $prevquest2 : "",
                 '{prevquest3}' => $prevquest3 ? ", ". $prevquest3 : "",

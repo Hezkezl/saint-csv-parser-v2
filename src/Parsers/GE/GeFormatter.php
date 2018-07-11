@@ -31,6 +31,7 @@ class GeFormatter
         $format = str_replace("<Split(<Highlight>ObjectParameter(1)</Highlight>, ,1)/>", "{{Loremforename}}", $format);
         $format = str_replace("<Split(<Highlight>ObjectParameter(1)</Highlight>, ,2)/>", "{{Loremsurname}}", $format);
         $format = str_replace("<Highlight>ObjectParameter(1)</Highlight>", "{{Loremforename}} {{Loremsurname}}", $format);
+        $format = str_replace("<Sheet(Addon,9,0)/>", "{{HQ|2}})", $format);
 
         return trim($format) . "\n\n";
     }
