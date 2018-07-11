@@ -28,10 +28,8 @@ class Quests implements ParseInterface
 
         |Objectives =
         {objectives}
-        |Description =
         {expreward}{gilreward}{sealsreward}
-        {tomestones}{relations}{instanceunlock}{questrewards}{catalystrewards}{guaranteeditem7}{guaranteeditem8}{guaranteeditem9}{guaranteeditem11}{questoptionrewards}
-        {trait}
+        {tomestones}{relations}{instanceunlock}{questrewards}{catalystrewards}{guaranteeditem7}{guaranteeditem8}{guaranteeditem9}{guaranteeditem11}{questoptionrewards}{trait}
         |Issuing NPC = {questgiver}
         |NPC Location =
         
@@ -39,9 +37,10 @@ class Quests implements ParseInterface
         |Mobs Involved =
         |Items Involved =
         
+        |Description =
         |Journal =
         {journal}
-        
+
         |Strategy =
         |Walkthrough =
         |Dialogue =
@@ -391,6 +390,7 @@ class Quests implements ParseInterface
             $objectives = [];
             $dialogue = [];
             $journal =[];
+
             if (!empty($quest['Id'])) {
                 $folder = substr(explode('_', $quest['Id'])[1], 0, 3);
                 $textdata = $this->csv("quest/{$folder}/{$quest['Id']}");
@@ -398,9 +398,6 @@ class Quests implements ParseInterface
 
                 foreach($textdata->data as $i => $entry) {
                     // grab files to a friendlier variable name
-                    //$id = $entry[0];
-                    //$command = $entry[1];
-                    //$text = $entry[2];
                     $id = $entry['id'];
                     $command = $entry['unknown_1'];
                     $text = $entry['unknown_2'];
@@ -526,7 +523,6 @@ class Quests implements ParseInterface
         $data->order = null;
 
         // split command
-        //print_r($command);die;
         $command = explode('_', $command);
 
         // special one (npc battle talk)
