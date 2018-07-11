@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * added support for variadics in named arguments
+ * added PSR-11 `ContainerBagInterface` and its `ContainerBag` implementation to access parameters as-a-service
+ * added support for service's decorators autowiring
+ * deprecated the `TypedReference::canBeAutoregistered()` and  `TypedReference::getRequiringClass()` methods
+ * environment variables are validated when used in extension configuration
+ * deprecated support for auto-discovered extension configuration class which does not implement `ConfigurationInterface`
+
 4.0.0
 -----
 

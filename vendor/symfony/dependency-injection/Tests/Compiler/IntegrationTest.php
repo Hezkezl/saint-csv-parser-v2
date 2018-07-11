@@ -126,7 +126,7 @@ class IntegrationTest extends TestCase
     public function testYamlContainerCompiles($directory, $actualServiceId, $expectedServiceId, ContainerBuilder $mainContainer = null)
     {
         // allow a container to be passed in, which might have autoconfigure settings
-        $container = $mainContainer ? $mainContainer : new ContainerBuilder();
+        $container = $mainContainer ?: new ContainerBuilder();
         $container->setResourceTracking(false);
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Fixtures/yaml/integration/'.$directory));
         $loader->load('main.yml');
@@ -206,6 +206,16 @@ class IntegrationTest extends TestCase
             'instanceof_parent_child',
             'child_service',
             'child_service_expected',
+        );
+
+        $container = new ContainerBuilder();
+        $container->registerForAutoconfiguration(IntegrationTestStub::class)
+            ->addMethodCall('setSunshine', array('supernova'));
+        yield array(
+            'instanceof_and_calls',
+            'main_service',
+            'main_service_expected',
+            $container,
         );
     }
 }

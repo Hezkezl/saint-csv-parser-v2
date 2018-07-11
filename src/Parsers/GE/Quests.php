@@ -6,6 +6,9 @@ use App\Parsers\CsvParseTrait;
 use App\Parsers\ParseInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 
+/**
+ * php bin/console app:parse:csv GE:Quests
+ */
 class Quests implements ParseInterface
 {
     use CsvParseTrait;
@@ -16,6 +19,7 @@ class Quests implements ParseInterface
         |Patch = {patch}
         |Index = {id}
         |Name = {name}{types}{repeatable}{faction}{eventicon}{reputationrank}
+        |Icontype = {questicontype}.png
         {smallimage}
         |Level = {level}
         {requiredclass}
@@ -30,7 +34,7 @@ class Quests implements ParseInterface
         |Description =
         {expreward}{gilreward}{sealsreward}
         {tomestones}{relations}{instanceunlock}{questrewards}{catalystrewards}{guaranteeditem7}{guaranteeditem8}{guaranteeditem9}{guaranteeditem11}{questoptionrewards}
-        
+        {trait}
         |Issuing NPC = {questgiver}
         |NPC Location =
         
@@ -74,6 +78,7 @@ class Quests implements ParseInterface
         $BeastReputationRankCsv = $this->csv('BeastReputationRank');
         $BeastTribeCsv = $this->csv('BeastTribe');
         $TraitCsv = $this->csv('Trait');
+        $EventIconTypeCsv = $this->csv('EventIconType');
 
         $this->io->progressStart($questCsv->total);
 
@@ -89,22 +94,25 @@ class Quests implements ParseInterface
             }
 
             //---------------------------------------------------------------------------------
-            //---------------------------------------------------------------------------------
-            //---------------------------------------------------------------------------------
-            //---------------------------------------------------------------------------------
-            //---------------------------------------------------------------------------------
+            // Actual code definition begins below!
             //---------------------------------------------------------------------------------
 
-            // change tomestone number to wiki parameter name
+            // Grab the correct EventIconType which should then show the correct Icon for a quest
+            // (the 'Blue Icon' that appears above an NPC's head, instead of the minimap icon)
+            //$EventIconType = $this->getRaw('EventIconType', $raw->event_icon_type);
+            //$npcIconAvailable = $EventIconType->npc_icon_available;
+            //$npcIconAvailable += $npcIconAvailable ? ( $quest->is_repeatable == "False" ? 1 : 2 ) : 0;
+
+            $EventIconType = $EventIconTypeCsv->at($quest['EventIconType'])['NpcIcon{Available}'];
+            $EventIconType += $EventIconType ? (($quest['IsRepeatable']) == "False" ? 1 : 2) : 0;
+            //$questCsv->at($quest['PreviousQuest[0]'])
+
+            // change Rewarded Tomestone Number to Correct Wiki Parameter/Name
             $tomestoneList = [
                 1 => '|ARRTomestone = ',
                 2 => '|TomestoneLow = ',
                 3 => '|TomestoneHigh = ',
             ];
-
-            $TraitReward = $TraitCsv->find("Quest", $quest["id"]);
-            print_r(array_values($TraitReward));
-            //echo "Reward = $TraitReward\n";
 
             // Loop through guaranteed QuestRewards and display the Item Name
             $questRewards = [];
@@ -210,17 +218,14 @@ class Quests implements ParseInterface
                 $guaranteedreward11 = $string;
             }
 
-
-
-
-
-
-
-
-
-
-
-
+            $TraitRewardName = false;
+            $TraitReward = $TraitCsv->find("Quest", $quest["id"]);
+            //if ($TraitReward[0]['id'] > 0) {
+            if (isset($TraitReward[0]) && $TraitReward[0]['id'] > 0) {
+                $RewardNumber = ($RewardNumber + 1);
+                $string = "\n|QuestReward ". $RewardNumber ." = ". $TraitReward[0]['Name'];
+                $TraitRewardName = $string;
+            }
 
             // If Event Icon greater than 0 (not blank) then display it in an html comment.
             // Need to update this later with a switch for the various Events.
@@ -294,7 +299,7 @@ class Quests implements ParseInterface
 
             // Show EXPReward if more than zero. Otherwise, blank it.
             if ($this->getQuestExp($quest) > 0) {
-                $string = "\n|EXPReward = ". $this->getQuestExp($quest);
+                $string = "\n|EXPReward = ". floor($this->getQuestExp($quest));
                 $expreward = $string;
             } else {
                 $string = "\n|EXPReward =";
@@ -315,7 +320,7 @@ class Quests implements ParseInterface
             //^^^ 29,"Lominsan Sidequests",3,1,3
 
             //Show the Index # of the JournalCategory.csv file
-            $JournalCategoryNumber = $JournalCategoryCsv->at($JournalGenreRow['JournalCategory'])['id'];
+            //$JournalCategoryNumber = $JournalCategoryCsv->at($JournalGenreRow['JournalCategory'])['id'];
             //^^^ 29
 
             //Take the same row from $JournalGenreName (JournalGenre.csv) and, using the information found at
@@ -324,7 +329,7 @@ class Quests implements ParseInterface
             $JournalCategoryName = $JournalCategoryCsv->at($JournalGenreRow['JournalCategory'])['Name'];
             //^^^ Lominsan Sidequests
 
-            $JournalSectionRow = $JournalSectionCsv->at($JournalCategoryRow['JournalSection']);
+            //$JournalSectionRow = $JournalSectionCsv->at($JournalCategoryRow['JournalSection']);
             //^^^ 3,"Sidequests",True,True
 
             //Take the same row from $JournalGenreCategory (JournalCategory.csv) and, using the information found at
@@ -334,45 +339,31 @@ class Quests implements ParseInterface
             //^^^ Sidequests
 
             //Show the Index # of the JournalSection.csv file
-            $JournalSectionNumber = $JournalSectionCsv->at($JournalCategoryRow['JournalSection'])['id'];
+            //$JournalSectionNumber = $JournalSectionCsv->at($JournalCategoryRow['JournalSection'])['id'];
             //^^^ 3
 
             // If SectionName is MSQ, or one of the Beast Tribe Names, show Section and Type.
-            if ($JournalSectionName == "Main Scenario (ARR/Heavensward)" || $JournalSectionName == "Main Scenario (Stormblood)"
-                || $JournalSectionName == "Chronicles of a New Era") {
+            if ($JournalSectionName === "Main Scenario (ARR/Heavensward)"
+                || $JournalSectionName === "Main Scenario (Stormblood)"
+                || $JournalSectionName === "Chronicles of a New Era") {
                 $string = "\n|Section = ". $JournalSectionName;
                 $string .= "\n|Type = ". $JournalCategoryName;
-                $types = $string;
-
-                // If JournalSectionName is for Beast Tribes, then show Section, Type, and subtype
-            } elseif ($JournalSectionName == "Beast Tribe Quests (ARR/Heavensward)" || $JournalSectionName
-                == "Beast Tribe Quests (Stormblood)") {
-                $string = "\n|Section = ". $JournalSectionName;
-                $string .= "\n|Type = ". $JournalCategoryName;
-                $string .= "\n|Subtype = ".$JournalGenreName;
                 $types = $string;
 
                 // Else if $JournalSectionName is Sidequests and $JournalCategoryName is not equal to Side Story Quests
                 // show Type, Subtype, and Subtype2 (Placename for SubType2 since all Sidequests except SSQ show it.)
             } elseif ($JournalSectionName === "Sidequests" && $JournalCategoryName != "Side Story Quests") {
                 $QuestPlaceName = $PlaceNameCsv->at($quest['PlaceName'])['Name'];
-                $string = "\n|Type = " . $JournalSectionName;
-                $string .= "\n|Subtype = " . $JournalCategoryName;
-                $string .= "\n|Subtype2 = " . $QuestPlaceName;
+                $string = "\n|Type = ". $JournalSectionName;
+                $string .= "\n|Subtype = ". $JournalCategoryName;
+                $string .= "\n|Subtype2 = ". $QuestPlaceName;
                 $types = $string;
 
-                // If Other quests (GC, Seasonal, Special quests) then show specific order.
-            } elseif ($JournalSectionName === "Other Quests") {
+                // Otherwise, for everything else how Section, Type, and Subtype.
+            } else {
                 $string = "\n|Section = ". $JournalSectionName;
                 $string .= "\n|Type = ". $JournalCategoryName;
                 $string .= "\n|Subtype = ". $JournalGenreName;
-                $types = $string;
-
-                // Otherwise, for everything else (Job quests, Levequests, etc) show Section, Type, and Subtype correctly.
-            } else {
-                $string = "\n|Section = ". $JournalSectionName;
-                $string .= "\n|Type = ". $JournalGenreName;
-                $string .= "\n|Subtype = ". $JournalSectionName;
                 $types = $string;
             }
 
@@ -391,9 +382,67 @@ class Quests implements ParseInterface
             $prevquest2 = $questCsv->at($quest['PreviousQuest[1]'])['Name'];
             $prevquest3 = $questCsv->at($quest['PreviousQuest[2]'])['Name'];
 
-            // npc start + finish name
+            // Show the names of Required Dungeons to Unlock this quest.
+            $InstanceContent1 = $InstanceContentCsv->at($quest['InstanceContent[0]'])['Name'];
+            $InstanceContent2 = $InstanceContentCsv->at($quest['InstanceContent[1]'])['Name'];
+            $InstanceContent3 = $InstanceContentCsv->at($quest['InstanceContent[2]'])['Name'];
+
+            // Quest Giver Name (All Words In Name Capitalized)
             $questgiver = ucwords(strtolower($ENpcResidentCsv->at($quest['ENpcResident{Start}'])['Singular']));
 
+            // Start Quest Objectives / Journal Entry code
+            $objectives = [];
+            $dialogue = [];
+            $journal =[];
+            if (!empty($quest['Id'])) {
+                $folder = substr(explode('_', $quest['Id'])[1], 0, 3);
+                $textdata = $this->csv("quest/{$folder}/{$quest['Id']}");
+
+                foreach($textdata->data as $i => $entry) {
+                    // grab files to a friendlier variable name
+                    $id = $entry['id'];
+                    $command = $entry['unknown_1'];
+                    $text = $entry['unknown_2'];
+                    
+                    // get the text group from the command
+                    $textgroup = $this->getTextGroup($i, $command);
+
+                    // ---------------------------------------------------------------
+                    // Handle quest text data
+                    // ---------------------------------------------------------------
+
+                    /**
+                     * Textgroup provides details on the command type, eg:
+                     * type: (npc, question, todo, scene, etc
+                     * npc: if "type == dialogue", then npc be the npc name!
+                     * order: the entry order, might not need
+                     *
+                     * Fill up arrays and then you can use something like:
+                     *
+                     *          implode("\n", $objectives)
+                     *
+                     * to throw them in your wiki format at the bottom
+                     */
+
+                    // add objective
+                    if ($textgroup->type == 'todo' && strlen($text) > 1) {
+                        $objectives[] = '*' .$text;
+                    }
+
+                    // add dialogue
+                    if ($textgroup->type == 'dialogue' && strlen($text) > 1) {
+                        // example: NPC says: Blah blah blah
+                        $dialogue[] = '{{Loremquote|' .$textgroup->npc .'|link=y|'. $text .'}}';
+                    }
+
+                    // add journal
+                    if ($textgroup->type == 'journal' && strlen($text) > 1) {
+                        $journal[] = '*' .$text;
+                    }
+
+                    // ---------------------------------------------------------------
+                }
+            }
             //---------------------------------------------------------------------------------
 
             $data = [
@@ -401,18 +450,17 @@ class Quests implements ParseInterface
                 '{id}' => $quest['id'],
                 '{name}' => $quest['Name'],
                 '{types}' => $types,
-                //'{questicontype}' => $npcIconAvailable,
+                '{questicontype}' => $EventIconType,
                 '{eventicon}' => $eventicon,
                 '{smallimage}' => $smallimage,
                 '{level}' => $quest['ClassJobLevel[0]'],
                 '{reputationrank}' => $reputation,
                 '{repeatable}' => $repeatable,
-                //'{interval}' => $quest['repeat_interval_type,']
                 '{faction}' => $faction,
                 '{requiredclass}' => $requiredclass,
-                '{instancecontent1}' => $quest['InstanceContent[0]'] ? "|Dungeon Requirement = ". $quest['InstanceContent[0]'] : "",
-                '{instancecontent2}' => $quest['InstanceContent[1]'] ? ", ". $quest['InstanceContent[1]'] : "",
-                '{instancecontent3}' => $quest['InstanceContent[2]'] ? ", ". $quest['InstanceContent[2]'] : "",
+                '{instancecontent1}' => $InstanceContent1 ? "\n|Dungeon Requirement = ". $InstanceContent1: "",
+                '{instancecontent2}' => $InstanceContent2 ? ", ". $InstanceContent2 : "",
+                '{instancecontent3}' => $InstanceContent3 ? ", ". $InstanceContent3 : "",
                 '{prevquest1}' => $prevquest1 ? $prevquest1 : "",
                 '{prevquest2}' => $prevquest2 ? ", ". $prevquest2 : "",
                 '{prevquest3}' => $prevquest3 ? ", ". $prevquest3 : "",
@@ -430,20 +478,13 @@ class Quests implements ParseInterface
                 '{guaranteeditem11}' => $guaranteedreward11,
                 '{questoptionrewards}' => $questoptionRewards,
                 '{questgiver}' => $questgiver,
-                //'{journal}' => implode("\n", $journal),
-                //'{objectives}' => implode("\n",  $objectives),
-                //'{dialogue}' => implode("\n", $dialogue),
-                //'{traits}' => $TraitRow,
+                '{journal}' => implode("\n", $journal),
+                '{objectives}' => implode("\n",  $objectives),
+                '{dialogue}' => implode("\n", $dialogue),
+                '{trait}' => $TraitRewardName,
             ];
 
-//            echo "
-//JournalGenreName:         {$JournalGenreName}
-//JournalCategoryName:      {$JournalCategoryName}
-//JournalSectionName:       {$JournalSectionName}
-//JournalCategoryNumber:    {$JournalCategoryNumber}
-//JournalSectionNumber:     {$JournalSectionNumber}\n";
-
-            // format using GamerEscape Formater and add to data array
+            // format using Gamer Escape formatter and add to data array
             $this->data[] = GeFormatter::format(self::WIKI_FORMAT, $data);
         }
 
@@ -456,6 +497,131 @@ class Quests implements ParseInterface
             [ 'Filename', 'Data Count', 'File Size' ],
             $info
         );
+    }
+
+    /**
+     * This is from XIVDB v3 and will be maintained there.
+     * Supports:
+     * - BattleTalk
+     * - Journal
+     * - Scene
+     * - Todo (Objectives)
+     * - Pop
+     * - Access
+     * - Instance Talk
+     * - Questions + Answers
+     * - NPC Dialogue
+     * - System
+     *
+     * @param $i
+     * @param $command
+     * @return \stdClass
+     */
+    private function getTextGroup($i, $command)
+    {
+        $data = new \stdClass();
+        $data->type = null;
+        $data->npc = null;
+        $data->order = null;
+
+        // split command
+        $command = explode('_', $command);
+
+        // special one (npc battle talk)
+        if ($command[4] == 'BATTLETALK') {
+            $data->type = 'battle_talk';
+            $data->npc = ucwords(strtolower($command[3]));
+            $data->order = isset($command[5]) ? intval($command[5]) : $i;
+            return $data;
+        }
+
+        // build data structure from command
+        switch($command[3]) {
+            case 'SEQ':
+                $data->type = 'journal';
+                $data->order = intval($command[4]);
+                break;
+
+            case 'SCENE':
+                $data->type = 'scene';
+                $data->order = intval($command[7]);
+                break;
+
+            case 'TODO':
+                $data->type = 'todo';
+                $data->order = intval($command[4]);
+                break;
+
+            case 'POP':
+                $data->type = 'pop';
+                $data->order = $i;
+                break;
+
+            case 'ACCESS':
+                $data->type = 'access';
+                $data->order = $i;
+                break;
+
+            case 'INSTANCE':
+                $data->type = 'instance_talk';
+                $data->order = $i;
+                break;
+
+            case 'SYSTEM':
+                $data->type = 'system';
+                $data->order = $i;
+                break;
+
+            case 'QIB':
+                $npc = filter_var($command[4], FILTER_SANITIZE_STRING);
+
+                // sometimes QIB can be a todo
+                if ($npc == 'TODO') {
+                    $data->type = 'todo';
+                    $data->order = $i;
+                    break;
+                }
+
+                $data->type = 'battle_talk';
+                $data->npc = ucwords(strtolower($npc));
+                $data->order = $i;
+                break;
+
+            // 20 possible questions ...
+            case 'Q1':  case 'Q2':  case 'Q3':  case 'Q4':  case 'Q5':
+            case 'Q6':  case 'Q7':  case 'Q8':  case 'Q9':  case 'Q10':
+            case 'Q11': case 'Q12': case 'Q13': case 'Q14': case 'Q15':
+            case 'Q16': case 'Q17': case 'Q18': case 'Q19': case 'Q20':
+            $data->type = 'qa_question';
+            $data->order = intval($command[4]);
+            break;
+
+            // with 20 possible answers ...
+            case 'A1':  case 'A2':  case 'A3':  case 'A4':  case 'A5':
+            case 'A6':  case 'A7':  case 'A8':  case 'A9':  case 'A10':
+            case 'A11': case 'A12': case 'A13': case 'A14': case 'A15':
+            case 'A16': case 'A17': case 'A18': case 'A19': case 'A20':
+            $data->type = 'qa_answer';
+            $data->order = intval($command[4]);
+            break;
+
+            default:
+                $npc = ucwords(strtolower($command[3]));
+                $order = isset($command[5]) ? intval($command[5]) : intval($command[4]);
+
+                // if npc is numeric, budge over 1
+                if (is_numeric($npc)) {
+                    $npc = ucwords(strtolower($command[4]));
+                    $order = intval($command[3]);
+                }
+
+
+                $data->type = 'dialogue';
+                $data->npc = $npc;
+                $data->order = $order;
+        }
+
+        return $data;
     }
 
     private function getQuestExp($quest)

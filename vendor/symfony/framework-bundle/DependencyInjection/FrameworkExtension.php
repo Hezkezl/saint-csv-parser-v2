@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
+use Symfony\Bridge\Twig\Extension\CsrfExtension;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Bundle\FrameworkBundle\Routing\AnnotatedRouteControllerLoader;
@@ -39,7 +40,10 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Parameter;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
@@ -56,6 +60,12 @@ use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Lock\Store\StoreFactory;
 use Symfony\Component\Lock\StoreInterface;
+use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
+use Symfony\Component\Messenger\MessageBus;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Transport\ChainSender;
+use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
+use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
@@ -67,8 +77,10 @@ use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
 use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
+use Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
@@ -109,6 +121,12 @@ class FrameworkExtension extends Extension
         $loader->load('web.xml');
         $loader->load('services.xml');
         $loader->load('fragment_renderer.xml');
+
+        if (!interface_exists(ContainerBagInterface::class)) {
+            $container->removeDefinition('parameter_bag');
+            $container->removeAlias(ContainerBagInterface::class);
+            $container->removeAlias(ParameterBagInterface::class);
+        }
 
         if (class_exists(Application::class)) {
             $loader->load('console.xml');
@@ -159,6 +177,7 @@ class FrameworkExtension extends Extension
                     'emacs' => 'emacs://open?url=file://%%f&line=%%l',
                     'sublime' => 'subl://open?url=file://%%f&line=%%l',
                     'phpstorm' => 'phpstorm://open?file=%%f&line=%%l',
+                    'atom' => 'atom://core/open/file?filename=%%f&line=%%l',
                 );
                 $ide = $config['ide'];
 
@@ -250,6 +269,13 @@ class FrameworkExtension extends Extension
             $this->registerLockConfiguration($config['lock'], $container, $loader);
         }
 
+        if ($this->isConfigEnabled($container, $config['messenger'])) {
+            $this->registerMessengerConfiguration($config['messenger'], $container, $loader, $config['serializer'], $config['validation']);
+        } else {
+            $container->removeDefinition('console.command.messenger_consume_messages');
+            $container->removeDefinition('console.command.messenger_debug');
+        }
+
         if ($this->isConfigEnabled($container, $config['web_link'])) {
             if (!class_exists(HttpHeaderSerializer::class)) {
                 throw new LogicException('WebLink support cannot be enabled as the WebLink component is not installed.');
@@ -273,6 +299,8 @@ class FrameworkExtension extends Extension
             ->addTag('config_cache.resource_checker');
         $container->registerForAutoconfiguration(EnvVarProcessorInterface::class)
             ->addTag('container.env_var_processor');
+        $container->registerForAutoconfiguration(ServiceLocator::class)
+            ->addTag('container.service_locator');
         $container->registerForAutoconfiguration(ServiceSubscriberInterface::class)
             ->addTag('container.service_subscriber');
         $container->registerForAutoconfiguration(ArgumentValueResolverInterface::class)
@@ -315,6 +343,10 @@ class FrameworkExtension extends Extension
             ->addTag('validator.constraint_validator');
         $container->registerForAutoconfiguration(ObjectInitializerInterface::class)
             ->addTag('validator.initializer');
+        $container->registerForAutoconfiguration(MessageHandlerInterface::class)
+            ->addTag('messenger.message_handler');
+        $container->registerForAutoconfiguration(TransportFactoryInterface::class)
+            ->addTag('messenger.transport_factory');
 
         if (!$container->getParameter('kernel.debug')) {
             // remove tagged iterator argument for resource checkers
@@ -448,32 +480,68 @@ class FrameworkExtension extends Extension
         foreach ($config['workflows'] as $name => $workflow) {
             $type = $workflow['type'];
 
+            // Process Metadata (workflow + places (transition is done in the "create transition" block))
+            $metadataStoreDefinition = new Definition(Workflow\Metadata\InMemoryMetadataStore::class, array(array(), array(), null));
+            if ($workflow['metadata']) {
+                $metadataStoreDefinition->replaceArgument(0, $workflow['metadata']);
+            }
+            $placesMetadata = array();
+            foreach ($workflow['places'] as $place) {
+                if ($place['metadata']) {
+                    $placesMetadata[$place['name']] = $place['metadata'];
+                }
+            }
+            if ($placesMetadata) {
+                $metadataStoreDefinition->replaceArgument(1, $placesMetadata);
+            }
+
+            // Create transitions
             $transitions = array();
+            $transitionsMetadataDefinition = new Definition(\SplObjectStorage::class);
             foreach ($workflow['transitions'] as $transition) {
                 if ('workflow' === $type) {
-                    $transitions[] = new Definition(Workflow\Transition::class, array($transition['name'], $transition['from'], $transition['to']));
+                    $transitionDefinition = new Definition(Workflow\Transition::class, array($transition['name'], $transition['from'], $transition['to']));
+                    $transitions[] = $transitionDefinition;
+                    if ($transition['metadata']) {
+                        $transitionsMetadataDefinition->addMethodCall('attach', array(
+                            $transitionDefinition,
+                            $transition['metadata'],
+                        ));
+                    }
                 } elseif ('state_machine' === $type) {
                     foreach ($transition['from'] as $from) {
                         foreach ($transition['to'] as $to) {
-                            $transitions[] = new Definition(Workflow\Transition::class, array($transition['name'], $from, $to));
+                            $transitionDefinition = new Definition(Workflow\Transition::class, array($transition['name'], $from, $to));
+                            $transitions[] = $transitionDefinition;
+                            if ($transition['metadata']) {
+                                $transitionsMetadataDefinition->addMethodCall('attach', array(
+                                    $transitionDefinition,
+                                    $transition['metadata'],
+                                ));
+                            }
                         }
                     }
                 }
             }
+            $metadataStoreDefinition->replaceArgument(2, $transitionsMetadataDefinition);
+
+            // Create places
+            $places = array_map(function (array $place) {
+                return $place['name'];
+            }, $workflow['places']);
 
             // Create a Definition
             $definitionDefinition = new Definition(Workflow\Definition::class);
             $definitionDefinition->setPublic(false);
-            $definitionDefinition->addArgument($workflow['places']);
+            $definitionDefinition->addArgument($places);
             $definitionDefinition->addArgument($transitions);
+            $definitionDefinition->addArgument($workflow['initial_place'] ?? null);
+            $definitionDefinition->addArgument($metadataStoreDefinition);
             $definitionDefinition->addTag('workflow.definition', array(
                 'name' => $name,
                 'type' => $type,
                 'marking_store' => isset($workflow['marking_store']['type']) ? $workflow['marking_store']['type'] : null,
             ));
-            if (isset($workflow['initial_place'])) {
-                $definitionDefinition->addArgument($workflow['initial_place']);
-            }
 
             // Create MarkingStore
             if (isset($workflow['marking_store']['type'])) {
@@ -501,12 +569,12 @@ class FrameworkExtension extends Extension
             // Add workflow to Registry
             if ($workflow['supports']) {
                 foreach ($workflow['supports'] as $supportedClassName) {
-                    $strategyDefinition = new Definition(Workflow\SupportStrategy\ClassInstanceSupportStrategy::class, array($supportedClassName));
+                    $strategyDefinition = new Definition(Workflow\SupportStrategy\InstanceOfSupportStrategy::class, array($supportedClassName));
                     $strategyDefinition->setPublic(false);
-                    $registryDefinition->addMethodCall('add', array(new Reference($workflowId), $strategyDefinition));
+                    $registryDefinition->addMethodCall('addWorkflow', array(new Reference($workflowId), $strategyDefinition));
                 }
             } elseif (isset($workflow['support_strategy'])) {
-                $registryDefinition->addMethodCall('add', array(new Reference($workflowId), new Reference($workflow['support_strategy'])));
+                $registryDefinition->addMethodCall('addWorkflow', array(new Reference($workflowId), new Reference($workflow['support_strategy'])));
             }
 
             // Enable the AuditTrail
@@ -583,8 +651,10 @@ class FrameworkExtension extends Extension
 
         $definition = $container->findDefinition('debug.debug_handlers_listener');
 
-        if (!$config['log']) {
+        if (false === $config['log']) {
             $definition->replaceArgument(1, null);
+        } elseif (true !== $config['log']) {
+            $definition->replaceArgument(2, $config['log']);
         }
 
         if (!$config['throw']) {
@@ -597,6 +667,7 @@ class FrameworkExtension extends Extension
         if ($debug && class_exists(DebugProcessor::class)) {
             $definition = new Definition(DebugProcessor::class);
             $definition->setPublic(false);
+            $definition->addArgument(new Reference('request_stack'));
             $container->setDefinition('debug.log_processor', $definition);
         }
     }
@@ -611,6 +682,13 @@ class FrameworkExtension extends Extension
         }
 
         $loader->load('routing.xml');
+
+        if (!interface_exists(ContainerBagInterface::class)) {
+            $container->getDefinition('router.default')
+                ->replaceArgument(0, new Reference('service_container'))
+                ->clearTag('container.service_subscriber')
+            ;
+        }
 
         $container->setParameter('router.resource', $config['resource']);
         $container->setParameter('router.cache_class_prefix', $container->getParameter('kernel.container_class'));
@@ -960,6 +1038,10 @@ class FrameworkExtension extends Extension
             throw new LogicException('Validation support cannot be enabled as the Validator component is not installed.');
         }
 
+        if (!isset($config['email_validation_mode'])) {
+            $config['email_validation_mode'] = 'loose';
+        }
+
         $loader->load('validator.xml');
 
         $validatorBuilder = $container->getDefinition('validator.builder');
@@ -978,7 +1060,7 @@ class FrameworkExtension extends Extension
         }
 
         $definition = $container->findDefinition('validator.email');
-        $definition->replaceArgument(0, $config['strict_email']);
+        $definition->replaceArgument(0, $config['email_validation_mode']);
 
         if (array_key_exists('enable_annotations', $config) && $config['enable_annotations']) {
             if (!$this->annotationsConfigEnabled) {
@@ -1152,6 +1234,10 @@ class FrameworkExtension extends Extension
 
         // Enable services for CSRF protection (even without forms)
         $loader->load('security_csrf.xml');
+
+        if (!class_exists(CsrfExtension::class)) {
+            $container->removeDefinition('twig.extension.security_csrf');
+        }
     }
 
     private function registerSerializerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
@@ -1160,6 +1246,15 @@ class FrameworkExtension extends Extension
 
         if (!class_exists(DateIntervalNormalizer::class)) {
             $container->removeDefinition('serializer.normalizer.dateinterval');
+        }
+
+        if (!class_exists(ConstraintViolationListNormalizer::class)) {
+            $container->removeDefinition('serializer.normalizer.constraint_violation_list');
+        }
+
+        if (!class_exists(ClassDiscriminatorFromClassMetadata::class)) {
+            $container->removeAlias('Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface');
+            $container->removeDefinition('serializer.mapping.class_discriminator_resolver');
         }
 
         $chainLoader = $container->getDefinition('serializer.mapping.chain_loader');
@@ -1244,6 +1339,10 @@ class FrameworkExtension extends Extension
         if (isset($config['circular_reference_handler']) && $config['circular_reference_handler']) {
             $container->getDefinition('serializer.normalizer.object')->addMethodCall('setCircularReferenceHandler', array(new Reference($config['circular_reference_handler'])));
         }
+
+        if ($config['max_depth_handler'] ?? false) {
+            $container->getDefinition('serializer.normalizer.object')->addMethodCall('setMaxDepthHandler', array(new Reference($config['max_depth_handler'])));
+        }
     }
 
     private function registerPropertyInfoConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
@@ -1279,7 +1378,7 @@ class FrameworkExtension extends Extension
                         $storeDefinition = new Reference('lock.store.semaphore');
                         break;
                     case $usedEnvs || preg_match('#^[a-z]++://#', $storeDsn):
-                        if (!$container->hasDefinition($connectionDefinitionId = $container->hash($storeDsn))) {
+                        if (!$container->hasDefinition($connectionDefinitionId = '.lock_connection.'.$container->hash($storeDsn))) {
                             $connectionDefinition = new Definition(\stdClass::class);
                             $connectionDefinition->setPublic(false);
                             $connectionDefinition->setFactory(array(AbstractAdapter::class, 'createConnection'));
@@ -1292,7 +1391,7 @@ class FrameworkExtension extends Extension
                         $storeDefinition->setFactory(array(StoreFactory::class, 'createStore'));
                         $storeDefinition->setArguments(array(new Reference($connectionDefinitionId)));
 
-                        $container->setDefinition($storeDefinitionId = 'lock.'.$resourceName.'.store.'.$container->hash($storeDsn), $storeDefinition);
+                        $container->setDefinition($storeDefinitionId = '.lock.'.$resourceName.'.store.'.$container->hash($storeDsn), $storeDefinition);
 
                         $storeDefinition = new Reference($storeDefinitionId);
                         break;
@@ -1333,6 +1432,104 @@ class FrameworkExtension extends Extension
                 $container->setAlias(Factory::class, new Alias('lock.factory', false));
                 $container->setAlias(LockInterface::class, new Alias('lock', false));
             }
+        }
+    }
+
+    private function registerMessengerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader, array $serializerConfig, array $validationConfig)
+    {
+        if (!interface_exists(MessageBusInterface::class)) {
+            throw new LogicException('Messenger support cannot be enabled as the Messenger component is not installed.');
+        }
+
+        $loader->load('messenger.xml');
+
+        if ($this->isConfigEnabled($container, $config['serializer'])) {
+            if (!$this->isConfigEnabled($container, $serializerConfig)) {
+                throw new LogicException('The default Messenger serializer cannot be enabled as the Serializer support is not available. Try enable it or install it by running "composer require symfony/serializer-pack".');
+            }
+
+            $container->getDefinition('messenger.transport.serializer')
+                ->replaceArgument(1, $config['serializer']['format'])
+                ->replaceArgument(2, $config['serializer']['context']);
+        } else {
+            $container->removeDefinition('messenger.transport.serializer');
+            if ('messenger.transport.serializer' === $config['encoder'] || 'messenger.transport.serializer' === $config['decoder']) {
+                $container->removeDefinition('messenger.transport.amqp.factory');
+            }
+        }
+
+        $container->setAlias('messenger.transport.encoder', $config['encoder']);
+        $container->setAlias('messenger.transport.decoder', $config['decoder']);
+
+        if (null === $config['default_bus']) {
+            if (\count($config['buses']) > 1) {
+                throw new LogicException(sprintf('You need to define a default bus with the "default_bus" configuration. Possible values: %s', implode(', ', array_keys($config['buses']))));
+            }
+
+            $config['default_bus'] = key($config['buses']);
+        }
+
+        $defaultMiddleware = array(
+            'before' => array(array('id' => 'logging')),
+            'after' => array(array('id' => 'route_messages'), array('id' => 'call_message_handler')),
+        );
+        foreach ($config['buses'] as $busId => $bus) {
+            $middleware = $bus['default_middleware'] ? array_merge($defaultMiddleware['before'], $bus['middleware'], $defaultMiddleware['after']) : $bus['middleware'];
+
+            foreach ($middleware as $middlewareItem) {
+                if (!$validationConfig['enabled'] && 'messenger.middleware.validation' === $middlewareItem['id']) {
+                    throw new LogicException('The Validation middleware is only available when the Validator component is installed and enabled. Try running "composer require symfony/validator".');
+                }
+            }
+
+            $container->setParameter($busId.'.middleware', $middleware);
+            $container->register($busId, MessageBus::class)->addArgument(array())->addTag('messenger.bus');
+
+            if ($busId === $config['default_bus']) {
+                $container->setAlias('message_bus', $busId);
+                $container->setAlias(MessageBusInterface::class, $busId);
+            }
+        }
+
+        if (!$container->hasAlias('message_bus')) {
+            throw new LogicException(sprintf('The default bus named "%s" is not defined. Define it or change the default bus name.', $config['default_bus']));
+        }
+
+        $messageToSenderIdMapping = array();
+        $messageToSendAndHandleMapping = array();
+        foreach ($config['routing'] as $message => $messageConfiguration) {
+            if ('*' !== $message && !class_exists($message) && !interface_exists($message, false)) {
+                throw new LogicException(sprintf('Messenger routing configuration contains a mistake: message "%s" does not exist. It needs to match an existing class or interface.', $message));
+            }
+
+            if (1 < \count($messageConfiguration['senders'])) {
+                $senders = array_map(function ($sender) { return new Reference($sender); }, $messageConfiguration['senders']);
+                $chainSenderDefinition = new Definition(ChainSender::class, array($senders));
+                $chainSenderId = '.messenger.chain_sender.'.$message;
+                $container->setDefinition($chainSenderId, $chainSenderDefinition);
+                $messageToSenderIdMapping[$message] = $chainSenderId;
+            } else {
+                $messageToSenderIdMapping[$message] = $messageConfiguration['senders'][0];
+            }
+
+            $messageToSendAndHandleMapping[$message] = $messageConfiguration['send_and_handle'];
+        }
+
+        $container->getDefinition('messenger.asynchronous.routing.sender_locator')->replaceArgument(1, $messageToSenderIdMapping);
+        $container->getDefinition('messenger.middleware.route_messages')->replaceArgument(1, $messageToSendAndHandleMapping);
+
+        foreach ($config['transports'] as $name => $transport) {
+            if (0 === strpos($transport['dsn'], 'amqp://') && !$container->hasDefinition('messenger.transport.amqp.factory')) {
+                throw new LogicException('The default AMQP transport is not available. Make sure you have installed and enabled the Serializer component. Try enable it or install it by running "composer require symfony/serializer-pack".');
+            }
+
+            $transportDefinition = (new Definition(TransportInterface::class))
+                ->setFactory(array(new Reference('messenger.transport_factory'), 'createTransport'))
+                ->setArguments(array($transport['dsn'], $transport['options']))
+                ->addTag('messenger.receiver', array('alias' => $name))
+                ->addTag('messenger.sender', array('alias' => $name))
+            ;
+            $container->setDefinition('messenger.transport.'.$name, $transportDefinition);
         }
     }
 

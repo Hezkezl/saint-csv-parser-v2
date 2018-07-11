@@ -76,14 +76,13 @@ trait ControllerTrait
     /**
      * Forwards the request to another controller.
      *
-     * @param string $controller The controller name (a string like BlogBundle:Post:index)
+     * @param string $controller The controller name (a string like Bundle\BlogBundle\Controller\PostController::indexAction)
      *
      * @final
      */
     protected function forward(string $controller, array $path = array(), array $query = array()): Response
     {
         $request = $this->container->get('request_stack')->getCurrentRequest();
-        $path['_forwarded'] = $request->attributes;
         $path['_controller'] = $controller;
         $subRequest = $request->duplicate($query, null, $path);
 
@@ -382,5 +381,21 @@ trait ControllerTrait
         }
 
         return $this->container->get('security.csrf.token_manager')->isTokenValid(new CsrfToken($id, $token));
+    }
+
+    /**
+     * Dispatches a message to the bus.
+     *
+     * @param object $message The message to dispatch
+     *
+     * @final
+     */
+    protected function dispatchMessage($message)
+    {
+        if (!$this->container->has('message_bus')) {
+            throw new \LogicException('The message bus is not enabled in your application. Try running "composer require symfony/messenger".');
+        }
+
+        return $this->container->get('message_bus')->dispatch($message);
     }
 }
