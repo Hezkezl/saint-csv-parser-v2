@@ -212,16 +212,6 @@ class Quests implements ParseInterface
 
 
 
-
-
-
-
-
-
-
-
-
-
             // If Event Icon greater than 0 (not blank) then display it in an html comment.
             // Need to update this later with a switch for the various Events.
             $eventicon = false;
