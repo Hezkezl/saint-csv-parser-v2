@@ -10,8 +10,8 @@ class Quests implements ParseInterface
 {
     use CsvParseTrait;
 
-    // the wiki format we shall use
-    const WIKI_FORMAT = '
+    // the wiki output format / template we shall use
+    const WIKI_FORMAT = 'http://ffxiv.gamerescape.com/wiki/{name}?action=edit
         {{ARR Infobox Quest
         |Patch = {patch}
         |Index = {id}
@@ -23,7 +23,7 @@ class Quests implements ParseInterface
         |Required Affiliation =
         |Quest Number ={instancecontent1}{instancecontent2}{instancecontent3}
 
-        |Required Quests ={prevquest1}{prevquest2}{prevquest3}
+        |Required Quests ={prevquestspace1}{prevquest2}{prevquest3}
         |Unlocks Quests =
 
         |Objectives =
@@ -80,12 +80,11 @@ class Quests implements ParseInterface
 
         // loop through quest data
         foreach($questCsv->data as $id => $quest) {
-            //print_r(array_keys($quest));die;
             // ---------------------------------------------------------
             $this->io->progressAdvance();
 
             // skip ones without a name
-            if (empty($quest['Name'])) {
+            if (empty($quest['Name']) || $quest['Name'] === "Testdfghjkl;") {
                 continue;
             }
 
@@ -375,6 +374,7 @@ class Quests implements ParseInterface
 
             //Show the Previous Quest(s) correct Name by looking them up.
             $prevquest1 = $questCsv->at($quest['PreviousQuest[0]'])['Name'];
+            $prevquestspace1 = $questCsv->at($quest['PreviousQuest[0]'])['Name'];
             $prevquest2 = $questCsv->at($quest['PreviousQuest[1]'])['Name'];
             $prevquest3 = $questCsv->at($quest['PreviousQuest[2]'])['Name'];
 
@@ -398,7 +398,7 @@ class Quests implements ParseInterface
 
                 foreach($textdata->data as $i => $entry) {
                     // grab files to a friendlier variable name
-                    $id = $entry['id'];
+                    //$id = $entry['id'];
                     $command = $entry['unknown_1'];
                     $text = $entry['unknown_2'];
 
@@ -459,6 +459,7 @@ class Quests implements ParseInterface
                 '{instancecontent1}' => $InstanceContent1 ? "\n|Dungeon Requirement = ". $InstanceContent1: "",
                 '{instancecontent2}' => $InstanceContent2 ? ", ". $InstanceContent2 : "",
                 '{instancecontent3}' => $InstanceContent3 ? ", ". $InstanceContent3 : "",
+                '{prevquestspace1}' => $prevquestspace1 ? " ". $prevquestspace1 : "",
                 '{prevquest1}' => $prevquest1 ? $prevquest1 : "",
                 '{prevquest2}' => $prevquest2 ? ", ". $prevquest2 : "",
                 '{prevquest3}' => $prevquest3 ? ", ". $prevquest3 : "",
