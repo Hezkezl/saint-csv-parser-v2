@@ -155,17 +155,16 @@ class Quests implements ParseInterface
 
                 // if optional item count is greater than zero, show the reward.
                 if ($quest["ItemCount{Reward}[1][{$i}]"] > 0) {
-                    $RewardNumber = ($RewardNumber + 1);
-                    $string = "\n|QuestRewardOption ". $RewardNumber ." = ". $optionalitemname;
+                    $string = "\n|QuestRewardOption ". ($i+1) ." = ". $optionalitemname;
 
                     // If Qty is greater than 1, show Qty.
                     if ($quest["ItemCount{Reward}[1][{$i}]"] > 1) {
-                        $string .= "\n|QuestRewardOption ". $RewardNumber ." Count = ". $quest["ItemCount{Reward}[1][{$i}]"] ."\n";
+                        $string .= "\n|QuestRewardOption ". ($i+1) ." Count = ". $quest["ItemCount{Reward}[1][{$i}]"] ."\n";
                     }
 
                     // If reward is HQ, show HQ.
                     if ($quest["IsHQ{Reward}[1][{$i}]"] === "True") {
-                        $string .= "\n|QuestRewardOption ". $RewardNumber ." HQ = x\n";
+                        $string .= "\n|QuestRewardOption ". ($i+1) ." HQ = x\n";
                     }
 
                     $questoptionRewards[] = $string;
