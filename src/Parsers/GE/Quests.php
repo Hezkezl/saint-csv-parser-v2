@@ -6,6 +6,9 @@ use App\Parsers\CsvParseTrait;
 use App\Parsers\ParseInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 
+/**
+ * php bin/console app:parse:csv GE:Quests
+ */
 class Quests implements ParseInterface
 {
     use CsvParseTrait;
@@ -394,18 +397,13 @@ class Quests implements ParseInterface
             if (!empty($quest['Id'])) {
                 $folder = substr(explode('_', $quest['Id'])[1], 0, 3);
                 $textdata = $this->csv("quest/{$folder}/{$quest['Id']}");
-                //print_r($textdata);die;
 
-                foreach($textdata as $i => $entry) {
+                foreach($textdata->data as $i => $entry) {
                     // grab files to a friendlier variable name
-                    //$id = $entry[0];
-                    //$command = $entry[1];
-                    //$text = $entry[2];
                     $id = $entry['id'];
                     $command = $entry['unknown_1'];
                     $text = $entry['unknown_2'];
-
-
+                    
                     // get the text group from the command
                     $textgroup = $this->getTextGroup($i, $command);
 
@@ -527,7 +525,6 @@ class Quests implements ParseInterface
         $data->order = null;
 
         // split command
-        print_r($command);die;
         $command = explode('_', $command);
 
         // special one (npc battle talk)
