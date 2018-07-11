@@ -23,6 +23,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
@@ -408,7 +409,7 @@ class XmlFileLoader extends FileLoader
             foreach ($nodes as $node) {
                 if ($services = $this->getChildren($node, 'service')) {
                     // give it a unique name
-                    $id = sprintf('%d_%s', ++$count, preg_replace('/^.*\\\\/', '', $services[0]->getAttribute('class')).'~'.$suffix);
+                    $id = sprintf('.%d_%s', ++$count, preg_replace('/^.*\\\\/', '', $services[0]->getAttribute('class')).'~'.$suffix);
                     $node->setAttribute('id', $id);
                     $node->setAttribute('service', $id);
 
@@ -510,6 +511,12 @@ class XmlFileLoader extends FileLoader
                         throw new InvalidArgumentException(sprintf('Tag "<%s>" with type="tagged" has no or empty "tag" attribute in "%s".', $name, $file));
                     }
                     $arguments[$key] = new TaggedIteratorArgument($arg->getAttribute('tag'));
+                    break;
+                case 'binary':
+                    if (false === $value = base64_decode($arg->nodeValue)) {
+                        throw new InvalidArgumentException(sprintf('Tag "<%s>" with type="binary" is not a valid base64 encoded string.', $name));
+                    }
+                    $arguments[$key] = $value;
                     break;
                 case 'string':
                     $arguments[$key] = $arg->nodeValue;
@@ -661,7 +668,7 @@ EOF
 
             // can it be handled by an extension?
             if (!$this->container->hasExtension($node->namespaceURI)) {
-                $extensionNamespaces = array_filter(array_map(function ($ext) { return $ext->getNamespace(); }, $this->container->getExtensions()));
+                $extensionNamespaces = array_filter(array_map(function (ExtensionInterface $ext) { return $ext->getNamespace(); }, $this->container->getExtensions()));
                 throw new InvalidArgumentException(sprintf(
                     'There is no extension able to load the configuration for "%s" (in %s). Looked for namespace "%s", found %s',
                     $node->tagName,

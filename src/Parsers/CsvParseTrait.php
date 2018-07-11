@@ -74,6 +74,11 @@ trait CsvParseTrait
             if (!$githubFiledata) {
                 $this->io->text('<error>Could not download file from github: '. $githubFilename);die;
             }
+            
+            $pi = pathinfo($filename);
+            if (!is_dir($pi['dirname'])) {
+                mkdir($pi['dirname'], 0777, true);
+            }
 
             file_put_contents($filename, $githubFiledata);
             $this->io->text('✓ Download complete');

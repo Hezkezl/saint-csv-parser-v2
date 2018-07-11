@@ -6,6 +6,9 @@ use App\Parsers\CsvParseTrait;
 use App\Parsers\ParseInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 
+/**
+ * php bin/console app:parse:csv GE:Quests
+ */
 class Quests implements ParseInterface
 {
     use CsvParseTrait;
