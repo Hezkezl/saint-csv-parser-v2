@@ -30,6 +30,7 @@ class Quests implements ParseInterface
         |Description =
         {expreward}{gilreward}{sealsreward}
         {tomestones}{relations}{instanceunlock}{questrewards}{catalystrewards}{guaranteeditem7}{guaranteeditem8}{guaranteeditem9}{guaranteeditem11}{questoptionrewards}
+        
         |Issuing NPC = {questgiver}
         |NPC Location =
         
@@ -72,7 +73,7 @@ class Quests implements ParseInterface
         $InstanceContentCsv = $this->csv('InstanceContent');
         $BeastReputationRankCsv = $this->csv('BeastReputationRank');
         $BeastTribeCsv = $this->csv('BeastTribe');
-
+        $TraitCsv = $this->csv('Trait');
 
         $this->io->progressStart($questCsv->total);
 
@@ -101,57 +102,67 @@ class Quests implements ParseInterface
                 3 => '|TomestoneHigh = ',
             ];
 
+            $TraitReward = $TraitCsv->find("Quest", $quest["id"]);
+            print_r(array_values($TraitReward));
+            //echo "Reward = $TraitReward\n";
+
             // Loop through guaranteed QuestRewards and display the Item Name
             $questRewards = [];
+            $RewardNumber = false;
             foreach(range(0,5) as $i) {
                 $guaranteeditemname = $ItemCsv->at($quest["Item{Reward}[0][{$i}]"])['Name'];
                 if ($quest["ItemCount{Reward}[0][{$i}]"] > 0) {
-                    $string = "\n\n|QuestReward ". ($i+1) ." = ". $guaranteeditemname;
+                    $RewardNumber = ($RewardNumber + 1);
+                    $string = "\n\n|QuestReward ". $RewardNumber ." = ". $guaranteeditemname;
 
                     // Show the Qty if more than 1 is received.
                     if ($quest["ItemCount{Reward}[0][{$i}]"] > 1) {
-                        $string .= "\n|QuestReward ". ($i+1) ." Count = ". $quest["ItemCount{Reward}[0][{$i}]"] ."\n";
+                        $string .= "\n|QuestReward ". $RewardNumber ." Count = ". $quest["ItemCount{Reward}[0][{$i}]"] ."\n";
                     }
 
                     $questRewards[] = $string;
                 }
             }
+
             $questRewards = implode("\n", $questRewards);
 
-            // Loop through catalyst rewards and display the Item Name as QuestReward 6, 7, or 8
+            // Loop through catalyst rewards and display the Item Name as QuestReward #.
             $catalystRewards = [];
             foreach(range(0,2) as $i) {
                 $guaranteedcatalystname = $ItemCsv->at($quest["Item{Catalyst}[{$i}]"])['Name'];
-                if ($quest["ItemCount{Catalyst}[{$i}]"] > 1) {
-                    $string = "\n|QuestReward ". (6+$i) ." = ". $guaranteedcatalystname;
+                if ($quest["ItemCount{Catalyst}[{$i}]"] > 0) {
+                    $RewardNumber = ($RewardNumber + 1);
+                    $string = "\n|QuestReward ". $RewardNumber ." = ". $guaranteedcatalystname;
 
                     // show Catalyst Qty received if greater than 1
                     if ($quest["ItemCount{Catalyst}[{$i}]"] > 1) {
-                        $string .= "\n|QuestReward ". (6+$i) ." Count = ". $quest["ItemCount{Catalyst}[{$i}]"] ."\n";
+                        $string .= "\n|QuestReward ". $RewardNumber ." Count = ". $quest["ItemCount{Catalyst}[{$i}]"] ."\n";
                     }
 
                     $catalystRewards[] = $string;
                 }
             }
+
             $catalystRewards = implode("\n", $catalystRewards);
 
-            // Loop through optional quest rewards and display them, as QuestRewardOption 1, 2, 3, or 4.
+            // Loop through optional quest rewards and display them, as QuestRewardOption #.
             $questoptionRewards = [];
             foreach(range(0,4) as $i) {
                 $optionalitemname = $ItemCsv->at($quest["Item{Reward}[1][{$i}]"])['Name'];
 
                 // if optional item count is greater than zero, show the reward.
                 if ($quest["ItemCount{Reward}[1][{$i}]"] > 0) {
-                    $string = "\n|QuestRewardOption ". ($i+1) ." = ". $optionalitemname;
+                    $RewardNumber = ($RewardNumber + 1);
+                    $string = "\n|QuestRewardOption ". $RewardNumber ." = ". $optionalitemname;
 
                     // If Qty is greater than 1, show Qty.
                     if ($quest["ItemCount{Reward}[1][{$i}]"] > 1) {
-                        $string .= "\n|QuestRewardOption ". ($i+1) ." Count = ". $quest["ItemCount{Reward}[1][{$i}]"] ."\n";
+                        $string .= "\n|QuestRewardOption ". $RewardNumber ." Count = ". $quest["ItemCount{Reward}[1][{$i}]"] ."\n";
                     }
 
                     // If reward is HQ, show HQ.
                     if ($quest["IsHQ{Reward}[1][{$i}]"] === "True") {
-                        $string .= "\n|QuestRewardOption ". ($i+1) ." HQ = x\n";
+                        $string .= "\n|QuestRewardOption ". $RewardNumber ." HQ = x\n";
                     }
 
                     $questoptionRewards[] = $string;
@@ -162,16 +173,18 @@ class Quests implements ParseInterface
             // If Emote is received as reward, display Emote Name from Emote.csv
             $guaranteedreward7 = false;
             if ($quest['Emote{Reward}']) {
+                $RewardNumber = ($RewardNumber + 1);
                 $emoterewardname = $EmoteCsv->at($quest["Emote{Reward}"])['Name'];
-                $string = "\n|QuestReward 10 = ". $emoterewardname;
+                $string = "\n|QuestReward ". $RewardNumber ." = ". $emoterewardname;
                 $guaranteedreward7 = $string;
             }
 
             // If Class/Job Action is rewarded, display Action Name from Action.csv
             $guaranteedreward8 = false;
             if ($quest['Action{Reward}']) {
+                $RewardNumber = ($RewardNumber + 1);
                 $ActionRewardName = $ActionCsv->at($quest['Action{Reward}'])['Name'];
-                $string = "\n|QuestReward 11 = ". $ActionRewardName;
+                $string = "\n|QuestReward ". $RewardNumber ." = ". $ActionRewardName;
                 $guaranteedreward8 = $string;
             }
 
@@ -179,20 +192,35 @@ class Quests implements ParseInterface
             $guaranteedreward9 = [];
             foreach(range(0,1) as $i) {
                 if ($quest["GeneralAction{Reward}[{$i}]"] > 0){
+                    $RewardNumber = ($RewardNumber + 1);
                     $GeneralActionRewardName = $ActionCsv->at($quest["GeneralAction{Reward}[{$i}]"])['Name'];
-                    $string = "\n|QuestReward ". ($i+12) ." = ". $GeneralActionRewardName;
+                    $string = "\n|QuestReward ". $RewardNumber ." = ". $GeneralActionRewardName;
                     $guaranteedreward9[] = $string;
                 }
             }
+
             $guaranteedreward9 = implode("\n", $guaranteedreward9);
 
             // If "Other Reward" is received, then show Other Name from OtherReward.csv
             $guaranteedreward11 = false;
             if ($quest['Other{Reward}']) {
+                $RewardNumber = ($RewardNumber + 1);
                 $OtherRewardName = $OtherRewardCsv->at($quest['Other{Reward}'])['Name'];
-                $string = "\n|QuestReward 14 = ". $OtherRewardName;
+                $string = "\n|QuestReward ". $RewardNumber ." = ". $OtherRewardName;
                 $guaranteedreward11 = $string;
             }
+
+
+
+
+
+
+
+
+
+
+
+
 
             // If Event Icon greater than 0 (not blank) then display it in an html comment.
             // Need to update this later with a switch for the various Events.
@@ -405,6 +433,7 @@ class Quests implements ParseInterface
                 //'{journal}' => implode("\n", $journal),
                 //'{objectives}' => implode("\n",  $objectives),
                 //'{dialogue}' => implode("\n", $dialogue),
+                //'{traits}' => $TraitRow,
             ];
 
 //            echo "
