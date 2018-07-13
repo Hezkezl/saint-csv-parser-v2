@@ -17,6 +17,8 @@ use Symfony\Bundle\FullStack;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Lock\Store\SemaphoreStore;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Serializer\Serializer;
 
 class ConfigurationTest extends TestCase
 {
@@ -187,7 +189,7 @@ class ConfigurationTest extends TestCase
             'translator' => array(
                 'enabled' => !class_exists(FullStack::class),
                 'fallbacks' => array('en'),
-                'logging' => true,
+                'logging' => false,
                 'formatter' => 'translator.formatter.default',
                 'paths' => array(),
                 'default_path' => '%kernel.project_dir%/translations',
@@ -197,7 +199,6 @@ class ConfigurationTest extends TestCase
                 'enable_annotations' => !class_exists(FullStack::class),
                 'static_method' => array('loadValidatorMetadata'),
                 'translation_domain' => 'validators',
-                'strict_email' => false,
                 'mapping' => array(
                     'paths' => array(),
                 ),
@@ -284,6 +285,20 @@ class ConfigurationTest extends TestCase
                         class_exists(SemaphoreStore::class) && SemaphoreStore::isSupported() ? 'semaphore' : 'flock',
                     ),
                 ),
+            ),
+            'messenger' => array(
+                'enabled' => !class_exists(FullStack::class) && interface_exists(MessageBusInterface::class),
+                'routing' => array(),
+                'transports' => array(),
+                'serializer' => array(
+                    'enabled' => !class_exists(FullStack::class),
+                    'format' => 'json',
+                    'context' => array(),
+                ),
+                'encoder' => 'messenger.transport.serializer',
+                'decoder' => 'messenger.transport.serializer',
+                'default_bus' => null,
+                'buses' => array('messenger.bus.default' => array('default_middleware' => true, 'middleware' => array())),
             ),
         );
     }
