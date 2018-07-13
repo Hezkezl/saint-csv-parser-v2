@@ -33,9 +33,10 @@ class Quests implements ParseInterface
         |Issuing NPC = {questgiver}
         |NPC Location =
         
-        |NPCs Involved =
+        |NPCs Involved = {npcs}
         |Mobs Involved =
-        |Items Involved =
+        |Items Involved = {items}
+        |Key Items Involved = {keyitems}
         
         |Description =
         |Journal =
@@ -46,7 +47,8 @@ class Quests implements ParseInterface
         |Dialogue =
         |Etymology =
         |Images =
-        |Notes =
+        |Notes = Quest Script Below:
+        {script}
         }}
         http://ffxiv.gamerescape.com/wiki/Loremonger:{name}?action=edit
         <noinclude>{{Lorempageturn|prev={prevquest1}|next=}}{{Loremquestheader|{name}|Mined=X|Summary=}}</noinclude>
@@ -75,6 +77,8 @@ class Quests implements ParseInterface
         $BeastTribeCsv = $this->csv('BeastTribe');
         $TraitCsv = $this->csv('Trait');
         $EventIconTypeCsv = $this->csv('EventIconType');
+        //$BNpcNameCsv = $this->csv('BNpcName');
+        $KeyItemCsv = $this->csv('EventItem');
 
         $this->io->progressStart($questCsv->total);
 
@@ -291,7 +295,7 @@ class Quests implements ParseInterface
                 $gilreward = $string;
             }
 
-            // Show EXPReward if more than zero. Otherwise, blank it.
+            // Show EXPReward if more than zero and round it down. Otherwise, blank it.
             if ($this->getQuestExp($quest) > 0) {
                 $string = "\n|EXPReward = ". floor($this->getQuestExp($quest));
                 $expreward = $string;
@@ -389,6 +393,10 @@ class Quests implements ParseInterface
             $objectives = [];
             $dialogue = [];
             $journal =[];
+            $questscripts = [];
+            $ItemsInvolved = [];
+            $KeyItemsInvolved = [];
+            $NpcsInvolved = [];
 
             if (!empty($quest['Id'])) {
                 $folder = substr(explode('_', $quest['Id'])[1], 0, 3);
@@ -439,6 +447,42 @@ class Quests implements ParseInterface
 
                     // ---------------------------------------------------------------
                 }
+
+                foreach(range(0,49) as $i) {
+                    if (!empty($quest["Script{Instruction}[$i]"])) {
+                        $string = "|Quest Script = ". $quest["Script{Instruction}[$i]"] ." = ". $quest["Script{Arg}[$i]"];
+                        $questscripts[] = $string;
+
+                        foreach(range(0,5) as $key) {
+                            if ($quest["Script{Instruction}[$i]"] == "RITEM{$key}") {
+                                $string =  $ItemCsv->at($quest["Script{Arg}[$i]"])['Name'];
+                                $ItemsInvolved[] = $string;
+                            }
+                        }
+
+                        foreach(range(0,6) as $key) {
+                            if ($quest["Script{Instruction}[$i]"] == "ITEM{$key}") {
+                                $string =  $KeyItemCsv->at($quest["Script{Arg}[$i]"])['Name'];
+                                $KeyItemsInvolved[] = $string;
+                            }
+                        }
+
+                        foreach(range(0,31) as $key) {
+                            if ($quest["Script{Instruction}[$i]"] == "ACTOR{$key}") {
+                                if (!empty($ENpcResidentCsv->at($quest["Script{Arg}[$i]"])['Singular'])) {
+                                    $string = ucwords(strtolower($ENpcResidentCsv->at($quest["Script{Arg}[$i]"])['Singular']));
+                                    $NpcsInvolved[] = $string;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                $questscripts = implode("\n", $questscripts);
+                $ItemsInvolved = implode(", ",$ItemsInvolved);
+                $KeyItemsInvolved = implode(", ", $KeyItemsInvolved);
+                $NpcsInvolved = implode(", ", $NpcsInvolved);
+
             }
             //---------------------------------------------------------------------------------
 
@@ -480,6 +524,10 @@ class Quests implements ParseInterface
                 '{objectives}' => implode("\n",  $objectives),
                 '{dialogue}' => implode("\n", $dialogue),
                 '{trait}' => $TraitRewardName,
+                '{script}' => $questscripts,
+                '{items}' => $ItemsInvolved,
+                '{keyitems}' =>$KeyItemsInvolved,
+                '{npcs}' => $NpcsInvolved,
             ];
 
             // format using Gamer Escape formatter and add to data array
@@ -495,6 +543,7 @@ class Quests implements ParseInterface
             [ 'Filename', 'Data Count', 'File Size' ],
             $info
         );
+
     }
 
     /**
