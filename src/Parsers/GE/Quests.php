@@ -6,9 +6,6 @@ use App\Parsers\CsvParseTrait;
 use App\Parsers\ParseInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 
-/**
- * php bin/console app:parse:csv GE:Quests
- */
 class Quests implements ParseInterface
 {
     use CsvParseTrait;
@@ -36,9 +33,10 @@ class Quests implements ParseInterface
         |Issuing NPC = {questgiver}
         |NPC Location =
         
-        |NPCs Involved =
+        |NPCs Involved = {npcs}
         |Mobs Involved =
-        |Items Involved =
+        |Items Involved = {items}
+        |Key Items Involved = {keyitems}
         
         |Description =
         |Journal =
@@ -78,6 +76,9 @@ class Quests implements ParseInterface
         $BeastTribeCsv = $this->csv('BeastTribe');
         $TraitCsv = $this->csv('Trait');
         $EventIconTypeCsv = $this->csv('EventIconType');
+        $KeyItemCsv = $this->csv('EventItem');
+        //$LevelCsv = $this->csv('Level');
+        //$MapCsv = $this->csv('Map');
 
         $this->io->progressStart($questCsv->total);
 
@@ -97,13 +98,8 @@ class Quests implements ParseInterface
 
             // Grab the correct EventIconType which should then show the correct Icon for a quest
             // (the 'Blue Icon' that appears above an NPC's head, instead of the minimap icon)
-            //$EventIconType = $this->getRaw('EventIconType', $raw->event_icon_type);
-            //$npcIconAvailable = $EventIconType->npc_icon_available;
-            //$npcIconAvailable += $npcIconAvailable ? ( $quest->is_repeatable == "False" ? 1 : 2 ) : 0;
-
             $EventIconType = $EventIconTypeCsv->at($quest['EventIconType'])['NpcIcon{Available}'];
             $EventIconType += $EventIconType ? (($quest['IsRepeatable']) == "False" ? 1 : 2) : 0;
-            //$questCsv->at($quest['PreviousQuest[0]'])
 
             // change Rewarded Tomestone Number to Correct Wiki Parameter/Name
             $tomestoneList = [
@@ -151,24 +147,24 @@ class Quests implements ParseInterface
 
             $catalystRewards = implode("\n", $catalystRewards);
 
-            // Loop through optional quest rewards and display them, as QuestRewardOption #.
+            // Loop through optional quest rewards and display them, as QuestRewardOption $i.
+            // (Does not use the $RewardNumber value, as Optional Rewards have different priority
             $questoptionRewards = [];
             foreach(range(0,4) as $i) {
                 $optionalitemname = $ItemCsv->at($quest["Item{Reward}[1][{$i}]"])['Name'];
 
                 // if optional item count is greater than zero, show the reward.
                 if ($quest["ItemCount{Reward}[1][{$i}]"] > 0) {
-                    $RewardNumber = ($RewardNumber + 1);
-                    $string = "\n|QuestRewardOption ". $RewardNumber ." = ". $optionalitemname;
+                    $string = "\n|QuestRewardOption ". ($i+1) ." = ". $optionalitemname;
 
                     // If Qty is greater than 1, show Qty.
                     if ($quest["ItemCount{Reward}[1][{$i}]"] > 1) {
-                        $string .= "\n|QuestRewardOption ". $RewardNumber ." Count = ". $quest["ItemCount{Reward}[1][{$i}]"] ."\n";
+                        $string .= "\n|QuestRewardOption ". ($i+1) ." Count = ". $quest["ItemCount{Reward}[1][{$i}]"] ."\n";
                     }
 
                     // If reward is HQ, show HQ.
                     if ($quest["IsHQ{Reward}[1][{$i}]"] === "True") {
-                        $string .= "\n|QuestRewardOption ". $RewardNumber ." HQ = x\n";
+                        $string .= "\n|QuestRewardOption ". ($i+1) ." HQ = x\n";
                     }
 
                     $questoptionRewards[] = $string;
@@ -225,19 +221,33 @@ class Quests implements ParseInterface
                 $TraitRewardName = $string;
             }
 
-            // If Event Icon greater than 0 (not blank) then display it in an html comment.
-            // Need to update this later with a switch for the various Events.
-            $eventicon = false;
-            if ($quest['Icon{Special}'] > 0) {
-                $string = "\n|Event = <!-- ui/icon/080000/". $quest['Icon{Special}'] .".tex -->";
-                $eventicon = $string;
-            }
+            // If Event Icon greater than 0 (ie: not blank) then convert it to the appropriate event with a
+            // placeholder year
+            $eventicon = [
+                80101 => "\n|Event = Moonfire Faire (2018)",
+                80102 => "\n|Event = Lightning Strikes (2018)",
+                80103 => "\n|Event = All Saints' Wake (2018)",
+                80104 => "\n|Event = Breaking Brick Mountains (2018)",
+                80105 => "\n|Event = The Maiden's Rhapsody (2018)",
+                80106 => "\n|Event = Starlight Celebration (2018)",
+                80107 => "\n|Event = Heavensturn (2014)",
+                80108 => "\n|Event = Valentione's Day (2018)",
+                80109 => "\n|Event = Little Ladies' Day (2018)",
+                80110 => "\n|Event = Hatching-tide (2018)",
+                80112 => "\n|Event = Heavensturn (2015)",
+                80113 => "\n|Event = The Rising (2018)",
+                80115 => "\n|Event = Heavensturn (2016)",
+                80116 => "\n|Event = The Make It Rain Campaign (2018)",
+                80117 => "\n|Event = Yo-kai Watch (2018)",
+                80118 => "\n|Event = Heavensturn (2017)",
+                80119 => "\n|Event = Heavensturn (2018)",
+            ];
 
             // If Small Image (Quest Header Image) is greater than 0 (not blank), then display in html comment
             // with "Quest Name Image.png" as default location for the filename to be saved.
             $smallimage = false;
             if ($quest['Icon'] > 0) {
-                $string = "\n|SmallImage = ". $quest['Name'] ." Image.png <!-- ui/icon/100000/". $quest['Icon'] .".tex -->";
+                $string = "\n|Header Image = ". $quest['Icon'] .".png";
                 $smallimage = $string;
             }
 
@@ -295,7 +305,7 @@ class Quests implements ParseInterface
                 $gilreward = $string;
             }
 
-            // Show EXPReward if more than zero. Otherwise, blank it.
+            // Show EXPReward if more than zero and round it down. Otherwise, blank it.
             if ($this->getQuestExp($quest) > 0) {
                 $string = "\n|EXPReward = ". floor($this->getQuestExp($quest));
                 $expreward = $string;
@@ -340,7 +350,7 @@ class Quests implements ParseInterface
             //$JournalSectionNumber = $JournalSectionCsv->at($JournalCategoryRow['JournalSection'])['id'];
             //^^^ 3
 
-            // If SectionName is MSQ, or one of the Beast Tribe Names, show Section and Type.
+            // If SectionName is MSQ, or Chronicles of a New Era, show Section and Type.
             if ($JournalSectionName === "Main Scenario (ARR/Heavensward)"
                 || $JournalSectionName === "Main Scenario (Stormblood)"
                 || $JournalSectionName === "Chronicles of a New Era") {
@@ -357,7 +367,7 @@ class Quests implements ParseInterface
                 $string .= "\n|Subtype2 = ". $QuestPlaceName;
                 $types = $string;
 
-                // Otherwise, for everything else how Section, Type, and Subtype.
+                // Otherwise, for everything else show Section, Type, and Subtype.
             } else {
                 $string = "\n|Section = ". $JournalSectionName;
                 $string .= "\n|Type = ". $JournalCategoryName;
@@ -394,6 +404,8 @@ class Quests implements ParseInterface
             $dialogue = [];
             $journal =[];
 
+            //If the Quest ID (NOT the same as id) is not empty, get the first three letters of the string after the
+            //underscore (_) in its full name, and store it as $folder. ie: "BanNam305_03107" would be: $folder = 031
             if (!empty($quest['Id'])) {
                 $folder = substr(explode('_', $quest['Id'])[1], 0, 3);
                 $textdata = $this->csv("quest/{$folder}/{$quest['Id']}");
@@ -443,6 +455,96 @@ class Quests implements ParseInterface
 
                     // ---------------------------------------------------------------
                 }
+
+                $ItemsInvolved = [];
+                $KeyItemsInvolved = [];
+                $NpcsInvolved = [];
+                //$questscripts = [];
+                //$NpcLevelX = false;
+                //$NpcLevelZ = false;
+                //$NpcLevelMap = false;
+                //$scale = false;
+                //$NpcPlaceName = false;
+                //$NpcLocation = false;
+
+                //Look up the Quest Scripts looking through the columns "Script{Instruction}[0-49]"
+                foreach(range(0,49) as $i) {
+                    if (!empty($quest["Script{Instruction}[$i]"])) {
+                        //Show "|Quest Script =" along with a full list of the Quest instructions and Arguments.
+                        //$string = "|Quest Script = ". $quest["Script{Instruction}[$i]"] ." = ". $quest["Script{Arg}[$i]"];
+                        //$questscripts[] = $string;
+
+                        //Look up the Required Items (RITEM[0-5]) using the Name value from ItemCsv
+                        foreach(range(0,5) as $key) {
+                            if ($quest["Script{Instruction}[$i]"] == "RITEM{$key}") {
+                                $string =  $ItemCsv->at($quest["Script{Arg}[$i]"])['Name'];
+                                $ItemsInvolved[] = $string;
+                            }
+                        }
+
+                        //Look up the Required Key Items (ITEM[0-6]) using the Name value from KeyItemCsv
+                        foreach(range(0,6) as $key) {
+                            if ($quest["Script{Instruction}[$i]"] == "ITEM{$key}") {
+                                $string =  $KeyItemCsv->at($quest["Script{Arg}[$i]"])['Name'];
+                                $KeyItemsInvolved[] = $string;
+                            }
+                        }
+
+                        //Look up all of the NPCS Involved (Actor[0-31]) and convert to their proper Singular name.
+                        foreach(range(0,31) as $key) {
+                            if ($quest["Script{Instruction}[$i]"] == "ACTOR{$key}") {
+                                if (!empty($ENpcResidentCsv->at($quest["Script{Arg}[$i]"])['Singular'])) {
+                                    $string = ucwords(strtolower($ENpcResidentCsv->at($quest["Script{Arg}[$i]"])['Singular']));
+                                    $NpcsInvolved[] = $string;
+                                }
+                            }
+                        }
+
+                        //Failed attempt at looking up NPC Locations based off of LOC_ACTOR#
+                        //foreach(range(0,31) as $key) {
+                            //if ($quest["Script{Instruction}[$i]"] == "LOC_ACTOR{$key}") {
+
+                                //If the Level Location of $i's LOC_ACTOR is above the smallest ID# shown in Level.csv
+                                //if ($quest["Script{Arg}[$i]"] > 1034659) {
+
+                                    //Retrieve the X, Z, and Map values using the Level info
+                                    //$NpcLevelX = $LevelCsv->at($quest["Script{Arg}[$i]"])['X'];
+                                    //$NpcLevelZ = $LevelCsv->at($quest["Script{Arg}[$i]"])['Z'];
+                                    //$NpcLevelMap = $LevelCsv->at($quest["Script{Arg}[$i]"])['Map'];
+
+                                    //Retrieve the 'Scale' size from Map.csv using the Map value
+                                    //$scale = $MapCsv->at($NpcLevelMap)['SizeFactor'];
+
+                                    //Pick 1 of the 3 PlaceNames from the Map.csv file, and convert to its actual name
+                                    //if ($MapCsv->at($NpcLevelMap)["PlaceName{Sub}"] > 0) {
+                                        //$NpcPlaceName = $PlaceNameCsv->at($MapCsv->at($NpcLevelMap)["PlaceName{Sub}"])['Name'];
+                                        //} elseif ($MapCsv->at($NpcLevelMap)["PlaceName"] > 0) {
+                                        //$NpcPlaceName = $PlaceNameCsv->at($MapCsv->at($NpcLevelMap)["PlaceName"])['Name'];
+                                        //} elseif ($MapCsv->at($NpcLevelMap)["PlaceName{Region}"] > 0) {
+                                        //$NpcPlaceName = $PlaceNameCsv->at($MapCsv->at($NpcLevelMap)["PlaceName{Region}"])['Name'];
+                                        //} elseif ($MapCsv->at($NpcLevelMap)["PlaceName{Region}"] < 1) {
+                                        //$NpcPlaceName = "Blank";
+                                        //}
+
+                                    //$string = "|Actor{$key} Location = ". $NpcLevelX ." - ". $NpcLevelZ ." - ". $NpcLevelMap ." - ". $scale ." - ". $NpcPlaceName;
+                                    //$NpcLocation = $string;
+                                    //echo "Actor{$key} Location:
+                                    //X         = $NpcLevelX
+                                    //Y         = $NpcLevelZ
+                                    //Map       = $NpcLevelMap
+                                    //Scale     = $scale
+                                    //PlaceName = $NpcPlaceName\n";
+                                //}
+                            //}
+                        //}
+                    }
+                }
+
+                //$questscripts = implode("\n", $questscripts);
+                $ItemsInvolved = implode(", ",$ItemsInvolved);
+                $KeyItemsInvolved = implode(", ", $KeyItemsInvolved);
+                $NpcsInvolved = implode(", ", $NpcsInvolved);
+
             }
             //---------------------------------------------------------------------------------
 
@@ -452,7 +554,8 @@ class Quests implements ParseInterface
                 '{name}' => $quest['Name'],
                 '{types}' => $types,
                 '{questicontype}' => $EventIconType,
-                '{eventicon}' => $eventicon,
+                //'{eventicon}' => $eventicon,
+                '{eventicon}' => $quest['Icon{Special}'] ? $eventicon[$quest['Icon{Special}']] : '',
                 '{smallimage}' => $smallimage,
                 '{level}' => $quest['ClassJobLevel[0]'],
                 '{reputationrank}' => $reputation,
@@ -484,6 +587,11 @@ class Quests implements ParseInterface
                 '{objectives}' => implode("\n",  $objectives),
                 '{dialogue}' => implode("\n", $dialogue),
                 '{trait}' => $TraitRewardName,
+                '{items}' => $ItemsInvolved,
+                '{keyitems}' =>$KeyItemsInvolved,
+                '{npcs}' => $NpcsInvolved,
+                //'{script}' => $questscripts,
+                //'{npclocation}' => $NpcLocation,
             ];
 
             // format using Gamer Escape formatter and add to data array
@@ -499,6 +607,7 @@ class Quests implements ParseInterface
             [ 'Filename', 'Data Count', 'File Size' ],
             $info
         );
+
     }
 
     /**
