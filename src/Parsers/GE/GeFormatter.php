@@ -14,6 +14,7 @@ class GeFormatter
         // set format
         $format = str_ireplace(array_keys($data), $data, $format);
         $format = str_ireplace('        |','|', $format);
+        $format = str_ireplace("        \n","\n", $format);
         //$format = str_ireplace('    |', '|', $format);
         $format = str_ireplace('        }}','}}', $format);
         $format = str_ireplace('        {{','{{', $format);

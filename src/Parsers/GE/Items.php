@@ -25,20 +25,13 @@ class Items implements ParseInterface
         | Required Level = {level}
         | Item Level     = {itemlevel}
         | Untradable     = {untradable}
-        | Unique         = {unique}{convertible}{sells}{dyeallowed}{crestallowed}{glamour}{desynthesis}{repair}
+        | Unique         = {unique}{convertible}{sells}{hq}{dyeallowed}{crestallowed}{glamour}{desynthesis}{repair}{physicaldamage}{magicdamage}
 
-        | Physical Damage    = {physicaldamage}
-        | Physical Damage HQ = {physicaldamagehq}
-        | Magic Damage    = {magicdamage}
-        | Magic Damage HQ = {magicdamagehq}
         | Defense         = {defense}
         | Defense HQ      = {defensehq}
         | Magic Defense    = {magicdefense}
-        | Magic Defense HQ = {magicdefensehq}
-        | Block Strength    = {blockstrength}
-        | Block Strength HQ = {blockstrengthhq}
-        | Block Rate      = {blockrate}
-        | Block Rate HQ   = {blockratehq}
+        | Magic Defense HQ = {magicdefensehq}{blockstrength}{blockrate}
+        
         | Auto-attack     = {autoattack}
         | Auto-attack HQ  = {autoattackhq}
         | Delay           = {delay}
@@ -253,9 +246,51 @@ class Items implements ParseInterface
             }
 
             // display Repair if it is NOT equal to adventurer
+            // doesn't work?
             $Repair = false;
             if (!$item['ClassJob{Repair}'] === "adventurer") {
                 $Repair = "\n| Repair Class   = ". ucwords(strtolower($ClassJobCsv->at($item['ClassJob{Repair}'])['Name']));
+            }
+
+            // display Physical Damage. Also display HQ if the value in Special[0] is > 0 (slight cheat
+            // should check if HQ but... fuckit) Double line break needed to separate this out from Repair
+            $PhysicalDamage = false;
+            if ($item['Damage{Phys}'] > 0 && $item['BaseParamValue{Special}[0]'] > 0) {
+                $PhysicalDamageHQ = $item['BaseParamValue{Special}[0]'] + $item['Damage{Phys}'];
+                $PhysicalDamage = "\n\n| Physical Damage    = ". $item['Damage{Phys}'] ."\n| Physical Damage HQ = ". $PhysicalDamageHQ;
+            } elseif ($item['Damage{Phys}'] > 0 && $item['BaseParamValue{Special}[0]'] == 0) {
+                $PhysicalDamage = "\n\n| Physical Damage    = ". $item['Damage{Phys}'];
+            }
+
+            // display Magic Damage. Also display HQ if the value in Special[1] is > 0 (slight cheat
+            // should check if HQ but... fuckit) No need for double line break since weapons *always*
+            // have both physical and magic damage on them.
+            $MagicDamage = false;
+            if ($item['Damage{Mag}'] > 0 && $item['BaseParamValue{Special}[1]'] > 0) {
+                $MagicDamageHQ = $item['BaseParamValue{Special}[1]'] + $item['Damage{Mag}'];
+                $MagicDamage = "\n| Magic Damage    = ". $item['Damage{Mag}'] ."\n| Magic Damage HQ = ". $MagicDamageHQ;
+            } elseif ($item['Damage{Mag}'] > 0 && $item['BaseParamValue{Special}[1]'] == 0) {
+                $MagicDamage = "\n| Magic Damage    = ". $item['Damage{Mag}'];
+            }
+
+            // display Block Strength. Also display HQ if the value in Special[1] is > 0 (slight cheat
+            // should check if HQ but... fuckit).
+            $BlockStrength = false;
+            if ($item['Block'] > 0 && $item['BaseParamValue{Special}[1]'] > 0) {
+                $BlockStrengthHQ = $item['BaseParamValue{Special}[1]'] + $item['Block'];
+                $BlockStrength = "\n\n| Block Strength    = ". $item['BlockRate'] ."\n| Block Strength HQ = ". $BlockStrengthHQ;
+            } elseif ($item['Block'] > 0 && $item['BaseParamValue{Special}[1]'] == 0) {
+                $BlockStrength = "\n\n| Block Strength = ". $item['Block'];
+            }
+
+            // display Block Rate. Also display HQ if the value in Special[0] is > 0 (slight cheat
+            // should check if HQ but... fuckit).
+            $BlockRate = false;
+            if ($item['BlockRate'] > 0 && $item['BaseParamValue{Special}[0]'] > 0) {
+                $BlockRateHQ = $item['BaseParamValue{Special}[0]'] + $item['BlockRate'];
+                $BlockRate = "\n| Block Rate      = ". $item['BlockRate'] ."\n| Block Rate HQ   = ". $BlockRateHQ;
+            } elseif ($item['BlockRate'] > 0 && $item['BaseParamValue{Special}[0]'] == 0) {
+                $BlockRate = "\n| Block Rate     = ". $item['BlockRate'];
             }
 
             // Save some data
@@ -275,6 +310,7 @@ class Items implements ParseInterface
                 '{unique}' => $item['IsUnique'],
                 '{convertible}' => $Convertible ? $Convertible : "",
                 '{sells}' => $Sells,
+                '{hq}' => "\n| HQ             = ". $item['CanBeHq'],
                 //'{dyeallowed}' => $DyeAllowed ? $DyeAllowed : "",
                 '{dyeallowed}' => "\n| Dye Allowed    = ". $item['IsDyeable'],
                 //'{crestallowed}' => $CrestAllowed ? $CrestAllowed : "",
@@ -283,6 +319,10 @@ class Items implements ParseInterface
                 '{glamour}' => "\n| Projectable    = ". $item['IsGlamourous'],
                 '{desynthesis}' => $Desynthesis,
                 '{repair}' => $Repair,
+                '{physicaldamage}' => $PhysicalDamage,
+                '{magicdamage}' => $MagicDamage,
+                '{blockstrength}' => $BlockStrength,
+                '{blockrate}' => $BlockRate,
             ];
 
             // format using Gamer Escape formatter and add to data array
