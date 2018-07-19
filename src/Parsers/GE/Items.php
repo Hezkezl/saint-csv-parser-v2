@@ -99,6 +99,7 @@ class Items implements ParseInterface
         $ItemUiCategoryCsv = $this->csv('ItemUICategory');
         $ClassJobCategoryCsv = $this->csv('ClassJobCategory');
         $ClassJobCsv = $this->csv('ClassJob');
+        $SalvageCsv = $this->csv('Salvage');
 
         // (optional) start a progress bar
         $this->io->progressStart($ItemCsv->total);
@@ -150,16 +151,13 @@ class Items implements ParseInterface
                     case 'Fits: All ♀':
                         $Description = "\n| Gender         = Female";
                         break;
-                    case 'Fits: All ♀
-Cannot equip gear to hands, legs, and feet.':
+                    case "Fits: All ♀\nCannot equip gear to hands, legs, and feet.":
                         $Description = "\n| Gender         = Female\n| Other Conditions = Cannot equip gear to hands, legs, and feet.";
                         break;
-                    case 'Fits: All ♂
-Cannot equip gear to head.':
+                    case "Fits: All ♂\nCannot equip gear to head.":
                         $Description = "\n| Gender         = Male\n| Other Conditions = Cannot equip gear to head.";
                         break;
-                    case 'Fits: All ♂
-Cannot equip gear to hands, legs, and feet.':
+                    case "Fits: All ♂\nCannot equip gear to hands, legs, and feet.":
                         $Description = "\n| Gender         = Male\n| Other Conditions = Cannot equip gear to hands, legs, and feet.";
                         break;
                     case 'Fits: Hyur ♂':
@@ -251,7 +249,7 @@ Cannot equip gear to hands, legs, and feet.':
             // (if both show up then it means it can be desynthesized. if only one shows up, it can't)
             $Desynthesis = false;
             if ($item['Salvage'] > 0 && $item['ClassJob{Repair}'] > 0) {
-                $Desynthesis = "\n| Desynthesizable= Yes\n| Desynth Level  = ". $item['Salvage'];
+                $Desynthesis = "\n| Desynthesizable= Yes\n| Desynth Level  = ". $SalvageCsv->at($item['Salvage'])['OptimalSkill'];
             }
 
             // display Repair if it is NOT equal to adventurer
@@ -278,11 +276,11 @@ Cannot equip gear to hands, legs, and feet.':
                 '{convertible}' => $Convertible ? $Convertible : "",
                 '{sells}' => $Sells,
                 //'{dyeallowed}' => $DyeAllowed ? $DyeAllowed : "",
-                '{dyeallowed}' => "\n| Dye Allowed = ". $item['IsDyeable'],
+                '{dyeallowed}' => "\n| Dye Allowed    = ". $item['IsDyeable'],
                 //'{crestallowed}' => $CrestAllowed ? $CrestAllowed : "",
-                '{crestallowed}' => "\n| Crest Allowed = ". $item['IsCrestWorthy'],
+                '{crestallowed}' => "\n| Crest Allowed  = ". $item['IsCrestWorthy'],
                 //'{glamour}' => $Glamour ? $Glamour : "",
-                '{glamour}' => "\n| Projectable = ". $item['IsGlamourous'],
+                '{glamour}' => "\n| Projectable    = ". $item['IsGlamourous'],
                 '{desynthesis}' => $Desynthesis,
                 '{repair}' => $Repair,
             ];

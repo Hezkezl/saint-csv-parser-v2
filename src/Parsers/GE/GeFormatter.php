@@ -13,7 +13,10 @@ class GeFormatter
 
         // set format
         $format = str_ireplace(array_keys($data), $data, $format);
-        $format = str_ireplace('    ', null, $format);
+        $format = str_ireplace('        |','|', $format);
+        //$format = str_ireplace('    |', '|', $format);
+        $format = str_ireplace('        }}','}}', $format);
+        $format = str_ireplace('        {{','{{', $format);
         $format = preg_replace("/\n\n\n+/", "\n\n", $format);
         $format = preg_replace("/(QuestReward.*)\n\n(?!\\|Issuing NPC)/", "$1\n", $format);
         $format = preg_replace("/(QuestReward.*)\n(\\|Issuing NPC.*)/", "$1\n\n$2", $format);
