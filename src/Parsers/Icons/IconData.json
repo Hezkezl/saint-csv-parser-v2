@@ -1,202 +1,566 @@
 [
-  {
-    "id": 22532,
-    "name_en": "Odder Otter Hanging Andon Lamp"
-  },
-  {
-    "id": 22538,
-    "name_en": "Odder Otter Dining Table"
-  },
-  {
-    "id": 22539,
-    "name_en": "Odder Otter Screen"
-  },
-  {
-    "id": 22540,
-    "name_en": "Odder Otter Chair"
-  },
-  {
-    "id": 22541,
-    "name_en": "Odder Otter Wall Lantern"
-  },
-  {
-    "id": 22566,
-    "name_en": "Empyrean Shrine"
-  },
-  {
-    "id": 22579,
-    "name_en": "Odder Otter Bench"
-  },
-  {
-    "id": 22581,
-    "name_en": "Miniature Heaven-on-High"
-  },
-  {
-    "id": 22582,
-    "name_en": "Odder Otter Andon Lamp"
-  },
-  {
-    "id": 22977,
-    "name_en": "Empyrean Blade"
-  },
-  {
-    "id": 22978,
-    "name_en": "Empyrean Fists"
-  },
-  {
-    "id": 22979,
-    "name_en": "Empyrean War Axe"
-  },
-  {
-    "id": 22980,
-    "name_en": "Empyrean Partisan"
-  },
-  {
-    "id": 22981,
-    "name_en": "Empyrean Greatbow"
-  },
-  {
-    "id": 22982,
-    "name_en": "Empyrean Daggers"
-  },
-  {
-    "id": 22983,
-    "name_en": "Empyrean Greatsword"
-  },
-  {
-    "id": 22984,
-    "name_en": "Empyrean Revolver"
-  },
-  {
-    "id": 22985,
-    "name_en": "Empyrean Cane"
-  },
-  {
-    "id": 22986,
-    "name_en": "Empyrean Rod"
-  },
-  {
-    "id": 22987,
-    "name_en": "Empyrean Grimoire"
-  },
-  {
-    "id": 22988,
-    "name_en": "Empyrean Codex"
-  },
-  {
-    "id": 22989,
-    "name_en": "Empyrean Ephemeris"
-  },
-  {
-    "id": 22990,
-    "name_en": "Empyrean Tachi"
-  },
-  {
-    "id": 22991,
-    "name_en": "Empyrean Rapier"
-  },
-  {
-    "id": 22992,
-    "name_en": "Empyrean Shield"
-  },
-  {
-    "id": 22993,
-    "name_en": "Empyrean Earring"
-  },
-  {
-    "id": 22994,
-    "name_en": "Empyrean Necklace"
-  },
-  {
-    "id": 22995,
-    "name_en": "Empyrean Bracelet"
-  },
-  {
-    "id": 22996,
-    "name_en": "Empyrean Ring"
-  },
-  {
-    "id": 23023,
-    "name_en": "Dodo Horn"
-  },
-  {
-    "id": 23024,
-    "name_en": "Juedi Horn"
-  },
-  {
-    "id": 23029,
-    "name_en": "Wind-up Cirina"
-  },
-  {
-    "id": 23033,
-    "name_en": "Frilled Dragon"
-  },
-  {
-    "id": 23044,
-    "name_en": "Wanyudo & Katasharin Card"
-  },
-  {
-    "id": 23045,
-    "name_en": "Hatamoto Card"
-  },
-  {
-    "id": 23048,
-    "name_en": "Hiruko Card"
-  },
-  {
-    "id": 23163,
-    "name_en": "Empyrean Potion"
-  },
-  {
-    "id": 23166,
-    "name_en": "Empyrean Aetherpool Grip"
-  },
-  {
-    "id": 23177,
-    "name_en": "Empyrean Reliquary"
-  },
-  {
-    "id": 23223,
-    "name_en": "Silver-haloed Sack"
-  },
-  {
-    "id": 23224,
-    "name_en": "Gold-haloed Sack"
-  },
-  {
-    "id": 23225,
-    "name_en": "Platinum-haloed Sack"
-  },
-  {
-    "id": 23227,
-    "name_en": "Empyrean Pine Log"
-  },
-  {
-    "id": 23228,
-    "name_en": "Empyrean Clay"
-  },
-  {
-    "id": 23318,
-    "name_en": "Far East of Eorzea Orchestrion Roll"
-  },
-  {
-    "id": 23319,
-    "name_en": "Parting Ways Orchestrion Roll"
-  },
-  {
-    "id": 23320,
-    "name_en": "Revolutions Orchestrion Roll"
-  },
-  {
-    "id": 23365,
-    "name_en": "Ballroom Etiquette - Excessive Petticoats"
-  },
-  {
-    "id": 23369,
-    "name_en": "Modern Aesthetics - Gyr Abanian Plait"
-  },
-  {
-    "id": 23381,
-    "name_en": "Rising Token"
-  }
+        {
+            "id": 22542,
+            "name_en": "Crossed Halberds"
+        },
+        {
+            "id": 22561,
+            "name_en": "Chainmail Hanger"
+        },
+        {
+            "id": 22571,
+            "name_en": "Indoor BBQ Spit"
+        },
+        {
+            "id": 22583,
+            "name_en": "BBQ Spit"
+        },
+        {
+            "id": 22599,
+            "name_en": "Rathalos Scale"
+        },
+        {
+            "id": 22600,
+            "name_en": "Rathalos Whistle"
+        },
+        {
+            "id": 22601,
+            "name_en": "Palico"
+        },
+        {
+            "id": 22602,
+            "name_en": "Poogie"
+        },
+        {
+            "id": 22603,
+            "name_en": "Cornerstone of the New World - Astera Orchestrion Roll"
+        },
+        {
+            "id": 22604,
+            "name_en": "Savage of the Ancient Forest Orchestrion Roll"
+        },
+        {
+            "id": 22605,
+            "name_en": "Proof of a Hero - Monster Hunter: World Version Orchestrion Roll"
+        },
+        {
+            "id": 22606,
+            "name_en": "Augmented Rathalos Helm [M]"
+        },
+        {
+            "id": 22607,
+            "name_en": "Augmented Rathalos Mail [M]"
+        },
+        {
+            "id": 22608,
+            "name_en": "Augmented Rathalos Vambraces [M]"
+        },
+        {
+            "id": 22609,
+            "name_en": "Augmented Rathalos Coil [M]"
+        },
+        {
+            "id": 22610,
+            "name_en": "Augmented Rathalos Greaves [M]"
+        },
+        {
+            "id": 22611,
+            "name_en": "Augmented Rathalos Helm [F]"
+        },
+        {
+            "id": 22612,
+            "name_en": "Augmented Rathalos Mail [F]"
+        },
+        {
+            "id": 22613,
+            "name_en": "Augmented Rathalos Vambraces [F]"
+        },
+        {
+            "id": 22614,
+            "name_en": "Augmented Rathalos Coil [F]"
+        },
+        {
+            "id": 22615,
+            "name_en": "Augmented Rathalos Greaves [F]"
+        },
+        {
+            "id": 22925,
+            "name_en": "Galatyn Pagos"
+        },
+        {
+            "id": 22926,
+            "name_en": "Sudarshana Chakra Pagos"
+        },
+        {
+            "id": 22927,
+            "name_en": "Farsha Pagos"
+        },
+        {
+            "id": 22928,
+            "name_en": "Ryunohige Pagos"
+        },
+        {
+            "id": 22929,
+            "name_en": "Failnaught Pagos"
+        },
+        {
+            "id": 22930,
+            "name_en": "Nagi Pagos"
+        },
+        {
+            "id": 22931,
+            "name_en": "Caladbolg Pagos"
+        },
+        {
+            "id": 22932,
+            "name_en": "Outsider Pagos"
+        },
+        {
+            "id": 22933,
+            "name_en": "Aymur Pagos"
+        },
+        {
+            "id": 22934,
+            "name_en": "Vanargand Pagos"
+        },
+        {
+            "id": 22935,
+            "name_en": "Lemegeton Pagos"
+        },
+        {
+            "id": 22936,
+            "name_en": "Organum Pagos"
+        },
+        {
+            "id": 22937,
+            "name_en": "Pleiades Pagos"
+        },
+        {
+            "id": 22938,
+            "name_en": "Kiku-ichimonji Pagos"
+        },
+        {
+            "id": 22939,
+            "name_en": "Murgleis Pagos"
+        },
+        {
+            "id": 22940,
+            "name_en": "Evalach Pagos"
+        },
+        {
+            "id": 22941,
+            "name_en": "Galatyn Pagos +1"
+        },
+        {
+            "id": 22942,
+            "name_en": "Sudarshana Chakra Pagos +1"
+        },
+        {
+            "id": 22943,
+            "name_en": "Farsha Pagos +1"
+        },
+        {
+            "id": 22944,
+            "name_en": "Ryunohige Pagos +1"
+        },
+        {
+            "id": 22945,
+            "name_en": "Failnaught Pagos +1"
+        },
+        {
+            "id": 22946,
+            "name_en": "Nagi Pagos +1"
+        },
+        {
+            "id": 22947,
+            "name_en": "Caladbolg Pagos +1"
+        },
+        {
+            "id": 22948,
+            "name_en": "Outsider Pagos +1"
+        },
+        {
+            "id": 22949,
+            "name_en": "Aymur Pagos +1"
+        },
+        {
+            "id": 22950,
+            "name_en": "Vanargand Pagos +1"
+        },
+        {
+            "id": 22951,
+            "name_en": "Lemegeton Pagos +1"
+        },
+        {
+            "id": 22952,
+            "name_en": "Organum Pagos +1"
+        },
+        {
+            "id": 22953,
+            "name_en": "Pleiades Pagos +1"
+        },
+        {
+            "id": 22954,
+            "name_en": "Kiku-ichimonji Pagos +1"
+        },
+        {
+            "id": 22955,
+            "name_en": "Murgleis Pagos +1"
+        },
+        {
+            "id": 22956,
+            "name_en": "Evalach Pagos +1"
+        },
+        {
+            "id": 22957,
+            "name_en": "Elemental Sword"
+        },
+        {
+            "id": 22958,
+            "name_en": "Elemental Knuckles"
+        },
+        {
+            "id": 22959,
+            "name_en": "Elemental Battleaxe"
+        },
+        {
+            "id": 22960,
+            "name_en": "Elemental Lance"
+        },
+        {
+            "id": 22961,
+            "name_en": "Elemental Harp Bow"
+        },
+        {
+            "id": 22962,
+            "name_en": "Elemental Knives"
+        },
+        {
+            "id": 22963,
+            "name_en": "Elemental Guillotine"
+        },
+        {
+            "id": 22964,
+            "name_en": "Elemental Handgonne"
+        },
+        {
+            "id": 22965,
+            "name_en": "Elemental Cane"
+        },
+        {
+            "id": 22966,
+            "name_en": "Elemental Rod"
+        },
+        {
+            "id": 22967,
+            "name_en": "Elemental Grimoire"
+        },
+        {
+            "id": 22968,
+            "name_en": "Elemental Codex"
+        },
+        {
+            "id": 22969,
+            "name_en": "Elemental Astrometer"
+        },
+        {
+            "id": 22970,
+            "name_en": "Elemental Blade"
+        },
+        {
+            "id": 22971,
+            "name_en": "Elemental Tuck"
+        },
+        {
+            "id": 22972,
+            "name_en": "Elemental Shield"
+        },
+        {
+            "id": 22973,
+            "name_en": "Cassie Earring"
+        },
+        {
+            "id": 22974,
+            "name_en": "Optical Hat"
+        },
+        {
+            "id": 22975,
+            "name_en": "Louhi's Ice"
+        },
+        {
+            "id": 22976,
+            "name_en": "Pagos Crystal"
+        },
+        {
+            "id": 22997,
+            "name_en": "Boulevardier's Hat"
+        },
+        {
+            "id": 22998,
+            "name_en": "Boulevardier's Ruffled Shirt"
+        },
+        {
+            "id": 22999,
+            "name_en": "Boulevardier's Ruffled Pants"
+        },
+        {
+            "id": 23000,
+            "name_en": "Boulevardier's Dress Shoes"
+        },
+        {
+            "id": 23027,
+            "name_en": "Copycat Bulb"
+        },
+        {
+            "id": 23028,
+            "name_en": "Wind-up Tarutaru"
+        },
+        {
+            "id": 23046,
+            "name_en": "Yukinko Card"
+        },
+        {
+            "id": 23049,
+            "name_en": "Happy Bunny Card"
+        },
+        {
+            "id": 23050,
+            "name_en": "Louhi Card"
+        },
+        {
+            "id": 23126,
+            "name_en": "Galatyn Anemos Replica"
+        },
+        {
+            "id": 23127,
+            "name_en": "Replica Sudarshana Chakra Anemos"
+        },
+        {
+            "id": 23128,
+            "name_en": "Farsha Anemos Replica"
+        },
+        {
+            "id": 23129,
+            "name_en": "Ryunohige Anemos Replica"
+        },
+        {
+            "id": 23130,
+            "name_en": "Failnaught Anemos Replica"
+        },
+        {
+            "id": 23131,
+            "name_en": "Replica Nagi Anemos"
+        },
+        {
+            "id": 23132,
+            "name_en": "Caladbolg Anemos Replica"
+        },
+        {
+            "id": 23133,
+            "name_en": "Outsider Anemos Replica"
+        },
+        {
+            "id": 23134,
+            "name_en": "Aymur Anemos Replica"
+        },
+        {
+            "id": 23135,
+            "name_en": "Vanargand Anemos Replica"
+        },
+        {
+            "id": 23136,
+            "name_en": "Lemegeton Anemos Replica"
+        },
+        {
+            "id": 23137,
+            "name_en": "Organum Anemos Replica"
+        },
+        {
+            "id": 23138,
+            "name_en": "Pleiades Anemos Replica"
+        },
+        {
+            "id": 23139,
+            "name_en": "Kiku-ichimonji Anemos Replica"
+        },
+        {
+            "id": 23140,
+            "name_en": "Murgleis Anemos Replica"
+        },
+        {
+            "id": 23141,
+            "name_en": "Evalach Anemos Replica"
+        },
+        {
+            "id": 23142,
+            "name_en": "Pagos Lockbox"
+        },
+        {
+            "id": 23213,
+            "name_en": "Wooden Hakutaku Eye"
+        },
+        {
+            "id": 23214,
+            "name_en": "Burning Hakutaku Eye"
+        },
+        {
+            "id": 23215,
+            "name_en": "Earthen Hakutaku Eye"
+        },
+        {
+            "id": 23216,
+            "name_en": "Golden Hakutaku Eye"
+        },
+        {
+            "id": 23217,
+            "name_en": "Damp Hakutaku Eye"
+        },
+        {
+            "id": 23218,
+            "name_en": "Hakutaku Eye Cluster"
+        },
+        {
+            "id": 23219,
+            "name_en": "Speed Belt"
+        },
+        {
+            "id": 23229,
+            "name_en": "Stuffed Happy Bunny"
+        },
+        {
+            "id": 23309,
+            "name_en": "Frosted Protean Crystal"
+        },
+        {
+            "id": 23342,
+            "name_en": "Behemoth Pelt"
+        },
+        {
+            "id": 23343,
+            "name_en": "Replica Behemoth Helm"
+        },
+        {
+            "id": 23344,
+            "name_en": "Replica Heavy Behemoth Helm"
+        },
+        {
+            "id": 23345,
+            "name_en": "Lizard Tail"
+        },
+        {
+            "id": 23346,
+            "name_en": "Reishi Mushroom"
+        },
+        {
+            "id": 23347,
+            "name_en": "Pagos Spring Water"
+        },
+        {
+            "id": 23348,
+            "name_en": "Pagos Sage"
+        },
+        {
+            "id": 23349,
+            "name_en": "Potion of Harmony"
+        },
+        {
+            "id": 23350,
+            "name_en": "Pagos Bandana"
+        },
+        {
+            "id": 23351,
+            "name_en": "Pagos Shirt"
+        },
+        {
+            "id": 23352,
+            "name_en": "Pagos Field Dressing"
+        },
+        {
+            "id": 23353,
+            "name_en": "Pagos Gaskins"
+        },
+        {
+            "id": 23354,
+            "name_en": "Pagos Sandals"
+        },
+        {
+            "id": 23355,
+            "name_en": "Pagos Circlet"
+        },
+        {
+            "id": 23356,
+            "name_en": "Pagos Bolero"
+        },
+        {
+            "id": 23357,
+            "name_en": "Pagos Gloves"
+        },
+        {
+            "id": 23358,
+            "name_en": "Pagos Culottes"
+        },
+        {
+            "id": 23359,
+            "name_en": "Pagos Boots"
+        },
+        {
+            "id": 23366,
+            "name_en": "Ballroom Etiquette - Insufficient Petticoats"
+        },
+        {
+            "id": 23377,
+            "name_en": "Boutique Batiste"
+        },
+        {
+            "id": 23378,
+            "name_en": "Boutique Boarded Leather"
+        },
+        {
+            "id": 23379,
+            "name_en": "Cold-warped Lockbox"
+        },
+        {
+            "id": 23383,
+            "name_en": "Rathalos Scale+"
+        },
+        {
+            "id": 23384,
+            "name_en": "Rathalos Helm [M]"
+        },
+        {
+            "id": 23385,
+            "name_en": "Rathalos Mail [M]"
+        },
+        {
+            "id": 23386,
+            "name_en": "Rathalos Vambraces [M]"
+        },
+        {
+            "id": 23387,
+            "name_en": "Rathalos Coil [M]"
+        },
+        {
+            "id": 23388,
+            "name_en": "Rathalos Greaves [M]"
+        },
+        {
+            "id": 23389,
+            "name_en": "Rathalos Helm [F]"
+        },
+        {
+            "id": 23390,
+            "name_en": "Rathalos Mail [F]"
+        },
+        {
+            "id": 23391,
+            "name_en": "Rathalos Vambraces [F]"
+        },
+        {
+            "id": 23392,
+            "name_en": "Rathalos Coil [F]"
+        },
+        {
+            "id": 23393,
+            "name_en": "Rathalos Greaves [F]"
+        }
 ]
