@@ -55,7 +55,7 @@ class Collectable implements ParseInterface
                     $Bonus2Collect = $item["Collectability{HighBonus}[$i]"];
                     $Bonus2Scrip = floor($BaseScrip * ($BonusMultiplier["CurrencyMultiplier[0]"]/1000));
                     $Bonus2EXP = floor($BaseEXP * ($BonusMultiplier["XpMultiplier[0]"]/1000));
-                    $string = "{{-start-}}\n'''". $Name ."'''\n{{ARR Infobox Collectable\n";
+                    $string = "{{-start-}}\n'''". $Name ."/Collectable'''\n{{ARR Infobox Collectable\n";
                     $string .= "|Class = ". $Class ."\n|Level = ". $Level ."\n|Name = ". $Name ."\n|Scrip = ". $Currency ."\n";
                     $string .= "|Base = ". $BaseCollect ."\n|Base Scrip = ". $BaseScrip ."\n|Base EXP = ". $BaseEXP ."\n";
                     $string .= "|Bonus1 = ". $Bonus1Collect ."\n|Bonus1 Scrip = ". $Bonus1Scrip ."\n|Bonus1 EXP = ". $Bonus1EXP ."\n";
