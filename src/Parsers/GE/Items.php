@@ -25,16 +25,7 @@ class Items implements ParseInterface
         | Required Level = {level}
         | Item Level     = {itemlevel}
         | Untradable     = {untradable}
-        | Unique         = {unique}{convertible}{sells}{hq}{dyeallowed}{crestallowed}{glamour}{desynthesis}{repair}{physicaldamage}{magicdamage}
-
-        | Defense         = {defense}
-        | Defense HQ      = {defensehq}
-        | Magic Defense    = {magicdefense}
-        | Magic Defense HQ = {magicdefensehq}{blockstrength}{blockrate}
-        
-        | Auto-attack     = {autoattack}
-        | Auto-attack HQ  = {autoattackhq}
-        | Delay           = {delay}
+        | Unique         = {unique}{convertible}{sells}{hq}{dyeallowed}{crestallowed}{glamour}{desynthesis}{repair}{physicaldamage}{magicdamage}{defense}{block}
 
         | Bonus Strength    = +{strength}
         | Bonus Strength HQ = +{strengthhq}
@@ -73,20 +64,20 @@ class Items implements ParseInterface
         | Bonus GP    = +{gp}
         | Bonus GP HQ = +{gphq}
 
-        | Gallery =
-        | Notes =
-        | Etymology =
+        {setbonus}
+
         }}';
 
     public function parse()
     {
-        $patch = '4.35';
+        $patch = '4.5';
 
         // grab CSV files we want to use
         $ItemCsv = $this->csv('Item');
         $ItemActionCsv = $this->csv('ItemAction');
         $ItemFoodCsv = $this->csv('ItemFood');
         $ItemSearchCategoryCsv = $this->csv('ItemSearchCategory');
+        $BaseParamCsv = $this->csv('BaseParam');
         $ItemSeriesCsv = $this->csv('ItemSeries');
         $ItemSpecialBonusCsv  = $this->csv('ItemSpecialBonus');
         $ItemUiCategoryCsv = $this->csv('ItemUICategory');
@@ -120,19 +111,6 @@ class Items implements ParseInterface
             if ($item['MateriaSlotCount'] > 0) {
                 $MateriaSlots = "\n| Slots          = ". $item['MateriaSlotCount'];
             }
-
-            //swap Description if gear is for Male or Female
-            //$Description = false;
-            //$Gender = false;
-            //if ($item['Description'] === "Fits: All ♂") {
-                //$Description === null;
-                //$Gender = "\n| Gender         = Male";
-            //} elseif ($item['Description'] === "Fits: All ♀") {
-                //$Description === null;
-                //$Gender = "\n| Gender         = Female";
-            //} else {
-                //$Description = $item['Description'];
-            //}
 
             // change Fits/Gender to wiki-specific parameters
             $Description = false;
@@ -200,14 +178,13 @@ class Items implements ParseInterface
                 }
             }
 
-            // if MaterializeType > 0, then item is Convertible into Materia. If = 0, then not.
+            // if MaterializeType > 0, then item is Convertible into Materia.
             $Convertible = false;
             if ($item['MaterializeType'] > 0) {
-                $Convertible = "\n| Convertible    = ". $item['MaterializeType'];
+                $Convertible = "\n| Convertible    = Yes";
             }
 
             // if Price{Low} > 0, then Sells = Price{Low}, otherwise Item = Unsellable.
-            $Sells = false;
             if ($item['Price{Low}'] > 0) {
                 $Sells = "\n| Sells          = ". $item['Price{Low}'];
             } else {
@@ -245,53 +222,86 @@ class Items implements ParseInterface
                 $Desynthesis = "\n| Desynthesizable= Yes\n| Desynth Level  = ". $SalvageCsv->at($item['Salvage'])['OptimalSkill'];
             }
 
-            // display Repair if it is NOT equal to adventurer
-            // doesn't work?
+            // display Repair Class if it is NOT equal to "adventurer" or if Item is NOT Seafood, Furniture, Miscellany
             $Repair = false;
-            if (!$item['ClassJob{Repair}'] === "adventurer") {
+            if ($item['ClassJob{Repair}'] == 0 || $item['ItemUICategory'] == 47 || $item['ItemUICategory'] == 65
+                || $item['ItemUICategory'] == 66 || $item['ItemUICategory'] == 67 || $item['ItemUICategory'] == 68
+                || $item['ItemUICategory'] == 69 || $item['ItemUICategory'] == 70 || $item['ItemUICategory'] == 71
+                || $item['ItemUICategory'] == 72 || $item['ItemUICategory'] == 73 || $item['ItemUICategory'] == 74
+                || $item['ItemUICategory'] == 75 || $item['ItemUICategory'] == 76 || $item['ItemUICategory'] == 77
+                || $item['ItemUICategory'] == 78 || $item['ItemUICategory'] == 79 || $item['ItemUICategory'] == 80
+                || $item['ItemUICategory'] == 64 || $item['ItemUICategory'] == 57 || $item['ItemUICategory'] == 61) {
+            } else {
                 $Repair = "\n| Repair Class   = ". ucwords(strtolower($ClassJobCsv->at($item['ClassJob{Repair}'])['Name']));
             }
 
-            // display Physical Damage. Also display HQ if the value in Special[0] is > 0 (slight cheat
-            // should check if HQ but... fuckit) Double line break needed to separate this out from Repair
+            // display Damage. Also display HQ if item is HQ.
+            // Double line break needed to separate this out from Repair
             $PhysicalDamage = false;
-            if ($item['Damage{Phys}'] > 0 && $item['BaseParamValue{Special}[0]'] > 0) {
-                $PhysicalDamageHQ = $item['BaseParamValue{Special}[0]'] + $item['Damage{Phys}'];
-                $PhysicalDamage = "\n\n| Physical Damage    = ". $item['Damage{Phys}'] ."\n| Physical Damage HQ = ". $PhysicalDamageHQ;
-            } elseif ($item['Damage{Phys}'] > 0 && $item['BaseParamValue{Special}[0]'] == 0) {
-                $PhysicalDamage = "\n\n| Physical Damage    = ". $item['Damage{Phys}'];
-            }
-
-            // display Magic Damage. Also display HQ if the value in Special[1] is > 0 (slight cheat
-            // should check if HQ but... fuckit) No need for double line break since weapons *always*
-            // have both physical and magic damage on them.
             $MagicDamage = false;
-            if ($item['Damage{Mag}'] > 0 && $item['BaseParamValue{Special}[1]'] > 0) {
+            if (($item['Damage{Phys}'] > 0 || $item['Damage{Mag}'] > 0) && $item['CanBeHq'] == "True") {
+                $Delay = round(($item["Delay<ms>"]/1000),2,PHP_ROUND_HALF_UP);
+                $PhysicalDamageHQ = $item['BaseParamValue{Special}[0]'] + $item['Damage{Phys}'];
                 $MagicDamageHQ = $item['BaseParamValue{Special}[1]'] + $item['Damage{Mag}'];
+                $AutoattackHQ = round((($Delay/3) * $PhysicalDamageHQ),1,PHP_ROUND_HALF_UP);
+                $Autoattack = round((($Delay/3) * $item['Damage{Phys}']),1,PHP_ROUND_HALF_UP);
+                $PhysicalDamage = "\n\n| Physical Damage    = " . $item['Damage{Phys}'] . "\n| Physical Damage HQ = " . $PhysicalDamageHQ;
                 $MagicDamage = "\n| Magic Damage    = ". $item['Damage{Mag}'] ."\n| Magic Damage HQ = ". $MagicDamageHQ;
-            } elseif ($item['Damage{Mag}'] > 0 && $item['BaseParamValue{Special}[1]'] == 0) {
+                $MagicDamage .= "\n| Auto-attack    = ". $Autoattack ."\n| Auto-attack HQ = ". $AutoattackHQ;
+                $MagicDamage .= "\n| Delay          = ". $Delay;
+            }   elseif (($item['Damage{Phys}'] > 0 || $item['Damage{Mag}'] > 0) && $item['CanBeHq'] == "False") {
+                $Delay = round(($item["Delay<ms>"]/1000),2,PHP_ROUND_HALF_UP);
+                $Autoattack = round((($Delay/3) * $item['Damage{Phys}']),1,PHP_ROUND_HALF_UP);
+                $PhysicalDamage = "\n\n| Physical Damage = ". $item['Damage{Phys}'];
                 $MagicDamage = "\n| Magic Damage    = ". $item['Damage{Mag}'];
+                $MagicDamage .= "\n| Auto-attack = ". $Autoattack ."\n| Delay       = ". $Delay;
             }
 
-            // display Block Strength. Also display HQ if the value in Special[1] is > 0 (slight cheat
-            // should check if HQ but... fuckit).
-            $BlockStrength = false;
-            if ($item['Block'] > 0 && $item['BaseParamValue{Special}[1]'] > 0) {
+            // display Block stats. Also display HQ stats if item is HQ
+            $Block = false;
+            if (($item['Block'] > 0 || $item['BlockRate'] > 0) && $item['CanBeHq'] == "True") {
                 $BlockStrengthHQ = $item['BaseParamValue{Special}[1]'] + $item['Block'];
-                $BlockStrength = "\n\n| Block Strength    = ". $item['BlockRate'] ."\n| Block Strength HQ = ". $BlockStrengthHQ;
-            } elseif ($item['Block'] > 0 && $item['BaseParamValue{Special}[1]'] == 0) {
-                $BlockStrength = "\n\n| Block Strength = ". $item['Block'];
+                $BlockRateHQ = $item['BaseParamValue{Special}[0]'] + $item['BlockRate'];
+                $Block = "\n\n| Block Strength    = ". $item['BlockRate'] ."\n| Block Strength HQ = ". $BlockStrengthHQ;
+                $Block .= "\n| Block Rate      = ". $item['BlockRate'] ."\n| Block Rate HQ   = ". $BlockRateHQ;
+            } elseif (($item['Block'] > 0 || $item['BlockRate'] > 0) && $item['CanBeHq'] == "False") {
+                $Block = "\n\n| Block Strength = ". $item['Block'];
+                $Block .= "\n| Block Rate     = ". $item['BlockRate'];
             }
 
-            // display Block Rate. Also display HQ if the value in Special[0] is > 0 (slight cheat
-            // should check if HQ but... fuckit).
-            $BlockRate = false;
-            if ($item['BlockRate'] > 0 && $item['BaseParamValue{Special}[0]'] > 0) {
-                $BlockRateHQ = $item['BaseParamValue{Special}[0]'] + $item['BlockRate'];
-                $BlockRate = "\n| Block Rate      = ". $item['BlockRate'] ."\n| Block Rate HQ   = ". $BlockRateHQ;
-            } elseif ($item['BlockRate'] > 0 && $item['BaseParamValue{Special}[0]'] == 0) {
-                $BlockRate = "\n| Block Rate     = ". $item['BlockRate'];
+            // display Defense (and Magic Defense) if Def/MagDef is greater than 0, or if subheading is
+            // ring, necklace, earring, or bracelets. Also Display Defense/MagDef HQ if item is HQ
+            $Defense = false;
+            if (($item['ItemUICategory'] == 40 || $item['ItemUICategory'] == 41
+                    || $item['ItemUICategory'] == 42 || $item['ItemUICategory'] == 43)
+                || ($item['Defense{Phys}'] > 0 || $item['Defense{Mag}'] > 0)
+                && $item['CanBeHq'] == "True") {
+                $DefenseHQ = ($item['Defense{Phys}'] + $item['BaseParamValue{Special}[0]']);
+                $MagicDefenseHQ = ($item['Defense{Mag}'] + $item['BaseParamValue{Special}[1]']);
+                $Defense = "\n\n| Defense    = ". $item['Defense{Phys}'] ."\n| Defense HQ = ". $DefenseHQ;
+                $Defense .= "\n| Magic Defense    = ". $item['Defense{Phys}'] ."\n| Magic Defense HQ = ". $MagicDefenseHQ;
+            } elseif (($item['ItemUICategory'] == 40 || $item['ItemUICategory'] == 41
+                    || $item['ItemUICategory'] == 42 || $item['ItemUICategory'] == 43)
+                || ($item['Defense{Phys}'] > 0 || $item['Defense{Mag}'] > 0)
+                && $item['CanBeHq'] == "False") {
+                $Defense = "\n\n| Defense       = ". $item['Defense{Phys}'];
+                $Defense .= "\n| Magic Defense = ". $item['Defense{Mag}'];
             }
+
+            // Set Bonus stats
+            $SetBonus = [];
+            if ($item['ItemSpecialBonus'] == 6) {
+                $SetBonus[0] = "\n\n| SetBonus Set_Bonus_(Capped):=\n:[[". $ItemSeriesCsv->at($item['ItemSeries'])['Name'] ."]]";
+                $SetBonus[1] = ":Active Under Lv. ". $item['ItemSpecialBonus{Param}'];
+                foreach(range(0,5) as $i) {
+                    if(!empty($item["BaseParam{Special}[$i]"])) {
+                        $SetBonus[] .= ":". ($i+2) ." Equipped: [[". $BaseParamCsv->at($item["BaseParam{Special}[$i]"])
+                            ['Name'] ."]] +". $item["BaseParamValue{Special}[$i]"];
+                    }
+                }
+            }
+
+            $SetBonus = implode("\n", $SetBonus);
 
             // Save some data
             $data = [
@@ -310,7 +320,7 @@ class Items implements ParseInterface
                 '{unique}' => $item['IsUnique'],
                 '{convertible}' => $Convertible ? $Convertible : "",
                 '{sells}' => $Sells,
-                '{hq}' => "\n| HQ             = ". $item['CanBeHq'],
+                '{hq}' => ($item['Price{Low}'] > 0) ? "\n| HQ             = ". $item['CanBeHq'] : "",
                 //'{dyeallowed}' => $DyeAllowed ? $DyeAllowed : "",
                 '{dyeallowed}' => "\n| Dye Allowed    = ". $item['IsDyeable'],
                 //'{crestallowed}' => $CrestAllowed ? $CrestAllowed : "",
@@ -321,8 +331,9 @@ class Items implements ParseInterface
                 '{repair}' => $Repair,
                 '{physicaldamage}' => $PhysicalDamage,
                 '{magicdamage}' => $MagicDamage,
-                '{blockstrength}' => $BlockStrength,
-                '{blockrate}' => $BlockRate,
+                '{block}' => $Block,
+                '{defense}' => $Defense,
+                '{setbonus}' => $SetBonus,
             ];
 
             // format using Gamer Escape formatter and add to data array
