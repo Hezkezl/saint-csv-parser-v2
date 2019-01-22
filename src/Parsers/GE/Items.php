@@ -20,52 +20,11 @@ class Items implements ParseInterface
         | Index          = {id}
         | Rarity         = {rarity}
         | Name           = {name}
-        | Subheading     = {subheading}{description}{slots}
-        | Stack          = {stack}{requires}
+        | Subheading     = {subheading}{description}{slots}{stack}{requires}
         | Required Level = {level}
         | Item Level     = {itemlevel}
         | Untradable     = {untradable}
-        | Unique         = {unique}{convertible}{sells}{hq}{dyeallowed}{crestallowed}{glamour}{desynthesis}{repair}{physicaldamage}{magicdamage}{defense}{block}
-
-        | Bonus Strength    = +{strength}
-        | Bonus Strength HQ = +{strengthhq}
-        | Bonus Intelligence    = +{intelligence}
-        | Bonus Intelligence HQ = +{intelligencehq}
-        | Bonus Mind    = +{mind}
-        | Bonus Mind HQ = +{mindhq}
-        | Bonus Vitality    = +{vitality}
-        | Bonus Vitality HQ = +{vitalityhq}
-        | Bonus Piety    = +{piety}
-        | Bonus Piety HQ = +{pietyhq}
-        | Bonus Parry    = +{parry}
-        | Bonus Parry HQ = +{parryhq}
-        | Bonus Accuracy    = +{accuracy}
-        | Bonus Accuracy HQ = +{accuracyhq}
-        | Bonus Critical_Hit_Rate    = +{chr}
-        | Bonus Critical_Hit_Rate HQ = +{chrhq}
-        | Bonus Determination    = +{determination}
-        | Bonus Determination HQ = +{determinationhq}
-        | Bonus Skill_Speed    = +{skillspeed}
-        | Bonus Skill_Speed HQ = +{skillspeedhq}
-        | Bonus Accuracy    = +{accuracy}
-        | Bonus Accuracy HQ = +{accuracyhq}
-        | Bonus Spell_Speed    = +{spellspeed}
-        | Bonus Spell_Speed HQ = +{spellspeedhq}
-        | Bonus Craftsmanship    = +{craftsmanship}
-        | Bonus Craftsmanship HQ = +{craftsmanshiphq}
-        | Bonus Control    = +{control}
-        | Bonus Control HQ = +{controlhq}
-        | Bonus CP    = +{cp}
-        | Bonus CP HQ = +{cphq}
-        | Bonus Gathering    = +{gathering}
-        | Bonus Gathering HQ = +{gatheringhq}
-        | Bonus Perception    = +{perception}
-        | Bonus Perception HQ = +{perceptionhq}
-        | Bonus GP    = +{gp}
-        | Bonus GP HQ = +{gphq}
-
-        {setbonus}
-
+        | Unique         = {unique}{convertible}{sells}{hq}{dyeallowed}{crestallowed}{glamour}{desynthesis}{repair}{setbonus}{setbonusgc}{sanction}{bonus}{physicaldamage}{magicdamage}{defense}{block}
         }}';
 
     public function parse()
@@ -79,7 +38,6 @@ class Items implements ParseInterface
         $ItemSearchCategoryCsv = $this->csv('ItemSearchCategory');
         $BaseParamCsv = $this->csv('BaseParam');
         $ItemSeriesCsv = $this->csv('ItemSeries');
-        $ItemSpecialBonusCsv  = $this->csv('ItemSpecialBonus');
         $ItemUiCategoryCsv = $this->csv('ItemUICategory');
         $ClassJobCategoryCsv = $this->csv('ClassJobCategory');
         $ClassJobCsv = $this->csv('ClassJob');
@@ -103,7 +61,9 @@ class Items implements ParseInterface
             // grab the Required Classes needed to equip this item
             $RequiredClasses = false;
             if ($item['ClassJobCategory'] > 0) {
-                $RequiredClasses = "\n| Requires       = ". $ClassJobCategoryCsv->at($item['ClassJobCategory'])['Name'];
+                $ClassNames = $ClassJobCategoryCsv->at($item['ClassJobCategory'])['Name'];
+                $ClassNames = preg_replace("/([A-Z]{3})\s/","$1, ",$ClassNames);
+                $RequiredClasses = "\n| Requires       = ". $ClassNames;
             }
 
             // display Materia Slot if greater than 0
@@ -181,7 +141,7 @@ class Items implements ParseInterface
             // if MaterializeType > 0, then item is Convertible into Materia.
             $Convertible = false;
             if ($item['MaterializeType'] > 0) {
-                $Convertible = "\n| Convertible    = Yes";
+                $Convertible = "\n| Convertible    = True";
             }
 
             // if Price{Low} > 0, then Sells = Price{Low}, otherwise Item = Unsellable.
@@ -219,7 +179,7 @@ class Items implements ParseInterface
             // (if both show up then it means it can be desynthesized. if only one shows up, it can't)
             $Desynthesis = false;
             if ($item['Salvage'] > 0 && $item['ClassJob{Repair}'] > 0) {
-                $Desynthesis = "\n| Desynthesizable= Yes\n| Desynth Level  = ". $SalvageCsv->at($item['Salvage'])['OptimalSkill'];
+                $Desynthesis = "\n| Desynthesizable= True\n| Desynth Level  = ". $SalvageCsv->at($item['Salvage'])['OptimalSkill'];
             }
 
             // display Repair Class if it is NOT equal to "adventurer" or if Item is NOT Seafood, Furniture, Miscellany
@@ -243,15 +203,15 @@ class Items implements ParseInterface
                 $Delay = round(($item["Delay<ms>"]/1000),2,PHP_ROUND_HALF_UP);
                 $PhysicalDamageHQ = $item['BaseParamValue{Special}[0]'] + $item['Damage{Phys}'];
                 $MagicDamageHQ = $item['BaseParamValue{Special}[1]'] + $item['Damage{Mag}'];
-                $AutoattackHQ = round((($Delay/3) * $PhysicalDamageHQ),1,PHP_ROUND_HALF_UP);
-                $Autoattack = round((($Delay/3) * $item['Damage{Phys}']),1,PHP_ROUND_HALF_UP);
+                $AutoattackHQ = round((($Delay/3) * $PhysicalDamageHQ),2,PHP_ROUND_HALF_UP);
+                $Autoattack = round((($Delay/3) * $item['Damage{Phys}']),2,PHP_ROUND_HALF_UP);
                 $PhysicalDamage = "\n\n| Physical Damage    = " . $item['Damage{Phys}'] . "\n| Physical Damage HQ = " . $PhysicalDamageHQ;
                 $MagicDamage = "\n| Magic Damage    = ". $item['Damage{Mag}'] ."\n| Magic Damage HQ = ". $MagicDamageHQ;
                 $MagicDamage .= "\n| Auto-attack    = ". $Autoattack ."\n| Auto-attack HQ = ". $AutoattackHQ;
                 $MagicDamage .= "\n| Delay          = ". $Delay;
             }   elseif (($item['Damage{Phys}'] > 0 || $item['Damage{Mag}'] > 0) && $item['CanBeHq'] == "False") {
                 $Delay = round(($item["Delay<ms>"]/1000),2,PHP_ROUND_HALF_UP);
-                $Autoattack = round((($Delay/3) * $item['Damage{Phys}']),1,PHP_ROUND_HALF_UP);
+                $Autoattack = round((($Delay/3) * $item['Damage{Phys}']),2,PHP_ROUND_HALF_UP);
                 $PhysicalDamage = "\n\n| Physical Damage = ". $item['Damage{Phys}'];
                 $MagicDamage = "\n| Magic Damage    = ". $item['Damage{Mag}'];
                 $MagicDamage .= "\n| Auto-attack = ". $Autoattack ."\n| Delay       = ". $Delay;
@@ -279,7 +239,7 @@ class Items implements ParseInterface
                 $DefenseHQ = ($item['Defense{Phys}'] + $item['BaseParamValue{Special}[0]']);
                 $MagicDefenseHQ = ($item['Defense{Mag}'] + $item['BaseParamValue{Special}[1]']);
                 $Defense = "\n\n| Defense    = ". $item['Defense{Phys}'] ."\n| Defense HQ = ". $DefenseHQ;
-                $Defense .= "\n| Magic Defense    = ". $item['Defense{Phys}'] ."\n| Magic Defense HQ = ". $MagicDefenseHQ;
+                $Defense .= "\n| Magic Defense    = ". $item['Defense{Mag}'] ."\n| Magic Defense HQ = ". $MagicDefenseHQ;
             } elseif (($item['ItemUICategory'] == 40 || $item['ItemUICategory'] == 41
                     || $item['ItemUICategory'] == 42 || $item['ItemUICategory'] == 43)
                 || ($item['Defense{Phys}'] > 0 || $item['Defense{Mag}'] > 0)
@@ -288,7 +248,7 @@ class Items implements ParseInterface
                 $Defense .= "\n| Magic Defense = ". $item['Defense{Mag}'];
             }
 
-            // Set Bonus stats
+            // Set Bonus stats for Mog Station gear
             $SetBonus = [];
             if ($item['ItemSpecialBonus'] == 6) {
                 $SetBonus[0] = "\n\n| SetBonus Set_Bonus_(Capped):=\n:[[". $ItemSeriesCsv->at($item['ItemSeries'])['Name'] ."]]";
@@ -300,8 +260,65 @@ class Items implements ParseInterface
                     }
                 }
             }
-
             $SetBonus = implode("\n", $SetBonus);
+
+            // Set Bonus stats for Grand Company gear
+            $SetBonusGC = [];
+            if ($item['ItemSpecialBonus'] == 2) {
+                $SetBonusGC[0] = "\n\n| Other Conditions = ". $ItemSeriesCsv->at($item['ItemSeries'])['Name'] ."";
+                $SetBonusGC[1] = "| Set              = ". $ItemSeriesCsv->at($item['ItemSeries'])['Name'] ."";
+                $SetBonusGC[2] = "| Set Bonus        =<br>";
+                foreach(range(0,5) as $i) {
+                    if(!empty($item["BaseParam{Special}[$i]"])) {
+                        $SetBonusGC[] .= ":". ($i+2) ." Equipped: [[". $BaseParamCsv->at($item["BaseParam{Special}[$i]"])
+                            ['Name'] ."]] +". $item["BaseParamValue{Special}[$i]"];
+                    }
+                }
+            }
+            $SetBonusGC = implode("\n", $SetBonusGC);
+
+            // Sanction Code (Sanction item gives you bonus on some GC gear)
+            $Sanction = [];
+            if ($item['ItemSpecialBonus'] == 4) {
+                foreach(range(0,5) as $i) {
+                    if(!empty($item["BaseParam{Special}[$i]"])) {
+                        //$ParamName = $BaseParamCsv->at($item["BaseParam{Special}[$i]"])['Name'];
+                        $ParamName = str_replace(" ", "_", $BaseParamCsv->at($item["BaseParam{Special}[$i]"])['Name']);
+                        $Sanction[0] = "\n";
+                        $Sanction[] .= "| Latent ". $ParamName ." = +". $item["BaseParamValue{Special}[$i]"];
+                        $Sanction[] .= "| Latent ". $ParamName ." Latent = Yes";
+                        $Sanction[] .= "| Latent ". $ParamName ." Conditions = Sanction";
+                    }
+                }
+            }
+            $Sanction = implode("\n",$Sanction);
+
+            // Bonus Stat Code (attempt)
+            $BonusStat = [];
+            if ($item['CanBeHq'] == "True" && !empty($item['BaseParam[0]'])) {
+                //print($item["Name"]);
+                //print "\n";
+                foreach (range(0, 5) as $i) {
+                    if (!empty($item["BaseParam[$i]"])) {
+                        $BonusStatName = str_replace(" ", "_", $BaseParamCsv->at($item["BaseParam[$i]"])['Name']);
+                        $BonusStat[0] ="\n";
+                        $BonusStat[] .= "| Bonus " . $BonusStatName . " = +" . $item["BaseParamValue[$i]"];
+                        if (!empty($item['BaseParamValue{Special}[' . ($i+2) . ']'])) {
+                            $BonusStat[] .= '| Bonus ' . $BonusStatName . ' HQ = +'.
+                                ($item["BaseParamValue[$i]"] + $item['BaseParamValue{Special}[' . ($i+2) . ']']);
+                        }
+                    }
+                }
+            } elseif ($item['CanBeHq'] == "False" && !empty($item['BaseParam[0]'])) {
+                foreach (range(0, 5) as $i) {
+                    if (!empty($item["BaseParam[$i]"])) {
+                        $BonusStatName = str_replace(" ", "_", $BaseParamCsv->at($item["BaseParam[$i]"])['Name']);
+                        $BonusStat[0] ="\n";
+                        $BonusStat[] .= "| Bonus " . $BonusStatName . " = +" . $item["BaseParamValue[$i]"];
+                    }
+                }
+            }
+            $BonusStat = implode("\n",$BonusStat);
 
             // Save some data
             $data = [
@@ -312,7 +329,7 @@ class Items implements ParseInterface
                 '{subheading}' => $itemUiCategory['Name'],
                 '{description}' => $Description ? $Description : "",
                 '{slots}' => $MateriaSlots ? $MateriaSlots : "",
-                '{stack}' => $item['StackSize'],
+                '{stack}' => ($item['StackSize'] > 1) ? '\n| Stack          = '. $item['StackSize'] : "",
                 '{requires}' => $RequiredClasses ? $RequiredClasses : "",
                 '{level}' => $item['Level{Equip}'],
                 '{itemlevel}' => $item['Level{Item}'],
@@ -334,6 +351,9 @@ class Items implements ParseInterface
                 '{block}' => $Block,
                 '{defense}' => $Defense,
                 '{setbonus}' => $SetBonus,
+                '{setbonusgc}' => $SetBonusGC,
+                '{sanction}' => $Sanction,
+                '{bonus}' => $BonusStat,
             ];
 
             // format using Gamer Escape formatter and add to data array
