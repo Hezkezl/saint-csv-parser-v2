@@ -50,7 +50,7 @@ class KeyItems implements ParseInterface
             // grab the proper icon number to use for the folder name
             if (!empty($eventitem['Icon'])) {
                 $iconstart = substr(($eventitem['Icon']), 0, 2);
-                $icon = "\n|Icon = 0" .$iconstart ."000/0". ($eventitem['Icon']) .".png";
+                $icon = "\n|Icon = 0". $iconstart ."000/0". ($eventitem['Icon']) .".png";
 
                 // ensure output directory exists
                 $EventIconoutputDirectory = $this->getOutputFolder() . '/eventicon';
