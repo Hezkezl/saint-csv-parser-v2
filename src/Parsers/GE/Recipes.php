@@ -14,7 +14,8 @@ class Recipes implements ParseInterface
     use CsvParseTrait;
 
     // the wiki output format / template we shall use
-    const WIKI_FORMAT = 'http://ffxiv.gamerescape.com/wiki/{result}/Recipe?action=edit
+    const WIKI_FORMAT = "{{-start-}}
+'''{result}'''
 {{ARR Infobox Recipe
 |Recipe ID           = {index}
 |Result              = {result}{resultcount}{unlockbook}{specialist}
@@ -26,7 +27,7 @@ class Recipes implements ParseInterface
 |Quality             = {quality}{requiredcrafts}{requiredcontrol}
 |Quick Synthesis     = {quicksynth}{quicksynthcrafts}{quicksynthcontrol}{status}{aspect}{ingredient1}{ingredient2}
 {ingredients}
-}}';
+}}{{-stop-}}";
 
     public function parse()
     {
