@@ -49,6 +49,8 @@ class GeFormatter
         $format = preg_replace("/\\<UIForeground\\>[^<]+\\<\\/UIForeground\\>|\\<UIGlow\\>[^<]+\\<\\/UIGlow\\>|\\<72\\>[^<]+\\<\\/72\\>|\\<73\\>[^<]+\\<\\/73\\>/","",$format);
         //regex to add a % to the end of [[EXP Bonus]] gear
         $format = preg_replace("/(\\[\\[EXP Bonus\\]\\] \\+\d+)/", "$1%", $format);
+        $format = str_replace("= False", "= No", $format);
+        $format = str_replace("= True", "= Yes", $format);
 
         return trim($format) . "\n\n";
     }

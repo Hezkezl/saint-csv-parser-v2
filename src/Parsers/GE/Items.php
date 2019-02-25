@@ -4,7 +4,6 @@ namespace App\Parsers\GE;
 
 use App\Parsers\CsvParseTrait;
 use App\Parsers\ParseInterface;
-use Symfony\Component\Console\Helper\ProgressBar;
 
 /**
  * php bin/console app:parse:csv GE:Items
@@ -14,28 +13,26 @@ class Items implements ParseInterface
     use CsvParseTrait;
 
     // the wiki output format / template we shall use
-    const WIKI_FORMAT = 'http://ffxiv.gamerescape.com/wiki/{name}?action=edit
+    const WIKI_FORMAT = "{{-start-}}'''{name}'''
         {{ARR Infobox Item
         | Patch = {patch}
         | Index          = {id}
         | Rarity         = {rarity}
         | Name           = {name}
-        | Subheading     = {subheading}{description}{slots}{stack}{requires}
+        | Subheading     = {subheading}{description}{slots}{advancedmelding}{stack}{requires}
         | Required Level = {level}
-        | Item Level     = {itemlevel}
-        | Untradable     = {untradable}
-        | Unique         = {unique}{convertible}{sells}{hq}{dyeallowed}{crestallowed}{glamour}{desynthesis}{repair}{setbonus}{setbonusgc}{sanction}{bonus}{physicaldamage}{magicdamage}{defense}{block}
-        }}';
+        | Item Level     = {itemlevel}{untradable}{unique}{convertible}{sells}{dyeallowed}{crestallowed}{glamour}{desynthesis}{repair}{setbonus}{setbonusgc}{sanction}{bonus}{eureka}{physicaldamage}{magicdamage}{defense}{block}
+        }}{{-stop-}}";
 
     public function parse()
     {
-        $patch = '4.5';
+        $patch = '4.55';
 
         // grab CSV files we want to use
         $ItemCsv = $this->csv('Item');
-        $ItemActionCsv = $this->csv('ItemAction');
-        $ItemFoodCsv = $this->csv('ItemFood');
-        $ItemSearchCategoryCsv = $this->csv('ItemSearchCategory');
+        //$ItemActionCsv = $this->csv('ItemAction');
+        //$ItemFoodCsv = $this->csv('ItemFood');
+        //$ItemSearchCategoryCsv = $this->csv('ItemSearchCategory');
         $BaseParamCsv = $this->csv('BaseParam');
         $ItemSeriesCsv = $this->csv('ItemSeries');
         $ItemUiCategoryCsv = $this->csv('ItemUICategory');
@@ -64,12 +61,6 @@ class Items implements ParseInterface
                 $ClassNames = $ClassJobCategoryCsv->at($item['ClassJobCategory'])['Name'];
                 $ClassNames = preg_replace("/([A-Z]{3})\s/","$1, ",$ClassNames);
                 $RequiredClasses = "\n| Requires       = ". $ClassNames;
-            }
-
-            // display Materia Slot if greater than 0
-            $MateriaSlots = false;
-            if ($item['MateriaSlotCount'] > 0) {
-                $MateriaSlots = "\n| Slots          = ". $item['MateriaSlotCount'];
             }
 
             // change Fits/Gender to wiki-specific parameters
@@ -138,48 +129,24 @@ class Items implements ParseInterface
                 }
             }
 
-            // if MaterializeType > 0, then item is Convertible into Materia.
-            $Convertible = false;
-            if ($item['MaterializeType'] > 0) {
-                $Convertible = "\n| Convertible    = True";
-            }
-
-            // if Price{Low} > 0, then Sells = Price{Low}, otherwise Item = Unsellable.
-            if ($item['Price{Low}'] > 0) {
-                $Sells = "\n| Sells          = ". $item['Price{Low}'];
-            } else {
-                $Sells = "\n| Sells          = No";
-            }
-
-            // if Dye is allowed, display it
-            //$DyeAllowed = false;
-            //if ($item['IsDyeable'] === "False") {
-                //$DyeAllowed = "\n| Dye Allowed    = ". $item['IsDyeable'];
-            //} else {
-                //$DyeAllowed = "\n| Dye Allowed    = ". $item['IsDyeable'];
-            //}
-
-            // if Crest is allowed, display it
-            //$CrestAllowed = false;
-            //if ($item['IsCrestWorthy'] === False) {
-                //$CrestAllowed = "\n| Crest Allowed  = ". $item['IsCrestWorthy'];
-            //} else {
-                //$CrestAllowed = "\n| Crest Allowed  = ". $item['IsCrestWorthy'];
-            //}
-
-            // if Glamourable, display Projectable = Yes
-            //$Glamour = false;
-            //if ($item['IsGlamourous'] === "False") {
-                //$Glamour = "\n| Projectable    = ". $item['IsGlamourous'];
-            //} else {
-                //$Glamour = "\n| Projectable    = ". $item['IsGlamourous'];
-            //}
-
-            // display Desynthesis level if Salvage > 0 and the item can be repaired
-            // (if both show up then it means it can be desynthesized. if only one shows up, it can't)
-            $Desynthesis = false;
-            if ($item['Salvage'] > 0 && $item['ClassJob{Repair}'] > 0) {
-                $Desynthesis = "\n| Desynthesizable= True\n| Desynth Level  = ". $SalvageCsv->at($item['Salvage'])['OptimalSkill'];
+            // don't display Dye status for equipment that its not applicable to, and do show Crest/Dye for Shield/Head/Body
+            $Dye = false;
+            $Crest = false;
+            switch ($item['ItemUICategory']) {
+                case 33; case 39; case 40; case 41; case 42; case 43; case 44; case 45; case 46; case 47;
+                case 48; case 49; case 50; case 51; case 52; case 53; case 54; case 55; case 56; case 58;
+                case 59; case 60; case 61; case 62; case 63; case 64; case 71; case 73; case 74; case 75;
+                case 81; case 82; case 83; case 85; case 86; case 94; case 95; case 99; case 100;
+                    break;
+                case 11; case 34; case 35;
+                    $Crest = "\n| Crest Allowed  = ". $item['IsCrestWorthy'];
+                    $Dye = "\n| Dye Allowed    = ". $item['IsDyeable'];
+                    break;
+                case NULL:
+                    break;
+                default:
+                    $Dye = "\n| Dye Allowed    = ". $item['IsDyeable'];
+                    break;
             }
 
             // display Repair Class if it is NOT equal to "adventurer" or if Item is NOT Seafood, Furniture, Miscellany
@@ -203,18 +170,21 @@ class Items implements ParseInterface
                 $Delay = round(($item["Delay<ms>"]/1000),2,PHP_ROUND_HALF_UP);
                 $PhysicalDamageHQ = $item['BaseParamValue{Special}[0]'] + $item['Damage{Phys}'];
                 $MagicDamageHQ = $item['BaseParamValue{Special}[1]'] + $item['Damage{Mag}'];
-                $AutoattackHQ = round((($Delay/3) * $PhysicalDamageHQ),2,PHP_ROUND_HALF_UP);
-                $Autoattack = round((($Delay/3) * $item['Damage{Phys}']),2,PHP_ROUND_HALF_UP);
+                //$AutoattackHQ = round((($Delay/3) * $PhysicalDamageHQ),2,PHP_ROUND_HALF_DOWN);
+                $AutoattackHQ = (floor((($item["Delay<ms>"]/1000)/3)*$PhysicalDamageHQ*100)/100);
+                //$Autoattack = round((($Delay/3) * $item['Damage{Phys}']),2,PHP_ROUND_HALF_DOWN);
+                $Autoattack = (floor((($item["Delay<ms>"]/1000)/3)*$item['Damage{Phys}']*100)/100);
                 $PhysicalDamage = "\n\n| Physical Damage    = " . $item['Damage{Phys}'] . "\n| Physical Damage HQ = " . $PhysicalDamageHQ;
                 $MagicDamage = "\n| Magic Damage    = ". $item['Damage{Mag}'] ."\n| Magic Damage HQ = ". $MagicDamageHQ;
-                $MagicDamage .= "\n| Auto-attack    = ". $Autoattack ."\n| Auto-attack HQ = ". $AutoattackHQ;
                 $MagicDamage .= "\n| Delay          = ". $Delay;
+                $MagicDamage .= "\n| Auto-attack    = ". $Autoattack ."\n| Auto-attack HQ = ". $AutoattackHQ;
             }   elseif (($item['Damage{Phys}'] > 0 || $item['Damage{Mag}'] > 0) && $item['CanBeHq'] == "False") {
                 $Delay = round(($item["Delay<ms>"]/1000),2,PHP_ROUND_HALF_UP);
-                $Autoattack = round((($Delay/3) * $item['Damage{Phys}']),2,PHP_ROUND_HALF_UP);
+                //$Autoattack = round((($Delay/3) * $item['Damage{Phys}']),2,PHP_ROUND_HALF_DOWN);
+                $Autoattack = (floor((($item["Delay<ms>"]/1000)/3)*$item['Damage{Phys}']*100)/100);
                 $PhysicalDamage = "\n\n| Physical Damage = ". $item['Damage{Phys}'];
                 $MagicDamage = "\n| Magic Damage    = ". $item['Damage{Mag}'];
-                $MagicDamage .= "\n| Auto-attack = ". $Autoattack ."\n| Delay       = ". $Delay;
+                $MagicDamage .= "\n| Delay       = ". $Delay ."\n| Auto-attack = ". $Autoattack;
             }
 
             // display Block stats. Also display HQ stats if item is HQ
@@ -232,17 +202,17 @@ class Items implements ParseInterface
             // display Defense (and Magic Defense) if Def/MagDef is greater than 0, or if subheading is
             // ring, necklace, earring, or bracelets. Also Display Defense/MagDef HQ if item is HQ
             $Defense = false;
-            if (($item['ItemUICategory'] == 40 || $item['ItemUICategory'] == 41
-                    || $item['ItemUICategory'] == 42 || $item['ItemUICategory'] == 43)
-                || ($item['Defense{Phys}'] > 0 || $item['Defense{Mag}'] > 0)
+            if ((($item['ItemUICategory'] == 40 || $item['ItemUICategory'] == 41
+                        || $item['ItemUICategory'] == 42 || $item['ItemUICategory'] == 43)
+                    || $item['Defense{Phys}'] > 0 || $item['Defense{Mag}'] > 0)
                 && $item['CanBeHq'] == "True") {
                 $DefenseHQ = ($item['Defense{Phys}'] + $item['BaseParamValue{Special}[0]']);
                 $MagicDefenseHQ = ($item['Defense{Mag}'] + $item['BaseParamValue{Special}[1]']);
                 $Defense = "\n\n| Defense    = ". $item['Defense{Phys}'] ."\n| Defense HQ = ". $DefenseHQ;
                 $Defense .= "\n| Magic Defense    = ". $item['Defense{Mag}'] ."\n| Magic Defense HQ = ". $MagicDefenseHQ;
-            } elseif (($item['ItemUICategory'] == 40 || $item['ItemUICategory'] == 41
-                    || $item['ItemUICategory'] == 42 || $item['ItemUICategory'] == 43)
-                || ($item['Defense{Phys}'] > 0 || $item['Defense{Mag}'] > 0)
+            } elseif ((($item['ItemUICategory'] == 40 || $item['ItemUICategory'] == 41
+                        || $item['ItemUICategory'] == 42 || $item['ItemUICategory'] == 43)
+                    || $item['Defense{Phys}'] > 0 || $item['Defense{Mag}'] > 0)
                 && $item['CanBeHq'] == "False") {
                 $Defense = "\n\n| Defense       = ". $item['Defense{Phys}'];
                 $Defense .= "\n| Magic Defense = ". $item['Defense{Mag}'];
@@ -293,11 +263,28 @@ class Items implements ParseInterface
             }
             $Sanction = implode("\n",$Sanction);
 
-            // Bonus Stat Code (attempt)
+            // Eureka Gear stats
+            $EurekaBonus = [];
+            if ($item['ItemSpecialBonus'] == 7) {
+                foreach (range(0, 5) as $i) {
+                    if (!empty($item["BaseParam[$i]"])) {
+                        $BonusStatName = str_replace(" ", "_", $BaseParamCsv->at($item["BaseParam[$i]"])['Name']);
+                        $EurekaBonus[0] = "\n";
+                        $EurekaBonus[] = "| Bonus ". $BonusStatName ." = +". $item["BaseParamValue[$i]"];
+                    }
+                } foreach (range(0,5) as $i) {
+                    if (!empty($item["BaseParam{Special}[$i]"])) {
+                        ($item["BaseParamValue{Special}[$i]"] > 0) ? $BonusStatValue = "+" : $BonusStatValue = false;
+                        $BonusStatName = str_replace(" ", "_", $BaseParamCsv->at($item["BaseParam{Special}[$i]"])['Name']);
+                        $EurekaBonus[] = "| Eureka ". $BonusStatName ." = $BonusStatValue". $item["BaseParamValue{Special}[$i]"];
+                    }
+                }
+            }
+            $EurekaBonus = implode("\n",$EurekaBonus);
+
+            // Bonus Stat Code for normal items
             $BonusStat = [];
-            if ($item['CanBeHq'] == "True" && !empty($item['BaseParam[0]'])) {
-                //print($item["Name"]);
-                //print "\n";
+            if ($item['CanBeHq'] == "True" && !empty($item['BaseParam[0]'] && !$item['ItemSpecialBonus'] == 7)) {
                 foreach (range(0, 5) as $i) {
                     if (!empty($item["BaseParam[$i]"])) {
                         $BonusStatName = str_replace(" ", "_", $BaseParamCsv->at($item["BaseParam[$i]"])['Name']);
@@ -309,7 +296,7 @@ class Items implements ParseInterface
                         }
                     }
                 }
-            } elseif ($item['CanBeHq'] == "False" && !empty($item['BaseParam[0]'])) {
+            } elseif ($item['CanBeHq'] == "False" && !empty($item['BaseParam[0]'] && !$item['ItemSpecialBonus'] == 7)) {
                 foreach (range(0, 5) as $i) {
                     if (!empty($item["BaseParam[$i]"])) {
                         $BonusStatName = str_replace(" ", "_", $BaseParamCsv->at($item["BaseParam[$i]"])['Name']);
@@ -328,23 +315,26 @@ class Items implements ParseInterface
                 '{name}' => $item['Name'],
                 '{subheading}' => $itemUiCategory['Name'],
                 '{description}' => $Description ? $Description : "",
-                '{slots}' => $MateriaSlots ? $MateriaSlots : "",
-                '{stack}' => ($item['StackSize'] > 1) ? '\n| Stack          = '. $item['StackSize'] : "",
+                '{slots}' => ($item['MateriaSlotCount'] > 0) ? "\n| Slots          = ". $item['MateriaSlotCount'] : "",
+                '{advancedmelding}' => ($item['MateriaSlotCount'] > 0) && ($item['IsAdvancedMeldingPermitted'] == "False") ? "\n| Advanced Melds = False" : "",
+                '{stack}' => ($item['StackSize'] > 1) ? "\n| Stack          = ". $item['StackSize'] : "",
                 '{requires}' => $RequiredClasses ? $RequiredClasses : "",
                 '{level}' => $item['Level{Equip}'],
                 '{itemlevel}' => $item['Level{Item}'],
-                '{untradable}' => $item['IsUntradable'],
-                '{unique}' => $item['IsUnique'],
-                '{convertible}' => $Convertible ? $Convertible : "",
-                '{sells}' => $Sells,
-                '{hq}' => ($item['Price{Low}'] > 0) ? "\n| HQ             = ". $item['CanBeHq'] : "",
-                //'{dyeallowed}' => $DyeAllowed ? $DyeAllowed : "",
-                '{dyeallowed}' => "\n| Dye Allowed    = ". $item['IsDyeable'],
-                //'{crestallowed}' => $CrestAllowed ? $CrestAllowed : "",
-                '{crestallowed}' => "\n| Crest Allowed  = ". $item['IsCrestWorthy'],
-                //'{glamour}' => $Glamour ? $Glamour : "",
-                '{glamour}' => "\n| Projectable    = ". $item['IsGlamourous'],
-                '{desynthesis}' => $Desynthesis,
+                '{untradable}' => ($item['IsUntradable'] == "True") ? "\n| Untradable     = Yes" : "",
+                '{unique}' => ($item['IsUnique'] == "True") ? "\n| Unique         = Yes" : "",
+                '{convertible}' => ($item['MaterializeType'] > 0)
+                    ? "\n| Convertible    = Yes"
+                    : "\n| Convertible    = No",
+                '{sells}' => ($item['Price{Low}'] > 0)
+                    ? "\n| Sells          = ". $item['Price{Low}'] ."\n| HQ             = ". $item['CanBeHq']
+                    : "\n| Sells          = No\n| HQ             = ". $item['CanBeHq'],
+                '{dyeallowed}' => $Dye,
+                '{crestallowed}' => $Crest,
+                '{glamour}' => ($item['IsGlamourous'] == "True") ? "\n| Projectable    = Yes" : "",
+                '{desynthesis}' => ($item['Salvage'] > 0 && $item['ClassJob{Repair}'] > 0)
+                    ? "\n| Desynthesizable= Yes\n| Desynth Level  = ". $SalvageCsv->at($item['Salvage'])['OptimalSkill']
+                    : "\n| Desynthesizable= No",
                 '{repair}' => $Repair,
                 '{physicaldamage}' => $PhysicalDamage,
                 '{magicdamage}' => $MagicDamage,
@@ -354,6 +344,7 @@ class Items implements ParseInterface
                 '{setbonusgc}' => $SetBonusGC,
                 '{sanction}' => $Sanction,
                 '{bonus}' => $BonusStat,
+                '{eureka}' => $EurekaBonus,
             ];
 
             // format using Gamer Escape formatter and add to data array
