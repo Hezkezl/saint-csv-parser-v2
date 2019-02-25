@@ -225,7 +225,7 @@ class Items implements ParseInterface
                 $SetBonus[1] = ":Active Under Lv. ". $item['ItemSpecialBonus{Param}'];
                 foreach(range(0,5) as $i) {
                     if(!empty($item["BaseParam{Special}[$i]"])) {
-                        $SetBonus[] .= ":". ($i+2) ." Equipped: [[". $BaseParamCsv->at($item["BaseParam{Special}[$i]"])
+                        $SetBonus[] = ":". ($i+2) ." Equipped: [[". $BaseParamCsv->at($item["BaseParam{Special}[$i]"])
                             ['Name'] ."]] +". $item["BaseParamValue{Special}[$i]"];
                     }
                 }
@@ -240,7 +240,7 @@ class Items implements ParseInterface
                 $SetBonusGC[2] = "| Set Bonus        =<br>";
                 foreach(range(0,5) as $i) {
                     if(!empty($item["BaseParam{Special}[$i]"])) {
-                        $SetBonusGC[] .= ":". ($i+2) ." Equipped: [[". $BaseParamCsv->at($item["BaseParam{Special}[$i]"])
+                        $SetBonusGC[] = ":". ($i+2) ." Equipped: [[". $BaseParamCsv->at($item["BaseParam{Special}[$i]"])
                             ['Name'] ."]] +". $item["BaseParamValue{Special}[$i]"];
                     }
                 }
@@ -255,9 +255,9 @@ class Items implements ParseInterface
                         //$ParamName = $BaseParamCsv->at($item["BaseParam{Special}[$i]"])['Name'];
                         $ParamName = str_replace(" ", "_", $BaseParamCsv->at($item["BaseParam{Special}[$i]"])['Name']);
                         $Sanction[0] = "\n";
-                        $Sanction[] .= "| Latent ". $ParamName ." = +". $item["BaseParamValue{Special}[$i]"];
-                        $Sanction[] .= "| Latent ". $ParamName ." Latent = Yes";
-                        $Sanction[] .= "| Latent ". $ParamName ." Conditions = Sanction";
+                        $Sanction[] = "| Latent ". $ParamName ." = +". $item["BaseParamValue{Special}[$i]"];
+                        $Sanction[] = "| Latent ". $ParamName ." Latent = Yes";
+                        $Sanction[] = "| Latent ". $ParamName ." Conditions = Sanction";
                     }
                 }
             }
@@ -289,9 +289,9 @@ class Items implements ParseInterface
                     if (!empty($item["BaseParam[$i]"])) {
                         $BonusStatName = str_replace(" ", "_", $BaseParamCsv->at($item["BaseParam[$i]"])['Name']);
                         $BonusStat[0] ="\n";
-                        $BonusStat[] .= "| Bonus " . $BonusStatName . " = +" . $item["BaseParamValue[$i]"];
+                        $BonusStat[] = "| Bonus " . $BonusStatName . " = +" . $item["BaseParamValue[$i]"];
                         if (!empty($item['BaseParamValue{Special}[' . ($i+2) . ']'])) {
-                            $BonusStat[] .= '| Bonus ' . $BonusStatName . ' HQ = +'.
+                            $BonusStat[] = '| Bonus ' . $BonusStatName . ' HQ = +'.
                                 ($item["BaseParamValue[$i]"] + $item['BaseParamValue{Special}[' . ($i+2) . ']']);
                         }
                     }
@@ -301,7 +301,7 @@ class Items implements ParseInterface
                     if (!empty($item["BaseParam[$i]"])) {
                         $BonusStatName = str_replace(" ", "_", $BaseParamCsv->at($item["BaseParam[$i]"])['Name']);
                         $BonusStat[0] ="\n";
-                        $BonusStat[] .= "| Bonus " . $BonusStatName . " = +" . $item["BaseParamValue[$i]"];
+                        $BonusStat[] = "| Bonus " . $BonusStatName . " = +" . $item["BaseParamValue[$i]"];
                     }
                 }
             }

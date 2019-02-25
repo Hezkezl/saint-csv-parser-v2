@@ -1,16 +1,12 @@
 cache/*
-output/*
-output-4.3/*
-output-4.45/*
+output*
 input/*
 !cache/.gitkeep
 !output/.gitkeep
 !input/.gitkeep
 .idea
-src/Parsers/Icons/imgs/
-src/Parsers/Icons/imgs-4.5/
-src/Parsers/GE/icons/*
-src/Parsers/GE/icons-4.45/*
+src/Parsers/Icons/imgs*
+src/Parsers/GE/icons*
 ###> symfony/framework-bundle ###
 .env
 /public/bundles/
