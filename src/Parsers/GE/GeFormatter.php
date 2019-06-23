@@ -26,7 +26,7 @@ class GeFormatter
         $format = preg_replace("/\s+|\s+/", null, $format);
         $format = preg_replace("/<Emphasis>|<\\/Emphasis>/", "''", $format);
         $format = preg_replace("/<If\\(LessThan\\(PlayerParameter\\(11\\),12\\)\\)><If\\(LessThan\\(PlayerParameter\\(11\\),4\\)\\)>([^>]+)<Else\\/>([^>]+)<\\/If><Else\\/><If\\(LessThan\\(PlayerParameter\\(11\\),17\\)\\)>([^>]+)<Else\\/>([^>]+)<\\/If><\\/If>/", "{{Loremtextconditional|$1|or '$2' or '$3', depending on the time of day.}}", $format);
-        $format = preg_replace("/{{Loremquote\\|Q\d+\\|link=y\\|(.*)}}/","{| class=\"datatable-GEtable\"\n+$1", $format);
+        $format = preg_replace("/{{Loremquote\\|Q\d+\\|link=y\\|(.*)}}/","\n{| class=\"datatable-GEtable\"\n|+$1\n|}\n", $format);
         $format = preg_replace("/{{Loremquote\\|A\d+\\|link=y\\|(.*)}}/","!$1", $format);
         $format = preg_replace("/{{Loremquote\\|(?:System)\\|link=y\\|(.*)}}/", "<div>'''$1'''</div>", $format);
         $format = preg_replace("/<Color\\(-3917469\\)>(.*)<\\/Color>/", "{{Loremascianspeak|$1}}", $format);
@@ -51,6 +51,7 @@ class GeFormatter
         $format = preg_replace("/(\\[\\[EXP Bonus\\]\\] \\+\d+)/", "$1%", $format);
         $format = str_replace("= False", "= No", $format);
         $format = str_replace("= True", "= Yes", $format);
+        $format = str_replace("|Section = Class & Job Quests", "|Section = Class and Job Quests", $format);
 
         return trim($format) . "\n\n";
     }

@@ -30,8 +30,9 @@ class Items implements ParseInterface
 
         // grab CSV files we want to use
         $ItemCsv = $this->csv('Item');
-        //$ItemActionCsv = $this->csv('ItemAction');
-        //$ItemFoodCsv = $this->csv('ItemFood');
+        $ItemActionCsv = $this->csv('ItemAction');
+        $ItemFoodCsv = $this->csv('ItemFood');
+        $StatusCsv = $this->csv('Status');
         //$ItemSearchCategoryCsv = $this->csv('ItemSearchCategory');
         $BaseParamCsv = $this->csv('BaseParam');
         $ItemSeriesCsv = $this->csv('ItemSeries');
