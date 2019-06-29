@@ -47,4 +47,6 @@ vendor/composer/autoload_static.php
 vendor/composer/ClassLoader.php
 vendor/composer/installed.json
 vendor/composer/LICENSE
-cache/.gitkeep
+cache*
+output*
+input*

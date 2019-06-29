@@ -4,7 +4,7 @@ namespace App\Parsers\GE;
 
 use App\Parsers\CsvParseTrait;
 use App\Parsers\ParseInterface;
-use Symfony\Component\Console\Helper\ProgressBar;
+//use Symfony\Component\Console\Helper\ProgressBar;
 
 class Quests implements ParseInterface
 {
@@ -16,10 +16,9 @@ class Quests implements ParseInterface
         |Patch = {patch}
         |Index = {id}
         |Name = {name}{types}{repeatable}{faction}{eventicon}{reputationrank}
-        |Icontype = {questicontype}.png
-        {smallimage}
+        |Icontype = {questicontype}.png{smallimage}
         |Level = {level}
-        {requiredclass}
+{requiredclass}
         |Required Affiliation =
         |Quest Number ={instancecontent1}{instancecontent2}{instancecontent3}
 
@@ -27,17 +26,12 @@ class Quests implements ParseInterface
         |Unlocks Quests =
 
         |Objectives =
-{objectives}        
-        {expreward}{gilreward}{sealsreward}
-        {tomestones}{relations}{instanceunlock}{questrewards}{catalystrewards}{guaranteeditem7}{guaranteeditem8}{guaranteeditem9}{guaranteeditem11}{questoptionrewards}{trait}
+{objectives}{expreward}{gilreward}{sealsreward}
+{tomestones}{relations}{instanceunlock}{questrewards}{catalystrewards}{guaranteeditem7}{guaranteeditem8}{guaranteeditem9}{guaranteeditem11}{questoptionrewards}{trait}
         |Issuing NPC = {questgiver}
-        |NPC Location =
-        
-        |NPCs Involved = {npcs}
-        |Mobs Involved =
-        |Items Involved = {items}
-        |Key Items Involved = {keyitems}
-        
+        |NPC Location ={npcs}
+        |Mobs Involved ={items}{keyitems}
+
         |Description =
         |Journal =
 {journal}
@@ -57,7 +51,7 @@ http://ffxiv.gamerescape.com/wiki/Loremonger:{name}?action=edit
     public function parse()
     {
         // i should pull this from xivdb :D
-        $patch = '4.5';
+        $patch = '4.56';
 
         // grab CSV files
         $questCsv = $this->csv('Quest');
@@ -243,13 +237,14 @@ http://ffxiv.gamerescape.com/wiki/Loremonger:{name}?action=edit
                 80119 => "\n|Event = Heavensturn (2018)",
                 80120 => "\n|Event = Heavensturn (2019)",
                 80121 => "\n|Event = Monster Hunter World",
+                80123 => "\n|Event = A Nocturne for Heroes",
             ];
 
             // If Small Image (Quest Header Image) is greater than 0 (not blank), then display in html comment
             // with "Quest Name Image.png" as default location for the filename to be saved.
             $smallimage = false;
             if ($quest['Icon'] > 0) {
-                $string = "\n|Header Image = ". $quest['Icon'] .".png";
+                $string = "\n\n|Header Image = ". $quest['Icon'] .".png";
                 $smallimage = $string;
             }
 
@@ -309,10 +304,10 @@ http://ffxiv.gamerescape.com/wiki/Loremonger:{name}?action=edit
 
             // Show EXPReward if more than zero and round it down. Otherwise, blank it.
             if ($this->getQuestExp($quest) > 0) {
-                $string = "\n|EXPReward = ". floor($this->getQuestExp($quest));
+                $string = "\n\n|EXPReward = ". floor($this->getQuestExp($quest));
                 $expreward = $string;
             } else {
-                $string = "\n|EXPReward =";
+                $string = "\n\n|EXPReward =";
                 $expreward = $string;
             }
 
@@ -606,9 +601,9 @@ http://ffxiv.gamerescape.com/wiki/Loremonger:{name}?action=edit
                 '{battletalk}' => implode("\n", $battletalk),
                 '{system}' => implode("\n", $system),
                 '{trait}' => $TraitRewardName,
-                '{items}' => $ItemsInvolved,
-                '{keyitems}' =>$KeyItemsInvolved,
-                '{npcs}' => $NpcsInvolved,
+                '{items}' => (!empty($ItemsInvolved)) ? "\n|Items Involved = $ItemsInvolved" : "\n|Items Involved =",
+                '{keyitems}' => (!empty($KeyItemsInvolved)) ? "\n|Key Items Involved = $KeyItemsInvolved" : "",
+                '{npcs}' => "\n\n|NPCs Involved = $NpcsInvolved",
                 //'{script}' => $questscripts,
                 //'{npclocation}' => $NpcLocation,
             ];
