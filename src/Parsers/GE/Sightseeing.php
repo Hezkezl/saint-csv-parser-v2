@@ -14,7 +14,7 @@ class Sightseeing implements ParseInterface
 
     // the wiki output format / template we shall use
     const WIKI_FORMAT = "{{-start-}}
-'''Sightseeing Log:{name}'''
+'''Sightseeing Log: {name}'''
 {{ARR Infobox Sightseeing Log
 | Patch = 5.0
 | Expansion   = Shadowbringers

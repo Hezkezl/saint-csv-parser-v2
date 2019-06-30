@@ -15,7 +15,7 @@ class Recipes implements ParseInterface
 
     // the wiki output format / template we shall use
     const WIKI_FORMAT = "{{-start-}}
-'''{result}'''
+'''{result}/Recipe'''
 {{ARR Infobox Recipe
 |Recipe ID           = {index}
 |Result              = {result}{resultcount}{unlockbook}{specialist}
@@ -24,8 +24,8 @@ class Recipes implements ParseInterface
 |Recipe Level        = {recipelevel}
 |Durability          = {durability}
 |Difficulty          = {difficulty}
-|Quality             = {quality}{requiredcrafts}{requiredcontrol}
-|Quick Synthesis     = {quicksynth}{quicksynthcrafts}{quicksynthcontrol}{status}{aspect}{ingredient1}{ingredient2}
+|Quality             = {quality}{maxquality}{requiredcrafts}{requiredcontrol}
+|Quick Synthesis     = {quicksynth}{quicksynthcrafts}{quicksynthcontrol}{status}{ingredient1}{ingredient2}
 {ingredients}
 }}{{-stop-}}";
 
@@ -61,16 +61,6 @@ class Recipes implements ParseInterface
                 7 => 'Culinarian',
             ];
 
-            $aspect = [
-                0 => NULL,
-                1 => 'Fire',
-                2 => 'Ice',
-                3 => 'Wind',
-                4 => 'Earth',
-                5 => 'Lightning',
-                6 => 'Water',
-            ];
-
             $level = $RecipeLevelCsv->at($recipe['RecipeLevelTable'])['ClassJobLevel'];
             $star = str_repeat("{{Star}}", $RecipeLevelCsv->at($recipe['RecipeLevelTable'])['Stars']);
             $levelstar = "$level $star";
@@ -96,11 +86,11 @@ class Recipes implements ParseInterface
                 '{skill}' => $skill[$recipe['CraftType']],
                 '{level}' => ($RecipeLevelCsv->at($recipe['RecipeLevelTable'])['Stars'] > 0) ? $levelstar :  $level,
                 '{recipelevel}' => $recipe['RecipeLevelTable'],
-                '{durability}' => floor($RecipeLevelCsv->at($recipe['RecipeLevelTable'])['Durability']*($recipe['DurabilityFactor']/100)),
-                '{difficulty}' => floor($RecipeLevelCsv->at($recipe['RecipeLevelTable'])['Difficulty']*($recipe['DifficultyFactor']/100)),
-                '{quality}' => floor($RecipeLevelCsv->at($recipe['RecipeLevelTable'])['Quality']*($recipe['QualityFactor']/100)),
+                '{durability}' => floor($RecipeLevelCsv->at($recipe['RecipeLevelTable'])['Durability']*($recipe['DurabilityFactor'])/100),
+                '{difficulty}' => floor($RecipeLevelCsv->at($recipe['RecipeLevelTable'])['Difficulty']*($recipe['DifficultyFactor'])/100),
+                '{quality}' => floor($RecipeLevelCsv->at($recipe['RecipeLevelTable'])['Quality']*($recipe['QualityFactor'])/100),
+                '{maxquality}' => $recipe['MaxInitialQuality'] ? "\n|Max Initial Quality = ". $recipe['MaxInitialQuality'] : "",
                 '{status}' => ($recipe['Status{Required}'] > 0) ? "\n|Status Required     = ". $StatusCsv->at($recipe['Status{Required}'])['Name'] : "",
-                '{aspect}' => ($recipe['RecipeElement'] > 0) ? "\n|Aspect              = ". $aspect[$recipe['RecipeElement']] : "",
                 '{requiredcrafts}' => ($recipe['RequiredCraftsmanship'] > 0) ? "\n|Craftsmanship Required = ". $recipe['RequiredCraftsmanship'] : "",
                 '{requiredcontrol}' => ($recipe['RequiredControl'] > 0) ? "\n|Control Required    = ". $recipe['RequiredControl'] : "",
                 '{quicksynth}' => ($recipe['CanQuickSynth'] == "True") ? 'Yes' : 'No',
