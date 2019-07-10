@@ -13,18 +13,19 @@ class KeyItems implements ParseInterface
     use CsvParseTrait;
 
     // the wiki output format / template we shall use
-    const WIKI_FORMAT = 'http://ffxiv.gamerescape.com/wiki/{name}?action=edit
+    const WIKI_FORMAT = "{{-start-}}
+'''{name}'''
 {{ARR Infobox Key Item
 |Index = {index}
 |Patch = {patch}
 |Name = {name}
 |Description = {description}
-|Stack = {stack}{icon}{quest}
-}}';
+|Stack = {stack}{quest}
+}}{{-stop-}}";
 
     public function parse()
     {
-        $patch = '4.5';
+        $patch = '5.0';
 
         // grab CSV files we want to use
         $EventItemCsv = $this->csv('EventItem');
@@ -39,7 +40,7 @@ class KeyItems implements ParseInterface
             $this->io->progressAdvance();
 
             // skip ones without a name
-            if (empty($eventitem['Name'])) {
+            if (empty($eventitem['Name']) || (empty($eventitem['Quest']))) {
                 continue;
             }
 
@@ -68,13 +69,13 @@ class KeyItems implements ParseInterface
 
                 // build output filenames for icon
                 // if saved icon exists, and if quest is not empty then add quest to the name
-                if (file_exists("{$EventIconoutputDirectory}/{$eventitem['Name']} Icon.png") && (empty ($quest))) {
-                    $eventiconFileName = "{$EventIconoutputDirectory}/{$eventitem['Name']} (Key Item) Icon.png";
-                } elseif (file_exists("{$EventIconoutputDirectory}/{$eventitem['Name']} Icon.png") && (!empty ($quest))) {
-                    $eventiconFileName = "{$EventIconoutputDirectory}/{$eventitem['Name']} ({$quest}) Icon.png";
-                } else {
+//                if (file_exists("{$EventIconoutputDirectory}/{$eventitem['Name']} Icon.png") && (empty ($quest))) {
+//                    $eventiconFileName = "{$EventIconoutputDirectory}/{$eventitem['Name']} (Key Item) Icon.png";
+//                } elseif (file_exists("{$EventIconoutputDirectory}/{$eventitem['Name']} Icon.png") && (!empty ($quest))) {
+//                    $eventiconFileName = "{$EventIconoutputDirectory}/{$eventitem['Name']} ({$quest}) Icon.png";
+//                } else {
                     $eventiconFileName = "{$EventIconoutputDirectory}/{$eventitem['Name']} Icon.png";
-                }
+//                }
 
 
                     // inform console what item we're copying
@@ -95,7 +96,7 @@ class KeyItems implements ParseInterface
                 '{name}' => $eventitem['Name'],
                 '{description}' => $EventItemHelpCsv->at($eventitem['id'])['Description'],
                 '{stack}' => $eventitem['StackSize'],
-                '{icon}' => $icon,
+//                '{icon}' => $icon,
                 '{quest}' => ($quest > 1) ? "\n|Quest Involvement = ". $quest : "",
                 '{index}' => $eventitem['id'],
             ];

@@ -11,7 +11,8 @@ class Quests implements ParseInterface
     use CsvParseTrait;
 
     // the wiki output format / template we shall use
-    const WIKI_FORMAT = 'http://ffxiv.gamerescape.com/wiki/{name}?action=edit
+    const WIKI_FORMAT = "{{-start-}}
+'''{name}''''
         {{ARR Infobox Quest
         |Patch = {patch}
         |Index = {id}
@@ -20,7 +21,7 @@ class Quests implements ParseInterface
         |Level = {level}
 {requiredclass}
         |Required Affiliation =
-        |Quest Number ={instancecontent1}{instancecontent2}{instancecontent3}
+        |Quest Number ={number}{instancecontent1}{instancecontent2}{instancecontent3}
 
         |Required Quests ={prevquestspace1}{prevquest2}{prevquest3}
         |Unlocks Quests =
@@ -43,15 +44,16 @@ class Quests implements ParseInterface
         |Images =
         |Notes =
         }}
-http://ffxiv.gamerescape.com/wiki/Loremonger:{name}?action=edit
+{{-stop-}}{{-start-}}
+'''Loremonger:{name}'''
 <noinclude>{{Lorempageturn|prev={prevquest1}|next=}}{{Loremquestheader|{name}|Mined=X|Summary=}}</noinclude>
-{{LoremLoc|Location=}}
-{dialogue}{battletalk}';
+{{LoremLoc|Location=Hydaelyn}}<!-- Replace 'Hydaelyn' here with proper location where first dialogue is said -->
+{dialogue}{battletalk}{{-stop-}}";
 
     public function parse()
     {
         // i should pull this from xivdb :D
-        $patch = '4.56';
+        $patch = '5.0';
 
         // grab CSV files
         $questCsv = $this->csv('Quest');
@@ -304,7 +306,7 @@ http://ffxiv.gamerescape.com/wiki/Loremonger:{name}?action=edit
 
             // Show EXPReward if more than zero and round it down. Otherwise, blank it.
             if ($this->getQuestExp($quest) > 0) {
-                $string = "\n\n|EXPReward = ". floor($this->getQuestExp($quest));
+                $string = "\n\n|EXPReward = {{Information Needed}}";//. floor($this->getQuestExp($quest));
                 $expreward = $string;
             } else {
                 $string = "\n\n|EXPReward =";
@@ -394,7 +396,7 @@ http://ffxiv.gamerescape.com/wiki/Loremonger:{name}?action=edit
             $InstanceContent3 = $InstanceContentCsv->at($quest['InstanceContent[2]'])['Name'];
 
             // Quest Giver Name (All Words In Name Capitalized)
-            $questgiver = ucwords(strtolower($ENpcResidentCsv->at($quest['ENpcResident{Start}'])['Singular']));
+            $questgiver = ucwords(strtolower($ENpcResidentCsv->at($quest['Issuer{Start}'])['Singular']));
 
             // Start Quest Objectives / Journal Entry / Dialogue code
             $objectives = [];
@@ -574,6 +576,7 @@ http://ffxiv.gamerescape.com/wiki/Loremonger:{name}?action=edit
                 '{repeatable}' => $repeatable,
                 '{faction}' => $faction,
                 '{requiredclass}' => $requiredclass,
+                '{number}' => $quest['id'],
                 '{instancecontent1}' => $InstanceContent1 ? "\n|Dungeon Requirement = ". $InstanceContent1 : "",
                 '{instancecontent2}' => $InstanceContent2 ? ", ". $InstanceContent2 : "",
                 '{instancecontent3}' => $InstanceContent3 ? ", ". $InstanceContent3 : "",
@@ -615,7 +618,7 @@ http://ffxiv.gamerescape.com/wiki/Loremonger:{name}?action=edit
         // save our data to the filename: GeQuestWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save('GeQuestWiki.txt');
+        $info = $this->save('GeQuestWikiBot.txt');
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],
