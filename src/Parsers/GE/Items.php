@@ -13,9 +13,12 @@ class Items implements ParseInterface
     use CsvParseTrait;
 
     // the wiki output format / template we shall use
-    const WIKI_FORMAT = "{{-start-}}'''{name}'''
+    const WIKI_FORMAT = "{{-start-}}
+'''{name}/Patch'''
+{patch}
+{{-stop-}}{{-start-}}
+'''{name}'''
         {{ARR Infobox Item
-        | Patch = {patch}
         | Index          = {id}
         | Rarity         = {rarity}
         | Name           = {name}
@@ -26,7 +29,7 @@ class Items implements ParseInterface
 
     public function parse()
     {
-        $patch = '4.55';
+        $patch = '5.1';
 
         // grab CSV files we want to use
         $ItemCsv = $this->csv('Item');

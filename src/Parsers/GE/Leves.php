@@ -77,7 +77,6 @@ otherwise (Fisher, Botanist, Goldsmith, Alchemist, etc) -->
         $CraftLeveCsv = $this->csv('CraftLeve');
         $GatheringLeveCsv = $this->csv('GatheringLeve');
         $LevelCsv = $this->csv('Level');
-        $LeveVfxCsv = $this->csv('LeveVfx');
         $MapCsv = $this->csv('Map');
         $PlaceNameCsv = $this->csv('PlaceName');
         $ClassJobCsv = $this->csv('ClassJobCategory');
@@ -192,9 +191,11 @@ otherwise (Fisher, Botanist, Goldsmith, Alchemist, etc) -->
             }
 
             // Objective text for Disciple of the Hand leves
-            if ($leve['DataID'] >= 917054 && $leve['DataID'] <= 920000) {
-                $CraftLeveItem = $CraftLeveCsv->at($leve['DataID'])['Item[0]'];
-                $CraftLeveItemQty = $CraftLeveCsv->at($leve['DataID'])['ItemCount[0]'];
+            $Objective = false;
+            $Item = false;
+            if ($leve['DataId'] >= 917054 && $leve['DataId'] <= 920000) {
+                $CraftLeveItem = $CraftLeveCsv->at($leve['DataId'])['Item[0]'];
+                $CraftLeveItemQty = $CraftLeveCsv->at($leve['DataId'])['ItemCount[0]'];
                 $ItemSingle = $CraftLeveItem->at($ItemCsv)['Singular'];
                 $ItemPlural = $CraftLeveItem->at($ItemCsv)['Plural'];
                 $ItemVowel = $CraftLeveItem->at($ItemCsv)['StartsWithVowel'];
@@ -208,6 +209,9 @@ otherwise (Fisher, Botanist, Goldsmith, Alchemist, etc) -->
                 }
             }
 
+            $NpcInvolvement = false;
+            $Npc = false;
+
                 // Save some data
             $data = [
                 '{patch}' => $patch,
@@ -219,14 +223,14 @@ otherwise (Fisher, Botanist, Goldsmith, Alchemist, etc) -->
                 '{grandcompany}' => ($leve['LeveAssignmentType'] == 16 || $leve['LeveAssignmentType'] == 17 || $leve['LeveAssignmentType'] == 18)
                     ? "\n|Grand Company      = ". $grandcompany : "",
                 '{classes}' => $classes,
-                '{objective}' => ,
+                '{objective}' => $Objective,
                 '{description}' => $leve['Description'],
                 '{exp}' => ($leve['ExpReward'] > 0) ? $leve['ExpReward'] : "{{Information Needed}}",
                 '{gil}' => $leve['GilReward'],
-                '{npc}' => ,
+                '{npc}' => $Npc,
                 '{client}' => $LeveClientCsv->at($leve['LeveClient'])['Name'],
-                '{npcinvolve}' => ,
-                '{item}' => ,
+                '{npcinvolve}' => $NpcInvolvement,
+                '{item}' => $Item,
             ];
 
             // format using Gamer Escape formatter and add to data array

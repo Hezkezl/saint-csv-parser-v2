@@ -29,14 +29,14 @@ class Satisfaction implements ParseInterface
 |Gil Low = {gillow}
 |Gil Mid = {gilmid}
 |Gil High = {gilhigh}
-|Red Type = {redtype}
-|Red Low = {redlow}
-|Red Mid = {redmid}
-|Red High = {redhigh}
 |Yellow Type = {yellowtype}
 |Yellow Low = {yellowlow}
 |Yellow Mid = {yellowmid}
 |Yellow High = {yellowhigh}
+|White Type = {whitetype}
+|White Low = {whitelow}
+|White Mid = {whitemid}
+|White High = {whitehigh}
 }}{{-stop-}}';
 
     public function parse()
@@ -96,14 +96,14 @@ class Satisfaction implements ParseInterface
                 '{gillow}' => $gillow,
                 '{gilmid}' => $gilmid,
                 '{gilhigh}' => $gilhigh,
-                '{redtype}' => $redtype,
-                '{redlow}' => $redlow,
-                '{redmid}' => $redmid,
-                '{redhigh}' => $redhigh,
                 '{yellowtype}' => $yellowtype,
                 '{yellowlow}' => $yellowlow,
                 '{yellowmid}' => $yellowmid,
                 '{yellowhigh}' => $yellowhigh,
+                '{whitetype}' => $whitetype,
+                '{whitelow}' => $whitelow,
+                '{whitemid}' => $whitemid,
+                '{whitehigh}' => $whitehigh,
             ];
 
             // format using Gamer Escape formatter and add to data array

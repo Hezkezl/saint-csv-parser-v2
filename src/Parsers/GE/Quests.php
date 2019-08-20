@@ -53,7 +53,7 @@ class Quests implements ParseInterface
     public function parse()
     {
         // i should pull this from xivdb :D
-        $patch = '5.0';
+        $patch = '5.05';
 
         // grab CSV files
         $questCsv = $this->csv('Quest');
@@ -220,23 +220,23 @@ class Quests implements ParseInterface
             // If Event Icon greater than 0 (ie: not blank) then convert it to the appropriate event with a
             // placeholder year
             $eventicon = [
-                80101 => "\n|Event = Moonfire Faire (2018)",
-                80102 => "\n|Event = Lightning Strikes (2018)",
-                80103 => "\n|Event = All Saints' Wake (2018)",
-                80104 => "\n|Event = Breaking Brick Mountains (2018)",
-                80105 => "\n|Event = The Maiden's Rhapsody (2018)",
-                80106 => "\n|Event = Starlight Celebration (2018)",
+                80101 => "\n|Event = Moonfire Faire (2019)",
+                80102 => "\n|Event = Lightning Strikes (2019)",
+                80103 => "\n|Event = All Saints' Wake (2019)",
+                80104 => "\n|Event = Breaking Brick Mountains (2019)",
+                80105 => "\n|Event = The Maiden's Rhapsody (2019)",
+                80106 => "\n|Event = Starlight Celebration (2019)",
                 80107 => "\n|Event = Heavensturn (2014)",
-                80108 => "\n|Event = Valentione's Day (2018)",
-                80109 => "\n|Event = Little Ladies' Day (2018)",
-                80110 => "\n|Event = Hatching-tide (2018)",
+                80108 => "\n|Event = Valentione's Day (2019)",
+                80109 => "\n|Event = Little Ladies' Day (2019)",
+                80110 => "\n|Event = Hatching-tide (2019)",
                 80112 => "\n|Event = Heavensturn (2015)",
-                80113 => "\n|Event = The Rising (2018)",
+                80113 => "\n|Event = The Rising (2019)",
                 80115 => "\n|Event = Heavensturn (2016)",
-                80116 => "\n|Event = The Make It Rain Campaign (2018)",
-                80117 => "\n|Event = Yo-kai Watch (2018)",
+                80116 => "\n|Event = The Make It Rain Campaign (2019)",
+                80117 => "\n|Event = Yo-kai Watch (2019)",
                 80118 => "\n|Event = Heavensturn (2017)",
-                80119 => "\n|Event = Heavensturn (2018)",
+                80119 => "\n|Event = Heavensturn (2019)",
                 80120 => "\n|Event = Heavensturn (2019)",
                 80121 => "\n|Event = Monster Hunter World",
                 80123 => "\n|Event = A Nocturne for Heroes",
