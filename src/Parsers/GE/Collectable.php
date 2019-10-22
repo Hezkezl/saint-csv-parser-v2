@@ -49,6 +49,8 @@ class Collectable implements ParseInterface
                     $Name = $ItemCsv->at($item["RequiredItem[$i]"])['Name'];
                     $BonusMultiplier = $MultiplierCsv->at($item["BonusMultiplier[$i]"]);
                     $Level = $item["ClassJobLevel{Max}[$i]"];
+                    $Star = str_repeat("{{Star}}", $item["Stars[$i]"]);
+                    $LevelStar = ($item["Stars[$i]"] > 0) ? "$Level $Star" : "$Level";
                     $BaseCollect = $item["Collectability{Base}[$i]"];
                     $ExpModifier = $item["ExpModifier[$i]"];
                     $BaseScrip = $item["Reward{Scrips}[$i]"];
@@ -63,7 +65,7 @@ class Collectable implements ParseInterface
                     $Multiplier2 = $MultiplierCsv->at($item["BonusMultiplier[$i]"])['XpMultiplier[0]'];
                     $Bonus2EXP = floor($BaseEXP * ($Multiplier2/1000));
                     $string = "{{-start-}}\n'''". $Name ."/Collectable'''\n{{ARR Infobox Collectable\n";
-                    $string .= "|Class = ". $Class ."\n|Level = ". $Level ."\n|Name = ". $Name ."\n|Scrip = ". $Currency ."\n";
+                    $string .= "|Class = ". $Class ."\n|Level = ". $LevelStar ."\n|Name = ". $Name ."\n|Scrip = ". $Currency ."\n";
                     $string .= "|Base = ". $BaseCollect ."\n|Base Scrip = ". $BaseScrip ."\n|Base EXP = ". $BaseEXP ."\n";
                     $string .= "|Bonus1 = ". $Bonus1Collect ."\n|Bonus1 Scrip = ". $Bonus1Scrip ."\n|Bonus1 EXP = ". $Bonus1EXP ."\n";
                     $string .= "|Bonus2 = ". $Bonus2Collect ."\n|Bonus2 Scrip = ". $Bonus2Scrip ."\n|Bonus2 EXP = ". $Bonus2EXP ."\n}}{{-stop-}}";
