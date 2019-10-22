@@ -59,7 +59,7 @@ class Collectable implements ParseInterface
                     $Bonus1Collect = $item["Collectability{Bonus}[$i]"];
                     $Bonus1Scrip = floor($BaseScrip * ($BonusMultiplier["CurrencyMultiplier[1]"]/1000));
                     $Multiplier1 = $MultiplierCsv->at($item["BonusMultiplier[$i]"])['XpMultiplier[1]'];
-                    $Bonus1EXP = ($BaseEXP * ($Multiplier1/1000));
+                    $Bonus1EXP = floor($BaseEXP * ($Multiplier1/1000));
                     $Bonus2Collect = $item["Collectability{HighBonus}[$i]"];
                     $Bonus2Scrip = floor($BaseScrip * ($BonusMultiplier["CurrencyMultiplier[0]"]/1000));
                     $Multiplier2 = $MultiplierCsv->at($item["BonusMultiplier[$i]"])['XpMultiplier[0]'];
