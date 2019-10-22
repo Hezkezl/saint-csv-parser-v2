@@ -6,6 +6,10 @@ use App\Parsers\CsvParseTrait;
 use App\Parsers\ParseInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 
+/**
+ * php bin/console app:parse:csv GE:Collectable
+ */
+
 class Collectable implements ParseInterface
 {
     use CsvParseTrait;
@@ -46,15 +50,18 @@ class Collectable implements ParseInterface
                     $BonusMultiplier = $MultiplierCsv->at($item["BonusMultiplier[$i]"]);
                     $Level = $item["ClassJobLevel{Max}[$i]"];
                     $BaseCollect = $item["Collectability{Base}[$i]"];
+                    $ExpModifier = $item["ExpModifier[$i]"];
                     $BaseScrip = $item["Reward{Scrips}[$i]"];
                     $ParamgrowEXP = $ParamgrowCsv->at($item["ClassJobLevel{Max}[$i]"])['ExpToNext'];
-                    $BaseEXP = floor($ParamgrowEXP * ($item['ExpModifier[0]']/1000));
+                    $BaseEXP = floor($ParamgrowEXP * ($ExpModifier/1000));
                     $Bonus1Collect = $item["Collectability{Bonus}[$i]"];
                     $Bonus1Scrip = floor($BaseScrip * ($BonusMultiplier["CurrencyMultiplier[1]"]/1000));
-                    $Bonus1EXP = floor($BaseEXP * ($BonusMultiplier["XpMultiplier[1]"]/1000));
+                    $Multiplier1 = $MultiplierCsv->at($item["BonusMultiplier[$i]"])['XpMultiplier[1]'];
+                    $Bonus1EXP = ($BaseEXP * ($Multiplier1/1000));
                     $Bonus2Collect = $item["Collectability{HighBonus}[$i]"];
                     $Bonus2Scrip = floor($BaseScrip * ($BonusMultiplier["CurrencyMultiplier[0]"]/1000));
-                    $Bonus2EXP = floor($BaseEXP * ($BonusMultiplier["XpMultiplier[0]"]/1000));
+                    $Multiplier2 = $MultiplierCsv->at($item["BonusMultiplier[$i]"])['XpMultiplier[0]'];
+                    $Bonus2EXP = floor($BaseEXP * ($Multiplier2/1000));
                     $string = "{{-start-}}\n'''". $Name ."/Collectable'''\n{{ARR Infobox Collectable\n";
                     $string .= "|Class = ". $Class ."\n|Level = ". $Level ."\n|Name = ". $Name ."\n|Scrip = ". $Currency ."\n";
                     $string .= "|Base = ". $BaseCollect ."\n|Base Scrip = ". $BaseScrip ."\n|Base EXP = ". $BaseEXP ."\n";
@@ -79,7 +86,7 @@ class Collectable implements ParseInterface
         // save our data to the filename: GeCollectWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save('GeCollectWiki.txt');
+        $info = $this->save('GeCollectWiki.txt', 999999);
 
         $this->io->table(
             ['Filename', 'Data Count', 'File Size'],
