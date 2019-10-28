@@ -16,6 +16,7 @@ class Items implements ParseInterface
     const WIKI_FORMAT = "{{-start-}}
 '''{name}/Patch'''
 {patch}
+<noinclude>[[Category:Patch Subpages]]</noinclude>
 {{-stop-}}{{-start-}}
 '''{name}'''
         {{ARR Infobox Item
