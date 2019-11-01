@@ -18,7 +18,7 @@ class Icons implements ParseInterface
         $url = 'https://xivapi.com/item?key=db4c36d2ba9a4f5c917f2566&limit=1000&columns=ID,Name&page=%s';
         @mkdir($saveto);
 
-        foreach(range(1, 25) as $page) {
+        foreach(range(25, 29) as $page) {
             // grab all items
             $items = json_decode(file_get_contents(sprintf($url, $page)));
 
