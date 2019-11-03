@@ -27,8 +27,8 @@ class TripleTriad implements ParseInterface
 | ValueLeft   = {ValueLeft}
 | Description = {Description}
 
-Large Icon: {{subst:#expr: 82100 + 281}}
-Small Icon: {{subst:#expr: 82500 + 281}}
+Large Icon: {LargeIcon}
+Small Icon: {SmallIcon}
 }}{{-stop-}}";
     public function parse()
     {
@@ -36,8 +36,8 @@ Small Icon: {{subst:#expr: 82500 + 281}}
 
         // grab CSV files we want to use
         $TripleTriadCardCsv = $this->csv('TripleTriadCard');
-        $TripleTriadCardRarityCsv = $this->csv('TripleTriadCardRarity');
         $TripleTriadCardResidentCsv = $this->csv('TripleTriadCardResident');
+        $TripleTriadCardRarityCsv = $this->csv('TripleTriadCardRarity');
         $TripleTriadCardTypeCsv = $this->csv('TripleTriadCardType');
 
         // (optional) start a progress bar
@@ -54,8 +54,9 @@ Small Icon: {{subst:#expr: 82500 + 281}}
 
             // Your parse code here
 
-            $Description = strip_tags($TripleTriadCardCsv->at($TripleTriad['Description']));
-            $Name = str_replace(" & ", " and ", $TripleTriadCardCsv->at($TripleTriad['Name']));
+            $Description = strip_tags($TripleTriad['Description']);
+            $Description = str_replace("\n", "<br>", $Description);
+            $Name = str_replace(" & ", " and ", $TripleTriad['Name']);
             $Family = $TripleTriadCardResidentCsv->at($TripleTriad['id'])['TripleTriadCardType'];
             $Type = [
                 0 => NULL,
@@ -65,20 +66,24 @@ Small Icon: {{subst:#expr: 82500 + 281}}
                 4 => "Garlean",
                 5 => NULL,
             ];
-            $Type1 = $TripleTriadCardTypeCsv->at($Family)['Name'];
+            $LargeIcon = (82100 + $TripleTriad['id']);
+            $SmallIcon = (82500 + $TripleTriad['id']);
 
             // Save some data
             $data = [
                 '{Name}' => $Name,
+                //'{Name}' => $TripleTriadCardCsv->at($TripleTriad['Name']),
                 '{Patch}' => $Patch,
                 '{Index}' => $TripleTriad['id'],
                 '{Rarity}'=> $TripleTriadCardResidentCsv->at($TripleTriad['id'])['TripleTriadCardRarity'],
-                '{Family}' => ($Family > 0) ? "\n| Family = ". $Type1["$Family"] : "\n| Family =",
+                '{Family}' => ($Family > 0) ? "\n| Family = ". $Type["$Family"] : "\n| Family =",
                 '{ValueTop}' => $TripleTriadCardResidentCsv->at($TripleTriad['id'])['Top'],
                 '{ValueRight}' => $TripleTriadCardResidentCsv->at($TripleTriad['id'])['Right'],
                 '{ValueBottom}' => $TripleTriadCardResidentCsv->at($TripleTriad['id'])['Bottom'],
                 '{ValueLeft}' => $TripleTriadCardResidentCsv->at($TripleTriad['id'])['Left'],
                 '{Description}' => $Description,
+                '{LargeIcon}' => $LargeIcon,
+                '{SmallIcon}' => $SmallIcon,
             ];
 
             // format using Gamer Escape formatter and add to data array
