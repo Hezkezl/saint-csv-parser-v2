@@ -65,9 +65,6 @@ Small Icon: {SmallIcon}
             // return the "Stars" / Rarity of the card  instead
             $Rarity = $TripleTriadCardRarityCsv->at($TripleTriadCardResidentCsv->at($TripleTriad['id'])['TripleTriadCardRarity'])['Stars'];
 
-            $LargeIcon = (82100 + $TripleTriad['id']);
-            $SmallIcon = (82500 + $TripleTriad['id']);
-
             // change the top and bottom code depending on if I want to bot the pages up or not
             if ($Bot == "true") {
                 $Top = "{{-start-}}\n'''$Name (Triple Triad Card)'''\n";
@@ -76,6 +73,26 @@ Small Icon: {SmallIcon}
                 $Top = "http://ffxiv.gamerescape.com/wiki/$Name (Triple Triad Card)?action=edit\n";
                 $Bottom = "";
             };
+
+            // Icon copying
+            $LargeIcon = (82100 + $TripleTriad['id']);
+            $SmallIcon = (82500 + $TripleTriad['id']);
+            // ensure output directory exists
+            $TriadIconoutputDirectory = $this->getOutputFolder() . '/TripleTriadIcons';
+            // if it doesn't exist, make it
+            if (!is_dir($TriadIconoutputDirectory)) {
+                mkdir($TriadIconoutputDirectory, 0777, true);
+            }
+
+            // build icon input folder paths
+            $LargeIconPath = $this->getInputFolder() .'/icon/'. $this->iconize($LargeIcon);
+            $SmallIconPath = $this->getInputFolder() .'/icon/'. $this->iconize($SmallIcon);
+            // give correct file names to icons for output
+            $LargeIconFileName = "{$TriadIconoutputDirectory}/$Name (Triple Triad Card) Full.png";
+            $SmallIconFileName = "{$TriadIconoutputDirectory}/$Name (Triple Triad Card) icon.png";
+            // actually copy the icons
+            copy($LargeIconPath, $LargeIconFileName);
+            copy($SmallIconPath, $SmallIconFileName);
 
             // Save some data
             $data = [
@@ -110,5 +127,32 @@ Small Icon: {SmallIcon}
             [ 'Filename', 'Data Count', 'File Size' ],
             $info
         );
+    }
+
+    /**
+     * Converts SE icon "number" into a proper path
+     */
+    private function iconize($number, $hq = false)
+    {
+        $number = intval($number);
+        $extended = (strlen($number) >= 6);
+
+        if ($number == 0) {
+            return null;
+        }
+
+        // create icon filename
+        $icon = $extended ? str_pad($number, 5, "0", STR_PAD_LEFT) : '0' . str_pad($number, 5, "0", STR_PAD_LEFT);
+
+        // create icon path
+        $path = [];
+        $path[] = $extended ? $icon[0] . $icon[1] . $icon[2] .'000' : '0'. $icon[1] . $icon[2] .'000';
+
+        $path[] = $icon;
+
+        // combine
+        $icon = implode('/', $path) .'.png';
+
+        return $icon;
     }
 }
