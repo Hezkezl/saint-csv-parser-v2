@@ -52,31 +52,28 @@ Small Icon: {SmallIcon}
                 continue;
             }
 
-            // Your parse code here
+            // code starts here
+            $Description = strip_tags($TripleTriad['Description']); // strip <Emphasis> and other tags from the Description
+            $Description = str_replace("\n", "<br>", $Description); // replace literal line breaks with <br>
 
-            $Description = strip_tags($TripleTriad['Description']);
-            $Description = str_replace("\n", "<br>", $Description);
-            $Name = str_replace(" & ", " and ", $TripleTriad['Name']);
-            $Family = $TripleTriadCardResidentCsv->at($TripleTriad['id'])['TripleTriadCardType'];
-            $Type = [
-                0 => NULL,
-                1 => "Primal",
-                2 => "Scion",
-                3 => "Beastman",
-                4 => "Garlean",
-                5 => NULL,
-            ];
+            // Using the ID#/key from TripleTriadCard.csv, match that up with the column "TripleTriadCardType" in the file
+            // TripleTriadCardResident, and take THAT value and match it with the "Name" column from TripleTriadCardRarity.csv
+            $Family = $TripleTriadCardTypeCsv->at($TripleTriadCardResidentCsv->at($TripleTriad['id'])['TripleTriadCardType'])['Name'];
+            // Do the same process as above, except use TripleTriadCardType.csv and
+            // return the "Stars" / Rarity of the card  instead
+            $Rarity = $TripleTriadCardRarityCsv->at($TripleTriadCardResidentCsv->at($TripleTriad['id'])['TripleTriadCardRarity'])['Stars'];
+
             $LargeIcon = (82100 + $TripleTriad['id']);
             $SmallIcon = (82500 + $TripleTriad['id']);
 
             // Save some data
             $data = [
-                '{Name}' => $Name,
-                //'{Name}' => $TripleTriadCardCsv->at($TripleTriad['Name']),
+                '{Name}' => str_replace(" & ", " and ", $TripleTriad['Name']),
                 '{Patch}' => $Patch,
                 '{Index}' => $TripleTriad['id'],
-                '{Rarity}'=> $TripleTriadCardResidentCsv->at($TripleTriad['id'])['TripleTriadCardRarity'],
-                '{Family}' => ($Family > 0) ? "\n| Family = ". $Type["$Family"] : "\n| Family =",
+                '{Rarity}' => $Rarity,
+                '{Family}' => ($TripleTriadCardResidentCsv->at($TripleTriad['id'])['TripleTriadCardType'] > 0)
+                    ? "\n| Family = ". $Family : "\n| Family =",
                 '{ValueTop}' => $TripleTriadCardResidentCsv->at($TripleTriad['id'])['Top'],
                 '{ValueRight}' => $TripleTriadCardResidentCsv->at($TripleTriad['id'])['Right'],
                 '{ValueBottom}' => $TripleTriadCardResidentCsv->at($TripleTriad['id'])['Bottom'],
