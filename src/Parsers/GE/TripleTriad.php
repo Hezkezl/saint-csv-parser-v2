@@ -70,16 +70,16 @@ Small Icon: {SmallIcon}
 
             // change the top and bottom code depending on if I want to bot the pages up or not
             if ($Bot == "true") {
-                $Address = "{{-start-}}\n'''$Name (Triple Triad Card)'''\n";
+                $Top = "{{-start-}}\n'''$Name (Triple Triad Card)'''\n";
                 $Bottom = "{{-stop-}}";
             } else {
-                $Address = "http://ffxiv.gamerescape.com/wiki/$Name (Triple Triad Card)?action=edit\n";
+                $Top = "http://ffxiv.gamerescape.com/wiki/$Name (Triple Triad Card)?action=edit\n";
                 $Bottom = "";
             };
 
             // Save some data
             $data = [
-                '{Top}' => $Address,
+                '{Top}' => $Top,
                 '{Name}' => $Name,
                 '{Patch}' => $Patch,
                 '{Index}' => $TripleTriad['id'],
