@@ -24,9 +24,6 @@ class TripleTriad implements ParseInterface
 | ValueBottom = {ValueBottom}
 | ValueLeft   = {ValueLeft}
 | Description = {Description}
-
-Large Icon: {LargeIcon}
-Small Icon: {SmallIcon}
 }}{Bottom}";
     public function parse()
     {
