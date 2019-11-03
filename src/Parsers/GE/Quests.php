@@ -351,8 +351,8 @@ class Quests implements ParseInterface
             //^^^ 3
 
             // If SectionName is MSQ, or Chronicles of a New Era, show Section and Type.
-            if ($JournalSectionName === "Main Scenario (ARR/Heavensward)"
-                || $JournalSectionName === "Main Scenario (Stormblood)"
+            if ($JournalSectionName === "Main Scenario (ARR/Heavensward/Stormblood)"
+                || $JournalSectionName === "Main Scenario (Shadowbringers)"
                 || $JournalSectionName === "Chronicles of a New Era") {
                 $string = "\n|Section = ". $JournalSectionName;
                 $string .= "\n|Type = ". $JournalCategoryName;
@@ -396,8 +396,13 @@ class Quests implements ParseInterface
             $InstanceContent2 = $InstanceContentCsv->at($quest['InstanceContent[1]'])['Name'];
             $InstanceContent3 = $InstanceContentCsv->at($quest['InstanceContent[2]'])['Name'];
 
+            // Array of names that should not be capitalized
+            $UpperCaseNames = array(" De ", " Bas ", " Mal ", " Van ", " Cen ", " Sas ", " Tol ", " Zos ", " Yae ", " The ", " Of The ", " Of ");
+            $lowercasenames = array(" de ", " bas ", " mal ", " van ", " cen ", " sas ", " tol ", " zos ", " yae ", " the ", " of the ", " of ");
+
             // Quest Giver Name (All Words In Name Capitalized)
             $questgiver = ucwords(strtolower($ENpcResidentCsv->at($quest['Issuer{Start}'])['Singular']));
+            $questgiver = str_replace($UpperCaseNames, $lowercasenames, $questgiver);
 
             // Start Quest Objectives / Journal Entry / Dialogue code
             $objectives = [];
@@ -510,7 +515,7 @@ class Quests implements ParseInterface
                         foreach(range(0,31) as $key) {
                             if ($quest["Script{Instruction}[$i]"] == "ACTOR{$key}") {
                                 if (!empty($ENpcResidentCsv->at($quest["Script{Arg}[$i]"])['Singular'])) {
-                                    $string = ucwords(strtolower($ENpcResidentCsv->at($quest["Script{Arg}[$i]"])['Singular']));
+                                    $string = str_replace($UpperCaseNames, $lowercasenames, ucwords(strtolower($ENpcResidentCsv->at($quest["Script{Arg}[$i]"])['Singular'])));
                                     $NpcsInvolved[] = $string;
                                 }
                             }
