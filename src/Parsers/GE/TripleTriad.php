@@ -13,9 +13,7 @@ class TripleTriad implements ParseInterface
     use CsvParseTrait;
 
     // the wiki output format / template we shall use
-    const WIKI_FORMAT = "{{-start-}}
-'''{name} (Triple Triad Card)'''
-{{ARR Infobox TTCard
+    const WIKI_FORMAT = "{Top}{{ARR Infobox TTCard
 | Name = {Name}
 | Patch = {Patch}
 | Index = {Index}
@@ -29,10 +27,13 @@ class TripleTriad implements ParseInterface
 
 Large Icon: {LargeIcon}
 Small Icon: {SmallIcon}
-}}{{-stop-}}";
+}}{Bottom}";
     public function parse()
     {
         $Patch = '5.1';
+        // if I want to use pywikibot to create these pages, this should be true. Otherwise if I want to create pages
+        // manually, set to false
+        $Bot = "true";
 
         // grab CSV files we want to use
         $TripleTriadCardCsv = $this->csv('TripleTriadCard');
@@ -53,6 +54,7 @@ Small Icon: {SmallIcon}
             }
 
             // code starts here
+            $Name = str_replace(" & ", " and ", $TripleTriad['Name']); // replace the & character with 'and' in names
             $Description = strip_tags($TripleTriad['Description']); // strip <Emphasis> and other tags from the Description
             $Description = str_replace("\n", "<br>", $Description); // replace literal line breaks with <br>
 
@@ -66,9 +68,19 @@ Small Icon: {SmallIcon}
             $LargeIcon = (82100 + $TripleTriad['id']);
             $SmallIcon = (82500 + $TripleTriad['id']);
 
+            // change the top and bottom code depending on if I want to bot the pages up or not
+            if ($Bot == "true") {
+                $Address = "{{-start-}}\n'''$Name (Triple Triad Card)'''\n";
+                $Bottom = "{{-stop-}}";
+            } else {
+                $Address = "http://ffxiv.gamerescape.com/wiki/$Name (Triple Triad Card)?action=edit\n";
+                $Bottom = "";
+            };
+
             // Save some data
             $data = [
-                '{Name}' => str_replace(" & ", " and ", $TripleTriad['Name']),
+                '{Top}' => $Address,
+                '{Name}' => $Name,
                 '{Patch}' => $Patch,
                 '{Index}' => $TripleTriad['id'],
                 '{Rarity}' => $Rarity,
@@ -81,12 +93,13 @@ Small Icon: {SmallIcon}
                 '{Description}' => $Description,
                 '{LargeIcon}' => $LargeIcon,
                 '{SmallIcon}' => $SmallIcon,
+                '{Bottom}' => $Bottom,
             ];
 
             // format using Gamer Escape formatter and add to data array
             // need to look into using item-specific regex, if required.
             $this->data[] = GeFormatter::format(self::WIKI_FORMAT, $data);
-        }
+        };
 
         // save our data to the filename: GeTripleTriadWiki.txt
         $this->io->progressFinish();
