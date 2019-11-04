@@ -351,9 +351,9 @@ class Quests implements ParseInterface
             //^^^ 3
 
             // If SectionName is MSQ, or Chronicles of a New Era, show Section and Type.
-            if ($JournalSectionName === "Main Scenario (ARR/Heavensward/Stormblood)"
-                || $JournalSectionName === "Main Scenario (Shadowbringers)"
-                || $JournalSectionName === "Chronicles of a New Era") {
+            // commenting out MSQ for a test
+            //$JournalSectionName === "Main Scenario (ARR/Heavensward/Stormblood)" || $JournalSectionName === "Main Scenario (Shadowbringers)" ||
+            if ($JournalSectionName === "Chronicles of a New Era") {
                 $string = "\n|Section = ". $JournalSectionName;
                 $string .= "\n|Type = ". $JournalCategoryName;
                 $types = $string;
@@ -397,12 +397,24 @@ class Quests implements ParseInterface
             $InstanceContent3 = $InstanceContentCsv->at($quest['InstanceContent[2]'])['Name'];
 
             // Array of names that should not be capitalized
-            $UpperCaseNames = array(" De ", " Bas ", " Mal ", " Van ", " Cen ", " Sas ", " Tol ", " Zos ", " Yae ", " The ", " Of The ", " Of ");
-            $lowercasenames = array(" de ", " bas ", " mal ", " van ", " cen ", " sas ", " tol ", " zos ", " yae ", " the ", " of the ", " of ");
+            $IncorrectNames = array(" De ", " Bas ", " Mal ", " Van ", " Cen ", " Sas ", " Tol ", " Zos ", " Yae ", " The ", " Of The ", " Of ",
+                "A-ruhn-senna", "A-towa-cant", "Bea-chorr", "Bie-zumm", "Bosta-bea", "Bosta-loe", "Chai-nuzz", "Chei-ladd", "Chora-kai", "Chora-lue",
+                "Chue-zumm", "Dulia-chai", "E-sumi-yan", "E-una-kotor", "Fae-hann", "Hangi-rua", "Hanji-fae", "Kai-shirr", "Kan-e-senna", "Kee-bostt",
+                "Kee-satt", "Lewto-sai", "Lue-reeq", "Mao-ladd", "Mei-tatch", "Moa-mosch", "Mosha-moa", "Moshei-lea", "Nunsi-lue", "O-app-pesi", "Qeshi-rae",
+                "Rae-qesh", "Rae-satt", "Raya-o-senna", "Renda-sue", "Riqi-mao", "Roi-tatch", "Rua-hann", "Sai-lewq", "Sai-qesh", "Sasha-rae", "Shai-satt",
+                "Shai-tistt", "Shee-tatch", "Shira-kee", "Shue-hann", "Sue-lewq", "Tao-tistt", "Tatcha-mei", "Tatcha-roi", "Tio-reeq", "Tista-bie", "Tui-shirr",
+                "Vroi-reeq", "Zao-mosc", "Zia-bostt", "Zoi-chorr", "Zumie-moa", "Zumie-shai");
+            $correctnames = array(" de ", " bas ", " mal ", " van ", " cen ", " sas ", " tol ", " zos ", " yae ", " the ", " of the ", " of ",
+                "A-Ruhn-Senna", "A-Towa-Cant", "Bea-Chorr", "Bie-Zumm", "Bosta-Bea", "Bosta-Loe", "Chai-Nuzz", "Chei-Ladd", "Chora-Kai", "Chora-Lue",
+                "Chue-Zumm", "Dulia-Chai", "E-Sumi-Yan", "E-Una-Kotor", "Fae-Hann", "Hangi-Rua", "Hanji-Fae", "Kai-Shirr", "Kan-E-Senna", "Kee-Bostt",
+                "Kee-Satt", "Lewto-Sai", "Lue-Reeq", "Mao-Ladd", "Mei-Tatch", "Moa-Mosch", "Mosha-Moa", "Moshei-Lea", "Nunsi-Lue", "O-App-Pesi", "Qeshi-Rae",
+                "Rae-Qesh", "Rae-Satt", "Raya-O-Senna", "Renda-Sue", "Riqi-Mao", "Roi-Tatch", "Rua-Hann", "Sai-Lewq", "Sai-Qesh", "Sasha-Rae", "Shai-Satt",
+                "Shai-Tistt", "Shee-Tatch", "Shira-Kee", "Shue-Hann", "Sue-Lewq", "Tao-Tistt", "Tatcha-Mei", "Tatcha-Roi", "Tio-Reeq", "Tista-Bie", "Tui-Shirr",
+                "Vroi-Reeq", "Zao-Mosc", "Zia-Bostt", "Zoi-Chorr", "Zumie-Moa", "Zumie-Shai");
 
             // Quest Giver Name (All Words In Name Capitalized)
             $questgiver = ucwords(strtolower($ENpcResidentCsv->at($quest['Issuer{Start}'])['Singular']));
-            $questgiver = str_replace($UpperCaseNames, $lowercasenames, $questgiver);
+            $questgiver = str_replace($IncorrectNames, $correctnames, $questgiver);
 
             // Start Quest Objectives / Journal Entry / Dialogue code
             $objectives = [];
@@ -515,7 +527,7 @@ class Quests implements ParseInterface
                         foreach(range(0,31) as $key) {
                             if ($quest["Script{Instruction}[$i]"] == "ACTOR{$key}") {
                                 if (!empty($ENpcResidentCsv->at($quest["Script{Arg}[$i]"])['Singular'])) {
-                                    $string = str_replace($UpperCaseNames, $lowercasenames, ucwords(strtolower($ENpcResidentCsv->at($quest["Script{Arg}[$i]"])['Singular'])));
+                                    $string = str_replace($IncorrectNames, $correctnames, ucwords(strtolower($ENpcResidentCsv->at($quest["Script{Arg}[$i]"])['Singular'])));
                                     $NpcsInvolved[] = $string;
                                 }
                             }
