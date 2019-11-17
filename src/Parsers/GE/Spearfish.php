@@ -6,9 +6,9 @@ use App\Parsers\CsvParseTrait;
 use App\Parsers\ParseInterface;
 
 /**
- * php bin/console app:parse:csv GE:FishParameter
+ * php bin/console app:parse:csv GE:Spearfish
  */
-class FishParameter implements ParseInterface
+class Spearfish implements ParseInterface
 {
     use CsvParseTrait;
 
@@ -18,11 +18,11 @@ class FishParameter implements ParseInterface
 {{Fishlog
 |Name = {name}
 |RecommendedLevel = {level}
-|FishType = {type}
+|FishType =
 |FishSizeLarge =
 |FishSizeSmall =
 |PrimeLocations = {location}
-|Bait =
+|Bait = {type}
 |Fishing Log Description = {description}
 |AquariumType =
 |AquariumSize =
@@ -32,37 +32,34 @@ class FishParameter implements ParseInterface
     {
         // grab CSV files we want to use
         $ItemCsv = $this->csv('Item');
-        $FishParameterCsv = $this->csv('FishParameter');
+        $SpearfishItemCsv = $this->csv('SpearfishingItem');
         $TerritoryTypeCsv = $this->csv('TerritoryType');
         $PlaceNameCsv = $this->csv('PlaceName');
         $GatheringItemLevelConvertTableCsv = $this->csv('GatheringItemLevelConvertTable');
 
-        // (optional) start a progress bar
-        $this->io->progressStart($FishParameterCsv->total);
-
         // loop through data
-        foreach ($FishParameterCsv->data as $id => $fish) {
+        foreach ($SpearfishItemCsv->data as $id => $Spear) {
             $this->io->progressAdvance();
 
             //skip ones with no data
-            if (empty($fish['Text'])) {
+            if (empty($Spear['Description'])) {
                 continue;
             }
 
-            $name = $ItemCsv->at($fish['Item'])['Name'];
-            $territory = $TerritoryTypeCsv->at($fish['TerritoryType'])['PlaceName'];
-            $location = $PlaceNameCsv->at($territory)['Name'];
-            $fishtype = [
-                0 => "Coastlines",
-                1 => "Deep Sea",
-                2 => "Rivers",
-                3 => "Lakes",
-                4 => "Sands",
-                5 => "Skies",
-                6 => "Floating Islands",
-                7 => "Magma",
-                8 => "Aetherochemical Spills",
-                9 => "Salt Lakes",
+            $SpearName = $ItemCsv->at($Spear['Item'])['Name'];
+            $Territory = $TerritoryTypeCsv->at($Spear['TerritoryType'])['PlaceName'];
+            $SpearLocation = $PlaceNameCsv->at($Territory)['Name'];
+            $SpearfishType = [
+                0 => null,
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null,
+                6 => null,
+                7 => null,
+                8 => null,
+                9 => null,
                 10 => "Gig{{!}}Small Gig Head",
                 11 => "Gig{{!}}Normal Gig Head",
                 12 => "Gig{{!}}Large Gig Head",
@@ -79,25 +76,26 @@ class FishParameter implements ParseInterface
                 23 => "Gig{{!}}Normal Gig Head",
                 24 => "Gig{{!}}Large Gig Head",
                 25 => null,
-                26 => null,
+                26 => "Gig{{!}}Small Gig Head, Gig{{!}}Normal Gig Head, Gig{{!}}Large Gig Head",
             ];
-            $level = $GatheringItemLevelConvertTableCsv->at($fish['GatheringItemLevel'])['GatheringItemLevel'];
-            $star = str_repeat("{{Star}}", $GatheringItemLevelConvertTableCsv->at($fish['GatheringItemLevel'])['Stars']);
-            $levelstar = "$level $star";
+
+            $SpearLevel = $GatheringItemLevelConvertTableCsv->at($Spear['GatheringItemLevel'])['GatheringItemLevel'];
+            $SpearStar = str_repeat("{{Star}}", $GatheringItemLevelConvertTableCsv->at($Spear['GatheringItemLevel'])['Stars']);
+            $SpearLevelStar = "$SpearLevel $SpearStar";
 
             // Save some data
             $data = [
-                '{name}' => $name,
-                '{location}' => $location,
-                //'{level}' => $fish['GatheringItemLevel'],
-                '{level}' => $levelstar,
-                '{type}' => $fishtype[$fish['FishingRecordType']],
-                '{description}' => $fish['Text'],
+                '{name}' => $SpearName,
+                '{location}' => $SpearLocation,
+                '{level}' => $SpearLevelStar,
+                '{type}' => $SpearfishType[$Spear['FishingRecordType']],
+                '{description}' => $Spear['Description'],
             ];
 
             // format using Gamer Escape formatter and add to data array
             // need to look into using item-specific regex, if required.
             $this->data[] = GeFormatter::format(self::WIKI_FORMAT, $data);
+
         }
 
         // (optional) finish progress bar
@@ -105,6 +103,6 @@ class FishParameter implements ParseInterface
 
         // save
         $this->io->text('Saving data ...');
-        $this->save('FishParameter.txt');
+        $this->save('SpearFish.txt');
     }
 }
