@@ -5,14 +5,16 @@ namespace App\Parsers\GE;
 use App\Parsers\CsvParseTrait;
 use App\Parsers\ParseInterface;
 //use Symfony\Component\Console\Helper\ProgressBar;
-
+/**
+ * php bin/console app:parse:csv GE:Quests
+ */
 class Quests implements ParseInterface
 {
     use CsvParseTrait;
 
     // the wiki output format / template we shall use
     const WIKI_FORMAT = "{{-start-}}
-'''{name}''''
+'''{name}'''
         {{ARR Infobox Quest
         |Patch = {patch}
         |Index = {id}
@@ -48,12 +50,16 @@ class Quests implements ParseInterface
 '''Loremonger:{name}'''
 <noinclude>{{Lorempageturn|prev={prevquest1}|next=}}{{Loremquestheader|{name}|Mined=X|Summary=}}</noinclude>
 {{LoremLoc|Location=Hydaelyn}}<!-- Replace 'Hydaelyn' here with proper location where first dialogue is said -->
-{dialogue}{battletalk}{{-stop-}}";
+{dialogue}{battletalk}{{-stop-}}
+{{-start-}}
+'''{name}/NPCs'''
+{npcloc}{npclocend}
+{{-stop-}}";
 
     public function parse()
     {
         // i should pull this from xivdb :D
-        $patch = '5.05';
+        $patch = '5.11';
 
         // grab CSV files
         $questCsv = $this->csv('Quest');
@@ -73,7 +79,7 @@ class Quests implements ParseInterface
         $TraitCsv = $this->csv('Trait');
         $EventIconTypeCsv = $this->csv('EventIconType');
         $KeyItemCsv = $this->csv('EventItem');
-        //$LevelCsv = $this->csv('Level');
+        $LevelCsv = $this->csv('Level');
         //$MapCsv = $this->csv('Map');
 
         $this->io->progressStart($questCsv->total);
@@ -489,9 +495,54 @@ class Quests implements ParseInterface
                     // ---------------------------------------------------------------
                 }
 
+                //do the questname/NPCs page for each quest
+                $npcloc = [];
+                foreach(range(0,49) as $i) {
+                    if (!empty($quest["Script{Instruction}[$i]"])) {
+
+                        //Look up the NPC and save ID and Name
+                        foreach(range(0,31) as $key) {
+                            if ($quest["Script{Instruction}[$i]"] == "ACTOR{$key}") {
+                                if (!empty($ENpcResidentCsv->at($quest["Script{Arg}[$i]"])['Singular'])) {
+                                    $npcname = str_replace($IncorrectNames, $correctnames, ucwords(strtolower($ENpcResidentCsv->at($quest["Script{Arg}[$i]"])['Singular'])));
+                                    //attempt: //look through level.csv and find the row which has the enpc number
+                                    $npcid = $quest["Script{Arg}[$i]"];
+
+                                        $string =
+                                    //"\n{{QuestNPC|Name={$NpcMapName}|}}";
+                                    //"{{QuestNPC|Name=". $NpcName ."|Loc=". $NpcPlaceName ."|Coordinates=". round($NpcLocX, 1) ."-". round($NpcLocY, 1)."|ID=". $npcid ."|Quest=". $quest['Name'] ."}}\n";
+                                    "{{QuestNPC|Name=". $npcname ."|ID=". $npcid ."|Quest=". $quest['Name'] ."}}\n";
+                                }
+							    $npcloc[] = $string;
+                            }
+                        }
+                    }
+                }
+                $npcloc = implode($npcloc);
+
+                //do the questname/NPCs page for each quest
+                $npclocend = [];
+                    if (!empty($quest["Target{End}"])) {
+                                if (!empty($ENpcResidentCsv->at($quest["Target{End}"])['Singular'])) {
+                                    $npcname = str_replace($IncorrectNames, $correctnames, ucwords(strtolower($ENpcResidentCsv->at($quest["Target{End}"])['Singular'])));
+                                    //attempt: //look through level.csv and find the row which has the enpc number
+                                    $npcid = $quest["Target{End}"];
+
+                                        $string =
+                                    //"\n{{QuestNPC|Name={$NpcMapName}|}}";
+                                    //"{{QuestNPC|Name=". $NpcName ."|Loc=". $NpcPlaceName ."|Coordinates=". round($NpcLocX, 1) ."-". round($NpcLocY, 1)."|ID=". $npcid ."|Quest=". $quest['Name'] ."}}\n";
+                                    "{{QuestNPC|Name=". $npcname ."|ID=". $npcid ."|Quest=". $quest['Name'] ."|Questend=True}}\n";
+                                }
+							    $npclocend[] = $string;
+                            }
+
+
+                $npclocend = implode($npclocend);
+
                 $ItemsInvolved = [];
                 $KeyItemsInvolved = [];
                 $NpcsInvolved = [];
+                //$npcloc = [];
                 //$questscripts = [];
                 //$NpcLevelX = false;
                 //$NpcLevelZ = false;
@@ -532,44 +583,6 @@ class Quests implements ParseInterface
                                 }
                             }
                         }
-
-                        //Failed attempt at looking up NPC Locations based off of LOC_ACTOR#
-                        //foreach(range(0,31) as $key) {
-                            //if ($quest["Script{Instruction}[$i]"] == "LOC_ACTOR{$key}") {
-
-                                //If the Level Location of $i's LOC_ACTOR is above the smallest ID# shown in Level.csv
-                                //if ($quest["Script{Arg}[$i]"] > 1034659) {
-
-                                    //Retrieve the X, Z, and Map values using the Level info
-                                    //$NpcLevelX = $LevelCsv->at($quest["Script{Arg}[$i]"])['X'];
-                                    //$NpcLevelZ = $LevelCsv->at($quest["Script{Arg}[$i]"])['Z'];
-                                    //$NpcLevelMap = $LevelCsv->at($quest["Script{Arg}[$i]"])['Map'];
-
-                                    //Retrieve the 'Scale' size from Map.csv using the Map value
-                                    //$scale = $MapCsv->at($NpcLevelMap)['SizeFactor'];
-
-                                    //Pick 1 of the 3 PlaceNames from the Map.csv file, and convert to its actual name
-                                    //if ($MapCsv->at($NpcLevelMap)["PlaceName{Sub}"] > 0) {
-                                        //$NpcPlaceName = $PlaceNameCsv->at($MapCsv->at($NpcLevelMap)["PlaceName{Sub}"])['Name'];
-                                        //} elseif ($MapCsv->at($NpcLevelMap)["PlaceName"] > 0) {
-                                        //$NpcPlaceName = $PlaceNameCsv->at($MapCsv->at($NpcLevelMap)["PlaceName"])['Name'];
-                                        //} elseif ($MapCsv->at($NpcLevelMap)["PlaceName{Region}"] > 0) {
-                                        //$NpcPlaceName = $PlaceNameCsv->at($MapCsv->at($NpcLevelMap)["PlaceName{Region}"])['Name'];
-                                        //} elseif ($MapCsv->at($NpcLevelMap)["PlaceName{Region}"] < 1) {
-                                        //$NpcPlaceName = "Blank";
-                                        //}
-
-                                    //$string = "|Actor{$key} Location = ". $NpcLevelX ." - ". $NpcLevelZ ." - ". $NpcLevelMap ." - ". $scale ." - ". $NpcPlaceName;
-                                    //$NpcLocation = $string;
-                                    //echo "Actor{$key} Location:
-                                    //X         = $NpcLevelX
-                                    //Y         = $NpcLevelZ
-                                    //Map       = $NpcLevelMap
-                                    //Scale     = $scale
-                                    //PlaceName = $NpcPlaceName\n";
-                                //}
-                            //}
-                        //}
                     }
                 }
 
@@ -625,6 +638,9 @@ class Quests implements ParseInterface
                 '{items}' => (!empty($ItemsInvolved)) ? "\n|Items Involved = $ItemsInvolved" : "\n|Items Involved =",
                 '{keyitems}' => (!empty($KeyItemsInvolved)) ? "\n|Key Items Involved = $KeyItemsInvolved" : "",
                 '{npcs}' => "\n\n|NPCs Involved = $NpcsInvolved",
+                '{npcloc}' => $npcloc,
+                '{npclocend}' => $npclocend,
+
                 //'{script}' => $questscripts,
                 //'{npclocation}' => $NpcLocation,
             ];
