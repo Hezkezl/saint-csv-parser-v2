@@ -90,7 +90,8 @@ class FishParameter implements ParseInterface
                 '{name}' => $name,
                 '{location}' => $location,
                 //'{level}' => $fish['GatheringItemLevel'],
-                '{level}' => $levelstar,
+                //'{level}' => $levelstar,
+                '{level}' => ($GatheringItemLevelConvertTableCsv->at($fish['GatheringItemLevel'])['Stars'] > 0) ? $levelstar : $level,
                 '{type}' => $fishtype[$fish['FishingRecordType']],
                 '{description}' => $fish['Text'],
             ];

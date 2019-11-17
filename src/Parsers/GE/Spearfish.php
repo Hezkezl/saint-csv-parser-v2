@@ -18,7 +18,7 @@ class Spearfish implements ParseInterface
 {{Fishlog
 |Name = {name}
 |RecommendedLevel = {level}
-|FishType =
+|FishType = Spearfishing
 |FishSizeLarge =
 |FishSizeSmall =
 |PrimeLocations = {location}
@@ -36,6 +36,9 @@ class Spearfish implements ParseInterface
         $TerritoryTypeCsv = $this->csv('TerritoryType');
         $PlaceNameCsv = $this->csv('PlaceName');
         $GatheringItemLevelConvertTableCsv = $this->csv('GatheringItemLevelConvertTable');
+
+        // (optional) start a progress bar
+        $this->io->progressStart($SpearfishItemCsv->total);
 
         // loop through data
         foreach ($SpearfishItemCsv->data as $id => $Spear) {
@@ -87,7 +90,7 @@ class Spearfish implements ParseInterface
             $data = [
                 '{name}' => $SpearName,
                 '{location}' => $SpearLocation,
-                '{level}' => $SpearLevelStar,
+                '{level}' => ($GatheringItemLevelConvertTableCsv->at($Spear['GatheringItemLevel'])['Stars'] > 0) ? $SpearLevelStar : $SpearLevel,
                 '{type}' => $SpearfishType[$Spear['FishingRecordType']],
                 '{description}' => $Spear['Description'],
             ];
