@@ -79,7 +79,7 @@ class Quests implements ParseInterface
         $TraitCsv = $this->csv('Trait');
         $EventIconTypeCsv = $this->csv('EventIconType');
         $KeyItemCsv = $this->csv('EventItem');
-        $LevelCsv = $this->csv('Level');
+        //$LevelCsv = $this->csv('Level');
         //$MapCsv = $this->csv('Map');
 
         $this->io->progressStart($questCsv->total);
