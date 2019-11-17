@@ -652,7 +652,7 @@ class Quests implements ParseInterface
         // save our data to the filename: GeQuestWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save('GeQuestWikiBot.txt');
+        $info = $this->save("GeQuestWikiBot - ". $patch .".txt", 9999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],
