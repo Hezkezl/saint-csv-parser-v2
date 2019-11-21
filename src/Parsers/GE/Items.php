@@ -522,9 +522,13 @@ class Items implements ParseInterface
                         }
                         //end of single type code
 
-                        //start of 844 and 845 (Battle Food/gathering food)
+                        //start of 844, 845 and 846 (Battle Food/gathering food/attrib potions)
                         if (($ItemActionType == "844") || ($ItemActionType == "845") || ($ItemActionType == "846")) {
                             //NQ
+                            //item status effect
+                            $ItemActionEffectStatus = $StatusCsv->at($ItemActionCsv->at($ItemActionNumber)["Data[0]"])["Name"];
+                            $ItemActionEffectStatusReplace = str_replace(" ", "_", $ItemActionEffectStatus);
+                            $ItemActionEffectStatusFmt = "\n| Consumable Adds_". $ItemActionEffectStatusReplace ."=&nbsp;";
                             $ItemActionEffectRaw = $ItemActionCsv->at($ItemActionNumber)["Data[1]"];
                             $ItemActionSeconds = $ItemActionCsv->at($ItemActionNumber)["Data[2]"];
                             //$ItemActionEffect = $ItemFoodCsv->at($ItemActionEffectRaw)["EXPBonus%"];
@@ -533,25 +537,40 @@ class Items implements ParseInterface
 
                             $DurationMinutes = floor(($ItemActionSeconds / 60) % 60);
                             $DurationSeconds = $ItemActionSeconds % 60;
-                            $DurationString = $DurationMinutes ."m". $DurationSeconds ."s";
-                            $DurationFormat = str_replace("0m", "", $DurationString);
+                            $DurationString = " ". $DurationMinutes ."m". $DurationSeconds ."s";
+                            $DurationFormat1 = str_replace(" 0m", " ", $DurationString);
+                            $DurationFormat = str_replace("m0s", "m", $DurationFormat1);
+                            //$DurationFormat = str_replace("0m", "", $DurationString);
                             //$DurationFormatCut = substr($DurationFormat, 0, -3);
-                            $Duration = "\n\n| Duration = ". $DurationFormat. "";
+                            $Duration = "\n\n| Duration =". $DurationFormat. "";
                             //exp
                             $EXPBonus = $ItemFoodCsv->at($ItemActionEffectRaw)["EXPBonus%"];
 
 
                             if ($ItemActionType == "846") {
                                 $EXPBonusFmt = "";
+                            } elseif ($ItemActionType !== "846") {
+                                $EXPBonusFmt = "| Consumable EXP_Bonus = +". $EXPBonus ."%";
+                            }
+
+
                                 $RecastNQ = $item['Cooldown<s>'];
                                 $RecastHQpercent = ($RecastNQ * 0.1);
                                 $RecastHQ = ($RecastNQ - $RecastHQpercent);
-                                $Recast = "\n| Recast = ". $RecastNQ ."m\n| Recast HQ = ". $RecastHQ ."";
-                            } elseif ($ItemActionType !== "846") {
-                                $EXPBonusFmt = "| Consumable EXP_Bonus = +". $EXPBonus ."%";
-                                $Recast = "\n| Recast = 5s\n";
-                            }
 
+                                $RecastMinutes = floor(($RecastNQ / 60) % 60);
+                                $RecastSeconds = $RecastNQ % 60;
+                                $RecastString = " ". $RecastMinutes ."m". $RecastSeconds ."s";
+                                $RecastFormatNQ1 = str_replace(" 0m", " ", $RecastString);
+                                $RecastFormatNQ = str_replace("m0s", "m", $RecastFormatNQ1);
+
+                                $RecastMinutesHQ = floor(($RecastHQ / 60) % 60);
+                                $RecastSecondsHQ = $RecastHQ % 60;
+                                $RecastStringHQ = " ". $RecastMinutesHQ ."m". $RecastSecondsHQ ."s";
+                                $RecastFormatHQ1 = str_replace(" 0m", " ", $RecastStringHQ);
+                                $RecastFormatHQ = str_replace("m0s", "m", $RecastFormatHQ1);
+
+                                $Recast = "\n| Recast = ". $RecastFormatNQ ."\n| Recast HQ = ". $RecastFormatHQ ."";
                             //each param value
                             //Start of base 0
                                 $RelativeSwitchBool = $ItemFoodCsv->at($ItemActionEffectRaw)["IsRelative[0]"];
@@ -562,6 +581,7 @@ class Items implements ParseInterface
                                     $RelativeSwitch = "";
                                 }
                                 $BaseStat = str_replace(" ", "_", $BaseParamCsv->at($ItemFoodCsv->at($ItemActionEffectRaw)["BaseParam[0]"])["Name"]);
+                                if (!empty($BaseStat)) {
                                     $BaseStatFmt = "| Consumable ". $BaseStat ." = ";
                                     $BaseStatHQFmt = "| Consumable ". $BaseStat ." HQ = ";
                                     $BaseStatCapFmt = "| Consumable ". $BaseStat ." Cap = ";
@@ -580,6 +600,11 @@ class Items implements ParseInterface
                                     $BaseMaxHQFmt = "". $BaseStatHQCapFmt ."+". $BaseMaxHQ ."\n";
 
                                 $outputstring0 = "\n". $BaseValueFmt ."". $BaseMaxFmt ."" . $BaseValueHQFmt . "". $BaseMaxHQFmt ."";
+                                }
+
+                                elseif (empty($BaseStat)) {
+                                    $outputstring0 = "";
+                                }
                             //End of base 0
 
                             //Start of base 1
@@ -655,7 +680,81 @@ class Items implements ParseInterface
 
                             //end text for string
                             $stringtype2 = "";
-                            $outputstring = "\n". $Duration ."" . $Recast . "". $outputstring0 ."". $outputstring1 ."". $outputstring2 ."". $EXPBonusFmt ."";
+                            $outputstring = "\n". $Duration ."" . $Recast . "". $outputstring0 ."". $outputstring1 ."". $outputstring2 ."". $EXPBonusFmt ."". $ItemActionEffectStatusFmt. "";
+                        }
+                        //end of single type code
+
+                        //start of 847 848 (HP/Mp Potions)
+                        if (($ItemActionType == "847") || ($ItemActionType == "848")) {
+
+                            if ($ItemActionType == "847") {
+                                $BaseStat = "Restores_HP";
+                            } elseif ($ItemActionType == "848") {
+                                $BaseStat = "Restores_MP";
+                            }
+
+                            //NQ
+                            $ItemActionEffectRaw = $ItemActionCsv->at($ItemActionNumber)["Data[0]"];
+                            $ItemActionEffectCapRaw = $ItemActionCsv->at($ItemActionNumber)["Data[1]"];
+                            //HQ
+                            $ItemActionEffectHQRaw = $ItemActionCsv->at($ItemActionNumber)["Data{HQ}[0]"];
+                            $ItemActionEffectCapHQRaw = $ItemActionCsv->at($ItemActionNumber)["Data{HQ}[1]"];
+
+                            $ItemActionEffectRawString = "| Consumable ". $BaseStat ." = ";
+                            $ItemActionEffectCapRawString = "| Consumable ". $BaseStat ." Cap = ";
+                            $ItemActionEffectHQRawString = "| Consumable ". $BaseStat ." HQ = ";
+                            $ItemActionEffectCapHQRawString = "| Consumable ". $BaseStat ." Cap HQ = ";
+
+                                    $BaseValueFmt = "". $ItemActionEffectRawString ."+". $ItemActionEffectRaw ."%\n";
+
+                                    $BaseValueCapFmt = "". $ItemActionEffectCapRawString ."+". $ItemActionEffectCapRaw ."\n";
+
+                                    $BaseValueHQFmt = "". $ItemActionEffectHQRawString ."+". $ItemActionEffectHQRaw ."%\n";
+
+                                    $BaseValueHQCapFmt = "". $ItemActionEffectCapHQRawString ."+". $ItemActionEffectCapHQRaw ."\n";
+
+                            $outputstring0 = "\n". $BaseValueFmt ."". $BaseValueCapFmt ."" . $BaseValueHQFmt . "". $BaseValueHQCapFmt ."";
+
+                            //Recast
+                            $RecastNQ = $item['Cooldown<s>'];
+                            $RecastHQpercent = ($RecastNQ * 0.1);
+                            $RecastHQ = ($RecastNQ - $RecastHQpercent);
+
+                            $RecastMinutes = floor(($RecastNQ / 60) % 60);
+                            $RecastSeconds = $RecastNQ % 60;
+                            $RecastString = " ". $RecastMinutes ."m". $RecastSeconds ."s";
+                            $RecastFormatNQ1 = str_replace(" 0m", " ", $RecastString);
+                            $RecastFormatNQ = str_replace("m0s", "m", $RecastFormatNQ1);
+
+                            $RecastMinutesHQ = floor(($RecastHQ / 60) % 60);
+                            $RecastSecondsHQ = $RecastHQ % 60;
+                            $RecastStringHQ = " ". $RecastMinutesHQ ."m". $RecastSecondsHQ ."s";
+                            $RecastFormatHQ1 = str_replace(" 0m", " ", $RecastStringHQ);
+                            $RecastFormatHQ = str_replace("m0s", "m", $RecastFormatHQ1);
+
+                            $Recast = "\n| Recast = ". $RecastFormatNQ ."\n| Recast HQ = ". $RecastFormatHQ ."";
+
+                            if (empty($ItemActionEffectRaw)) continue;
+                            //start text for string
+                            $outputstring = "\n" . $Recast . "". $outputstring0 ."";
+
+                        }
+                        //end of single type code
+
+
+                        //start of 853 (Minions)
+                        if ($ItemActionType == "853") {
+
+                            //NQ
+                            $ItemActionEffectRaw = $ItemActionCsv->at($ItemActionNumber)["Data[0]"];
+                            $ItemActionEffect = ucwords(strtolower($CompanionCsv->at($ItemActionEffectRaw)["Singular"]));
+                            if (empty($ItemActionEffect)) continue;
+                            //start text for string
+                            $stringtype1 = "| Grants = ";
+                            //end text for string
+                            $stringtype2 = "_(Minion)";
+                            $outputstring = "\n". $stringtype1 ."" . $ItemActionEffect . "". $stringtype2 ."";
+
                         }
                         //end of single type code
 
