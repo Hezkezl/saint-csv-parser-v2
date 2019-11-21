@@ -352,7 +352,7 @@ class Items implements ParseInterface
                     //start text for string
                     $stringtype1 = "| Consumable Cures_";
                     //end text for string
-                    $stringtype2 = "=&nbsp;";
+                    $stringtype2 = " = &nbsp;";
 
                     //HQ - If there is no HQ it will not add anything extra
                     //$ItemActionEffectHQRaw = $ItemActionCsv->at($ItemActionNumber)["Data{HQ}[0]"];
@@ -529,7 +529,7 @@ class Items implements ParseInterface
                     //item status effect
                     $ItemActionEffectStatus = $StatusCsv->at($ItemActionCsv->at($ItemActionNumber)["Data[0]"])["Name"];
                     $ItemActionEffectStatusReplace = str_replace(" ", "_", $ItemActionEffectStatus);
-                    $ItemActionEffectStatusFmt = "\n| Consumable Adds_". $ItemActionEffectStatusReplace ."=&nbsp;";
+                    $ItemActionEffectStatusFmt = "\n| Consumable Adds_". $ItemActionEffectStatusReplace ." = &nbsp;";
                     $ItemActionEffectRaw = $ItemActionCsv->at($ItemActionNumber)["Data[1]"];
                     $ItemActionSeconds = $ItemActionCsv->at($ItemActionNumber)["Data[2]"];
                     //$ItemActionEffect = $ItemFoodCsv->at($ItemActionEffectRaw)["EXPBonus%"];
@@ -543,7 +543,7 @@ class Items implements ParseInterface
                     $DurationFormat = str_replace("m0s", "m", $DurationFormat1);
                     //$DurationFormat = str_replace("0m", "", $DurationString);
                     //$DurationFormatCut = substr($DurationFormat, 0, -3);
-                    $Duration = "\n\n| Duration =". $DurationFormat. "";
+                    $Duration = "\n| Duration =". $DurationFormat. "";
                     //exp
                     $EXPBonus = $ItemFoodCsv->at($ItemActionEffectRaw)["EXPBonus%"];
 
@@ -551,7 +551,7 @@ class Items implements ParseInterface
                     if ($ItemActionType == "846") {
                         $EXPBonusFmt = "";
                     } elseif ($ItemActionType !== "846") {
-                        $EXPBonusFmt = "| Consumable EXP_Bonus = +". $EXPBonus ."%";
+                        $EXPBonusFmt = "\n| Consumable EXP_Bonus = +". $EXPBonus ."%";
                     }
 
 
@@ -572,7 +572,7 @@ class Items implements ParseInterface
                     $RecastFormatHQ = str_replace("m0s", "m", $RecastFormatHQ1);
 
                     if ($ItemActionType == "846") {
-                        $Recast = "\n| Recast = ". $RecastFormatNQ ."\n| Recast HQ = ". $RecastFormatHQ ."";
+                        $Recast = "\n| Recast =". $RecastFormatNQ ."\n| Recast HQ =". $RecastFormatHQ ."";
                     } elseif (($ItemActionType == "844") || ($ItemActionType == "845")) {
                         $Recast = "";
                     }
@@ -738,7 +738,7 @@ class Items implements ParseInterface
                     $RecastFormatHQ1 = str_replace(" 0m", " ", $RecastStringHQ);
                     $RecastFormatHQ = str_replace("m0s", "m", $RecastFormatHQ1);
 
-                    $Recast = "\n| Recast = ". $RecastFormatNQ ."\n| Recast HQ = ". $RecastFormatHQ ."";
+                    $Recast = "\n| Recast =". $RecastFormatNQ ."\n| Recast HQ =". $RecastFormatHQ ."";
 
                     if (empty($ItemActionEffectRaw)) continue;
                     //start text for string
