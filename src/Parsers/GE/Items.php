@@ -571,7 +571,12 @@ class Items implements ParseInterface
                                 $RecastFormatHQ1 = str_replace(" 0m", " ", $RecastStringHQ);
                                 $RecastFormatHQ = str_replace("m0s", "m", $RecastFormatHQ1);
 
+                                if ($ItemActionType == "846") {
                                 $Recast = "\n| Recast = ". $RecastFormatNQ ."\n| Recast HQ = ". $RecastFormatHQ ."";
+                                } elseif (($ItemActionType == "844") || ($ItemActionType == "845")) {
+                                    $Recast = "";
+                                }
+
                             //each param value
                             //Start of base 0
                                 $RelativeSwitchBool = $ItemFoodCsv->at($ItemActionEffectRaw)["IsRelative[0]"];
