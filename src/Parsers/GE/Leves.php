@@ -36,15 +36,12 @@ otherwise (Fisher, Botanist, Goldsmith, Alchemist, etc) -->
 |GilReward = ~{gil}
 |SealsReward =  <!-- Raw number, no commas. Delete if not needed -->
 
-<!--  If all rewards are single items, just add them below as a comma delineated list  -->
-| Levequest Reward List =
-
 <!--  If rewards need count data, add them one at a time below, adding more rows as needed-->
 |LevequestReward 1       =  <!-- Item name only -->
 |LevequestReward 1 Count =  <!-- Use only if more than 1 -->
 
 <!--  If rewards are conditional, such as only appearing inside of a chest during the leve itself, use these below -->
-<!--  Can be combined with the above options. Useful for Amber-encased Vilekin -->
+<!--  Can be combined with the above options. Useful for things like Amber-encased Vilekin -->
 |LevequestRewardOption 1       =  <!-- Item name only -->
 |LevequestRewardOption 1 Count =  <!-- Use only if more than 1 -->
 

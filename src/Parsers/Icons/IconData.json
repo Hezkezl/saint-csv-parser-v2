@@ -1,1886 +1,1462 @@
 [
         {
-            "id": 15144,
-            "name_en": "Washbasin"
+            "id": 22406,
+            "name_en": "Authentic Boar's Head Kadomatsu"
         },
         {
-            "id": 17718,
-            "name_en": "Exclusive Eastern Journey Circlet"
+            "id": 23866,
+            "name_en": "Heavensturn Bounty"
         },
         {
-            "id": 17719,
-            "name_en": "Exclusive Eastern Journey Jacket"
+            "id": 24236,
+            "name_en": "Crimson Nezumi Kabuto"
         },
         {
-            "id": 17720,
-            "name_en": "Exclusive Eastern Journey Armlets"
+            "id": 24237,
+            "name_en": "Cobalt Nezumi Kabuto"
         },
         {
-            "id": 17721,
-            "name_en": "Exclusive Eastern Journey Bottoms"
+            "id": 24238,
+            "name_en": "Magicked Prism (Advent Cakes)"
         },
         {
-            "id": 17722,
-            "name_en": "Exclusive Eastern Journey Shoes"
+            "id": 24239,
+            "name_en": "Cut Mochi"
         },
         {
-            "id": 21061,
-            "name_en": "Wind-up Ramza"
+            "id": 28309,
+            "name_en": "Replica Shamash"
         },
         {
-            "id": 22405,
-            "name_en": "Authentic Hatching-tide Banner"
+            "id": 28310,
+            "name_en": "Replica Daboya"
         },
         {
-            "id": 22407,
-            "name_en": "Authentic Valentione's Day Advertisement"
+            "id": 28311,
+            "name_en": "Replica Circinae"
         },
         {
-            "id": 22408,
-            "name_en": "Authentic Valentione's Day Balloons"
+            "id": 28312,
+            "name_en": "Replica Kasasagi"
         },
         {
-            "id": 22409,
-            "name_en": "Authentic Far Eastern Doll Display"
+            "id": 28313,
+            "name_en": "Replica Xiphias"
         },
         {
-            "id": 22410,
-            "name_en": "Authentic Rose Wagon"
+            "id": 28314,
+            "name_en": "Replica Mollfrith"
         },
         {
-            "id": 22746,
-            "name_en": "Rainmaker"
+            "id": 28315,
+            "name_en": "Replica Rose Couverte"
         },
         {
-            "id": 22747,
-            "name_en": "Soul of the Blue Mage"
+            "id": 28316,
+            "name_en": "Replica Paikea"
         },
         {
-            "id": 23310,
-            "name_en": "Whalaqee Off-guard Totem"
+            "id": 28317,
+            "name_en": "Replica Tuah"
         },
         {
-            "id": 23311,
-            "name_en": "Whalaqee Transfusion Totem"
+            "id": 28318,
+            "name_en": "Replica Jebat"
         },
         {
-            "id": 23312,
-            "name_en": "Whalaqee Mighty Guard Totem"
+            "id": 28319,
+            "name_en": "Replica Albireo"
         },
         {
-            "id": 23313,
-            "name_en": "Whalaqee Moon Flute Totem"
+            "id": 28320,
+            "name_en": "Replica Torigashira"
         },
         {
-            "id": 23314,
-            "name_en": "Whalaqee Doom Totem"
+            "id": 28321,
+            "name_en": "Replica Brunello"
         },
         {
-            "id": 23363,
-            "name_en": "Ballroom Etiquette - Ultima"
+            "id": 28322,
+            "name_en": "Replica Bellerophon"
         },
         {
-            "id": 23983,
-            "name_en": "Fatter Cat Bugle"
+            "id": 28323,
+            "name_en": "Replica Antea Eureka"
         },
         {
-            "id": 23995,
-            "name_en": "Wind-up Cloud"
+            "id": 28324,
+            "name_en": "Replica Dumuzis Eureka"
         },
         {
-            "id": 23996,
-            "name_en": "Wind-up Aerith"
+            "id": 28325,
+            "name_en": "Replica Shamash Eureka"
         },
         {
-            "id": 24220,
-            "name_en": "Ballroom Etiquette - Get Fantasy"
+            "id": 28326,
+            "name_en": "Replica Daboya Eureka"
         },
         {
-            "id": 24221,
-            "name_en": "Ballroom Etiquette - The Popoto Step"
+            "id": 28327,
+            "name_en": "Replica Circinae Eureka"
         },
         {
-            "id": 24314,
-            "name_en": "Rise (The Primals) Orchestrion Roll"
+            "id": 28328,
+            "name_en": "Replica Kasasagi Eureka"
         },
         {
-            "id": 24315,
-            "name_en": "Oblivion (GUNN Vocals) Orchestrion Roll"
+            "id": 28329,
+            "name_en": "Replica Xiphias Eureka"
         },
         {
-            "id": 24344,
-            "name_en": "Syldra-class Bow"
+            "id": 28330,
+            "name_en": "Replica Mollfrith Eureka"
         },
         {
-            "id": 24345,
-            "name_en": "Syldra-class Bridge"
+            "id": 28331,
+            "name_en": "Replica Rose Couverte Eureka"
         },
         {
-            "id": 24346,
-            "name_en": "Syldra-class Hull"
+            "id": 28332,
+            "name_en": "Replica Paikea Eureka"
         },
         {
-            "id": 24347,
-            "name_en": "Syldra-class Stern"
+            "id": 28333,
+            "name_en": "Replica Tuah Eureka"
         },
         {
-            "id": 24368,
-            "name_en": "Alliance Helm of Fending"
+            "id": 28334,
+            "name_en": "Replica Jebat Eureka"
         },
         {
-            "id": 24369,
-            "name_en": "Alliance Coat of Fending"
+            "id": 28335,
+            "name_en": "Replica Albireo Eureka"
         },
         {
-            "id": 24370,
-            "name_en": "Alliance Armguards of Fending"
+            "id": 28336,
+            "name_en": "Replica Torigashira Eureka"
         },
         {
-            "id": 24371,
-            "name_en": "Alliance Trousers of Fending"
+            "id": 28337,
+            "name_en": "Replica Brunello Eureka"
         },
         {
-            "id": 24372,
-            "name_en": "Alliance Boots of Fending"
+            "id": 28338,
+            "name_en": "Replica Bellerophon Eureka"
         },
         {
-            "id": 24373,
-            "name_en": "Alliance Belt of Fending"
+            "id": 28339,
+            "name_en": "YoRHa Type-51 Headband of Fending"
         },
         {
-            "id": 24374,
-            "name_en": "Alliance Visor of Maiming"
+            "id": 28340,
+            "name_en": "YoRHa Type-51 Jacket of Fending"
         },
         {
-            "id": 24375,
-            "name_en": "Alliance Vest of Maiming"
+            "id": 28341,
+            "name_en": "YoRHa Type-51 Gloves of Fending"
         },
         {
-            "id": 24376,
-            "name_en": "Alliance Armguards of Maiming"
+            "id": 28342,
+            "name_en": "YoRHa Type-51 Trousers of Fending"
         },
         {
-            "id": 24377,
-            "name_en": "Alliance Trousers of Maiming"
+            "id": 28343,
+            "name_en": "YoRHa Type-51 Boots of Fending"
         },
         {
-            "id": 24378,
-            "name_en": "Alliance Boots of Maiming"
+            "id": 28345,
+            "name_en": "YoRHa Type-51 Headband of Maiming"
         },
         {
-            "id": 24379,
-            "name_en": "Alliance Belt of Maiming"
+            "id": 28346,
+            "name_en": "YoRHa Type-51 Jacket of Maiming"
         },
         {
-            "id": 24380,
-            "name_en": "Alliance Visor of Striking"
+            "id": 28347,
+            "name_en": "YoRHa Type-51 Gloves of Maiming"
         },
         {
-            "id": 24381,
-            "name_en": "Alliance Vest of Striking"
+            "id": 28348,
+            "name_en": "YoRHa Type-51 Halfslops of Maiming"
         },
         {
-            "id": 24382,
-            "name_en": "Alliance Fingerless Gloves of Striking"
+            "id": 28349,
+            "name_en": "YoRHa Type-51 Boots of Maiming"
         },
         {
-            "id": 24383,
-            "name_en": "Alliance Skirt of Striking"
+            "id": 28351,
+            "name_en": "YoRHa Type-51 Cap of Striking"
         },
         {
-            "id": 24384,
-            "name_en": "Alliance Shoes of Striking"
+            "id": 28352,
+            "name_en": "YoRHa Type-51 Jacket of Striking"
         },
         {
-            "id": 24385,
-            "name_en": "Alliance Belt of Striking"
+            "id": 28353,
+            "name_en": "YoRHa Type-51 Gloves of Striking"
         },
         {
-            "id": 24386,
-            "name_en": "Alliance Visor of Aiming"
+            "id": 28354,
+            "name_en": "YoRHa Type-51 Halfslops of Striking"
         },
         {
-            "id": 24387,
-            "name_en": "Alliance Jacket of Aiming"
+            "id": 28355,
+            "name_en": "YoRHa Type-51 Boots of Striking"
         },
         {
-            "id": 24388,
-            "name_en": "Alliance Armguards of Aiming"
+            "id": 28357,
+            "name_en": "YoRHa Type-51 Hood of Aiming"
         },
         {
-            "id": 24389,
-            "name_en": "Alliance Trousers of Aiming"
+            "id": 28358,
+            "name_en": "YoRHa Type-51 Coat of Aiming"
         },
         {
-            "id": 24390,
-            "name_en": "Alliance Shoes of Aiming"
+            "id": 28359,
+            "name_en": "YoRHa Type-51 Gloves of Aiming"
         },
         {
-            "id": 24391,
-            "name_en": "Alliance Belt of Aiming"
+            "id": 28360,
+            "name_en": "YoRHa Type-51 Trousers of Aiming"
         },
         {
-            "id": 24392,
-            "name_en": "Alliance Helm of Scouting"
+            "id": 28361,
+            "name_en": "YoRHa Type-51 Boots of Aiming"
         },
         {
-            "id": 24393,
-            "name_en": "Alliance Vest of Scouting"
+            "id": 28363,
+            "name_en": "YoRHa Type-51 Hood of Scouting"
         },
         {
-            "id": 24394,
-            "name_en": "Alliance Fingerless Gloves of Scouting"
+            "id": 28364,
+            "name_en": "YoRHa Type-51 Jacket of Scouting"
         },
         {
-            "id": 24395,
-            "name_en": "Alliance Skirt of Scouting"
+            "id": 28365,
+            "name_en": "YoRHa Type-51 Gloves of Scouting"
         },
         {
-            "id": 24396,
-            "name_en": "Alliance Shoes of Scouting"
+            "id": 28366,
+            "name_en": "YoRHa Type-51 Halfslops of Scouting"
         },
         {
-            "id": 24397,
-            "name_en": "Alliance Belt of Scouting"
+            "id": 28367,
+            "name_en": "YoRHa Type-51 Boots of Scouting"
         },
         {
-            "id": 24398,
-            "name_en": "Alliance Circlet of Healing"
+            "id": 28369,
+            "name_en": "YoRHa Type-51 Cap of Healing"
         },
         {
-            "id": 24399,
-            "name_en": "Alliance Coat of Healing"
+            "id": 28370,
+            "name_en": "YoRHa Type-51 Jacket of Healing"
         },
         {
-            "id": 24400,
-            "name_en": "Alliance Fingerless Gloves of Healing"
+            "id": 28371,
+            "name_en": "YoRHa Type-51 Gloves of Healing"
         },
         {
-            "id": 24401,
-            "name_en": "Alliance Bottoms of Healing"
+            "id": 28372,
+            "name_en": "YoRHa Type-51 Trousers of Healing"
         },
         {
-            "id": 24402,
-            "name_en": "Alliance Boots of Healing"
+            "id": 28373,
+            "name_en": "YoRHa Type-51 Boots of Healing"
         },
         {
-            "id": 24403,
-            "name_en": "Alliance Belt of Healing"
+            "id": 28375,
+            "name_en": "YoRHa Type-51 Cap of Casting"
         },
         {
-            "id": 24404,
-            "name_en": "Alliance Circlet of Casting"
+            "id": 28376,
+            "name_en": "YoRHa Type-51 Robe of Casting"
         },
         {
-            "id": 24405,
-            "name_en": "Alliance Coat of Casting"
+            "id": 28377,
+            "name_en": "YoRHa Type-51 Gloves of Casting"
         },
         {
-            "id": 24406,
-            "name_en": "Alliance Fingerless Gloves of Casting"
+            "id": 28378,
+            "name_en": "YoRHa Type-51 Trousers of Casting"
         },
         {
-            "id": 24407,
-            "name_en": "Alliance Bottoms of Casting"
+            "id": 28379,
+            "name_en": "YoRHa Type-51 Boots of Casting"
         },
         {
-            "id": 24408,
-            "name_en": "Alliance Boots of Casting"
+            "id": 28381,
+            "name_en": "Augmented Sinfender"
         },
         {
-            "id": 24409,
-            "name_en": "Alliance Belt of Casting"
+            "id": 28382,
+            "name_en": "Augmented Burattinaios"
         },
         {
-            "id": 24410,
-            "name_en": "Alliance Earring of Fending"
+            "id": 28383,
+            "name_en": "Augmented Alastor"
         },
         {
-            "id": 24411,
-            "name_en": "Alliance Earring of Slaying"
+            "id": 28384,
+            "name_en": "Augmented Skystrider"
         },
         {
-            "id": 24412,
-            "name_en": "Alliance Earring of Aiming"
+            "id": 28385,
+            "name_en": "Augmented Gendawa"
         },
         {
-            "id": 24413,
-            "name_en": "Alliance Earring of Healing"
+            "id": 28386,
+            "name_en": "Augmented Silktones"
         },
         {
-            "id": 24414,
-            "name_en": "Alliance Earring of Casting"
+            "id": 28387,
+            "name_en": "Augmented Gust Tongue"
         },
         {
-            "id": 24415,
-            "name_en": "Alliance Necklace of Fending"
+            "id": 28388,
+            "name_en": "Augmented Murderer"
         },
         {
-            "id": 24416,
-            "name_en": "Alliance Necklace of Slaying"
+            "id": 28389,
+            "name_en": "Augmented Clearpath"
         },
         {
-            "id": 24417,
-            "name_en": "Alliance Necklace of Aiming"
+            "id": 28390,
+            "name_en": "Augmented Catalyst"
         },
         {
-            "id": 24418,
-            "name_en": "Alliance Necklace of Healing"
+            "id": 28391,
+            "name_en": "Augmented Galdrabok"
         },
         {
-            "id": 24419,
-            "name_en": "Alliance Necklace of Casting"
+            "id": 28392,
+            "name_en": "Augmented Pragmatism"
         },
         {
-            "id": 24420,
-            "name_en": "Alliance Bracelet of Fending"
+            "id": 28393,
+            "name_en": "Augmented Pollux"
         },
         {
-            "id": 24421,
-            "name_en": "Alliance Bracelet of Slaying"
+            "id": 28394,
+            "name_en": "Augmented Sankhara"
         },
         {
-            "id": 24422,
-            "name_en": "Alliance Bracelet of Aiming"
+            "id": 28395,
+            "name_en": "Augmented Merveilleuse"
         },
         {
-            "id": 24423,
-            "name_en": "Alliance Bracelet of Healing"
+            "id": 28396,
+            "name_en": "Augmented Tutelary"
         },
         {
-            "id": 24424,
-            "name_en": "Alliance Bracelet of Casting"
+            "id": 28397,
+            "name_en": "Augmented Barathrum"
         },
         {
-            "id": 24425,
-            "name_en": "Alliance Ring of Fending"
+            "id": 28398,
+            "name_en": "Augmented Dominus Shield"
         },
         {
-            "id": 24426,
-            "name_en": "Alliance Ring of Slaying"
+            "id": 28399,
+            "name_en": "Augmented Facet Circlet of Fending"
         },
         {
-            "id": 24427,
-            "name_en": "Alliance Ring of Aiming"
+            "id": 28400,
+            "name_en": "Augmented Suit of Facet Mail of Fending"
         },
         {
-            "id": 24428,
-            "name_en": "Alliance Ring of Healing"
+            "id": 28401,
+            "name_en": "Augmented Facet Gauntlets of Fending"
         },
         {
-            "id": 24429,
-            "name_en": "Alliance Ring of Casting"
+            "id": 28402,
+            "name_en": "Augmented Facet Chain Hose of Fending"
         },
         {
-            "id": 24430,
-            "name_en": "Ivalician Holy Knight's Circlet"
+            "id": 28403,
+            "name_en": "Augmented Facet Sabatons of Fending"
         },
         {
-            "id": 24431,
-            "name_en": "Ivalician Holy Knight's Armor"
+            "id": 28404,
+            "name_en": "Augmented Facet Plate Belt of Fending"
         },
         {
-            "id": 24432,
-            "name_en": "Ivalician Holy Knight's Gloves"
+            "id": 28405,
+            "name_en": "Augmented Facet Circlet of Maiming"
         },
         {
-            "id": 24433,
-            "name_en": "Ivalician Holy Knight's Trousers"
+            "id": 28406,
+            "name_en": "Augmented Suit of Facet Mail of Maiming"
         },
         {
-            "id": 24434,
-            "name_en": "Ivalician Holy Knight's Boots"
+            "id": 28407,
+            "name_en": "Augmented Facet Gauntlets of Maiming"
         },
         {
-            "id": 24435,
-            "name_en": "Ivalician Holy Knight's Belt"
+            "id": 28408,
+            "name_en": "Augmented Facet Bottoms of Maiming"
         },
         {
-            "id": 24436,
-            "name_en": "Ivalician Royal Knight's Circlet"
+            "id": 28409,
+            "name_en": "Augmented Facet Sabatons of Maiming"
         },
         {
-            "id": 24437,
-            "name_en": "Ivalician Royal Knight's Armor"
+            "id": 28410,
+            "name_en": "Augmented Facet Plate Belt of Maiming"
         },
         {
-            "id": 24438,
-            "name_en": "Ivalician Royal Knight's Gloves"
+            "id": 28411,
+            "name_en": "Augmented Facet Circlet of Striking"
         },
         {
-            "id": 24439,
-            "name_en": "Ivalician Royal Knight's Trousers"
+            "id": 28412,
+            "name_en": "Augmented Facet Cyclas of Striking"
         },
         {
-            "id": 24440,
-            "name_en": "Ivalician Royal Knight's Boots"
+            "id": 28413,
+            "name_en": "Augmented Facet Gloves of Striking"
         },
         {
-            "id": 24441,
-            "name_en": "Ivalician Royal Knight's Belt"
+            "id": 28414,
+            "name_en": "Augmented Facet Gaskins of Striking"
         },
         {
-            "id": 24442,
-            "name_en": "Ivalician Brave's Circlet"
+            "id": 28415,
+            "name_en": "Augmented Facet Sandals of Striking"
         },
         {
-            "id": 24443,
-            "name_en": "Ivalician Brave's Jacket"
+            "id": 28416,
+            "name_en": "Augmented Facet Plate Belt of Striking"
         },
         {
-            "id": 24444,
-            "name_en": "Ivalician Brave's Gauntlets"
+            "id": 28417,
+            "name_en": "Augmented Facet Turban of Aiming"
         },
         {
-            "id": 24445,
-            "name_en": "Ivalician Brave's Trousers"
+            "id": 28418,
+            "name_en": "Augmented Facet Tabard of Aiming"
         },
         {
-            "id": 24446,
-            "name_en": "Ivalician Brave's Greaves"
+            "id": 28419,
+            "name_en": "Augmented Facet Halfgloves of Aiming"
         },
         {
-            "id": 24447,
-            "name_en": "Ivalician Brave's Belt"
+            "id": 28420,
+            "name_en": "Augmented Facet Brais of Aiming"
         },
         {
-            "id": 24448,
-            "name_en": "Ivalician Sky Pirate's Hat"
+            "id": 28421,
+            "name_en": "Augmented Facet Boots of Aiming"
         },
         {
-            "id": 24449,
-            "name_en": "Ivalician Sky Pirate's Jacket"
+            "id": 28422,
+            "name_en": "Augmented Facet Plate Belt of Aiming"
         },
         {
-            "id": 24450,
-            "name_en": "Ivalician Sky Pirate's Plunder"
+            "id": 28423,
+            "name_en": "Augmented Facet Turban of Scouting"
         },
         {
-            "id": 24451,
-            "name_en": "Ivalician Sky Pirate's Trousers"
+            "id": 28424,
+            "name_en": "Augmented Facet Dolman of Scouting"
         },
         {
-            "id": 24452,
-            "name_en": "Ivalician Sky Pirate's Shoes"
+            "id": 28425,
+            "name_en": "Augmented Facet Gloves of Scouting"
         },
         {
-            "id": 24453,
-            "name_en": "Ivalician Sky Pirate's Belt"
+            "id": 28426,
+            "name_en": "Augmented Facet Bottoms of Scouting"
         },
         {
-            "id": 24454,
-            "name_en": "Ivalician Mercenary's Circlet"
+            "id": 28427,
+            "name_en": "Augmented Facet Thighboots of Scouting"
         },
         {
-            "id": 24455,
-            "name_en": "Ivalician Mercenary's Jacket"
+            "id": 28428,
+            "name_en": "Augmented Facet Plate Belt of Scouting"
         },
         {
-            "id": 24456,
-            "name_en": "Ivalician Mercenary's Gauntlets"
+            "id": 28429,
+            "name_en": "Augmented Facet Hat of Healing"
         },
         {
-            "id": 24457,
-            "name_en": "Ivalician Mercenary's Trousers"
+            "id": 28430,
+            "name_en": "Augmented Facet Coat of Healing"
         },
         {
-            "id": 24458,
-            "name_en": "Ivalician Mercenary's Greaves"
+            "id": 28431,
+            "name_en": "Augmented Facet Dress Gloves of Healing"
         },
         {
-            "id": 24459,
-            "name_en": "Ivalician Mercenary's Belt"
+            "id": 28432,
+            "name_en": "Augmented Facet Trousers of Healing"
         },
         {
-            "id": 24460,
-            "name_en": "Ivalician Mystic's Hat"
+            "id": 28433,
+            "name_en": "Augmented Facet Boots of Healing"
         },
         {
-            "id": 24461,
-            "name_en": "Ivalician Mystic's Coat"
+            "id": 28434,
+            "name_en": "Augmented Facet Plate Belt of Healing"
         },
         {
-            "id": 24462,
-            "name_en": "Ivalician Mystic's Halfgloves"
+            "id": 28435,
+            "name_en": "Augmented Facet Hat of Casting"
         },
         {
-            "id": 24463,
-            "name_en": "Ivalician Mystic's Bottoms"
+            "id": 28436,
+            "name_en": "Augmented Facet Coat of Casting"
         },
         {
-            "id": 24464,
-            "name_en": "Ivalician Mystic's Shoes"
+            "id": 28437,
+            "name_en": "Augmented Facet Halfgloves of Casting"
         },
         {
-            "id": 24465,
-            "name_en": "Ivalician Mystic's Belt"
+            "id": 28438,
+            "name_en": "Augmented Facet Bottoms of Casting"
         },
         {
-            "id": 24466,
-            "name_en": "Ivalician Oracle's Mask"
+            "id": 28439,
+            "name_en": "Augmented Facet Boots of Casting"
         },
         {
-            "id": 24467,
-            "name_en": "Ivalician Oracle's Coat"
+            "id": 28440,
+            "name_en": "Augmented Facet Plate Belt of Casting"
         },
         {
-            "id": 24468,
-            "name_en": "Ivalician Oracle's Halfgloves"
+            "id": 28441,
+            "name_en": "Augmented Facet Earrings of Fending"
         },
         {
-            "id": 24469,
-            "name_en": "Ivalician Oracle's Bottoms"
+            "id": 28442,
+            "name_en": "Augmented Facet Earrings of Slaying"
         },
         {
-            "id": 24470,
-            "name_en": "Ivalician Oracle's Shoes"
+            "id": 28443,
+            "name_en": "Augmented Facet Earrings of Aiming"
         },
         {
-            "id": 24471,
-            "name_en": "Ivalician Oracle's Belt"
+            "id": 28444,
+            "name_en": "Augmented Facet Earrings of Healing"
         },
         {
-            "id": 24472,
-            "name_en": "Seiryu's Longsword"
+            "id": 28445,
+            "name_en": "Augmented Facet Earrings of Casting"
         },
         {
-            "id": 24473,
-            "name_en": "Seiryu's Bladed Tekko"
+            "id": 28446,
+            "name_en": "Augmented Facet Choker of Fending"
         },
         {
-            "id": 24474,
-            "name_en": "Seiryu's War Axe"
+            "id": 28447,
+            "name_en": "Augmented Facet Choker of Slaying"
         },
         {
-            "id": 24475,
-            "name_en": "Seiryu's Lance"
+            "id": 28448,
+            "name_en": "Augmented Facet Choker of Aiming"
         },
         {
-            "id": 24476,
-            "name_en": "Seiryu's Greatbow"
+            "id": 28449,
+            "name_en": "Augmented Facet Choker of Healing"
         },
         {
-            "id": 24477,
-            "name_en": "Seiryu's Daggers"
+            "id": 28450,
+            "name_en": "Augmented Facet Choker of Casting"
         },
         {
-            "id": 24478,
-            "name_en": "Seiryu's Spine"
+            "id": 28451,
+            "name_en": "Augmented Facet Bracelet of Fending"
         },
         {
-            "id": 24479,
-            "name_en": "Seiryu's Revolver"
+            "id": 28452,
+            "name_en": "Augmented Facet Bracelet of Slaying"
         },
         {
-            "id": 24480,
-            "name_en": "Seiryu's Cane"
+            "id": 28453,
+            "name_en": "Augmented Facet Bracelet of Aiming"
         },
         {
-            "id": 24481,
-            "name_en": "Seiryu's Rod"
+            "id": 28454,
+            "name_en": "Augmented Facet Bracelet of Healing"
         },
         {
-            "id": 24482,
-            "name_en": "Seiryu's Grimoire"
+            "id": 28455,
+            "name_en": "Augmented Facet Bracelet of Casting"
         },
         {
-            "id": 24483,
-            "name_en": "Seiryu's Codex"
+            "id": 28456,
+            "name_en": "Augmented Facet Ring of Fending"
         },
         {
-            "id": 24484,
-            "name_en": "Seiryu's Ephemeris"
+            "id": 28457,
+            "name_en": "Augmented Facet Ring of Slaying"
         },
         {
-            "id": 24485,
-            "name_en": "Seiryu's Rippled Katana"
+            "id": 28458,
+            "name_en": "Augmented Facet Ring of Aiming"
         },
         {
-            "id": 24486,
-            "name_en": "Seiryu's Rapier"
+            "id": 28459,
+            "name_en": "Augmented Facet Ring of Healing"
         },
         {
-            "id": 24487,
-            "name_en": "Seiryu's Shield"
+            "id": 28460,
+            "name_en": "Augmented Facet Ring of Casting"
         },
         {
-            "id": 24489,
-            "name_en": "Paint Can"
+            "id": 28461,
+            "name_en": "Facet Saw"
         },
         {
-            "id": 24490,
-            "name_en": "Emerald Crystal Boule"
+            "id": 28462,
+            "name_en": "Facet Cross-pein Hammer"
         },
         {
-            "id": 24491,
-            "name_en": "Mirific Mogshelf"
+            "id": 28463,
+            "name_en": "Facet Raising Hammer"
         },
         {
-            "id": 24492,
-            "name_en": "Tier 3 Metal Aquarium"
+            "id": 28464,
+            "name_en": "Facet Mallet"
         },
         {
-            "id": 24493,
-            "name_en": "Tier 4 Metal Aquarium"
+            "id": 28465,
+            "name_en": "Facet Round Knife"
         },
         {
-            "id": 24494,
-            "name_en": "Travel Paint Set"
+            "id": 28466,
+            "name_en": "Facet Needle"
         },
         {
-            "id": 24495,
-            "name_en": "Seiryu Statuette"
+            "id": 28467,
+            "name_en": "Facet Alembic"
         },
         {
-            "id": 24496,
-            "name_en": "Valentione Lobster Platter"
+            "id": 28468,
+            "name_en": "Facet Frypan"
         },
         {
-            "id": 24497,
-            "name_en": "Valentione Cake Pairing"
+            "id": 28469,
+            "name_en": "Facet Pickaxe"
         },
         {
-            "id": 24500,
-            "name_en": "アルコンエッグス"
+            "id": 28470,
+            "name_en": "Facet Hatchet"
         },
         {
-            "id": 24501,
-            "name_en": "Small Imitation Window"
+            "id": 28471,
+            "name_en": "Facet Fishing Rod"
         },
         {
-            "id": 24502,
-            "name_en": "Bag of Booty"
+            "id": 28472,
+            "name_en": "Facet Hat of Crafting"
         },
         {
-            "id": 24503,
-            "name_en": "Undersea Spoils"
+            "id": 28473,
+            "name_en": "Facet Coat of Crafting"
         },
         {
-            "id": 24504,
-            "name_en": "Level Checker Replica"
+            "id": 28474,
+            "name_en": "Facet Gloves of Crafting"
         },
         {
-            "id": 24505,
-            "name_en": "Cerulean Crystal Boule"
+            "id": 28475,
+            "name_en": "Facet Trousers of Crafting"
         },
         {
-            "id": 24506,
-            "name_en": "Fat Cat Bank"
+            "id": 28476,
+            "name_en": "Facet Boots of Crafting"
         },
         {
-            "id": 24507,
-            "name_en": "Tree Slice Tower"
+            "id": 28477,
+            "name_en": "Facet Cap of Gathering"
         },
         {
-            "id": 24508,
-            "name_en": "Botanist's Dried Herbs"
+            "id": 28478,
+            "name_en": "Facet Coat of Gathering"
         },
         {
-            "id": 24509,
-            "name_en": "Steppe Kitchen"
+            "id": 28479,
+            "name_en": "Facet Fingerless Gloves of Gathering"
         },
         {
-            "id": 24510,
-            "name_en": "Four Lords"
+            "id": 28480,
+            "name_en": "Facet Bottoms of Gathering"
         },
         {
-            "id": 24511,
-            "name_en": "Wooden Loft"
+            "id": 28481,
+            "name_en": "Facet Boots of Gathering"
         },
         {
-            "id": 24512,
-            "name_en": "Wooden Steps"
+            "id": 28501,
+            "name_en": "Dragonsong Reproduction"
         },
         {
-            "id": 24513,
-            "name_en": "Wooden Beam"
+            "id": 28502,
+            "name_en": "Liberation Reproduction"
         },
         {
-            "id": 24514,
-            "name_en": "White Rectangular Partition"
+            "id": 28503,
+            "name_en": "Nightfall Reproduction"
         },
         {
-            "id": 24515,
-            "name_en": "Bowl of Oden"
+            "id": 28507,
+            "name_en": "Ballroom Etiquette - Celebratory Cups"
         },
         {
-            "id": 24516,
-            "name_en": "Fruit Stall"
+            "id": 28509,
+            "name_en": "Facet Claw Hammer"
         },
         {
-            "id": 24517,
-            "name_en": "Vegetable Stall"
+            "id": 28510,
+            "name_en": "Facet File"
         },
         {
-            "id": 24518,
-            "name_en": "Pastry Cupboard"
+            "id": 28511,
+            "name_en": "Facet Pliers"
         },
         {
-            "id": 24519,
-            "name_en": "Mineral Display"
+            "id": 28512,
+            "name_en": "Facet Grinding Wheel"
         },
         {
-            "id": 24520,
-            "name_en": "Fabric Rack"
+            "id": 28513,
+            "name_en": "Facet Awl"
         },
         {
-            "id": 24521,
-            "name_en": "Potion Rack"
+            "id": 28514,
+            "name_en": "Facet Spinning Wheel"
         },
         {
-            "id": 24522,
-            "name_en": "Prism Pouch"
+            "id": 28515,
+            "name_en": "Facet Mortar"
         },
         {
-            "id": 24523,
-            "name_en": "Marimo Lamp"
+            "id": 28516,
+            "name_en": "Facet Culinary Knife"
         },
         {
-            "id": 24524,
-            "name_en": "Honey Pot"
+            "id": 28517,
+            "name_en": "Facet Sledgehammer"
         },
         {
-            "id": 24525,
-            "name_en": "Red Carpet"
+            "id": 28518,
+            "name_en": "Facet Scythe"
         },
         {
-            "id": 24526,
-            "name_en": "Hanging Planter Shelf"
+            "id": 28553,
+            "name_en": "Majestic Dress"
         },
         {
-            "id": 24527,
-            "name_en": "Plush Pile"
+            "id": 28554,
+            "name_en": "Majestic Wristdresses"
         },
         {
-            "id": 24528,
-            "name_en": "Fat Cat Sofa"
+            "id": 28555,
+            "name_en": "Majestic Boots"
         },
         {
-            "id": 24529,
-            "name_en": "Enormous Stuffed Alpha"
+            "id": 28558,
+            "name_en": "Valentione Rose Hat"
         },
         {
-            "id": 24530,
-            "name_en": "Stuffed Mammet"
+            "id": 28559,
+            "name_en": "Valentione Rose Waistcoat"
         },
         {
-            "id": 24531,
-            "name_en": "Festive Chirashi-zushi"
+            "id": 28560,
+            "name_en": " Valentione Rose Gloves"
         },
         {
-            "id": 24532,
-            "name_en": "Festive Sushi Balls"
+            "id": 28561,
+            "name_en": " Valentione Rose Slacks"
         },
         {
-            "id": 24533,
-            "name_en": "Season Eleven Lone Wolf Trophy"
+            "id": 28562,
+            "name_en": " Valentione Rose Shoes"
         },
         {
-            "id": 24534,
-            "name_en": "Season Twelve Lone Wolf Trophy"
+            "id": 28563,
+            "name_en": "Valentione Forget-Me-Not Hat"
         },
         {
-            "id": 24536,
-            "name_en": "Botanist's Garden"
+            "id": 28564,
+            "name_en": "Valentione Forget-Me-Not Waistcoat"
         },
         {
-            "id": 24538,
-            "name_en": "Teal Blue Carpeting"
+            "id": 28565,
+            "name_en": " Valentione Forget-Me-Not Gloves"
         },
         {
-            "id": 24539,
-            "name_en": "Black-and-white Interior Wall"
+            "id": 28566,
+            "name_en": " Valentione Forget-Me-Not Slacks"
         },
         {
-            "id": 24540,
-            "name_en": "Moonlit Tank Trimmings"
+            "id": 28567,
+            "name_en": " Valentione Forget-Me-Not Shoes"
         },
         {
-            "id": 24541,
-            "name_en": "Lily of the Valley Pips"
+            "id": 28568,
+            "name_en": "Valentione Acacia Hat"
         },
         {
-            "id": 24542,
-            "name_en": "Red Lilies of the Valley"
+            "id": 28569,
+            "name_en": "Valentione Acacia Waistcoat"
         },
         {
-            "id": 24543,
-            "name_en": "Blue Lilies of the Valley"
+            "id": 28570,
+            "name_en": " Valentione Acacia Gloves"
         },
         {
-            "id": 24544,
-            "name_en": "Yellow Lilies of the Valley"
+            "id": 28571,
+            "name_en": " Valentione Acacia Slacks"
         },
         {
-            "id": 24545,
-            "name_en": "Green Lilies of the Valley"
+            "id": 28572,
+            "name_en": " Valentione Acacia Shoes"
         },
         {
-            "id": 24546,
-            "name_en": "Orange Lilies of the Valley"
+            "id": 28573,
+            "name_en": "Valentione Rose Ribboned Hat"
         },
         {
-            "id": 24547,
-            "name_en": "Purple Lilies of the Valley"
+            "id": 28574,
+            "name_en": "Valentione Rose Dress"
         },
         {
-            "id": 24548,
-            "name_en": "White Lilies of the Valley"
+            "id": 28575,
+            "name_en": " Valentione Rose Ribboned Gloves"
         },
         {
-            "id": 24549,
-            "name_en": "Black Lilies of the Valley"
+            "id": 28576,
+            "name_en": " Valentione Rose Tights"
         },
         {
-            "id": 24550,
-            "name_en": "Rainbow Lilies of the Valley"
+            "id": 28577,
+            "name_en": " Valentione Rose Heels"
         },
         {
-            "id": 24551,
-            "name_en": "The Spirit of the Whalaqee"
+            "id": 28578,
+            "name_en": "Valentione Forget-Me-Not Ribboned Hat"
         },
         {
-            "id": 24552,
-            "name_en": "Magus's Mask"
+            "id": 28579,
+            "name_en": "Valentione Forget-Me-Not Dress"
         },
         {
-            "id": 24553,
-            "name_en": "Magus's Jacket"
+            "id": 28580,
+            "name_en": " Valentione Forget-Me-Not Ribboned Gloves"
         },
         {
-            "id": 24554,
-            "name_en": "Magus's Gloves"
+            "id": 28581,
+            "name_en": " Valentione Forget-Me-Not Tights"
         },
         {
-            "id": 24555,
-            "name_en": "Magus's Trousers"
+            "id": 28582,
+            "name_en": " Valentione Forget-Me-Not Heels"
         },
         {
-            "id": 24556,
-            "name_en": "Magus's Shoes"
+            "id": 28583,
+            "name_en": "Valentione Acacia Ribboned Hat"
         },
         {
-            "id": 24557,
-            "name_en": "Northern Oyster"
+            "id": 28584,
+            "name_en": "Valentione Acacia Dress"
         },
         {
-            "id": 24558,
-            "name_en": "Ruby Laver"
+            "id": 28585,
+            "name_en": " Valentione Acacia Ribboned Gloves"
         },
         {
-            "id": 24559,
-            "name_en": "Chakrafish"
+            "id": 28586,
+            "name_en": " Valentione Acacia Tights"
         },
         {
-            "id": 24560,
-            "name_en": "Wicked Wartfish"
+            "id": 28587,
+            "name_en": " Valentione Acacia Heels"
         },
         {
-            "id": 24561,
-            "name_en": "Othardian Salmon"
+            "id": 28588,
+            "name_en": "Urban Coat"
         },
         {
-            "id": 24562,
-            "name_en": "Ishgardian Culinary Essentials"
+            "id": 28589,
+            "name_en": "Urban Boots"
         },
         {
-            "id": 24563,
-            "name_en": "Fermented Juice"
+            "id": 28590,
+            "name_en": "Rebel Coat"
         },
         {
-            "id": 24564,
-            "name_en": "Signature Buuz Cookware"
+            "id": 28591,
+            "name_en": "Rebel Boots"
         },
         {
-            "id": 24565,
-            "name_en": "Hard Place Decorative Furnishings"
+            "id": 28614,
+            "name_en": "Modern Cosmetics - A Wicked Wake"
         },
         {
-            "id": 24566,
-            "name_en": "Arkhi Brewing Set"
+            "id": 28616,
+            "name_en": "Hades Barding"
         },
         {
-            "id": 24567,
-            "name_en": "Sparkstone"
+            "id": 28617,
+            "name_en": "Saintly Barding"
         },
         {
-            "id": 24568,
-            "name_en": "Malleable Still Material"
+            "id": 28618,
+            "name_en": "Bacon Bits"
         },
         {
-            "id": 24569,
-            "name_en": "Strong Steppe Spice"
+            "id": 28619,
+            "name_en": "Wind-up Pixie"
         },
         {
-            "id": 24570,
-            "name_en": "Hard Place Furnishing Materials"
+            "id": 28620,
+            "name_en": "Mystic Weapon"
         },
         {
-            "id": 24571,
-            "name_en": "Sturdy Vat Material"
+            "id": 28621,
+            "name_en": "Meerkat"
         },
         {
-            "id": 24572,
-            "name_en": "Ishgardian Culinary Materials"
+            "id": 28624,
+            "name_en": "Domakin"
         },
         {
-            "id": 24573,
-            "name_en": "Juice Fermenting Supplies"
+            "id": 28626,
+            "name_en": "Little Leannan"
         },
         {
-            "id": 24574,
-            "name_en": "Signature Buuz Cookware Materials"
+            "id": 28627,
+            "name_en": "Wind-up Hobgoblin"
         },
         {
-            "id": 24575,
-            "name_en": "Decorative Tavern Furnishing Materials"
+            "id": 28629,
+            "name_en": "Pod 054"
         },
         {
-            "id": 24576,
-            "name_en": "Arkhi Brewing Vat Materials"
+            "id": 28630,
+            "name_en": "Pod 316"
         },
         {
-            "id": 24577,
-            "name_en": "Raw Ishgardian Materials"
+            "id": 28631,
+            "name_en": "Hades's Auracite"
         },
         {
-            "id": 24578,
-            "name_en": "Raw Fermenting Supplies"
+            "id": 28632,
+            "name_en": "Manufactured Coin"
         },
         {
-            "id": 24579,
-            "name_en": "Raw Steppe Cookware Materials"
+            "id": 28634,
+            "name_en": "Metal Spinner"
         },
         {
-            "id": 24580,
-            "name_en": "Raw Tavern Furnishing Materials"
+            "id": 28636,
+            "name_en": "Shirt Display Rack"
         },
         {
-            "id": 24581,
-            "name_en": "Raw Brewing Vat Materials"
+            "id": 28637,
+            "name_en": "Lakeland Chair"
         },
         {
-            "id": 24582,
-            "name_en": "True Blue Hat"
+            "id": 28638,
+            "name_en": "Lakeland Table"
         },
         {
-            "id": 24583,
-            "name_en": "True Blue Coat"
+            "id": 28639,
+            "name_en": "Leather Sofa"
         },
         {
-            "id": 24584,
-            "name_en": "True Blue Gloves"
+            "id": 28640,
+            "name_en": "Il Mheg Flower Lamp"
         },
         {
-            "id": 24585,
-            "name_en": "True Blue Trousers"
+            "id": 28641,
+            "name_en": "Macaron Cushion"
         },
         {
-            "id": 24586,
-            "name_en": "True Blue Boots"
+            "id": 28648,
+            "name_en": "Irregular Tomestone of Soldiery"
         },
         {
-            "id": 24587,
-            "name_en": "True Blue Attire Coffer"
+            "id": 28649,
+            "name_en": "Certificate of Good Cheer"
         },
         {
-            "id": 24588,
-            "name_en": "Magus's Attire Coffer"
-        },
-        {
-            "id": 24589,
-            "name_en": "Aetheryte Earring"
-        },
-        {
-            "id": 24590,
-            "name_en": "Flower Crown"
-        },
-        {
-            "id": 24591,
-            "name_en": "Rain Hood"
-        },
-        {
-            "id": 24592,
-            "name_en": "Raincoat"
-        },
-        {
-            "id": 24593,
-            "name_en": "Rain Boots"
-        },
-        {
-            "id": 24599,
-            "name_en": "Far Eastern Schoolboy's Hat"
-        },
-        {
-            "id": 24600,
-            "name_en": "Far Eastern Schoolboy's Hakama"
-        },
-        {
-            "id": 24601,
-            "name_en": "Far Eastern Schoolboy's Zori"
-        },
-        {
-            "id": 24602,
-            "name_en": "Far Eastern Schoolgirl's Hair Ribbon"
-        },
-        {
-            "id": 24603,
-            "name_en": "Far Eastern Schoolgirl's Hakama"
-        },
-        {
-            "id": 24604,
-            "name_en": "Far Eastern Schoolgirl's Boots"
-        },
-        {
-            "id": 24605,
-            "name_en": "スプリガンジャケット"
-        },
-        {
-            "id": 24606,
-            "name_en": "スプリガンボトム"
-        },
-        {
-            "id": 24607,
-            "name_en": "スプリガンブーツ"
-        },
-        {
-            "id": 24612,
-            "name_en": "Namazu Earring"
-        },
-        {
-            "id": 24613,
-            "name_en": "Namazu Neckerchief"
-        },
-        {
-            "id": 24614,
-            "name_en": "Mameshiba Earring"
-        },
-        {
-            "id": 24615,
-            "name_en": "Mameshiba Neckerchief"
-        },
-        {
-            "id": 24622,
-            "name_en": "Maxima Roader Identification Key"
-        },
-        {
-            "id": 24623,
-            "name_en": "Hallowed Kamuy Fife"
-        },
-        {
-            "id": 24625,
-            "name_en": "Fabled Kamuy Fife"
-        },
-        {
-            "id": 24627,
-            "name_en": "Magicked Carpet"
-        },
-        {
-            "id": 24628,
-            "name_en": "Sabotender Emperador Horn"
-        },
-        {
-            "id": 24634,
-            "name_en": "Seitei"
-        },
-        {
-            "id": 24636,
-            "name_en": "Minitek Conveyor"
-        },
-        {
-            "id": 24639,
-            "name_en": "Wind-up Weapon"
-        },
-        {
-            "id": 24642,
-            "name_en": "Baby Gremlin"
-        },
-        {
-            "id": 24796,
-            "name_en": "Azulmagia"
-        },
-        {
-            "id": 24797,
-            "name_en": "Seiryu Totem"
-        },
-        {
-            "id": 24798,
-            "name_en": "Mullondeis Coin"
-        },
-        {
-            "id": 24799,
-            "name_en": "Seiryu Barding"
-        },
-        {
-            "id": 24801,
-            "name_en": "Modern Aesthetics - Lexen-tails"
-        },
-        {
-            "id": 24803,
-            "name_en": "Seiryu's Scale"
-        },
-        {
-            "id": 24804,
-            "name_en": "Waterproof Cloth"
-        },
-        {
-            "id": 24805,
-            "name_en": "Peerless Clan Mark Log"
-        },
-        {
-            "id": 24821,
-            "name_en": "Blessed Millking's Saw"
-        },
-        {
-            "id": 24822,
-            "name_en": "Blessed Forgeking's Hammer"
-        },
-        {
-            "id": 24823,
-            "name_en": "Blessed Hammerking's Beetle"
-        },
-        {
-            "id": 24824,
-            "name_en": "Blessed Gemking's Mallet"
-        },
-        {
-            "id": 24825,
-            "name_en": "Blessed Hideking's Knife"
-        },
-        {
-            "id": 24826,
-            "name_en": "Blessed Boltking's Needle"
-        },
-        {
-            "id": 24827,
-            "name_en": "Blessed Cauldronking's Alembic"
-        },
-        {
-            "id": 24828,
-            "name_en": "Blessed Galleyking's Frypan"
-        },
-        {
-            "id": 24829,
-            "name_en": "Blessed Mineking's Pickaxe"
-        },
-        {
-            "id": 24830,
-            "name_en": "Blessed Fieldking's Hatchet"
-        },
-        {
-            "id": 24831,
-            "name_en": "Blessed Tackleking's Rod"
-        },
-        {
-            "id": 24859,
-            "name_en": "Red Lily of the Valley Corsage"
-        },
-        {
-            "id": 24860,
-            "name_en": "Blue Lily of the Valley Corsage"
-        },
-        {
-            "id": 24861,
-            "name_en": "Yellow Lily of the Valley Corsage"
-        },
-        {
-            "id": 24862,
-            "name_en": "Green Lily of the Valley Corsage"
-        },
-        {
-            "id": 24863,
-            "name_en": "Orange Lily of the Valley Corsage"
-        },
-        {
-            "id": 24864,
-            "name_en": "Purple Lily of the Valley Corsage"
-        },
-        {
-            "id": 24865,
-            "name_en": "White Lily of the Valley Corsage"
-        },
-        {
-            "id": 24866,
-            "name_en": "Black Lily of the Valley Corsage"
-        },
-        {
-            "id": 24867,
-            "name_en": "Rainbow Lily of the Valley Corsage"
-        },
-        {
-            "id": 24868,
-            "name_en": "Carbuncle Chandelier"
-        },
-        {
-            "id": 24869,
-            "name_en": "Stormblood Tataru Taru Card"
-        },
-        {
-            "id": 24872,
-            "name_en": "Prometheus Card"
-        },
-        {
-            "id": 24874,
-            "name_en": "Seiryu Card"
-        },
-        {
-            "id": 24875,
-            "name_en": "Alpha Card"
-        },
-        {
-            "id": 24876,
-            "name_en": "Great Gold Whisker Card"
-        },
-        {
-            "id": 24878,
-            "name_en": "Ultima, the High Seraph Card"
-        },
-        {
-            "id": 24879,
-            "name_en": "Stormblood Alphinaud and Alisaie Card"
-        },
-        {
-            "id": 24881,
-            "name_en": "Lily of the Veil"
-        },
-        {
-            "id": 24882,
-            "name_en": "The Vegetarian"
-        },
-        {
-            "id": 24883,
-            "name_en": "Seven Stars"
-        },
-        {
-            "id": 24884,
-            "name_en": "Pinhead"
-        },
-        {
-            "id": 24885,
-            "name_en": "Pomegranate Trout"
-        },
-        {
-            "id": 24886,
-            "name_en": "Glarramundi"
-        },
-        {
-            "id": 24887,
-            "name_en": "Hermit's End"
-        },
-        {
-            "id": 24888,
-            "name_en": "Suiten Ippeki"
-        },
-        {
-            "id": 24889,
-            "name_en": "Axelrod"
-        },
-        {
-            "id": 24890,
-            "name_en": "The Unraveled Bow"
-        },
-        {
-            "id": 24891,
-            "name_en": "Nhaama's Treasure"
-        },
-        {
-            "id": 24892,
-            "name_en": "Garden Skipper"
-        },
-        {
-            "id": 24893,
-            "name_en": "Banderole"
-        },
-        {
-            "id": 24894,
+            "id": 28650,
             "name_en": "Valentione's Day Chocolate"
         },
         {
-            "id": 24895,
-            "name_en": "Season Eleven Pack Wolf Voucher A"
+            "id": 28652,
+            "name_en": "Dream Triad Card"
         },
         {
-            "id": 24896,
-            "name_en": "Season Eleven Pack Wolf Voucher B"
+            "id": 28653,
+            "name_en": "Hobgoblin Card"
         },
         {
-            "id": 24897,
-            "name_en": "Season Eleven Pack Wolf Voucher C"
+            "id": 28654,
+            "name_en": "Porxie Card"
         },
         {
-            "id": 24898,
-            "name_en": "Season Twelve Pack Wolf Voucher A"
+            "id": 28655,
+            "name_en": "Iguana Card"
         },
         {
-            "id": 24899,
-            "name_en": "Season Twelve Pack Wolf Voucher B"
+            "id": 28656,
+            "name_en": "Nu Mou Card"
         },
         {
-            "id": 24900,
-            "name_en": "Season Twelve Pack Wolf Voucher C"
+            "id": 28657,
+            "name_en": "Fuath Card"
         },
         {
-            "id": 24902,
-            "name_en": "Abroader Otter"
+            "id": 28658,
+            "name_en": "Leannan Sith Card"
         },
         {
-            "id": 24903,
-            "name_en": "Hedgehoglet"
+            "id": 28659,
+            "name_en": "Seeker of Solitude Card"
         },
         {
-            "id": 24908,
-            "name_en": "Salvaged Coinage"
+            "id": 28660,
+            "name_en": "Oracle of Light Card"
         },
         {
-            "id": 24910,
-            "name_en": "Yama Blade"
+            "id": 28661,
+            "name_en": "Archaeotania Card"
         },
         {
-            "id": 24911,
-            "name_en": "Yama Knuckles"
+            "id": 28662,
+            "name_en": "9S Card"
         },
         {
-            "id": 24912,
-            "name_en": "Yama Axe"
+            "id": 28663,
+            "name_en": "Painting of the Rotunda"
         },
         {
-            "id": 24913,
-            "name_en": "Yama Lance"
+            "id": 28664,
+            "name_en": "Painting of Musica Universalis"
         },
         {
-            "id": 24914,
-            "name_en": "Yama Greatbow"
+            "id": 28665,
+            "name_en": "Painting of the Cabinet of Curiosity"
         },
         {
-            "id": 24915,
-            "name_en": "Yama Daggers"
+            "id": 28666,
+            "name_en": "Painting of Rapture"
         },
         {
-            "id": 24916,
-            "name_en": "Yama Odachi"
+            "id": 28667,
+            "name_en": "Painting of Temenos Rookery"
         },
         {
-            "id": 24917,
-            "name_en": "Yama Revolver"
+            "id": 28668,
+            "name_en": "Painting of the Glory Gate"
         },
         {
-            "id": 24918,
-            "name_en": "Yama Cane"
+            "id": 28669,
+            "name_en": "Painting of the Derelicts"
         },
         {
-            "id": 24919,
-            "name_en": "Yama Rod"
+            "id": 28670,
+            "name_en": "Painting of the Eulmoran Army Headquarters"
         },
         {
-            "id": 24920,
-            "name_en": "Yama Grimoire"
+            "id": 28671,
+            "name_en": "Painting of the Beehive"
         },
         {
-            "id": 24921,
-            "name_en": "Yama Codex"
+            "id": 28672,
+            "name_en": "Painting of Fort Jobb"
         },
         {
-            "id": 24922,
-            "name_en": "Yama Ephemeris"
+            "id": 28673,
+            "name_en": "Painting of Radisca's Round"
         },
         {
-            "id": 24923,
-            "name_en": "Yama Katana"
+            "id": 28674,
+            "name_en": "Painting of Laxan Loft"
         },
         {
-            "id": 24924,
-            "name_en": "Yama Rapier"
+            "id": 28675,
+            "name_en": "Painting of the Ostall Imperative"
         },
         {
-            "id": 24925,
-            "name_en": "Yama Greatshield"
+            "id": 28676,
+            "name_en": "Painting of the Hour of Certain Durance"
         },
         {
-            "id": 24926,
-            "name_en": "Yama Mask of Fending"
+            "id": 28677,
+            "name_en": "Painting of Sullen"
         },
         {
-            "id": 24927,
-            "name_en": "Yama Kasaya of Fending"
+            "id": 28678,
+            "name_en": "Painting of Cracked Shell Beach"
         },
         {
-            "id": 24928,
-            "name_en": "Yama Kote of Fending"
+            "id": 28679,
+            "name_en": "Painting of White Oil Falls"
         },
         {
-            "id": 24929,
-            "name_en": "Yama Tsutsu-Hakama of Fending"
+            "id": 28680,
+            "name_en": "Painting of Gatetown"
         },
         {
-            "id": 24930,
-            "name_en": "Yama Sune-Ate of Fending"
+            "id": 28681,
+            "name_en": "Painting of Wright"
         },
         {
-            "id": 24931,
-            "name_en": "Yama Obi of Fending"
+            "id": 28682,
+            "name_en": "Painting of the Ladder"
         },
         {
-            "id": 24932,
-            "name_en": "Yama Mask of Maiming"
+            "id": 28683,
+            "name_en": "Painting of Tomra"
         },
         {
-            "id": 24933,
-            "name_en": "Yama Kasaya of Maiming"
+            "id": 28684,
+            "name_en": "Painting of the Duergar's Tewel"
         },
         {
-            "id": 24934,
-            "name_en": "Yama Kote of Maiming"
+            "id": 28685,
+            "name_en": "Painting of the Red Serai"
         },
         {
-            "id": 24935,
-            "name_en": "Yama Tsutsu-Hakama of Maiming"
+            "id": 28686,
+            "name_en": "Painting of Mord Souq"
         },
         {
-            "id": 24936,
-            "name_en": "Yama Sune-Ate of Maiming"
+            "id": 28687,
+            "name_en": "Painting of the Pristine Palace of Amh Malik"
         },
         {
-            "id": 24937,
-            "name_en": "Yama Obi of Maiming"
+            "id": 28688,
+            "name_en": "Painting of Mount Biran Mines"
         },
         {
-            "id": 24938,
-            "name_en": "Yama Gantai of Striking"
+            "id": 28689,
+            "name_en": "Painting of Twine"
         },
         {
-            "id": 24939,
-            "name_en": "Yama Haori of Striking"
+            "id": 28690,
+            "name_en": "Painting of Kelk"
         },
         {
-            "id": 24940,
-            "name_en": "Yama Tekko of Striking"
+            "id": 28691,
+            "name_en": "Painting of Lydha Lran"
         },
         {
-            "id": 24941,
-            "name_en": "Yama Hakama of Striking"
+            "id": 28692,
+            "name_en": "Painting of the Bookman's Shelves"
         },
         {
-            "id": 24942,
-            "name_en": "Yama Zori of Striking"
+            "id": 28693,
+            "name_en": "Painting of Pla Enni"
         },
         {
-            "id": 24943,
-            "name_en": "Yama Obi of Striking"
+            "id": 28694,
+            "name_en": "Painting of Deepwood Swim"
         },
         {
-            "id": 24944,
-            "name_en": "Yama Gantai of Aiming"
+            "id": 28695,
+            "name_en": "Painting of Lyhe Ghiah"
         },
         {
-            "id": 24945,
-            "name_en": "Yama Haori of Aiming"
+            "id": 28696,
+            "name_en": "Painting of Saint Fathric's Temple"
         },
         {
-            "id": 24946,
-            "name_en": "Yama Tekko of Aiming"
+            "id": 28697,
+            "name_en": "Painting of Fort Gohn"
         },
         {
-            "id": 24947,
-            "name_en": "Yama Hakama of Aiming"
+            "id": 28698,
+            "name_en": "Painting of Fruit of the Protector"
         },
         {
-            "id": 24948,
-            "name_en": "Yama Zori of Aiming"
+            "id": 28699,
+            "name_en": "Painting of the Covered Halls of Dwatl"
         },
         {
-            "id": 24949,
-            "name_en": "Yama Obi of Aiming"
+            "id": 28700,
+            "name_en": "Painting of Lozatl's Conquest"
         },
         {
-            "id": 24950,
-            "name_en": "Yama Gantai of Scouting"
+            "id": 28701,
+            "name_en": "Painting of Fanow"
         },
         {
-            "id": 24951,
-            "name_en": "Yama Haori of Scouting"
+            "id": 28702,
+            "name_en": "Painting of the Morning Stars"
         },
         {
-            "id": 24952,
-            "name_en": "Yama Tekko of Scouting"
+            "id": 28703,
+            "name_en": "Painting of the Ondo Cups"
         },
         {
-            "id": 24953,
-            "name_en": "Yama Hakama of Scouting"
+            "id": 28704,
+            "name_en": "Painting of the Workbench"
         },
         {
-            "id": 24954,
-            "name_en": "Yama Zori of Scouting"
+            "id": 28705,
+            "name_en": "Painting of Where the Dry Return"
         },
         {
-            "id": 24955,
-            "name_en": "Yama Obi of Scouting"
+            "id": 28706,
+            "name_en": "Painting of Purpure"
         },
         {
-            "id": 24956,
-            "name_en": "Yama Kanmuri of Healing"
+            "id": 28707,
+            "name_en": "Painting of Amaurot"
         },
         {
-            "id": 24957,
-            "name_en": "Yama Dogi of Healing"
+            "id": 28708,
+            "name_en": "Hades Totem"
         },
         {
-            "id": 24958,
-            "name_en": "Yama Tekko of Healing"
+            "id": 28709,
+            "name_en": "No.2 Type B Goggles"
         },
         {
-            "id": 24959,
-            "name_en": "Yama Tsutsu-Hakama of Healing"
+            "id": 28710,
+            "name_en": "No.2 Type B Dress"
         },
         {
-            "id": 24960,
-            "name_en": "Yama Zori of Healing"
+            "id": 28711,
+            "name_en": "No.2 Type B Gloves"
         },
         {
-            "id": 24961,
-            "name_en": "Yama Obi of Healing"
+            "id": 28712,
+            "name_en": "No.2 Type B Leggings"
         },
         {
-            "id": 24962,
-            "name_en": "Yama Kanmuri of Casting"
+            "id": 28713,
+            "name_en": "No.2 Type B Boots"
         },
         {
-            "id": 24963,
-            "name_en": "Yama Dogi of Casting"
+            "id": 28714,
+            "name_en": "Alumina Whetstone"
         },
         {
-            "id": 24964,
-            "name_en": "Yama Tekko of Casting"
+            "id": 28715,
+            "name_en": "Pliable Glass Fiber"
         },
         {
-            "id": 24965,
-            "name_en": "Yama Tsutsu-Hakama of Casting"
+            "id": 28716,
+            "name_en": "Sandalwood Sap"
         },
         {
-            "id": 24966,
-            "name_en": "Yama Zori of Casting"
+            "id": 28717,
+            "name_en": "Beryllium Ore"
         },
         {
-            "id": 24967,
-            "name_en": "Yama Obi of Casting"
+            "id": 28718,
+            "name_en": "Sublime Solution"
         },
         {
-            "id": 24968,
-            "name_en": "Yama Earring of Fending"
+            "id": 28719,
+            "name_en": "Sweetmeat Mussel"
         },
         {
-            "id": 24969,
-            "name_en": "Yama Earring of Slaying"
+            "id": 28720,
+            "name_en": "Mejillones al Ajillo"
         },
         {
-            "id": 24970,
-            "name_en": "Yama Earring of Aiming"
+            "id": 28721,
+            "name_en": "Arros Negre"
         },
         {
-            "id": 24971,
-            "name_en": "Yama Earring of Healing"
+            "id": 28722,
+            "name_en": "Kholusian Rain"
         },
         {
-            "id": 24972,
-            "name_en": "Yama Earring of Casting"
+            "id": 28723,
+            "name_en": "Eulmoran Certificate of Import"
         },
         {
-            "id": 24973,
-            "name_en": "Yama Necklace of Fending"
+            "id": 28724,
+            "name_en": "Crafter's Delineation"
         },
         {
-            "id": 24974,
-            "name_en": "Yama Necklace of Slaying"
+            "id": 28799,
+            "name_en": "Red Campanula Corsage"
         },
         {
-            "id": 24975,
-            "name_en": "Yama Necklace of Aiming"
+            "id": 28800,
+            "name_en": "Blue Campanula Corsage"
         },
         {
-            "id": 24976,
-            "name_en": "Yama Necklace of Healing"
+            "id": 28801,
+            "name_en": "Yellow Campanula Corsage"
         },
         {
-            "id": 24977,
-            "name_en": "Yama Necklace of Casting"
+            "id": 28802,
+            "name_en": "Green Campanula Corsage"
         },
         {
-            "id": 24978,
-            "name_en": "Yama Bracelet of Fending"
+            "id": 28803,
+            "name_en": "Orange Campanula Corsage"
         },
         {
-            "id": 24979,
-            "name_en": "Yama Bracelet of Slaying"
+            "id": 28804,
+            "name_en": "Purple Campanula Corsage"
         },
         {
-            "id": 24980,
-            "name_en": "Yama Bracelet of Aiming"
+            "id": 28805,
+            "name_en": "White Campanula Corsage"
         },
         {
-            "id": 24981,
-            "name_en": "Yama Bracelet of Healing"
+            "id": 28806,
+            "name_en": "Black Campanula Corsage"
         },
         {
-            "id": 24982,
-            "name_en": "Yama Bracelet of Casting"
+            "id": 28807,
+            "name_en": "Rainbow Campanula Corsage"
         },
         {
-            "id": 24983,
-            "name_en": "Yama Ring of Fending"
+            "id": 28878,
+            "name_en": "Knowledge Never Sleeps Orchestrion Roll"
         },
         {
-            "id": 24984,
-            "name_en": "Yama Ring of Slaying"
+            "id": 28879,
+            "name_en": "Masquerade Orchestrion Roll"
         },
         {
-            "id": 24985,
-            "name_en": "Yama Ring of Aiming"
+            "id": 28880,
+            "name_en": "Unchanging, Everchanging Orchestrion Roll"
         },
         {
-            "id": 24986,
-            "name_en": "Yama Ring of Healing"
+            "id": 28881,
+            "name_en": "The Quick Way Orchestrion Roll"
         },
         {
-            "id": 24987,
-            "name_en": "Yama Ring of Casting"
+            "id": 28882,
+            "name_en": "Sands of Blood Orchestrion Roll"
         },
         {
-            "id": 24988,
-            "name_en": "Rakshasa Token"
+            "id": 28883,
+            "name_en": "The Faerie Ring Orchestrion Roll"
         },
         {
-            "id": 24989,
-            "name_en": "Doman Reiyaku"
+            "id": 28884,
+            "name_en": "A Hopeless Race Orchestrion Roll"
         },
         {
-            "id": 24999,
-            "name_en": "Gown of Light"
+            "id": 28885,
+            "name_en": "Neath Dark Waters Orchestrion Roll"
         },
         {
-            "id": 25000,
-            "name_en": "Skirt of Light"
+            "id": 28886,
+            "name_en": "Pain in Pleasure Orchestrion Roll"
         },
         {
-            "id": 25002,
-            "name_en": "Ballroom Etiquette - Refined Reproaches"
+            "id": 28887,
+            "name_en": "Invincible Orchestrion Roll"
         },
         {
-            "id": 25005,
-            "name_en": "Magicked Prism (Job Mastery)"
+            "id": 28888,
+            "name_en": "The Grand Cosmos Orchestrion Roll"
         },
         {
-            "id": 25006,
-            "name_en": "マジックプリズム:ガーベラ"
+            "id": 28889,
+            "name_en": "The Garden's Gates Orchestrion Roll"
         },
         {
-            "id": 25008,
-            "name_en": "Kamacite Ore"
+            "id": 28892,
+            "name_en": "Starlight de Chocobo Orchestrion Roll"
         },
         {
-            "id": 25009,
-            "name_en": "Kamacite"
+            "id": 28894,
+            "name_en": "Significance Orchestrion Roll"
         },
         {
-            "id": 25010,
-            "name_en": "Ishgardian Gown"
+            "id": 28895,
+            "name_en": "City Ruins (Rays of Light) Orchestrion Roll"
         },
         {
-            "id": 25011,
-            "name_en": "Far Eastern Smock"
+            "id": 28897,
+            "name_en": "Voice of no Return Orchestrion Roll"
         },
         {
-            "id": 25012,
-            "name_en": "Whalaqee White Wind Totem"
+            "id": 28898,
+            "name_en": "Alien Manifestation Orchestrion Roll"
         },
         {
-            "id": 25013,
-            "name_en": "Gigas Shield"
+            "id": 28899,
+            "name_en": "Song of the Ancients (Atonement) Orchestrion Roll"
         },
         {
-            "id": 25014,
-            "name_en": "Halicarnassus Sword"
+            "id": 28900,
+            "name_en": "The Sound of the End Orchestrion Roll"
         },
         {
-            "id": 25015,
-            "name_en": "Giant Axe"
+            "id": 28901,
+            "name_en": "Weight of the World (Prelude Version) Orchestrion Roll"
         },
         {
-            "id": 25016,
-            "name_en": "Faust Lance"
+            "id": 28902,
+            "name_en": "Tsukuyomi's Pain (Orchestral Version) Orchestrion Roll"
         },
         {
-            "id": 25017,
-            "name_en": "Kum Kum Staff"
+            "id": 28903,
+            "name_en": "The Worm's Tail (Orchestral Version) Orchestrion Roll"
         },
         {
-            "id": 25018,
-            "name_en": "Bokuto"
+            "id": 28904,
+            "name_en": "Faded Copy of Invincible"
         },
         {
-            "id": 25019,
-            "name_en": "Colossus Guillotine"
+            "id": 28905,
+            "name_en": "Shell Leather"
         },
         {
-            "id": 25020,
-            "name_en": "Gigas Greatsword"
+            "id": 28911,
+            "name_en": "Authentic Silver Starlight Sentinel"
         },
         {
-            "id": 25021,
-            "name_en": "Tonberry Knife"
+            "id": 28912,
+            "name_en": "Authentic Starlight Donuts"
         },
         {
-            "id": 25022,
-            "name_en": "Blade of the Goddess"
+            "id": 28913,
+            "name_en": "Authentic Evercold Starlight Snowman"
         },
         {
-            "id": 25023,
-            "name_en": "Fists of the Goddess"
+            "id": 28914,
+            "name_en": "Authentic Opened Twinkleboxes"
         },
         {
-            "id": 25024,
-            "name_en": "Axe of the Goddess"
+            "id": 28915,
+            "name_en": "Scions of the Seventh Dawn Reproduction"
         },
         {
-            "id": 25025,
-            "name_en": "Pike of the Goddess"
+            "id": 28918,
+            "name_en": "Gentleman's Valentione Rose Chest"
         },
         {
-            "id": 25026,
-            "name_en": "Bow of the Goddess"
+            "id": 28919,
+            "name_en": "Gentleman's Valentione Acacia Chest"
         },
         {
-            "id": 25027,
-            "name_en": "Points of the Goddess"
+            "id": 28920,
+            "name_en": "Gentleman's Valentione Forget-Me-Not Chest"
         },
         {
-            "id": 25028,
-            "name_en": "Edge of the Goddess"
+            "id": 28921,
+            "name_en": "Lady's Valentione Rose Chest"
         },
         {
-            "id": 25029,
-            "name_en": "Fire of the Goddess"
+            "id": 28922,
+            "name_en": "Lady's Valentione Acacia Chest"
         },
         {
-            "id": 25030,
-            "name_en": "Cane of the Goddess"
+            "id": 28923,
+            "name_en": "Lady's Valentione Forget-Me-Not Chest"
         },
         {
-            "id": 25031,
-            "name_en": "Pole of the Goddess"
-        },
-        {
-            "id": 25032,
-            "name_en": "Word of the Goddess"
-        },
-        {
-            "id": 25033,
-            "name_en": "Song of the Goddess"
-        },
-        {
-            "id": 25034,
-            "name_en": "Star of the Goddess"
-        },
-        {
-            "id": 25035,
-            "name_en": "Katana of the Goddess"
-        },
-        {
-            "id": 25036,
-            "name_en": "Rapier of the Goddess"
-        },
-        {
-            "id": 25037,
-            "name_en": "Shield of the Goddess"
-        },
-        {
-            "id": 25054,
-            "name_en": "Miracle Elixir"
-        },
-        {
-            "id": 25055,
-            "name_en": "Exclusive Eastern Journey Battle Staff"
-        },
-        {
-            "id": 25056,
-            "name_en": "Eastern Journey Attire Coffer"
-        },
-        {
-            "id": 25058,
-            "name_en": "From the Dragon's Wake Orchestrion Roll"
-        },
-        {
-            "id": 25059,
-            "name_en": "A Pall Most Murderous Orchestrion Roll"
-        },
-        {
-            "id": 25060,
-            "name_en": "Game Theory Orchestrion Roll"
-        },
-        {
-            "id": 25061,
-            "name_en": "Doman Distractions Orchestrion Roll"
-        },
-        {
-            "id": 25062,
-            "name_en": "Afterglow Orchestrion Roll"
-        },
-        {
-            "id": 25063,
-            "name_en": "Hope Forgotten Orchestrion Roll"
-        },
-        {
-            "id": 25064,
-            "name_en": "The Stone Remembers Orchestrion Roll"
-        },
-        {
-            "id": 25065,
-            "name_en": "Old Wounds Orchestrion Roll"
-        },
-        {
-            "id": 25066,
-            "name_en": "Harmony Orchestrion Roll"
-        },
-        {
-            "id": 25070,
-            "name_en": "Beyond Redemption Orchestrion Roll"
-        },
-        {
-            "id": 25071,
-            "name_en": "Staff Credits Orchestrion Roll"
-        },
-        {
-            "id": 25072,
-            "name_en": "Alma's Theme Orchestrion Roll"
-        },
-        {
-            "id": 25073,
-            "name_en": "Under The Stars Orchestrion Roll"
-        },
-        {
-            "id": 25074,
-            "name_en": "Fear (No. 1) Orchestrion Roll"
-        },
-        {
-            "id": 25075,
-            "name_en": "Antipyretic Orchestrion Roll"
-        },
-        {
-            "id": 25076,
-            "name_en": "A Man Consumed Orchestrion Roll"
-        },
-        {
-            "id": 25077,
-            "name_en": "Ultima's Perfection Orchestrion Roll"
-        },
-        {
-            "id": 25084,
-            "name_en": "Painted Foothills (Orchestral Version) Orchestrion Roll"
-        },
-        {
-            "id": 25085,
-            "name_en": "Moebius (Orchestral Version) Orchestrion Roll"
-        },
-        {
-            "id": 25086,
-            "name_en": "Faded Copy of From the Dragon's Wake"
+            "id": 28924,
+            "name_en": "No.2 Type B Materiel Storage Crate"
         }
 ]
