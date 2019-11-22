@@ -7,7 +7,7 @@ use App\Parsers\ParseInterface;
 use Symfony\Component\Config\Resource\FileResource;
 
 /**
- * php bin/console app:parse:csv GE:Recipes
+ * php bin/console app:parse:csv GE:Leves
  */
 class Leves implements ParseInterface
 {
@@ -81,6 +81,7 @@ otherwise (Fisher, Botanist, Goldsmith, Alchemist, etc) -->
         $PlaceNameCsv = $this->csv('PlaceName');
         $ClassJobCsv = $this->csv('ClassJobCategory');
         $JournalGenreCsv = $this->csv('JournalGenre');
+        $ENpcResidentCsv = $this->csv('ENpcResident');
 
         // (optional) start a progress bar
         $this->io->progressStart($LeveCsv->total);
@@ -89,7 +90,7 @@ otherwise (Fisher, Botanist, Goldsmith, Alchemist, etc) -->
         foreach ($LeveCsv->data as $id => $leve) {
             $this->io->progressAdvance();
 
-            $patch = '5.0';
+            $patch = '5.11';
 
             // skip ones without a name
             if (empty($leve['Name'])) {
@@ -196,10 +197,11 @@ otherwise (Fisher, Botanist, Goldsmith, Alchemist, etc) -->
             if ($leve['DataId'] >= 917054 && $leve['DataId'] <= 920000) {
                 $CraftLeveItem = $CraftLeveCsv->at($leve['DataId'])['Item[0]'];
                 $CraftLeveItemQty = $CraftLeveCsv->at($leve['DataId'])['ItemCount[0]'];
-                $ItemSingle = $CraftLeveItem->at($ItemCsv)['Singular'];
-                $ItemPlural = $CraftLeveItem->at($ItemCsv)['Plural'];
-                $ItemVowel = $CraftLeveItem->at($ItemCsv)['StartsWithVowel'];
-                $Item = $CraftLeveItem->at($ItemCsv)['Name'];
+                $ItemSingle = $ItemCsv->at($CraftLeveItem)['Singular'];
+                $ItemPlural = $ItemCsv->at($CraftLeveItem)['Plural'];
+                $ItemVowel = $ItemCsv->at($CraftLeveItem)['StartsWithVowel'];
+                $Item = $ItemCsv->at($CraftLeveItem)['Name'];
+                $NpcName = $ENpcResidentCsv->at($LevelCsv->at($leve['Level{Levemete}'])['Object'])['Singular'];
                 if (($ItemVowel == 0 || $ItemVowel == 1) && $CraftLeveItemQty > 1) {
                     $Objective = "*Deliver [[$Item|$ItemPlural]] to {{NPCLink|$NpcName}}. 0/$CraftLeveItemQty";
                 } elseif ($ItemVowel == 0 && $CraftLeveItemQty == 1) {
@@ -241,7 +243,7 @@ otherwise (Fisher, Botanist, Goldsmith, Alchemist, etc) -->
         // save our data to the filename: GeRecipeWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save('GeLeveWiki.txt');
+        $info = $this->save("GeLeveWiki.txt - ". $patch .".txt", 9999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],
