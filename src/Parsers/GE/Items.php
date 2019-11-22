@@ -653,7 +653,7 @@ class Items implements ParseInterface
                     //switch to percentage if true and flat if false
                     if ($RelativeSwitchBool2 = True) {
                         $RelativeSwitch2 = "%";
-                    } elseif ($RelativeSwitchBool1 = False) {
+                    } elseif ($RelativeSwitchBool2 = False) {
                         $RelativeSwitch2 = "";
                     }
                     $BaseStat2 = str_replace(" ", "_", $BaseParamCsv->at($ItemFoodCsv->at($ItemActionEffectRaw)["BaseParam[2]"])["Name"]);
