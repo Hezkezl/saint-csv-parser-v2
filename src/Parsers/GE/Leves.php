@@ -23,11 +23,8 @@ class Leves implements ParseInterface
 |Levequest Type     = {levetype}{duration}
 |Levequest Location ={grandcompany}
 
-<!-- Disciples of Magic, Disciples of War for \"Battlecraft\" leves. The full name of the class
-otherwise (Fisher, Botanist, Goldsmith, Alchemist, etc) -->
 |Recommended Classes = {classes}
 
-|Objectives = <!-- Just list them exactly as they appear on screen -->
 {objective}{mobobjective}
 
 |Description = {description}
@@ -36,12 +33,16 @@ otherwise (Fisher, Botanist, Goldsmith, Alchemist, etc) -->
 |GilReward = ~{gil}
 |SealsReward =  <!-- Raw number, no commas. Delete if not needed -->
 
+<!--  If all rewards are single items, just add them below as a comma delineated list  -->
+| Levequest Reward List =
+{RewardTest}
+
 <!--  If rewards need count data, add them one at a time below, adding more rows as needed-->
 |LevequestReward 1       =  <!-- Item name only -->
 |LevequestReward 1 Count =  <!-- Use only if more than 1 -->
 
 <!--  If rewards are conditional, such as only appearing inside of a chest during the leve itself, use these below -->
-<!--  Can be combined with the above options. Useful for things like Amber-encased Vilekin -->
+<!--  Can be combined with the above options. Useful for Amber-encased Vilekin -->
 |LevequestRewardOption 1       =  <!-- Item name only -->
 |LevequestRewardOption 1 Count =  <!-- Use only if more than 1 -->
 
@@ -79,6 +80,9 @@ otherwise (Fisher, Botanist, Goldsmith, Alchemist, etc) -->
         $JournalGenreCsv = $this->csv('JournalGenre');
         $ENpcResidentCsv = $this->csv('ENpcResident');
         $EventItemCsv = $this->csv('EventItem');
+        $LeveRewardItemGroupCsv = $this->csv('LeveRewardItemGroup');
+        $LeveRewardItemCsv = $this->csv('LeveRewardItem');
+
 
         // (optional) start a progress bar
         $this->io->progressStart($LeveCsv->total);
@@ -207,9 +211,28 @@ otherwise (Fisher, Botanist, Goldsmith, Alchemist, etc) -->
             $Item = false;
             $NpcInvolvement = false;
             $Npc = false;
+            $RewardNumber = false;
             $MobInvolvement = [];
             $InvolvementObjective = [];
             $BattlecraftItemsInvolved = [];
+            $RewardTest = [];
+
+
+            // | Levequest Reward List =
+            foreach(range(0,7) as $i) {
+                foreach(range(0,8) as $a) {
+                    $TestReward = $ItemCsv->at($LeveRewardItemGroupCsv->at($LeveRewardItemCsv->at($leve['LeveRewardItem'])["LeveRewardItemGroup[$i]"])["Item[$a]"])['Name'];
+                    $TestRewardAmount = $LeveRewardItemGroupCsv->at($LeveRewardItemCsv->at($leve['LeveRewardItem'])["LeveRewardItemGroup[$i]"])["Count[$a]"];
+                    $Chance = $LeveRewardItemCsv->at($leve['LeveRewardItem'])["Probability<%>[$i]"];
+                    //is the item HQ?
+                    $TestRewardHQ = $LeveRewardItemGroupCsv->at($LeveRewardItemCsv->at($leve['LeveRewardItem'])["LeveRewardItemGroup[$i]"])["HQ[$a]"];
+                    if ($TestRewardAmount == 0) continue;
+                    $RewardNumber = ($RewardNumber + 1);
+                    $RewardTest[0] = "\n";
+                    $RewardTest[] = "|LevequestReward ". $RewardNumber ."        = ". $TestReward ."\n|LevequestReward ". $RewardNumber ." Count  = ". $TestRewardAmount ."\n|LevequestReward ". $RewardNumber ." Chance = ". $Chance ."\n|LevequestReward ". $RewardNumber ." HQ     = ". $TestRewardHQ ."";
+
+                }
+            }
 
             if ($levetype == "Tradecraft") {
                 $CraftLeveItem = $CraftLeveCsv->at($leve['DataId'])['Item[0]'];
@@ -254,6 +277,11 @@ otherwise (Fisher, Botanist, Goldsmith, Alchemist, etc) -->
             $MobInvolvement = implode(", ", $MobInvolvement);
             $InvolvementObjective = array_unique($InvolvementObjective);
             $MobObjective = implode("\n*", $InvolvementObjective);
+            $RewardTest = implode("\n", $RewardTest);
+
+
+            //Mapcode
+            
 
                 // Save some data
             $data = [
@@ -279,6 +307,7 @@ otherwise (Fisher, Botanist, Goldsmith, Alchemist, etc) -->
                 '{mobinvolve}' => $MobInvolvement,
                 '{item}' => $Item,
                 '{Bottom}' => $Bottom,
+                '{RewardTest}' => $RewardTest,
             ];
 
             // format using Gamer Escape formatter and add to data array
