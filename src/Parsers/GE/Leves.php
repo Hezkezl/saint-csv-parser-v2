@@ -23,12 +23,11 @@ class Leves implements ParseInterface
 |Levequest Type     = {levetype}{duration}
 |Levequest Location ={grandcompany}
 
-<!-- Disciples of Magic, Disciples of War for \"Battlecraft\" leves. The full name of the class
-otherwise (Fisher, Botanist, Goldsmith, Alchemist, etc) -->
 |Recommended Classes = {classes}
 
-|Objectives = <!-- Just list them exactly as they appear on screen -->
 {objective}{mobobjective}
+
+{BattleObjective}
 
 |Description = {description}
 
@@ -36,12 +35,10 @@ otherwise (Fisher, Botanist, Goldsmith, Alchemist, etc) -->
 |GilReward = ~{gil}
 |SealsReward =  <!-- Raw number, no commas. Delete if not needed -->
 
-<!--  If rewards need count data, add them one at a time below, adding more rows as needed-->
-|LevequestReward 1       =  <!-- Item name only -->
-|LevequestReward 1 Count =  <!-- Use only if more than 1 -->
+| Levequest Reward List = {Reward}
 
 <!--  If rewards are conditional, such as only appearing inside of a chest during the leve itself, use these below -->
-<!--  Can be combined with the above options. Useful for things like Amber-encased Vilekin -->
+<!--  Can be combined with the above options. Useful for Amber-encased Vilekin -->
 |LevequestRewardOption 1       =  <!-- Item name only -->
 |LevequestRewardOption 1 Count =  <!-- Use only if more than 1 -->
 
@@ -79,6 +76,10 @@ otherwise (Fisher, Botanist, Goldsmith, Alchemist, etc) -->
         $JournalGenreCsv = $this->csv('JournalGenre');
         $ENpcResidentCsv = $this->csv('ENpcResident');
         $EventItemCsv = $this->csv('EventItem');
+        $LeveRewardItemGroupCsv = $this->csv('LeveRewardItemGroup');
+        $LeveRewardItemCsv = $this->csv('LeveRewardItem');
+        $LeveStringCsv = $this->csv('LeveString');
+
 
         // (optional) start a progress bar
         $this->io->progressStart($LeveCsv->total);
@@ -207,9 +208,40 @@ otherwise (Fisher, Botanist, Goldsmith, Alchemist, etc) -->
             $Item = false;
             $NpcInvolvement = false;
             $Npc = false;
+            $RewardNumber = false;
             $MobInvolvement = [];
             $InvolvementObjective = [];
             $BattlecraftItemsInvolved = [];
+            $RewardItem = [];
+            $Objective = [];
+
+
+            // | Levequest Reward List =
+            foreach(range(0,7) as $i) {
+                foreach(range(0,8) as $a) {
+
+                    //|LevequestReward 3        = item name
+                    $RewardItemName = $ItemCsv->at($LeveRewardItemGroupCsv->at($LeveRewardItemCsv->at($leve['LeveRewardItem'])["LeveRewardItemGroup[$i]"])["Item[$a]"])['Name'];
+
+                    //|LevequestReward 6 Count  = x
+                    $ItemRewardAmount = $LeveRewardItemGroupCsv->at($LeveRewardItemCsv->at($leve['LeveRewardItem'])["LeveRewardItemGroup[$i]"])["Count[$a]"];
+                    //skip if the reward is zero therefore no reward then increase the Reward number by 1
+                    if ($ItemRewardAmount == 0) continue;
+                    $RewardNumber = ($RewardNumber + 1);
+                    //probability
+                    $RewardChance = $LeveRewardItemCsv->at($leve['LeveRewardItem'])["Probability<%>[$i]"];
+                    //is the item HQ?
+                    if ($LeveRewardItemGroupCsv->at($LeveRewardItemCsv->at($leve['LeveRewardItem'])["LeveRewardItemGroup[$i]"])["HQ[$a]"] == "False") {
+                        $RewardHQ = "";
+                    } elseif ($LeveRewardItemGroupCsv->at($LeveRewardItemCsv->at($leve['LeveRewardItem'])["LeveRewardItemGroup[$i]"])["HQ[$a]"] == "True") {
+                        $RewardHQ = "|LevequestReward ". $RewardNumber ." HQ     = x\n";
+                    }
+                    //string
+                    $RewardItem[0] = "\n";
+                    $RewardItem[] = "|LevequestReward ". $RewardNumber ."        = ". $RewardItemName ."\n|LevequestReward ". $RewardNumber ." Count  = ". $ItemRewardAmount ."\n|LevequestReward ". $RewardNumber ." Chance = ". $RewardChance ."%\n". $RewardHQ ."";
+
+                }
+            }
 
             if ($levetype == "Tradecraft") {
                 $CraftLeveItem = $CraftLeveCsv->at($leve['DataId'])['Item[0]'];
@@ -230,10 +262,28 @@ otherwise (Fisher, Botanist, Goldsmith, Alchemist, etc) -->
                 foreach(range(0,7) as $i) {
                     if ($BattleLeveCsv->at($leve['DataId'])["BNpcName[$i]"] > 1 && $BattleLeveCsv->at($leve['DataId'])["ItemsInvolved[$i]"] == "0") {
                         $BNpcName = ucwords(strtolower($BNpcNameCsv->at($BattleLeveCsv->at($leve['DataId'])["BNpcName[$i]"])['Singular']));
+
                         $MobInvolvement[] = $BNpcName;
                         $InvolvementObjective[0] = "*Defeat target enemies.";
                         $InvolvementObjective[] = $BNpcName;
                     }
+
+                    //output data for each battlecraft thing (This is just a test to get all format data out)
+                    $BNpcNameObjective = ucwords(strtolower($BNpcNameCsv->at($BattleLeveCsv->at($leve['DataId'])["BNpcName[0]"])['Singular']));
+                    foreach (range(0,1) as $i) {
+                        $ObjectiveText = $LeveStringCsv->at($BattleLeveCsv->at($leve['DataId'])["Objective[$i]"])['Objective'];
+
+                        $ReplaceOld = array("<SheetEn(BNpcName,2,IntegerParameter(1),1,1)/>");
+                        $ReplaceNew = array("". $BNpcNameObjective ."");
+                        if (!empty($ObjectiveText)) {
+                            $ObjectiveText = str_replace($ReplaceOld, $ReplaceNew, $ObjectiveText);
+                            $ObjectiveString = "|Objective = ". $ObjectiveText ."";
+                        }
+
+                        $Objective[] = "". $ObjectiveString ."";
+                        //$Objective[] = $BNpcName;
+                    }
+
                     // doesn't work. attempt to make it so that if there's an item that appears during a battle leve, then it should get priority over
                     // just displaying the "Defeat target enemies." text. But... doesn't work. Also need to finish adding in the item list for
                     // items involved here, as it doesn't work either (items involved currently only works for tradecraft leves, but battlecraft
@@ -254,6 +304,13 @@ otherwise (Fisher, Botanist, Goldsmith, Alchemist, etc) -->
             $MobInvolvement = implode(", ", $MobInvolvement);
             $InvolvementObjective = array_unique($InvolvementObjective);
             $MobObjective = implode("\n*", $InvolvementObjective);
+            $RewardItem = implode("\n", $RewardItem);
+            $Objective = array_unique($Objective);
+            $Objective = implode(", ", $Objective);
+
+
+            //Mapcode
+            
 
                 // Save some data
             $data = [
@@ -279,6 +336,8 @@ otherwise (Fisher, Botanist, Goldsmith, Alchemist, etc) -->
                 '{mobinvolve}' => $MobInvolvement,
                 '{item}' => $Item,
                 '{Bottom}' => $Bottom,
+                '{Reward}' => $RewardItem,
+                '{BattleObjective}' => $Objective,
             ];
 
             // format using Gamer Escape formatter and add to data array
