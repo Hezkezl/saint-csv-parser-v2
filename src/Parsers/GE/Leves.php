@@ -268,20 +268,38 @@ class Leves implements ParseInterface
                         $InvolvementObjective[] = $BNpcName;
                     }
 
-                    //output data for each battlecraft thing (This is just a test to get all format data out)
                     $BNpcNameObjective = ucwords(strtolower($BNpcNameCsv->at($BattleLeveCsv->at($leve['DataId'])["BNpcName[0]"])['Singular']));
-                    foreach (range(0,1) as $i) {
-                        $ObjectiveText = $LeveStringCsv->at($BattleLeveCsv->at($leve['DataId'])["Objective[$i]"])['Objective'];
-
-                        $ReplaceOld = array("<SheetEn(BNpcName,2,IntegerParameter(1),1,1)/>");
-                        $ReplaceNew = array("". $BNpcNameObjective ."");
-                        if (!empty($ObjectiveText)) {
-                            $ObjectiveText = str_replace($ReplaceOld, $ReplaceNew, $ObjectiveText);
-                            $ObjectiveString = "|Objective = ". $ObjectiveText ."";
+                    foreach (range(0,1) as $a) {
+                        $ObjectiveText = str_replace("<SheetEn(BNpcName,2,IntegerParameter(1),1,1)/>", "". $BNpcNameObjective ."", $LeveStringCsv->at($BattleLeveCsv->at($leve['DataId'])["Objective[$a]"])['Objective']);
+                        //sort SE's if code
+                        /**
+                         * THIS IS BROKEN AND DOES NOT WORK 100% PLEASE FIX BEFORE USE
+                        */
+                        foreach(range(0,7) as $i) {
+                            $ItemIF = $EventItemCsv->at($BattleLeveCsv->at($leve['DataId'])["ItemsInvolved[0]"])['Name'];
+                        }
+                        if (!empty($ItemIF)) {
+                            $ObjectiveText = str_replace("<If(Equal(IntegerParameter(1),0))>Attack target to reveal its<Else/>", "", $ObjectiveText);
+                            $ObjectiveText = str_replace("<SheetEn(EventItem,1,IntegerParameter(1),1,1)/>", $ItemIF, $ObjectiveText);
+                            $ObjectiveText = str_replace("</If>", "", $ObjectiveText);
+                            $ObjectiveText = str_replace("<If(Equal(IntegerParameter(1),0))>the /soothe emote<Else/><SheetEn(EventItem,2,IntegerParameter(1),1,1)/>", "". $ItemIF ."", $ObjectiveText);
+                        } elseif (empty($ItemIF)) {
+                            $ObjectiveText = str_replace("<If(Equal(IntegerParameter(1),0))>Attack target to reveal its<Else/>", "", $ObjectiveText);
+                            $ObjectiveText = str_replace("<SheetEn(EventItem,1,IntegerParameter(1),1,1)/>", $ItemIF, $ObjectiveText);
+                            $ObjectiveText = str_replace("</If>", "", $ObjectiveText);
+                            $ObjectiveText = str_replace("<If(Equal(IntegerParameter(1),0))>the /soothe emote<Else/><SheetEn(EventItem,2,IntegerParameter(1),1,1)/>", "the /soothe emote", $ObjectiveText);
                         }
 
+                        if (!empty($ObjectiveText)) {
+                            $ObjectiveString = "|Objective = ". $ObjectiveText ."";
+                        }
+                        /**
+                         * THIS IS BROKEN AND DOES NOT WORK 100% PLEASE FIX BEFORE USE
+                        */
+
+
                         $Objective[] = "". $ObjectiveString ."";
-                        //$Objective[] = $BNpcName;
+                        //$Objective[1] = "";
                     }
 
                     // doesn't work. attempt to make it so that if there's an item that appears during a battle leve, then it should get priority over
