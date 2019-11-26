@@ -19,25 +19,22 @@ class Leves implements ParseInterface
 |Patch = {patch}
 |Level = {level}
 
+{Card}
+
 |Guildleve Type     = {guildtype}
 |Levequest Type     = {levetype}{duration}
 |Levequest Location = {Location}
 
 |Recommended Classes = {classes}
-
-{Objective}
-
-{mobobjective}
-{objective}
-{fldobjective}
-
+{trdobjective}{fldobjective}{Btlobjective}{mobobjective}
 |Description = {description}
 
+{turnins}
 |EXPReward = {exp}
 |GilReward = ~{gil}
 |SealsReward =  <!-- Raw number, no commas. Delete if not needed -->
 
-| Levequest Reward List = {Reward}
+|Levequest Reward List = {Reward}
 
 <!--  If rewards are conditional, such as only appearing inside of a chest during the leve itself, use these below -->
 <!--  Can be combined with the above options. Useful for Amber-encased Vilekin -->
@@ -48,14 +45,8 @@ class Leves implements ParseInterface
 |Client = {client}
 
 |NPCs Involved  = {npcinvolve} <!-- List of NPCs involved (besides the quest giver,) comma separated-->
-|Mobs Involved  = {mobinvolve} <!-- List any Mobs who are involved, comma separated-->
 |Items Involved = {item} <!-- List any items used, comma separated-->
 |Wanted Target  =  <!-- Usually found during Battlecraft leves -->
-
-
-{Map}
-
-{FieldLeveMap}
 
 |Strategy =
 |Walkthrough =
@@ -141,11 +132,11 @@ class Leves implements ParseInterface
             // Give the proper name to the Levequest's type (the card icon)
             $guildtype = [
                 0 => NULL,
-                1 => NULL,
-                2 => NULL,
-                3 => NULL,
-                4 => NULL,
-                5 => NULL,
+                1 => "Platinum",
+                2 => "Gold",
+                3 => "Blue",
+                4 => "Silver",
+                5 => "Bronze",
                 6 => "Valor",
                 7 => "Tenacity (Guildleve)",
                 8 => "Wisdom",
@@ -196,6 +187,7 @@ class Leves implements ParseInterface
                 53 => "Sincerity",
             ];
 
+
             // Assigning Grand Company and classes for appropriate leves
             $grandcompany = false;
             if ($leve['LeveAssignmentType'] == 1) {
@@ -214,8 +206,8 @@ class Leves implements ParseInterface
             }
 
             // Objective text for Disciple of the Hand leves
-            $TradecraftObjective = false;
-            $FieldcraftObjective = false;
+            $TradecraftObjective = "";
+            $FieldcraftObjective = "";
             $Item = false;
             $NpcInvolvement = false;
             $Npc = false;
@@ -260,21 +252,30 @@ class Leves implements ParseInterface
             }
 
             if ($levetype == "Tradecraft") {
+                $BattleObjective = "";//just clearing it for these
                 $CraftLeveItem = $CraftLeveCsv->at($leve['DataId'])['Item[0]'];
                 $CraftLeveItemQty = $CraftLeveCsv->at($leve['DataId'])['ItemCount[0]'];
                 $ItemSingle = $ItemCsv->at($CraftLeveItem)['Singular'];
                 $ItemPlural = $ItemCsv->at($CraftLeveItem)['Plural'];
                 $ItemVowel = $ItemCsv->at($CraftLeveItem)['StartsWithVowel'];
                 $Item = $ItemCsv->at($CraftLeveItem)['Name'];
+                $MoreTradeinRaw = $CraftLeveCsv->at($leve['DataId'])['Repeats'];
+                if ($MoreTradeinRaw == 0) {
+                    $MoreTradein = "";
+                } elseif ($MoreTradeinRaw !== 0) {
+                    $MoreTradeinMaths = ($MoreTradeinRaw + 1);
+                    $MoreTradein = "|TurnInRepeat = ". $MoreTradeinMaths ."";
+                }
                 $NpcName = $ENpcResidentCsv->at($LevelCsv->at($leve['Level{Levemete}'])['Object'])['Singular'];
                 if ($CraftLeveItemQty > 1) {
-                    $TradecraftObjective = "*Deliver [[$Item|$ItemPlural]] to {{NPCLink|$NpcName}}. 0/$CraftLeveItemQty";
+                    $TradecraftObjective = "|Objective = Deliver [[$Item|$ItemPlural]] to {{NPCLink|$NpcName}}. 0/$CraftLeveItemQty";
                 } elseif ($ItemVowel == "0" && $CraftLeveItemQty == "1") {
-                    $TradecraftObjective = "*Deliver a [[$Item|$ItemSingle]] to {{NPCLink|$NpcName}}. 0/$CraftLeveItemQty";
+                    $TradecraftObjective = "|Objective = Deliver a [[$Item|$ItemSingle]] to {{NPCLink|$NpcName}}. 0/$CraftLeveItemQty";
                 } elseif ($ItemVowel == "1" && $CraftLeveItemQty == "1") {
-                    $TradecraftObjective = "*Deliver an [[$Item|$ItemSingle]] to {{NPCLink|$NpcName}}. 0/$CraftLeveItemQty";
+                    $TradecraftObjective = "|Objective = Deliver an [[$Item|$ItemSingle]] to {{NPCLink|$NpcName}}. 0/$CraftLeveItemQty";
                 }
             } elseif ($levetype == "Battlecraft") {
+                $MoreTradein = "";//just clearing it for these
                 foreach(range(0,7) as $i) {
                     if ($BattleLeveCsv->at($leve['DataId'])["BNpcName[$i]"] > 1) {
                         $TargetNumber = ($TargetNumber + 1);
@@ -296,16 +297,14 @@ class Leves implements ParseInterface
                         $BCToDoParam = "|Target ". $TargetNumber ." Param    = ". $BattleLeveCsv->at($leve['DataId'])["ToDoParam[$i]"];
                         $MobInvolvement[] = $BNpcName;
                         $InvolvementObjective[0] = "Enemies:";
-                        $InvolvementObjective[] = "" .$BNpcName ."\n" .$BCTime ."\n" .$BCBaseID ."\n" .$BCLevel ."\n" .$BCItemsInvolved ."" .$BCItemQTY ."" .$BCItemDropRate ."" .$BCToDoNumber ."\n" .$BCToDoParam ."\n";
+                        $InvolvementObjective[] = "" .$BNpcName ."\n" .$BCLevel ."\n" .$BCItemsInvolved ."" .$BCItemQTY ."" .$BCItemDropRate ."" .$BCToDoNumber ."\n";
                     }
 
                     $BNpcNameObjective = ucwords(strtolower($BNpcNameCsv->at($BattleLeveCsv->at($leve['DataId'])["BNpcName[0]"])['Singular']));
                     foreach (range(0,1) as $a) {
                         $ObjectiveText = str_replace("<SheetEn(BNpcName,2,IntegerParameter(1),1,1)/>", "". $BNpcNameObjective ."", $LeveStringCsv->at($BattleLeveCsv->at($leve['DataId'])["Objective[$a]"])['Objective']);
                         //sort SE's if code
-                        /**
-                         * THIS IS BROKEN AND DOES NOT WORK 100% PLEASE FIX BEFORE USE
-                        */
+                    }
                         foreach(range(0,7) as $i) {
                             $ItemIF = $EventItemCsv->at($BattleLeveCsv->at($leve['DataId'])["ItemsInvolved[0]"])['Name'];
                         }
@@ -322,32 +321,17 @@ class Leves implements ParseInterface
                         }
 
                         if (!empty($ObjectiveText)) {
-                            $ObjectiveString = "|Objective = ". $ObjectiveText ."";
+                            $BattleObjective = "|Objective = ". $ObjectiveText ."";
+                        } elseif (empty($ObjectiveText)) {
+                            $BattleObjective = "";
                         }
                         /**
                          * THIS IS BROKEN AND DOES NOT WORK 100% PLEASE FIX BEFORE USE
                         */
-
-
-                        $Objective[] = "". $ObjectiveString ."";
-                        //$Objective[1] = "";
-                    }
-
-                    // doesn't work. attempt to make it so that if there's an item that appears during a battle leve, then it should get priority over
-                    // just displaying the "Defeat target enemies." text. But... doesn't work. Also need to finish adding in the item list for
-                    // items involved here, as it doesn't work either (items involved currently only works for tradecraft leves, but battlecraft
-                    // can have them too. They're just in the battleleve file instead of the craftleve file...)
-                    //if ($BattleLeveCsv->at($leve['DataId'])["BNpcName[$i]"] > 1 && $BattleLeveCsv->at($leve['DataId'])["ItemsInvolved[$i]"] > 1) {
-                        //$BattlecraftItemsInvolved = $EventItemCsv->at($BattleLeveCsv->at($leve['DataId'])["ItemsInvolved[$i]"])['Name'];
-                        //$BNpcName = ucwords(strtolower($BNpcNameCsv->at($BattleLeveCsv->at($leve['DataId'])["BNpcName[$i]"])['Singular']));
-                        //$MobInvolvement[] = $BNpcName;
-                        //$InvolvementObjective[0] = "*Obtain target items.";
-                        //$InvolvementObjective[] = $BattlecraftItemsInvolved;
-
-                    //}
                 }
             } elseif ($levetype == "Fieldcraft") {
-
+                $MoreTradein = "";//just clearing it for these
+                $BattleObjective = "";//just clearing it for these
              // Need to do something for fieldcraft ones, but haven't even begun to think about it yet so commenting out.
             
                 $FieldLeveItem = $CraftLeveCsv->at($leve['DataId'])['Item[0]'];
@@ -442,7 +426,12 @@ class Leves implements ParseInterface
 
             $Map[] = "". $MapString ."";
 
-
+            //Icon for Superimpose
+            $VFXOuterType = $guildtype[$leve['LeveVfx{Frame}']];
+            $VFXOuter = "|Frame = ". $VFXOuterType .".png\n";
+            $VFXInnerType = $guildtype[$leve['LeveVfx']];
+            $VFXInner = "|Image = ". $VFXInnerType .".png";
+            $VFXImage = "". $VFXOuter ."". $VFXInner ."";
 
 
             $MobInvolvement = array_unique($MobInvolvement);
@@ -450,15 +439,20 @@ class Leves implements ParseInterface
             $InvolvementObjective = array_unique($InvolvementObjective);
             $MobObjective = implode("\n", $InvolvementObjective);
             $RewardItem = implode("\n", $RewardItem);
-            $Objective = implode(", ", $Objective);
             $Map = implode("", $Map);
             $FieldLeveMap = implode("", $FieldLeveMap);
 
 
 
             //NOTES TO DO:
-            //I found that in places like "CraftLeve.exd there is a "Repeats" Column, this means we can show on the
-            //wiki that we can have it say when "Repeats = 2" "You can hand it in a total of 3 times for extra exp"
+
+            //work on items dropped
+
+            //figure out why objectives are only working with Fieldcraft
+
+            //reward options ????
+
+            //CraftLeveDifference? Can we use this in any way
 
             //I can link each GatheringLeve to a gathering point. What i cannot figure out how to do is how to
             //link that gathering point to level. I would need to somehow find it in "Object" Column in Level
@@ -477,8 +471,9 @@ class Leves implements ParseInterface
                 '{grandcompany}' => ($leve['LeveAssignmentType'] == 16 || $leve['LeveAssignmentType'] == 17 || $leve['LeveAssignmentType'] == 18)
                     ? "\n|Grand Company      = ". $grandcompany : "",
                 '{classes}' => $classes,
-                '{objective}' => $TradecraftObjective,
+                '{trdobjective}' => $TradecraftObjective,
                 '{fldobjective}' => $FieldcraftObjective,
+                '{Btlobjective}' => $BattleObjective,
                 '{mobobjective}' => $MobObjective,
                 '{description}' => $leve['Description'],
                 '{exp}' => ($leve['ExpReward'] > 0) ? $leve['ExpReward'] : "{{Information Needed}}",
@@ -490,10 +485,11 @@ class Leves implements ParseInterface
                 '{item}' => $Item,
                 '{Bottom}' => $Bottom,
                 '{Reward}' => $RewardItem,
-                '{Objective}' => $Objective,
                 '{Map}' => $Map,
                 '{Location}' => $LevelTeriPlaceName,
                 '{FieldLeveMap}' => $FieldLeveMap,
+                '{Card}' => $VFXImage,
+                '{turnins}' => $MoreTradein,
             ];
 
             // format using Gamer Escape formatter and add to data array
