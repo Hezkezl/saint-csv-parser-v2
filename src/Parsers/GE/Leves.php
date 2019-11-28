@@ -26,7 +26,7 @@ class Leves implements ParseInterface
 |Levequest Location = {Location}
 
 |Recommended Classes = {classes}
-{trdobjective}{fldobjective}{Btlobjective}{mobobjective}
+{trdobjective}{fldobjective}{mobobjective}
 |Description = {description}
 
 {turnins}
@@ -35,11 +35,6 @@ class Leves implements ParseInterface
 |SealsReward =  <!-- Raw number, no commas. Delete if not needed -->
 
 |Levequest Reward List = {Reward}
-
-<!--  If rewards are conditional, such as only appearing inside of a chest during the leve itself, use these below -->
-<!--  Can be combined with the above options. Useful for Amber-encased Vilekin -->
-|LevequestRewardOption 1       =  <!-- Item name only -->
-|LevequestRewardOption 1 Count =  <!-- Use only if more than 1 -->
 
 |Issuing NPC = {npc}
 |Client = {client}
@@ -79,6 +74,7 @@ class Leves implements ParseInterface
         $LeveStringCsv = $this->csv('LeveString');
         $TerritoryTypeCsv = $this->csv('TerritoryType');
         $GatheringLeveRouteCsv = $this->csv('GatheringLeveRoute');
+        $TownCsv = $this->csv('Town');
 
 
 
@@ -208,6 +204,7 @@ class Leves implements ParseInterface
             // Objective text for Disciple of the Hand leves
             $TradecraftObjective = "";
             $FieldcraftObjective = "";
+            $BattleObjective = false;//just clearing it for these
             $Item = false;
             $NpcInvolvement = false;
             $Npc = false;
@@ -252,7 +249,6 @@ class Leves implements ParseInterface
             }
 
             if ($levetype == "Tradecraft") {
-                $BattleObjective = "";//just clearing it for these
                 $CraftLeveItem = $CraftLeveCsv->at($leve['DataId'])['Item[0]'];
                 $CraftLeveItemQty = $CraftLeveCsv->at($leve['DataId'])['ItemCount[0]'];
                 $ItemSingle = $ItemCsv->at($CraftLeveItem)['Singular'];
@@ -293,47 +289,52 @@ class Leves implements ParseInterface
                         $BCItemQTY = "";
                         $BCItemDropRate = "";
                         }
-                        $BCToDoNumber = "|Target ". $TargetNumber ." Amount   = ". $BattleLeveCsv->at($leve['DataId'])["ToDoNumberInvolved[$i]"];
+                        $BCToDoNumber = "|Target ". $TargetNumber ." Required Amount   = ". $BattleLeveCsv->at($leve['DataId'])["ToDoNumberInvolved[$i]"];
                         $BCToDoParam = "|Target ". $TargetNumber ." Param    = ". $BattleLeveCsv->at($leve['DataId'])["ToDoParam[$i]"];
                         $MobInvolvement[] = $BNpcName;
-                        $InvolvementObjective[0] = "Enemies:";
+                        $BNpcNameObjective = ucwords(strtolower($BNpcNameCsv->at($BattleLeveCsv->at($leve['DataId'])["BNpcName[0]"])['Singular']));
+
+                        $ObjectiveText = $LeveStringCsv->at($BattleLeveCsv->at($leve['DataId'])["Objective[0]"])['Objective'];
+                        $ObjectiveText2 = $LeveStringCsv->at($BattleLeveCsv->at($leve['DataId'])["Objective[1]"])['Objective'];
+                        if (empty($ObjectiveText2)) {
+                            $BattleObjective = "\n|Objective = ". $ObjectiveText ."";
+                        } elseif (!empty($ObjectiveText2)) {
+                            $BattleObjective = "\n|Objective = ". $ObjectiveText ."\n|Objective Sub = ". $ObjectiveText2 ."";
+                        }
+
+                        $InvolvementObjective[0] = "". $BattleObjective ."\n";
                         $InvolvementObjective[] = "" .$BNpcName ."\n" .$BCLevel ."\n" .$BCItemsInvolved ."" .$BCItemQTY ."" .$BCItemDropRate ."" .$BCToDoNumber ."\n";
                     }
 
-                    $BNpcNameObjective = ucwords(strtolower($BNpcNameCsv->at($BattleLeveCsv->at($leve['DataId'])["BNpcName[0]"])['Singular']));
-                    foreach (range(0,1) as $a) {
-                        $ObjectiveText = str_replace("<SheetEn(BNpcName,2,IntegerParameter(1),1,1)/>", "". $BNpcNameObjective ."", $LeveStringCsv->at($BattleLeveCsv->at($leve['DataId'])["Objective[$a]"])['Objective']);
-                        //sort SE's if code
-                    }
-                        foreach(range(0,7) as $i) {
-                            $ItemIF = $EventItemCsv->at($BattleLeveCsv->at($leve['DataId'])["ItemsInvolved[0]"])['Name'];
-                        }
-                        if (!empty($ItemIF)) {
-                            $ObjectiveText = str_replace("<If(Equal(IntegerParameter(1),0))>Attack target to reveal its<Else/>", "", $ObjectiveText);
-                            $ObjectiveText = str_replace("<SheetEn(EventItem,1,IntegerParameter(1),1,1)/>", $ItemIF, $ObjectiveText);
-                            $ObjectiveText = str_replace("</If>", "", $ObjectiveText);
-                            $ObjectiveText = str_replace("<If(Equal(IntegerParameter(1),0))>the /soothe emote<Else/><SheetEn(EventItem,2,IntegerParameter(1),1,1)/>", "". $ItemIF ."", $ObjectiveText);
-                        } elseif (empty($ItemIF)) {
-                            $ObjectiveText = str_replace("<If(Equal(IntegerParameter(1),0))>Attack target to reveal its<Else/>", "", $ObjectiveText);
-                            $ObjectiveText = str_replace("<SheetEn(EventItem,1,IntegerParameter(1),1,1)/>", $ItemIF, $ObjectiveText);
-                            $ObjectiveText = str_replace("</If>", "", $ObjectiveText);
-                            $ObjectiveText = str_replace("<If(Equal(IntegerParameter(1),0))>the /soothe emote<Else/><SheetEn(EventItem,2,IntegerParameter(1),1,1)/>", "the /soothe emote", $ObjectiveText);
-                        }
 
-                        if (!empty($ObjectiveText)) {
-                            $BattleObjective = "|Objective = ". $ObjectiveText ."";
-                        } elseif (empty($ObjectiveText)) {
-                            $BattleObjective = "";
-                        }
-                        /**
-                         * THIS IS BROKEN AND DOES NOT WORK 100% PLEASE FIX BEFORE USE
-                        */
-                }
+                    // THIS is where i was working on the "replace SE text to displace correctly" stuff but its a mess
+
+                    //$BNpcNameObjective = ucwords(strtolower($BNpcNameCsv->at($BattleLeveCsv->at($leve['DataId'])["BNpcName[0]"])['Singular']));
+                    //foreach (range(0,1) as $a) {
+                    //    $ObjectiveText = str_replace("<SheetEn(BNpcName,2,IntegerParameter(1),1,1)/>", "". $BNpcNameObjective ."", $LeveStringCsv->at($BattleLeveCsv->at($leve['DataId'])["Objective[$a]"])['Objective']);
+                    //    //sort SE's if code
+                    //    $BattleObjective = "|Objective = ". $ObjectiveText ."";
+                    //}
+                    //foreach(range(0,7) as $i) {
+                    //    $ItemIF = $EventItemCsv->at($BattleLeveCsv->at($leve['DataId'])["ItemsInvolved[0]"])['Name'];
+                    //}
+                    //if (!empty($ItemIF)) {
+                    //    $ObjectiveText = str_replace("<If(Equal(IntegerParameter(1),0))>Attack target to reveal its<Else/>", "", $ObjectiveText);
+                    //    $ObjectiveText = str_replace("<SheetEn(EventItem,1,IntegerParameter(1),1,1)/>", $ItemIF, $ObjectiveText);
+                    //    $ObjectiveText = str_replace("</If>", "", $ObjectiveText);
+                    //    $ObjectiveText = str_replace("<If(Equal(IntegerParameter(1),0))>the /soothe emote<Else/><SheetEn(EventItem,2,IntegerParameter(1),1,1)/>", "". $ItemIF ."", $ObjectiveText);
+                    //} elseif (empty($ItemIF)) {
+                    //    $ObjectiveText = str_replace("<If(Equal(IntegerParameter(1),0))>Attack target to reveal its<Else/>", "", $ObjectiveText);
+                    //    $ObjectiveText = str_replace("<SheetEn(EventItem,1,IntegerParameter(1),1,1)/>", $ItemIF, $ObjectiveText);
+                    //    $ObjectiveText = str_replace("</If>", "", $ObjectiveText);
+                    //    $ObjectiveText = str_replace("<If(Equal(IntegerParameter(1),0))>the /soothe emote<Else/><SheetEn(EventItem,2,IntegerParameter(1),1,1)/>", "the /soothe emote", $ObjectiveText);
+                    //}
+
             } elseif ($levetype == "Fieldcraft") {
                 $MoreTradein = "";//just clearing it for these
-                $BattleObjective = "";//just clearing it for these
+                //$BattleObjective = "";//just clearing it for these
              // Need to do something for fieldcraft ones, but haven't even begun to think about it yet so commenting out.
-            
+
                 $FieldLeveItem = $CraftLeveCsv->at($leve['DataId'])['Item[0]'];
                 $FieldLeveItemQty = $CraftLeveCsv->at($leve['DataId'])['ItemCount[0]'];
                 $ItemSingle = $ItemCsv->at($CraftLeveItem)['Singular'];
@@ -430,8 +431,10 @@ class Leves implements ParseInterface
             $VFXOuterType = $guildtype[$leve['LeveVfx{Frame}']];
             $VFXOuter = "|Frame = ". $VFXOuterType .".png\n";
             $VFXInnerType = $guildtype[$leve['LeveVfx']];
-            $VFXInner = "|Image = ". $VFXInnerType .".png";
-            $VFXImage = "". $VFXOuter ."". $VFXInner ."";
+            $VFXInner = "|Image = ". $VFXInnerType .".png\n";
+            $VFXTownType = str_replace(" ","_",$TownCsv->at($leve['Town'])['Name']);
+            $VFXTown = "|Town = ". $VFXTownType ."_Leve.png";
+            $VFXImage = "". $VFXOuter ."". $VFXInner ."". $VFXTown ."";
 
 
             $MobInvolvement = array_unique($MobInvolvement);
@@ -446,17 +449,7 @@ class Leves implements ParseInterface
 
             //NOTES TO DO:
 
-            //work on items dropped
-
-            //figure out why objectives are only working with Fieldcraft
-
-            //reward options ????
-
-            //CraftLeveDifference? Can we use this in any way
-
-            //I can link each GatheringLeve to a gathering point. What i cannot figure out how to do is how to
-            //link that gathering point to level. I would need to somehow find it in "Object" Column in Level
-            //and output the key and then go back to that key to get the x and y
+            //make it fit for wiki template
 
                 // Save some data
             $data = [
