@@ -77,7 +77,6 @@ class Leves implements ParseInterface
         $TownCsv = $this->csv('Town');
 
 
-
         // (optional) start a progress bar
         $this->io->progressStart($LeveCsv->total);
 
@@ -243,7 +242,8 @@ class Leves implements ParseInterface
                     }
                     //string
                     $RewardItem[0] = "\n";
-                    $RewardItem[] = "|LevequestReward ". $RewardNumber ."        = ". $RewardItemName ."\n|LevequestReward ". $RewardNumber ." Count  = ". $ItemRewardAmount ."\n|LevequestReward ". $RewardNumber ." Chance = ". $RewardChance ."%\n". $RewardHQ ."";
+                    $RewardItem[] = "|LevequestReward ". $RewardNumber ."        = ". $RewardItemName ."\n|LevequestReward ". $RewardNumber ." Count  = ".
+                        $ItemRewardAmount ."\n|LevequestReward ". $RewardNumber ." Chance = ". $RewardChance ."%\n". $RewardHQ ."";
 
                 }
             }
@@ -275,35 +275,35 @@ class Leves implements ParseInterface
                 foreach(range(0,7) as $i) {
                     if ($BattleLeveCsv->at($leve['DataId'])["BNpcName[$i]"] > 1) {
                         $TargetNumber = ($TargetNumber + 1);
-                        $BNpcName = "|Target ". $TargetNumber ." Name     = ". ucwords(strtolower($BNpcNameCsv->at($BattleLeveCsv->at($leve['DataId'])["BNpcName[$i]"])['Singular']));
+                        $BNpcName = "|Target " . $TargetNumber . " Name     = " . ucwords(strtolower($BNpcNameCsv->at($BattleLeveCsv->at($leve['DataId'])["BNpcName[$i]"])['Singular']));
                         //Data per monster
-                        $BCTime = "|Target ". $TargetNumber ." Time     = ". $BattleLeveCsv->at($leve['DataId'])["Time[$i]"];
-                        $BCBaseID = "|Target ". $TargetNumber ." ID       = ". $BattleLeveCsv->at($leve['DataId'])["BaseID[$i]"];
-                        $BCLevel = "|Target ". $TargetNumber ." Level    = ". $BattleLeveCsv->at($leve['DataId'])["EnemyLevel[$i]"];
+                        $BCTime = "|Target " . $TargetNumber . " Time     = " . $BattleLeveCsv->at($leve['DataId'])["Time[$i]"];
+                        $BCBaseID = "|Target " . $TargetNumber . " ID       = " . $BattleLeveCsv->at($leve['DataId'])["BaseID[$i]"];
+                        $BCLevel = "|Target " . $TargetNumber . " Level    = " . $BattleLeveCsv->at($leve['DataId'])["EnemyLevel[$i]"];
                         if (!empty($EventItemCsv->at($BattleLeveCsv->at($leve['DataId'])["ItemsInvolved[$i]"])['Name'])) {
-                        $BCItemsInvolved = "|Target ". $TargetNumber ." Drops    = ". $EventItemCsv->at($BattleLeveCsv->at($leve['DataId'])["ItemsInvolved[$i]"])['Name']. "\n";
-                        $BCItemQTY = "|Target ". $TargetNumber ." QTY      = ". $BattleLeveCsv->at($leve['DataId'])["ItemsInvolvedQty[$i]"] ."\n";
-                        $BCItemDropRate = "|Target ". $TargetNumber ." DropRate = ". $BattleLeveCsv->at($leve['DataId'])["ItemDropRate[$i]"] ." %\n";
+                            $BCItemsInvolved = "|Target " . $TargetNumber . " Drops    = " . $EventItemCsv->at($BattleLeveCsv->at($leve['DataId'])["ItemsInvolved[$i]"])['Name'] . "\n";
+                            $BCItemQTY = "|Target " . $TargetNumber . " QTY      = " . $BattleLeveCsv->at($leve['DataId'])["ItemsInvolvedQty[$i]"] . "\n";
+                            $BCItemDropRate = "|Target " . $TargetNumber . " DropRate = " . $BattleLeveCsv->at($leve['DataId'])["ItemDropRate[$i]"] . " %\n";
                         } elseif (empty($EventItemCsv->at($BattleLeveCsv->at($leve['DataId'])["ItemsInvolved[$i]"])['Name'])) {
-                        $BCItemsInvolved = "";
-                        $BCItemQTY = "";
-                        $BCItemDropRate = "";
+                            $BCItemsInvolved = "";
+                            $BCItemQTY = "";
+                            $BCItemDropRate = "";
                         }
-                        $BCToDoNumber = "|Target ". $TargetNumber ." Required Amount   = ". $BattleLeveCsv->at($leve['DataId'])["ToDoNumberInvolved[$i]"];
-                        $BCToDoParam = "|Target ". $TargetNumber ." Param    = ". $BattleLeveCsv->at($leve['DataId'])["ToDoParam[$i]"];
+                        $BCToDoNumber = "|Target " . $TargetNumber . " Required Amount   = " . $BattleLeveCsv->at($leve['DataId'])["ToDoNumberInvolved[$i]"];
+                        $BCToDoParam = "|Target " . $TargetNumber . " Param    = " . $BattleLeveCsv->at($leve['DataId'])["ToDoParam[$i]"];
                         $MobInvolvement[] = $BNpcName;
                         $BNpcNameObjective = ucwords(strtolower($BNpcNameCsv->at($BattleLeveCsv->at($leve['DataId'])["BNpcName[0]"])['Singular']));
 
                         $ObjectiveText = $LeveStringCsv->at($BattleLeveCsv->at($leve['DataId'])["Objective[0]"])['Objective'];
                         $ObjectiveText2 = $LeveStringCsv->at($BattleLeveCsv->at($leve['DataId'])["Objective[1]"])['Objective'];
                         if (empty($ObjectiveText2)) {
-                            $BattleObjective = "\n|Objective = ". $ObjectiveText ."";
+                            $BattleObjective = "\n|Objective = " . $ObjectiveText . "";
                         } elseif (!empty($ObjectiveText2)) {
-                            $BattleObjective = "\n|Objective = ". $ObjectiveText ."\n|Objective Sub = ". $ObjectiveText2 ."";
+                            $BattleObjective = "\n|Objective = " . $ObjectiveText . "\n|Objective Sub = " . $ObjectiveText2 . "";
                         }
 
-                        $InvolvementObjective[0] = "". $BattleObjective ."\n";
-                        $InvolvementObjective[] = "" .$BNpcName ."\n" .$BCLevel ."\n" .$BCItemsInvolved ."" .$BCItemQTY ."" .$BCItemDropRate ."" .$BCToDoNumber ."\n";
+                        $InvolvementObjective[0] = "" . $BattleObjective . "\n";
+                        $InvolvementObjective[] = "" . $BNpcName . "\n" . $BCLevel . "\n" . $BCItemsInvolved . "" . $BCItemQTY . "" . $BCItemDropRate . "" . $BCToDoNumber . "\n";
                     }
 
 
@@ -329,6 +329,7 @@ class Leves implements ParseInterface
                     //    $ObjectiveText = str_replace("</If>", "", $ObjectiveText);
                     //    $ObjectiveText = str_replace("<If(Equal(IntegerParameter(1),0))>the /soothe emote<Else/><SheetEn(EventItem,2,IntegerParameter(1),1,1)/>", "the /soothe emote", $ObjectiveText);
                     //}
+                }
 
             } elseif ($levetype == "Fieldcraft") {
                 $MoreTradein = "";//just clearing it for these
@@ -337,10 +338,10 @@ class Leves implements ParseInterface
 
                 $FieldLeveItem = $CraftLeveCsv->at($leve['DataId'])['Item[0]'];
                 $FieldLeveItemQty = $CraftLeveCsv->at($leve['DataId'])['ItemCount[0]'];
-                $ItemSingle = $ItemCsv->at($CraftLeveItem)['Singular'];
-                $ItemPlural = $ItemCsv->at($CraftLeveItem)['Plural'];
-                $ItemVowel = $ItemCsv->at($CraftLeveItem)['StartsWithVowel'];
-                $Item = $ItemCsv->at($CraftLeveItem)['Name'];
+                $ItemSingle = $ItemCsv->at($FieldLeveItem)['Singular'];
+                $ItemPlural = $ItemCsv->at($FieldLeveItem)['Plural'];
+                $ItemVowel = $ItemCsv->at($FieldLeveItem)['StartsWithVowel'];
+                $Item = $ItemCsv->at($FieldLeveItem)['Name'];
                 $NpcName = $ENpcResidentCsv->at($LevelCsv->at($leve['Level{Levemete}'])['Object'])['Singular'];
                 //if ($FieldLeveItemQty > 1) {
                 //    $FieldcraftObjective = "*Deliver [[$Item|$ItemPlural]] to {{NPCLink|$NpcName}}. 0/$FieldLeveItemQty";
@@ -390,8 +391,11 @@ class Leves implements ParseInterface
                         $LocY = ((41.0 / $a) * (($offsetValueY + 1024.0) / 2048.0) +1);
                         $PixelY = ((($LocY - 1) * 50 * $a) /2);
 
-                        $PopRange = "{{Superimpose2\n| border = \n| collapse = \n| base = ". $PopRangeBase ."\n| base_width = 1024px\n| base_style = float: left\n| base_alt = PopRange\n| base_caption =\n| base_link =\n\n";
-                        $PopRange2 = "| float". $RouteNumber ." = Map19_Icon.png\n| float". $RouteNumber ."_width = 36px\n| float". $RouteNumber ."_alt = ". $RouteNumber ."\n| float". $RouteNumber ."_caption =\n| link". $RouteNumber ." =\n| x". $RouteNumber ." = ". $PixelX ."\n| y". $RouteNumber ." = ". $PixelY ."\n| t". $RouteNumber ." =";
+                        $PopRange = "{{Superimpose2\n| border = \n| collapse = \n| base = ". $PopRangeBase
+                            ."\n| base_width = 1024px\n| base_style = float: left\n| base_alt = PopRange\n| base_caption =\n| base_link =\n\n";
+                        $PopRange2 = "| float". $RouteNumber ." = Map19_Icon.png\n| float". $RouteNumber ."_width = 36px\n| float". $RouteNumber
+                            ."_alt = ". $RouteNumber ."\n| float". $RouteNumber ."_caption =\n| link". $RouteNumber ." =\n| x". $RouteNumber ." = ".
+                            $PixelX ."\n| y". $RouteNumber ." = ". $PixelY ."\n| t". $RouteNumber ." =";
                         $FieldLeveMap[0] = "". $PopRange ."\n";
                         $FieldLeveMap[] = "". $PopRange2 ."\n";
                     }
