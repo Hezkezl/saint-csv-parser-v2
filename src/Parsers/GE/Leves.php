@@ -329,6 +329,7 @@ class Leves implements ParseInterface
                     //    $ObjectiveText = str_replace("</If>", "", $ObjectiveText);
                     //    $ObjectiveText = str_replace("<If(Equal(IntegerParameter(1),0))>the /soothe emote<Else/><SheetEn(EventItem,2,IntegerParameter(1),1,1)/>", "the /soothe emote", $ObjectiveText);
                     //}
+                }
 
             } elseif ($levetype == "Fieldcraft") {
                 $MoreTradein = "";//just clearing it for these
