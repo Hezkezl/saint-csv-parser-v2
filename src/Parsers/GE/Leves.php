@@ -19,37 +19,27 @@ class Leves implements ParseInterface
 |Patch = {patch}
 |Level = {level}
 
+{Card}
+
 |Guildleve Type     = {guildtype}
 |Levequest Type     = {levetype}{duration}
-|Levequest Location ={grandcompany}
+|Levequest Location = {Location}
 
-<!-- Disciples of Magic, Disciples of War for \"Battlecraft\" leves. The full name of the class
-otherwise (Fisher, Botanist, Goldsmith, Alchemist, etc) -->
 |Recommended Classes = {classes}
-
-|Objectives = <!-- Just list them exactly as they appear on screen -->
-{objective}{mobobjective}
-
+{trdobjective}{fldobjective}{mobobjective}
 |Description = {description}
 
+{turnins}
 |EXPReward = {exp}
 |GilReward = ~{gil}
 |SealsReward =  <!-- Raw number, no commas. Delete if not needed -->
 
-<!--  If rewards need count data, add them one at a time below, adding more rows as needed-->
-|LevequestReward 1       =  <!-- Item name only -->
-|LevequestReward 1 Count =  <!-- Use only if more than 1 -->
-
-<!--  If rewards are conditional, such as only appearing inside of a chest during the leve itself, use these below -->
-<!--  Can be combined with the above options. Useful for things like Amber-encased Vilekin -->
-|LevequestRewardOption 1       =  <!-- Item name only -->
-|LevequestRewardOption 1 Count =  <!-- Use only if more than 1 -->
+|Levequest Reward List = {Reward}
 
 |Issuing NPC = {npc}
 |Client = {client}
 
 |NPCs Involved  = {npcinvolve} <!-- List of NPCs involved (besides the quest giver,) comma separated-->
-|Mobs Involved  = {mobinvolve} <!-- List any Mobs who are involved, comma separated-->
 |Items Involved = {item} <!-- List any items used, comma separated-->
 |Wanted Target  =  <!-- Usually found during Battlecraft leves -->
 
@@ -79,6 +69,14 @@ otherwise (Fisher, Botanist, Goldsmith, Alchemist, etc) -->
         $JournalGenreCsv = $this->csv('JournalGenre');
         $ENpcResidentCsv = $this->csv('ENpcResident');
         $EventItemCsv = $this->csv('EventItem');
+        $LeveRewardItemGroupCsv = $this->csv('LeveRewardItemGroup');
+        $LeveRewardItemCsv = $this->csv('LeveRewardItem');
+        $LeveStringCsv = $this->csv('LeveString');
+        $TerritoryTypeCsv = $this->csv('TerritoryType');
+        $GatheringLeveRouteCsv = $this->csv('GatheringLeveRoute');
+        $TownCsv = $this->csv('Town');
+
+
 
         // (optional) start a progress bar
         $this->io->progressStart($LeveCsv->total);
@@ -130,11 +128,11 @@ otherwise (Fisher, Botanist, Goldsmith, Alchemist, etc) -->
             // Give the proper name to the Levequest's type (the card icon)
             $guildtype = [
                 0 => NULL,
-                1 => NULL,
-                2 => NULL,
-                3 => NULL,
-                4 => NULL,
-                5 => NULL,
+                1 => "Platinum",
+                2 => "Gold",
+                3 => "Blue",
+                4 => "Silver",
+                5 => "Bronze",
                 6 => "Valor",
                 7 => "Tenacity (Guildleve)",
                 8 => "Wisdom",
@@ -185,6 +183,7 @@ otherwise (Fisher, Botanist, Goldsmith, Alchemist, etc) -->
                 53 => "Sincerity",
             ];
 
+
             // Assigning Grand Company and classes for appropriate leves
             $grandcompany = false;
             if ($leve['LeveAssignmentType'] == 1) {
@@ -203,13 +202,51 @@ otherwise (Fisher, Botanist, Goldsmith, Alchemist, etc) -->
             }
 
             // Objective text for Disciple of the Hand leves
-            $TradecraftObjective = false;
+            $TradecraftObjective = "";
+            $FieldcraftObjective = "";
+            $BattleObjective = false;//just clearing it for these
             $Item = false;
             $NpcInvolvement = false;
             $Npc = false;
+            $RewardNumber = false;
+            $TargetNumber = false;
+            $RouteNumber = false;
+            $GatheringLeveNumber = false;
             $MobInvolvement = [];
             $InvolvementObjective = [];
             $BattlecraftItemsInvolved = [];
+            $RewardItem = [];
+            $Objective = [];
+            $Map = [];
+            $FieldLeveMap = [];
+
+
+            // | Levequest Reward List =
+            foreach(range(0,7) as $i) {
+                foreach(range(0,8) as $a) {
+
+                    //|LevequestReward 3        = item name
+                    $RewardItemName = $ItemCsv->at($LeveRewardItemGroupCsv->at($LeveRewardItemCsv->at($leve['LeveRewardItem'])["LeveRewardItemGroup[$i]"])["Item[$a]"])['Name'];
+
+                    //|LevequestReward 6 Count  = x
+                    $ItemRewardAmount = $LeveRewardItemGroupCsv->at($LeveRewardItemCsv->at($leve['LeveRewardItem'])["LeveRewardItemGroup[$i]"])["Count[$a]"];
+                    //skip if the reward is zero therefore no reward then increase the Reward number by 1
+                    if ($ItemRewardAmount == 0) continue;
+                    $RewardNumber = ($RewardNumber + 1);
+                    //probability
+                    $RewardChance = $LeveRewardItemCsv->at($leve['LeveRewardItem'])["Probability<%>[$i]"];
+                    //is the item HQ?
+                    if ($LeveRewardItemGroupCsv->at($LeveRewardItemCsv->at($leve['LeveRewardItem'])["LeveRewardItemGroup[$i]"])["HQ[$a]"] == "False") {
+                        $RewardHQ = "";
+                    } elseif ($LeveRewardItemGroupCsv->at($LeveRewardItemCsv->at($leve['LeveRewardItem'])["LeveRewardItemGroup[$i]"])["HQ[$a]"] == "True") {
+                        $RewardHQ = "|LevequestReward ". $RewardNumber ." HQ     = x\n";
+                    }
+                    //string
+                    $RewardItem[0] = "\n";
+                    $RewardItem[] = "|LevequestReward ". $RewardNumber ."        = ". $RewardItemName ."\n|LevequestReward ". $RewardNumber ." Count  = ". $ItemRewardAmount ."\n|LevequestReward ". $RewardNumber ." Chance = ". $RewardChance ."%\n". $RewardHQ ."";
+
+                }
+            }
 
             if ($levetype == "Tradecraft") {
                 $CraftLeveItem = $CraftLeveCsv->at($leve['DataId'])['Item[0]'];
@@ -218,42 +255,201 @@ otherwise (Fisher, Botanist, Goldsmith, Alchemist, etc) -->
                 $ItemPlural = $ItemCsv->at($CraftLeveItem)['Plural'];
                 $ItemVowel = $ItemCsv->at($CraftLeveItem)['StartsWithVowel'];
                 $Item = $ItemCsv->at($CraftLeveItem)['Name'];
+                $MoreTradeinRaw = $CraftLeveCsv->at($leve['DataId'])['Repeats'];
+                if ($MoreTradeinRaw == 0) {
+                    $MoreTradein = "";
+                } elseif ($MoreTradeinRaw !== 0) {
+                    $MoreTradeinMaths = ($MoreTradeinRaw + 1);
+                    $MoreTradein = "|TurnInRepeat = ". $MoreTradeinMaths ."";
+                }
                 $NpcName = $ENpcResidentCsv->at($LevelCsv->at($leve['Level{Levemete}'])['Object'])['Singular'];
                 if ($CraftLeveItemQty > 1) {
-                    $TradecraftObjective = "*Deliver [[$Item|$ItemPlural]] to {{NPCLink|$NpcName}}. 0/$CraftLeveItemQty";
+                    $TradecraftObjective = "|Objective = Deliver [[$Item|$ItemPlural]] to {{NPCLink|$NpcName}}. 0/$CraftLeveItemQty";
                 } elseif ($ItemVowel == "0" && $CraftLeveItemQty == "1") {
-                    $TradecraftObjective = "*Deliver a [[$Item|$ItemSingle]] to {{NPCLink|$NpcName}}. 0/$CraftLeveItemQty";
+                    $TradecraftObjective = "|Objective = Deliver a [[$Item|$ItemSingle]] to {{NPCLink|$NpcName}}. 0/$CraftLeveItemQty";
                 } elseif ($ItemVowel == "1" && $CraftLeveItemQty == "1") {
-                    $TradecraftObjective = "*Deliver an [[$Item|$ItemSingle]] to {{NPCLink|$NpcName}}. 0/$CraftLeveItemQty";
+                    $TradecraftObjective = "|Objective = Deliver an [[$Item|$ItemSingle]] to {{NPCLink|$NpcName}}. 0/$CraftLeveItemQty";
                 }
             } elseif ($levetype == "Battlecraft") {
+                $MoreTradein = "";//just clearing it for these
                 foreach(range(0,7) as $i) {
-                    if ($BattleLeveCsv->at($leve['DataId'])["BNpcName[$i]"] > 1 && $BattleLeveCsv->at($leve['DataId'])["ItemsInvolved[$i]"] == "0") {
-                        $BNpcName = ucwords(strtolower($BNpcNameCsv->at($BattleLeveCsv->at($leve['DataId'])["BNpcName[$i]"])['Singular']));
+                    if ($BattleLeveCsv->at($leve['DataId'])["BNpcName[$i]"] > 1) {
+                        $TargetNumber = ($TargetNumber + 1);
+                        $BNpcName = "|Target ". $TargetNumber ." Name     = ". ucwords(strtolower($BNpcNameCsv->at($BattleLeveCsv->at($leve['DataId'])["BNpcName[$i]"])['Singular']));
+                        //Data per monster
+                        $BCTime = "|Target ". $TargetNumber ." Time     = ". $BattleLeveCsv->at($leve['DataId'])["Time[$i]"];
+                        $BCBaseID = "|Target ". $TargetNumber ." ID       = ". $BattleLeveCsv->at($leve['DataId'])["BaseID[$i]"];
+                        $BCLevel = "|Target ". $TargetNumber ." Level    = ". $BattleLeveCsv->at($leve['DataId'])["EnemyLevel[$i]"];
+                        if (!empty($EventItemCsv->at($BattleLeveCsv->at($leve['DataId'])["ItemsInvolved[$i]"])['Name'])) {
+                        $BCItemsInvolved = "|Target ". $TargetNumber ." Drops    = ". $EventItemCsv->at($BattleLeveCsv->at($leve['DataId'])["ItemsInvolved[$i]"])['Name']. "\n";
+                        $BCItemQTY = "|Target ". $TargetNumber ." QTY      = ". $BattleLeveCsv->at($leve['DataId'])["ItemsInvolvedQty[$i]"] ."\n";
+                        $BCItemDropRate = "|Target ". $TargetNumber ." DropRate = ". $BattleLeveCsv->at($leve['DataId'])["ItemDropRate[$i]"] ." %\n";
+                        } elseif (empty($EventItemCsv->at($BattleLeveCsv->at($leve['DataId'])["ItemsInvolved[$i]"])['Name'])) {
+                        $BCItemsInvolved = "";
+                        $BCItemQTY = "";
+                        $BCItemDropRate = "";
+                        }
+                        $BCToDoNumber = "|Target ". $TargetNumber ." Required Amount   = ". $BattleLeveCsv->at($leve['DataId'])["ToDoNumberInvolved[$i]"];
+                        $BCToDoParam = "|Target ". $TargetNumber ." Param    = ". $BattleLeveCsv->at($leve['DataId'])["ToDoParam[$i]"];
                         $MobInvolvement[] = $BNpcName;
-                        $InvolvementObjective[0] = "*Defeat target enemies.";
-                        $InvolvementObjective[] = $BNpcName;
-                    }
-                    // doesn't work. attempt to make it so that if there's an item that appears during a battle leve, then it should get priority over
-                    // just displaying the "Defeat target enemies." text. But... doesn't work. Also need to finish adding in the item list for
-                    // items involved here, as it doesn't work either (items involved currently only works for tradecraft leves, but battlecraft
-                    // can have them too. They're just in the battleleve file instead of the craftleve file...)
-                    //if ($BattleLeveCsv->at($leve['DataId'])["BNpcName[$i]"] > 1 && $BattleLeveCsv->at($leve['DataId'])["ItemsInvolved[$i]"] > 1) {
-                        //$BattlecraftItemsInvolved = $EventItemCsv->at($BattleLeveCsv->at($leve['DataId'])["ItemsInvolved[$i]"])['Name'];
-                        //$BNpcName = ucwords(strtolower($BNpcNameCsv->at($BattleLeveCsv->at($leve['DataId'])["BNpcName[$i]"])['Singular']));
-                        //$MobInvolvement[] = $BNpcName;
-                        //$InvolvementObjective[0] = "*Obtain target items.";
-                        //$InvolvementObjective[] = $BattlecraftItemsInvolved;
+                        $BNpcNameObjective = ucwords(strtolower($BNpcNameCsv->at($BattleLeveCsv->at($leve['DataId'])["BNpcName[0]"])['Singular']));
 
+                        $ObjectiveText = $LeveStringCsv->at($BattleLeveCsv->at($leve['DataId'])["Objective[0]"])['Objective'];
+                        $ObjectiveText2 = $LeveStringCsv->at($BattleLeveCsv->at($leve['DataId'])["Objective[1]"])['Objective'];
+                        if (empty($ObjectiveText2)) {
+                            $BattleObjective = "\n|Objective = ". $ObjectiveText ."";
+                        } elseif (!empty($ObjectiveText2)) {
+                            $BattleObjective = "\n|Objective = ". $ObjectiveText ."\n|Objective Sub = ". $ObjectiveText2 ."";
+                        }
+
+                        $InvolvementObjective[0] = "". $BattleObjective ."\n";
+                        $InvolvementObjective[] = "" .$BNpcName ."\n" .$BCLevel ."\n" .$BCItemsInvolved ."" .$BCItemQTY ."" .$BCItemDropRate ."" .$BCToDoNumber ."\n";
+                    }
+
+
+                    // THIS is where i was working on the "replace SE text to displace correctly" stuff but its a mess
+
+                    //$BNpcNameObjective = ucwords(strtolower($BNpcNameCsv->at($BattleLeveCsv->at($leve['DataId'])["BNpcName[0]"])['Singular']));
+                    //foreach (range(0,1) as $a) {
+                    //    $ObjectiveText = str_replace("<SheetEn(BNpcName,2,IntegerParameter(1),1,1)/>", "". $BNpcNameObjective ."", $LeveStringCsv->at($BattleLeveCsv->at($leve['DataId'])["Objective[$a]"])['Objective']);
+                    //    //sort SE's if code
+                    //    $BattleObjective = "|Objective = ". $ObjectiveText ."";
                     //}
+                    //foreach(range(0,7) as $i) {
+                    //    $ItemIF = $EventItemCsv->at($BattleLeveCsv->at($leve['DataId'])["ItemsInvolved[0]"])['Name'];
+                    //}
+                    //if (!empty($ItemIF)) {
+                    //    $ObjectiveText = str_replace("<If(Equal(IntegerParameter(1),0))>Attack target to reveal its<Else/>", "", $ObjectiveText);
+                    //    $ObjectiveText = str_replace("<SheetEn(EventItem,1,IntegerParameter(1),1,1)/>", $ItemIF, $ObjectiveText);
+                    //    $ObjectiveText = str_replace("</If>", "", $ObjectiveText);
+                    //    $ObjectiveText = str_replace("<If(Equal(IntegerParameter(1),0))>the /soothe emote<Else/><SheetEn(EventItem,2,IntegerParameter(1),1,1)/>", "". $ItemIF ."", $ObjectiveText);
+                    //} elseif (empty($ItemIF)) {
+                    //    $ObjectiveText = str_replace("<If(Equal(IntegerParameter(1),0))>Attack target to reveal its<Else/>", "", $ObjectiveText);
+                    //    $ObjectiveText = str_replace("<SheetEn(EventItem,1,IntegerParameter(1),1,1)/>", $ItemIF, $ObjectiveText);
+                    //    $ObjectiveText = str_replace("</If>", "", $ObjectiveText);
+                    //    $ObjectiveText = str_replace("<If(Equal(IntegerParameter(1),0))>the /soothe emote<Else/><SheetEn(EventItem,2,IntegerParameter(1),1,1)/>", "the /soothe emote", $ObjectiveText);
+                    //}
+
+            } elseif ($levetype == "Fieldcraft") {
+                $MoreTradein = "";//just clearing it for these
+                //$BattleObjective = "";//just clearing it for these
+             // Need to do something for fieldcraft ones, but haven't even begun to think about it yet so commenting out.
+
+                $FieldLeveItem = $CraftLeveCsv->at($leve['DataId'])['Item[0]'];
+                $FieldLeveItemQty = $CraftLeveCsv->at($leve['DataId'])['ItemCount[0]'];
+                $ItemSingle = $ItemCsv->at($CraftLeveItem)['Singular'];
+                $ItemPlural = $ItemCsv->at($CraftLeveItem)['Plural'];
+                $ItemVowel = $ItemCsv->at($CraftLeveItem)['StartsWithVowel'];
+                $Item = $ItemCsv->at($CraftLeveItem)['Name'];
+                $NpcName = $ENpcResidentCsv->at($LevelCsv->at($leve['Level{Levemete}'])['Object'])['Singular'];
+                //if ($FieldLeveItemQty > 1) {
+                //    $FieldcraftObjective = "*Deliver [[$Item|$ItemPlural]] to {{NPCLink|$NpcName}}. 0/$FieldLeveItemQty";
+                //} elseif ($ItemVowel == "0" && $FieldLeveItemQty == "1") {
+                //    $FieldcraftObjective = "*Deliver a [[$Item|$ItemSingle]] to {{NPCLink|$NpcName}}. 0/$FieldLeveItemQty";
+                //} elseif ($ItemVowel == "1" && $FieldLeveItemQty == "1") {
+                //    $FieldcraftObjective = "*Deliver an [[$Item|$ItemSingle]] to {{NPCLink|$NpcName}}. 0/$FieldLeveItemQty";
+                //}
+                $ObjectiveString = $LeveStringCsv->at($GatheringLeveCsv->at($leve['DataId'])["Objective[0]"])["Objective"];
+                $ObjectiveString2 = $LeveStringCsv->at($GatheringLeveCsv->at($leve['DataId'])["Objective[1]"])["Objective"];
+                if (empty($ObjectiveString2)) {
+                    $FieldcraftObjective = "|Objective = ". $ObjectiveString ."";
+                } elseif (empty($ObjectiveString)) {
+                    $FieldcraftObjective = "";
+                } elseif (!empty($ObjectiveString2)) {
+                    $FieldcraftObjective = "|Objective = ". $ObjectiveString ."\n". $ObjectiveString2 ."";
                 }
-            } // Need to do something for fieldcraft ones, but haven't even begun to think about it yet so commenting out.
-            //elseif ($levetype == "Fieldcraft") { }
+            //maps for fieldleve
+                foreach (range(0,3) as $c) { // 4 of GatheringLeve
+                    $GatheringLeveNumber = ($GatheringLeveNumber + 1);
+                    foreach (range(0,11) as $s) { //12 of LeveRoute
+                        $RouteNumber = ($RouteNumber + 1);
+                        $X = $LevelCsv->at($GatheringLeveRouteCsv->at($GatheringLeveCsv->at($leve["DataId"])["Route[$c]"])["PopRange[$s]"])["X"];
+                        $Y = $LevelCsv->at($GatheringLeveRouteCsv->at($GatheringLeveCsv->at($leve["DataId"])["Route[$c]"])["PopRange[$s]"])["Z"];
+                        $route = $GatheringLeveCsv->at($leve["DataId"])["Route[$c]"];
+                        $PopRangeRoute = $GatheringLeveRouteCsv->at($route)["PopRange[$s]"];
+
+                        //superimpose data:
+
+                        //get the map positions for each object
+
+                        $PopRangeLevelTeri = $LevelCsv->at($leve['Level{Levemete}'])["Territory"];
+                        $PopRangeTeriZoneID = $TerritoryTypeCsv->at($PopRangeLevelTeri)['Name']; //Zone ID
+                        $PopRangeTeriPlaceName = $PlaceNameCsv->at($TerritoryTypeCsv->at($PopRangeLevelTeri)['PlaceName'])['Name']; //PlaceName
+                        $PopRangeBase = "". $PopRangeTeriZoneID ." - ". $PopRangeTeriPlaceName .".png";
+                        if (empty($X))continue;
+                        //position calculator
+                        $scale = $MapCsv->at($TerritoryTypeCsv->at($PopRangeLevelTeri)['Map'])['SizeFactor'];
+                        $a = $scale / 100.0;
+                        $offsetx = $MapCsv->at($TerritoryTypeCsv->at($PopRangeLevelTeri)['Map'])['Offset{X}'];
+                        $offsetValueX = ($X + $offsetx) * $a;
+                        $LocX = ((41.0 / $a) * (($offsetValueX + 1024.0) / 2048.0) +1);
+                        $PixelX = ((($LocX - 1) * 50 * $a) /2);
+
+                        $offsety = $MapCsv->at($TerritoryTypeCsv->at($PopRangeLevelTeri)['Map'])['Offset{Y}'];
+                        $offsetValueY = ($Y + $offsety) * $a;
+                        $LocY = ((41.0 / $a) * (($offsetValueY + 1024.0) / 2048.0) +1);
+                        $PixelY = ((($LocY - 1) * 50 * $a) /2);
+
+                        $PopRange = "{{Superimpose2\n| border = \n| collapse = \n| base = ". $PopRangeBase ."\n| base_width = 1024px\n| base_style = float: left\n| base_alt = PopRange\n| base_caption =\n| base_link =\n\n";
+                        $PopRange2 = "| float". $RouteNumber ." = Map19_Icon.png\n| float". $RouteNumber ."_width = 36px\n| float". $RouteNumber ."_alt = ". $RouteNumber ."\n| float". $RouteNumber ."_caption =\n| link". $RouteNumber ." =\n| x". $RouteNumber ." = ". $PixelX ."\n| y". $RouteNumber ." = ". $PixelY ."\n| t". $RouteNumber ." =";
+                        $FieldLeveMap[0] = "". $PopRange ."\n";
+                        $FieldLeveMap[] = "". $PopRange2 ."\n";
+                    }
+                }
+            }
+
+
+
+            //check to see if theres a "start" before moving to levemete
+            $LevelMeteStart = $leve['Level{Levemete}'];
+            $LevelStart = $leve['Level{Start}'];
+            if ($LevelStart !== "0") {
+                $LevelMete = $LevelStart;
+            } elseif ($LevelStart == "0") {
+                $LevelMete = $LevelMeteStart;
+            }
+            $LevelX = $LevelCsv->at($LevelMete)['X']; //Raw X
+            $LevelY = $LevelCsv->at($LevelMete)['Z']; //Raw Y
+            //Get the zone id and placenames
+            $LevelTeri = $LevelCsv->at($LevelMete)['Territory'];
+            $LevelTeriZoneID = $TerritoryTypeCsv->at($LevelTeri)['Name']; //Zone ID
+            $LevelTeriPlaceName = $PlaceNameCsv->at($TerritoryTypeCsv->at($LevelTeri)['PlaceName'])['Name']; //PlaceName
+            $LevelTeriString = "|levelTeri = ". $LevelTeri ."\n";
+            $LevelTeriString .= "|ZoneID       = ". $LevelTeriZoneID ."\n";
+            $LevelTeriString .= "|PlaceName       = ". $LevelTeriPlaceName ."\n";
+
+
+            $LevelObject = $LevelCsv->at($LevelMete)['Object'];
+            $ObjectName = ucwords(strtolower($ENpcResidentCsv->at($LevelObject)['Singular']));
+
+
+            $MapString = "|LeveMeteID = ". $LevelMete ."\n|levelX = ". $LevelX ."\n|levelY = ". $LevelY ."\n". $LevelTeriString ."|levelObject = ". $LevelObject ."\n|ENpcName = ". $ObjectName ."\n";
+
+            $Map[] = "". $MapString ."";
+
+            //Icon for Superimpose
+            $VFXOuterType = $guildtype[$leve['LeveVfx{Frame}']];
+            $VFXOuter = "|Frame = ". $VFXOuterType .".png\n";
+            $VFXInnerType = $guildtype[$leve['LeveVfx']];
+            $VFXInner = "|Image = ". $VFXInnerType .".png\n";
+            $VFXTownType = str_replace(" ","_",$TownCsv->at($leve['Town'])['Name']);
+            $VFXTown = "|Town = ". $VFXTownType ."_Leve.png";
+            $VFXImage = "". $VFXOuter ."". $VFXInner ."". $VFXTown ."";
+
 
             $MobInvolvement = array_unique($MobInvolvement);
             $MobInvolvement = implode(", ", $MobInvolvement);
             $InvolvementObjective = array_unique($InvolvementObjective);
-            $MobObjective = implode("\n*", $InvolvementObjective);
+            $MobObjective = implode("\n", $InvolvementObjective);
+            $RewardItem = implode("\n", $RewardItem);
+            $Map = implode("", $Map);
+            $FieldLeveMap = implode("", $FieldLeveMap);
+
+
+
+            //NOTES TO DO:
+
+            //make it fit for wiki template
 
                 // Save some data
             $data = [
@@ -268,7 +464,9 @@ otherwise (Fisher, Botanist, Goldsmith, Alchemist, etc) -->
                 '{grandcompany}' => ($leve['LeveAssignmentType'] == 16 || $leve['LeveAssignmentType'] == 17 || $leve['LeveAssignmentType'] == 18)
                     ? "\n|Grand Company      = ". $grandcompany : "",
                 '{classes}' => $classes,
-                '{objective}' => $TradecraftObjective,
+                '{trdobjective}' => $TradecraftObjective,
+                '{fldobjective}' => $FieldcraftObjective,
+                '{Btlobjective}' => $BattleObjective,
                 '{mobobjective}' => $MobObjective,
                 '{description}' => $leve['Description'],
                 '{exp}' => ($leve['ExpReward'] > 0) ? $leve['ExpReward'] : "{{Information Needed}}",
@@ -279,6 +477,12 @@ otherwise (Fisher, Botanist, Goldsmith, Alchemist, etc) -->
                 '{mobinvolve}' => $MobInvolvement,
                 '{item}' => $Item,
                 '{Bottom}' => $Bottom,
+                '{Reward}' => $RewardItem,
+                '{Map}' => $Map,
+                '{Location}' => $LevelTeriPlaceName,
+                '{FieldLeveMap}' => $FieldLeveMap,
+                '{Card}' => $VFXImage,
+                '{turnins}' => $MoreTradein,
             ];
 
             // format using Gamer Escape formatter and add to data array
