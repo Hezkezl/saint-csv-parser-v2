@@ -20,10 +20,12 @@ class Collectable implements ParseInterface
     public function parse()
     {
 
+        $patch = 5.11;
+
         // grab CSV files
         $MasterpieceCsv = $this->csv('MasterpieceSupplyDuty');
         $MultiplierCsv = $this->csv('MasterpieceSupplyMultiplier');
-        $ParamgrowCsv = $this->csv('Paramgrow');
+        $ParamgrowCsv = $this->csv('ParamGrow');
         $ItemCsv = $this->csv('Item');
         $ClassJobCsv = $this->csv('ClassJob');
         $CurrencyCsv = $this->csv('Currency');
@@ -88,7 +90,7 @@ class Collectable implements ParseInterface
         // save our data to the filename: GeCollectWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save('GeCollectWiki.txt', 999999);
+        $info = $this->save("GeCollectWiki.txt - ". $patch .".txt", 9999999);
 
         $this->io->table(
             ['Filename', 'Data Count', 'File Size'],
