@@ -264,11 +264,11 @@ class Leves implements ParseInterface
                 }
                 $NpcName = $ENpcResidentCsv->at($LevelCsv->at($leve['Level{Levemete}'])['Object'])['Singular'];
                 if ($CraftLeveItemQty > 1) {
-                    $TradecraftObjective = "|Objective = Deliver [[$Item|$ItemPlural]] to {{NPCLink|$NpcName}}. 0/$CraftLeveItemQty";
+                    $TradecraftObjective = "|Objectives = Deliver [[$Item|$ItemPlural]] to {{NPCLink|$NpcName}}. 0/$CraftLeveItemQty";
                 } elseif ($ItemVowel == "0" && $CraftLeveItemQty == "1") {
-                    $TradecraftObjective = "|Objective = Deliver a [[$Item|$ItemSingle]] to {{NPCLink|$NpcName}}. 0/$CraftLeveItemQty";
+                    $TradecraftObjective = "|Objectives = Deliver a [[$Item|$ItemSingle]] to {{NPCLink|$NpcName}}. 0/$CraftLeveItemQty";
                 } elseif ($ItemVowel == "1" && $CraftLeveItemQty == "1") {
-                    $TradecraftObjective = "|Objective = Deliver an [[$Item|$ItemSingle]] to {{NPCLink|$NpcName}}. 0/$CraftLeveItemQty";
+                    $TradecraftObjective = "|Objectives = Deliver an [[$Item|$ItemSingle]] to {{NPCLink|$NpcName}}. 0/$CraftLeveItemQty";
                 }
             } elseif ($levetype == "Battlecraft") {
                 $MoreTradein = "";//just clearing it for these
@@ -296,39 +296,39 @@ class Leves implements ParseInterface
 
                         $ObjectiveText = $LeveStringCsv->at($BattleLeveCsv->at($leve['DataId'])["Objective[0]"])['Objective'];
                         $ObjectiveText2 = $LeveStringCsv->at($BattleLeveCsv->at($leve['DataId'])["Objective[1]"])['Objective'];
+
+                         // THIS is where i was working on the "replace SE text to displace correctly" stuff but its a mess
+
+                        foreach(range(0,7) as $i) {
+                            $ItemIF = $EventItemCsv->at($BattleLeveCsv->at($leve['DataId'])["ItemsInvolved[0]"])['Name'];
+                        }
+                        $ObjectiveTextKey = $BattleLeveCsv->at($leve['DataId'])["Objective[0]"];
+                        if ($ObjectiveTextKey == "5") {
+                            if (!empty($ItemIF)) {
+                                $ObjectiveText = "Weaken target and then pacify it using [[". $ItemIF ."|". $ItemIF ."]].";
+                            } elseif (empty($ItemIF)) {
+                                $ObjectiveText = "Weaken target and then pacify it using the /soothe emote.";
+                            }
+                        } elseif ($ObjectiveTextKey == "6") {
+                            if (!empty($ItemIF)) {
+                                $ObjectiveText = "Use [[". $ItemIF ."|". $ItemIF ."]] to reveal target's true form, then defeat it.";
+                            } elseif (empty($ItemIF)) {
+                                $ObjectiveText = "Attack target to reveal its true form, then defeat it.";
+                            }
+                        } elseif ($ObjectiveTextKey == "9") {
+                            $ObjectiveText = "Use the /beckon emote to lead {{NPCLink|". $BNpcNameObjective ."}} safely to the specified location.";
+                        }
+
                         if (empty($ObjectiveText2)) {
-                            $BattleObjective = "\n|Objective = " . $ObjectiveText . "";
+                            $BattleObjective = "\n|Objectives = " . $ObjectiveText . "";
                         } elseif (!empty($ObjectiveText2)) {
-                            $BattleObjective = "\n|Objective = " . $ObjectiveText . "\n|Objective Sub = " . $ObjectiveText2 . "";
+                            $BattleObjective = "\n|Objectives = " . $ObjectiveText . "\n|Objective Sub = " . $ObjectiveText2 . "";
                         }
 
                         $InvolvementObjective[0] = "" . $BattleObjective . "\n";
                         $InvolvementObjective[] = "" . $BNpcName . "\n" . $BCLevel . "\n" . $BCItemsInvolved . "" . $BCItemQTY . "" . $BCItemDropRate . "" . $BCToDoNumber . "\n";
                     }
 
-
-                    // THIS is where i was working on the "replace SE text to displace correctly" stuff but its a mess
-
-                    //$BNpcNameObjective = ucwords(strtolower($BNpcNameCsv->at($BattleLeveCsv->at($leve['DataId'])["BNpcName[0]"])['Singular']));
-                    //foreach (range(0,1) as $a) {
-                    //    $ObjectiveText = str_replace("<SheetEn(BNpcName,2,IntegerParameter(1),1,1)/>", "". $BNpcNameObjective ."", $LeveStringCsv->at($BattleLeveCsv->at($leve['DataId'])["Objective[$a]"])['Objective']);
-                    //    //sort SE's if code
-                    //    $BattleObjective = "|Objective = ". $ObjectiveText ."";
-                    //}
-                    //foreach(range(0,7) as $i) {
-                    //    $ItemIF = $EventItemCsv->at($BattleLeveCsv->at($leve['DataId'])["ItemsInvolved[0]"])['Name'];
-                    //}
-                    //if (!empty($ItemIF)) {
-                    //    $ObjectiveText = str_replace("<If(Equal(IntegerParameter(1),0))>Attack target to reveal its<Else/>", "", $ObjectiveText);
-                    //    $ObjectiveText = str_replace("<SheetEn(EventItem,1,IntegerParameter(1),1,1)/>", $ItemIF, $ObjectiveText);
-                    //    $ObjectiveText = str_replace("</If>", "", $ObjectiveText);
-                    //    $ObjectiveText = str_replace("<If(Equal(IntegerParameter(1),0))>the /soothe emote<Else/><SheetEn(EventItem,2,IntegerParameter(1),1,1)/>", "". $ItemIF ."", $ObjectiveText);
-                    //} elseif (empty($ItemIF)) {
-                    //    $ObjectiveText = str_replace("<If(Equal(IntegerParameter(1),0))>Attack target to reveal its<Else/>", "", $ObjectiveText);
-                    //    $ObjectiveText = str_replace("<SheetEn(EventItem,1,IntegerParameter(1),1,1)/>", $ItemIF, $ObjectiveText);
-                    //    $ObjectiveText = str_replace("</If>", "", $ObjectiveText);
-                    //    $ObjectiveText = str_replace("<If(Equal(IntegerParameter(1),0))>the /soothe emote<Else/><SheetEn(EventItem,2,IntegerParameter(1),1,1)/>", "the /soothe emote", $ObjectiveText);
-                    //}
                 }
 
             } elseif ($levetype == "Fieldcraft") {
@@ -353,11 +353,11 @@ class Leves implements ParseInterface
                 $ObjectiveString = $LeveStringCsv->at($GatheringLeveCsv->at($leve['DataId'])["Objective[0]"])["Objective"];
                 $ObjectiveString2 = $LeveStringCsv->at($GatheringLeveCsv->at($leve['DataId'])["Objective[1]"])["Objective"];
                 if (empty($ObjectiveString2)) {
-                    $FieldcraftObjective = "|Objective = ". $ObjectiveString ."";
+                    $FieldcraftObjective = "|Objectives = ". $ObjectiveString ."";
                 } elseif (empty($ObjectiveString)) {
                     $FieldcraftObjective = "";
                 } elseif (!empty($ObjectiveString2)) {
-                    $FieldcraftObjective = "|Objective = ". $ObjectiveString ."\n". $ObjectiveString2 ."";
+                    $FieldcraftObjective = "|Objectives = ". $ObjectiveString ."\n". $ObjectiveString2 ."";
                 }
             //maps for fieldleve
                 foreach (range(0,3) as $c) { // 4 of GatheringLeve
@@ -421,6 +421,7 @@ class Leves implements ParseInterface
             $LevelTeriString = "|levelTeri = ". $LevelTeri ."\n";
             $LevelTeriString .= "|ZoneID       = ". $LevelTeriZoneID ."\n";
             $LevelTeriString .= "|PlaceName       = ". $LevelTeriPlaceName ."\n";
+            $PlaceNameStart = $PlaceNameCsv->at($leve['PlaceName{Start}'])['Name'];
 
 
             $LevelObject = $LevelCsv->at($LevelMete)['Object'];
@@ -431,7 +432,7 @@ class Leves implements ParseInterface
 
             $Map[] = "". $MapString ."";
 
-            //Icon for Superimpose
+            //images (super impose and header image)
             $VFXOuterType = $guildtype[$leve['LeveVfx{Frame}']];
             $VFXOuter = "|Frame = ". $VFXOuterType .".png\n";
             $VFXInnerType = $guildtype[$leve['LeveVfx']];
@@ -439,6 +440,8 @@ class Leves implements ParseInterface
             $VFXTownType = str_replace(" ","_",$TownCsv->at($leve['Town'])['Name']);
             $VFXTown = "|Town = ". $VFXTownType ."_Leve.png";
             $VFXImage = "". $VFXOuter ."". $VFXInner ."". $VFXTown ."";
+            //header image
+            $VFXHeader = $leve['Icon{Issuer}'];
 
 
             $MobInvolvement = array_unique($MobInvolvement);
@@ -453,6 +456,8 @@ class Leves implements ParseInterface
 
             //NOTES TO DO:
 
+            //are we doing CompanyLeve?
+
             //make it fit for wiki template
 
                 // Save some data
@@ -463,7 +468,7 @@ class Leves implements ParseInterface
                 '{name}' => $leve['Name'],
                 '{level}' => $leve['ClassJobLevel'],
                 '{guildtype}' => $guildtype[$leve['LeveVfx']],
-                '{duration}' => ($levetype == "Battlecraft") ? "\n|Leve Duration      = ". $leve['TimeLimit'] ."m" : "",
+                '{duration}' => ($levetype == "Battlecraft") ? "\n|Leve Duration      = ". $leve['TimeLimit'] ."" : "",
                 '{levetype}' => $levetype,
                 '{grandcompany}' => ($leve['LeveAssignmentType'] == 16 || $leve['LeveAssignmentType'] == 17 || $leve['LeveAssignmentType'] == 18)
                     ? "\n|Grand Company      = ". $grandcompany : "",
@@ -483,7 +488,7 @@ class Leves implements ParseInterface
                 '{Bottom}' => $Bottom,
                 '{Reward}' => $RewardItem,
                 '{Map}' => $Map,
-                '{Location}' => $LevelTeriPlaceName,
+                '{Location}' => $PlaceNameStart,
                 '{FieldLeveMap}' => $FieldLeveMap,
                 '{Card}' => $VFXImage,
                 '{turnins}' => $MoreTradein,
