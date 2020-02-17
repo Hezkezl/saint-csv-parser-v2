@@ -25,7 +25,7 @@ class KeyItems implements ParseInterface
 
     public function parse()
     {
-        $patch = '5.0';
+        $patch = '5.2';
 
         // grab CSV files we want to use
         $EventItemCsv = $this->csv('EventItem');
@@ -109,7 +109,7 @@ class KeyItems implements ParseInterface
         // save our data to the filename: GeEventItemWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save('GeEventItemWiki.txt');
+        $info = $this->save('GeEventItemWiki - '. $patch .'.txt', 999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],

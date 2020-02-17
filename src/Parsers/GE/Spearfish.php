@@ -30,6 +30,8 @@ class Spearfish implements ParseInterface
 
     public function parse()
     {
+        $patch = '5.2';
+
         // grab CSV files we want to use
         $ItemCsv = $this->csv('Item');
         $SpearfishItemCsv = $this->csv('SpearfishingItem');
@@ -106,6 +108,6 @@ class Spearfish implements ParseInterface
 
         // save
         $this->io->text('Saving data ...');
-        $this->save('SpearFish.txt');
+        $info = $this->save('GeSpearfishWiki - '. $patch .'.txt', 999999);
     }
 }

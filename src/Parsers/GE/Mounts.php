@@ -27,7 +27,7 @@ class Mounts implements ParseInterface
 }}{Bottom}";
     public function parse()
     {
-        $Patch = '5.1';
+        $Patch = '5.2';
         // if I want to use pywikibot to create these pages, this should be true. Otherwise if I want to create pages
         // manually, set to false
         $Bot = "true";
@@ -130,7 +130,7 @@ class Mounts implements ParseInterface
         // save our data to the filename: GeMountWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save('GeMountWiki.txt', 2000);
+        $info = $this->save('GeMountWiki - '. $patch .'.txt', 999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],

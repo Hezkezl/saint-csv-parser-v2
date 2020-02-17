@@ -24,7 +24,7 @@ class Items implements ParseInterface
 
     public function parse()
     {
-        $patch = '5.11';
+        $patch = '5.2';
 
         // if I want to use pywikibot to create these pages, this should be true. Otherwise if I want to create pages
         // manually, set to false

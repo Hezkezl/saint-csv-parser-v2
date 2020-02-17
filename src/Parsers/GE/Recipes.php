@@ -31,6 +31,8 @@ class Recipes implements ParseInterface
 
     public function parse()
     {
+        $patch = '5.2';
+
         // grab CSV files we want to use
         $RecipeCsv = $this->csv('Recipe');
         $ItemCsv = $this->csv('Item');
@@ -109,7 +111,7 @@ class Recipes implements ParseInterface
         // save our data to the filename: GeRecipeWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save('GeRecipeWiki.txt');
+        $info = $this->save('GeItemWiki - '. $patch .'.txt', 999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],

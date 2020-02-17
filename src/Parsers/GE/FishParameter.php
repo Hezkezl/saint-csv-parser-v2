@@ -30,6 +30,8 @@ class FishParameter implements ParseInterface
 
     public function parse()
     {
+        $patch = '5.2';
+
         // grab CSV files we want to use
         $ItemCsv = $this->csv('Item');
         $FishParameterCsv = $this->csv('FishParameter');
@@ -107,5 +109,6 @@ class FishParameter implements ParseInterface
         // save
         $this->io->text('Saving data ...');
         $this->save('FishParameter.txt');
+        $info = $this->save('GeFishParameterWiki - '. $patch .'.txt', 999999);
     }
 }

@@ -59,7 +59,7 @@ class Quests implements ParseInterface
     public function parse()
     {
         // i should pull this from xivdb :D
-        $patch = '5.11';
+        $patch = '5.2';
 
         // grab CSV files
         $questCsv = $this->csv('Quest');

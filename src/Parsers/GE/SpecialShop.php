@@ -21,6 +21,7 @@ class SpecialShop implements ParseInterface
 
     public function parse()
     {
+        $patch = '5.2';
 
         $SpecialShopCsv = $this->csv('SpecialShop');
         $ItemCsv = $this->csv('Item');
@@ -214,6 +215,6 @@ class SpecialShop implements ParseInterface
 
         // save
         $console->writeln(" Saving... ");
-        $this->save("SpecialShop.txt", 999999);
+        $info = $this->save('GeSpecialShopWiki - '. $patch .'.txt', 999999);
     }
 }
