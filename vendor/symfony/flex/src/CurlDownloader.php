@@ -27,10 +27,8 @@ class CurlDownloader
         'http' => [
             'method' => CURLOPT_CUSTOMREQUEST,
             'content' => CURLOPT_POSTFIELDS,
-            'proxy' => CURLOPT_PROXY,
         ],
         'ssl' => [
-            'ciphers' => CURLOPT_SSL_CIPHER_LIST,
             'cafile' => CURLOPT_CAINFO,
             'capath' => CURLOPT_CAPATH,
         ],
@@ -48,8 +46,8 @@ class CurlDownloader
     public function __construct()
     {
         $this->multiHandle = $mh = curl_multi_init();
-        curl_multi_setopt($mh, CURLMOPT_PIPELINING, /*CURLPIPE_HTTP1 | CURLPIPE_MULTIPLEX*/ 3);
-        if (defined('CURLMOPT_MAX_HOST_CONNECTIONS')) {
+        curl_multi_setopt($mh, CURLMOPT_PIPELINING, /*CURLPIPE_MULTIPLEX*/ 2);
+        if (\defined('CURLMOPT_MAX_HOST_CONNECTIONS')) {
             curl_multi_setopt($mh, CURLMOPT_MAX_HOST_CONNECTIONS, 8);
         }
 
@@ -64,7 +62,7 @@ class CurlDownloader
         $params = stream_context_get_params($context);
 
         $ch = curl_init();
-        $hd = fopen('php://memory', 'w+b');
+        $hd = fopen('php://temp/maxmemory:32768', 'w+b');
         if ($file && !$fd = @fopen($file.'~', 'w+b')) {
             $file = null;
         }
@@ -77,6 +75,9 @@ class CurlDownloader
             curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_0);
         } else {
             $headers[] = 'Connection: keep-alive';
+            if (0 === strpos($url, 'https://') && \defined('CURL_VERSION_HTTP2') && \defined('CURL_HTTP_VERSION_2_0') && (CURL_VERSION_HTTP2 & curl_version()['features'])) {
+                curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2_0);
+            }
         }
 
         curl_setopt($ch, CURLOPT_URL, $url);

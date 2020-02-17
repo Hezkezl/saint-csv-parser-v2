@@ -13,7 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\EventListener;
 
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
@@ -21,30 +21,52 @@ use Symfony\Component\HttpKernel\KernelEvents;
  *
  * @author Ryan Weaver <ryan@knpuniversity.com>
  *
+ * @method onKernelRequest(RequestEvent $event)
+ *
  * @deprecated since Symfony 4.1
  */
 class ResolveControllerNameSubscriber implements EventSubscriberInterface
 {
     private $parser;
 
-    public function __construct(ControllerNameParser $parser)
+    public function __construct(ControllerNameParser $parser, bool $triggerDeprecation = true)
     {
+        if ($triggerDeprecation) {
+            @trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.1.', __CLASS__), E_USER_DEPRECATED);
+        }
+
         $this->parser = $parser;
     }
 
-    public function onKernelRequest(GetResponseEvent $event)
+    /**
+     * @internal
+     */
+    public function resolveControllerName(...$args)
     {
+        $this->onKernelRequest(...$args);
+    }
+
+    public function __call(string $method, array $args)
+    {
+        if ('onKernelRequest' !== $method && 'onKernelRequest' !== strtolower($method)) {
+            throw new \Error(sprintf('Error: Call to undefined method %s::%s()', \get_class($this), $method));
+        }
+
+        $event = $args[0];
+
         $controller = $event->getRequest()->attributes->get('_controller');
-        if (is_string($controller) && false === strpos($controller, '::') && 2 === substr_count($controller, ':')) {
+        if (\is_string($controller) && false === strpos($controller, '::') && 2 === substr_count($controller, ':')) {
             // controller in the a:b:c notation then
-            $event->getRequest()->attributes->set('_controller', $this->parser->parse($controller, false));
+            $event->getRequest()->attributes->set('_controller', $parsedNotation = $this->parser->parse($controller, false));
+
+            @trigger_error(sprintf('Referencing controllers with %s is deprecated since Symfony 4.1, use "%s" instead.', $controller, $parsedNotation), E_USER_DEPRECATED);
         }
     }
 
     public static function getSubscribedEvents()
     {
-        return array(
-            KernelEvents::REQUEST => array('onKernelRequest', 24),
-        );
+        return [
+            KernelEvents::REQUEST => ['resolveControllerName', 24],
+        ];
     }
 }

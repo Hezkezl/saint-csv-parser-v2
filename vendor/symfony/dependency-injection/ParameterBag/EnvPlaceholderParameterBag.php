@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection\ParameterBag;
 
-use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -20,9 +20,11 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 class EnvPlaceholderParameterBag extends ParameterBag
 {
     private $envPlaceholderUniquePrefix;
-    private $envPlaceholders = array();
-    private $unusedEnvPlaceholders = array();
-    private $providedTypes = array();
+    private $envPlaceholders = [];
+    private $unusedEnvPlaceholders = [];
+    private $providedTypes = [];
+
+    private static $counter = 0;
 
     /**
      * {@inheritdoc}
@@ -42,19 +44,22 @@ class EnvPlaceholderParameterBag extends ParameterBag
                     return $placeholder; // return first result
                 }
             }
-            if (!preg_match('/^(?:\w++:)*+\w++$/', $env)) {
+            if (!preg_match('/^(?:\w*+:)*+\w++$/', $env)) {
                 throw new InvalidArgumentException(sprintf('Invalid %s name: only "word" characters are allowed.', $name));
             }
 
             if ($this->has($name)) {
                 $defaultValue = parent::get($name);
 
-                if (null !== $defaultValue && !is_scalar($defaultValue)) {
-                    throw new RuntimeException(sprintf('The default value of an env() parameter must be scalar or null, but "%s" given to "%s".', gettype($defaultValue), $name));
+                if (null !== $defaultValue && !is_scalar($defaultValue)) { // !is_string in 5.0
+                    //throw new RuntimeException(sprintf('The default value of an env() parameter must be a string or null, but "%s" given to "%s".', \gettype($defaultValue), $name));
+                    throw new RuntimeException(sprintf('The default value of an env() parameter must be scalar or null, but "%s" given to "%s".', \gettype($defaultValue), $name));
+                } elseif (is_scalar($defaultValue) && !\is_string($defaultValue)) {
+                    @trigger_error(sprintf('A non-string default value of an env() parameter is deprecated since 4.3, cast "%s" to string instead.', $name), E_USER_DEPRECATED);
                 }
             }
 
-            $uniqueName = md5($name.uniqid(mt_rand(), true));
+            $uniqueName = md5($name.'_'.self::$counter++);
             $placeholder = sprintf('%s_%s_%s', $this->getEnvPlaceholderUniquePrefix(), str_replace(':', '_', $env), $uniqueName);
             $this->envPlaceholders[$env][$placeholder] = $placeholder;
 
@@ -69,7 +74,13 @@ class EnvPlaceholderParameterBag extends ParameterBag
      */
     public function getEnvPlaceholderUniquePrefix(): string
     {
-        return $this->envPlaceholderUniquePrefix ?? $this->envPlaceholderUniquePrefix = 'env_'.bin2hex(random_bytes(8));
+        if (null === $this->envPlaceholderUniquePrefix) {
+            $reproducibleEntropy = unserialize(serialize($this->parameters));
+            array_walk_recursive($reproducibleEntropy, function (&$v) { $v = null; });
+            $this->envPlaceholderUniquePrefix = 'env_'.substr(md5(serialize($reproducibleEntropy)), -16);
+        }
+
+        return $this->envPlaceholderUniquePrefix;
     }
 
     /**
@@ -89,7 +100,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
 
     public function clearUnusedEnvPlaceholders()
     {
-        $this->unusedEnvPlaceholders = array();
+        $this->unusedEnvPlaceholders = [];
     }
 
     /**
@@ -147,9 +158,15 @@ class EnvPlaceholderParameterBag extends ParameterBag
                 continue;
             }
             if (is_numeric($default = $this->parameters[$name])) {
+                if (!\is_string($default)) {
+                    @trigger_error(sprintf('A non-string default value of env parameter "%s" is deprecated since 4.3, cast it to string instead.', $env), E_USER_DEPRECATED);
+                }
                 $this->parameters[$name] = (string) $default;
-            } elseif (null !== $default && !is_scalar($default)) {
-                throw new RuntimeException(sprintf('The default value of env parameter "%s" must be scalar or null, %s given.', $env, gettype($default)));
+            } elseif (null !== $default && !is_scalar($default)) { // !is_string in 5.0
+                //throw new RuntimeException(sprintf('The default value of env parameter "%s" must be a string or null, %s given.', $env, \gettype($default)));
+                throw new RuntimeException(sprintf('The default value of env parameter "%s" must be scalar or null, %s given.', $env, \gettype($default)));
+            } elseif (is_scalar($default) && !\is_string($default)) {
+                @trigger_error(sprintf('A non-string default value of env parameter "%s" is deprecated since 4.3, cast it to string instead.', $env), E_USER_DEPRECATED);
             }
         }
     }

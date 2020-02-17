@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Proxy;
 /**
  * @author Drak <drak@zikula.org>
  */
-class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterface
+class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterface, \SessionUpdateTimestampHandlerInterface
 {
     protected $handler;
 
@@ -36,7 +36,7 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
     // \SessionHandlerInterface
 
     /**
-     * {@inheritdoc}
+     * @return bool
      */
     public function open($savePath, $sessionName)
     {
@@ -44,7 +44,7 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
     }
 
     /**
-     * {@inheritdoc}
+     * @return bool
      */
     public function close()
     {
@@ -52,7 +52,7 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
     }
 
     /**
-     * {@inheritdoc}
+     * @return string
      */
     public function read($sessionId)
     {
@@ -60,7 +60,7 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
     }
 
     /**
-     * {@inheritdoc}
+     * @return bool
      */
     public function write($sessionId, $data)
     {
@@ -68,7 +68,7 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
     }
 
     /**
-     * {@inheritdoc}
+     * @return bool
      */
     public function destroy($sessionId)
     {
@@ -76,10 +76,26 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
     }
 
     /**
-     * {@inheritdoc}
+     * @return bool
      */
     public function gc($maxlifetime)
     {
         return (bool) $this->handler->gc($maxlifetime);
+    }
+
+    /**
+     * @return bool
+     */
+    public function validateId($sessionId)
+    {
+        return !$this->handler instanceof \SessionUpdateTimestampHandlerInterface || $this->handler->validateId($sessionId);
+    }
+
+    /**
+     * @return bool
+     */
+    public function updateTimestamp($sessionId, $data)
+    {
+        return $this->handler instanceof \SessionUpdateTimestampHandlerInterface ? $this->handler->updateTimestamp($sessionId, $data) : $this->write($sessionId, $data);
     }
 }

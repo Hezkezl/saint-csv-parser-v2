@@ -44,9 +44,9 @@ class CacheWarmupCommand extends Command
     protected function configure()
     {
         $this
-            ->setDefinition(array(
+            ->setDefinition([
                 new InputOption('no-optional-warmers', '', InputOption::VALUE_NONE, 'Skip optional cache warmers (faster)'),
-            ))
+            ])
             ->setDescription('Warms up an empty cache')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command warms up the cache.
@@ -66,7 +66,7 @@ EOF
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
@@ -80,5 +80,7 @@ EOF
         $this->cacheWarmer->warmUp($kernel->getContainer()->getParameter('kernel.cache_dir'));
 
         $io->success(sprintf('Cache for the "%s" environment (debug=%s) was successfully warmed.', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
+
+        return 0;
     }
 }

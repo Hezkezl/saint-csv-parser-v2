@@ -37,7 +37,7 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
      * @param string                              $file             The absolute cache path
      * @param iterable|ResourceCheckerInterface[] $resourceCheckers The ResourceCheckers to use for the freshness check
      */
-    public function __construct(string $file, iterable $resourceCheckers = array())
+    public function __construct(string $file, iterable $resourceCheckers = [])
     {
         $this->file = $file;
         $this->resourceCheckers = $resourceCheckers;
@@ -72,7 +72,7 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
             $this->resourceCheckers = iterator_to_array($this->resourceCheckers);
         }
 
-        if (!count($this->resourceCheckers)) {
+        if (!\count($this->resourceCheckers)) {
             return true; // shortcut - if we don't have any checkers we don't need to bother with the meta file at all
         }
 
@@ -137,29 +137,27 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
             }
         }
 
-        if (\function_exists('opcache_invalidate') && ini_get('opcache.enable')) {
+        if (\function_exists('opcache_invalidate') && filter_var(ini_get('opcache.enable'), FILTER_VALIDATE_BOOLEAN)) {
             @opcache_invalidate($this->file, true);
         }
     }
 
     /**
      * Gets the meta file path.
-     *
-     * @return string The meta file path
      */
-    private function getMetaFile()
+    private function getMetaFile(): string
     {
         return $this->file.'.meta';
     }
 
-    private function safelyUnserialize($file)
+    private function safelyUnserialize(string $file)
     {
-        $e = null;
         $meta = false;
+        $content = file_get_contents($file);
         $signalingException = new \UnexpectedValueException();
-        $prevUnserializeHandler = ini_set('unserialize_callback_func', '');
-        $prevErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context = array()) use (&$prevErrorHandler, $signalingException) {
-            if (E_WARNING === $type && 'Class __PHP_Incomplete_Class has no unserializer' === $msg) {
+        $prevUnserializeHandler = ini_set('unserialize_callback_func', self::class.'::handleUnserializeCallback');
+        $prevErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context = []) use (&$prevErrorHandler, $signalingException) {
+            if (__FILE__ === $file) {
                 throw $signalingException;
             }
 
@@ -167,7 +165,7 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
         });
 
         try {
-            $meta = unserialize(file_get_contents($file));
+            $meta = unserialize($content);
         } catch (\Throwable $e) {
             if ($e !== $signalingException) {
                 throw $e;
@@ -178,5 +176,13 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
         }
 
         return $meta;
+    }
+
+    /**
+     * @internal
+     */
+    public static function handleUnserializeCallback($class)
+    {
+        trigger_error('Class not found: '.$class);
     }
 }

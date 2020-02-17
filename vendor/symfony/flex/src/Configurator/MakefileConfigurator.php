@@ -11,6 +11,7 @@
 
 namespace Symfony\Flex\Configurator;
 
+use Symfony\Flex\Lock;
 use Symfony\Flex\Recipe;
 
 /**
@@ -18,20 +19,22 @@ use Symfony\Flex\Recipe;
  */
 class MakefileConfigurator extends AbstractConfigurator
 {
-    public function configure(Recipe $recipe, $definitions)
+    public function configure(Recipe $recipe, $definitions, Lock $lock, array $options = [])
     {
-        $this->write('Added Makefile entries');
+        $this->write('Adding Makefile entries');
 
-        $makefile = getcwd().'/Makefile';
-        if ($this->isFileMarked($recipe, $makefile)) {
+        $makefile = $this->options->get('root-dir').'/Makefile';
+        if (empty($options['force']) && $this->isFileMarked($recipe, $makefile)) {
             return;
         }
 
-        $data = $this->markData($recipe, implode("\n", $definitions));
+        $data = $this->options->expandTargetDir(implode("\n", $definitions));
+        $data = $this->markData($recipe, $data);
+        $data = "\n".ltrim($data, "\r\n");
 
         if (!file_exists($makefile)) {
             file_put_contents(
-                getcwd().'/Makefile',
+                $this->options->get('root-dir').'/Makefile',
                 <<<EOF
 ifndef APP_ENV
 	include .env
@@ -45,12 +48,15 @@ help:
 EOF
             );
         }
-        file_put_contents(getcwd().'/Makefile', "\n".ltrim($data, "\r\n"), FILE_APPEND);
+
+        if (!$this->updateData($makefile, $data)) {
+            file_put_contents($makefile, $data, FILE_APPEND);
+        }
     }
 
-    public function unconfigure(Recipe $recipe, $vars)
+    public function unconfigure(Recipe $recipe, $vars, Lock $lock)
     {
-        if (!file_exists($makefile = getcwd().'/Makefile')) {
+        if (!file_exists($makefile = $this->options->get('root-dir').'/Makefile')) {
             return;
         }
 
@@ -59,7 +65,7 @@ EOF
             return;
         }
 
-        $this->write(sprintf('Removed Makefile entries from %s', $makefile));
+        $this->write(sprintf('Removing Makefile entries from %s', $makefile));
         if (!trim($contents)) {
             @unlink($makefile);
         } else {

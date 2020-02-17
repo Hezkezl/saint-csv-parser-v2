@@ -11,19 +11,21 @@
 
 namespace Symfony\Component\HttpKernel\EventListener;
 
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\RequestMatcherInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Event\PostResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
-use Symfony\Component\HttpFoundation\RequestMatcherInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * ProfilerListener collects data for the current request by listening to the kernel events.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final since Symfony 4.3
  */
 class ProfilerListener implements EventSubscriberInterface
 {
@@ -37,11 +39,8 @@ class ProfilerListener implements EventSubscriberInterface
     protected $parents;
 
     /**
-     * @param Profiler                     $profiler           A Profiler instance
-     * @param RequestStack                 $requestStack       A RequestStack instance
-     * @param RequestMatcherInterface|null $matcher            A RequestMatcher instance
-     * @param bool                         $onlyException      True if the profiler only collects data when an exception occurs, false otherwise
-     * @param bool                         $onlyMasterRequests True if the profiler only collects data when the request is a master request, false otherwise
+     * @param bool $onlyException      True if the profiler only collects data when an exception occurs, false otherwise
+     * @param bool $onlyMasterRequests True if the profiler only collects data when the request is a master request, false otherwise
      */
     public function __construct(Profiler $profiler, RequestStack $requestStack, RequestMatcherInterface $matcher = null, bool $onlyException = false, bool $onlyMasterRequests = false)
     {
@@ -63,7 +62,7 @@ class ProfilerListener implements EventSubscriberInterface
             return;
         }
 
-        $this->exception = $event->getException();
+        $this->exception = $event->getThrowable();
     }
 
     /**
@@ -119,10 +118,10 @@ class ProfilerListener implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return array(
-            KernelEvents::RESPONSE => array('onKernelResponse', -100),
-            KernelEvents::EXCEPTION => array('onKernelException', 0),
-            KernelEvents::TERMINATE => array('onKernelTerminate', -1024),
-        );
+        return [
+            KernelEvents::RESPONSE => ['onKernelResponse', -100],
+            KernelEvents::EXCEPTION => ['onKernelException', 0],
+            KernelEvents::TERMINATE => ['onKernelTerminate', -1024],
+        ];
     }
 }

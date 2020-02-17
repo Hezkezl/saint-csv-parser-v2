@@ -32,31 +32,27 @@ class SymfonyBundle
 
     public function getClassNames(): array
     {
-        $all = 'uninstall' === $this->operation;
+        $uninstall = 'uninstall' === $this->operation;
         $classes = [];
         $autoload = $this->package->getAutoload();
+        $isSyliusPlugin = 'sylius-plugin' === $this->package->getType();
         foreach (['psr-4' => true, 'psr-0' => false] as $psr => $isPsr4) {
             if (!isset($autoload[$psr])) {
                 continue;
             }
 
             foreach ($autoload[$psr] as $namespace => $paths) {
-                if (!is_array($paths)) {
+                if (!\is_array($paths)) {
                     $paths = [$paths];
                 }
                 foreach ($paths as $path) {
-                    foreach ($this->extractClassNames($namespace) as $class) {
-                        if (!$all) {
-                            // we only check class existence on install as we do have the code available
-                            if (!$this->checkClassExists($class, $path, $isPsr4)) {
-                                continue;
-                            }
-
-                            return [$class];
+                    foreach ($this->extractClassNames($namespace, $isSyliusPlugin) as $class) {
+                        // we only check class existence on install as we do have the code available
+                        // in contrast to uninstall operation
+                        if (!$uninstall && !$this->checkClassExists($class, $path, $isPsr4)) {
+                            continue;
                         }
 
-                        // on uninstall, we gather all possible values (as we don't have access to the code anymore)
-                        // and try to remove them all from bundles.php
                         $classes[] = $class;
                     }
                 }
@@ -66,19 +62,26 @@ class SymfonyBundle
         return $classes;
     }
 
-    private function extractClassNames(string $namespace): array
+    private function extractClassNames(string $namespace, bool $isSyliusPlugin): array
     {
         $namespace = trim($namespace, '\\');
         $class = $namespace.'\\';
         $parts = explode('\\', $namespace);
-        $suffix = $parts[count($parts) - 1];
-        if ('Bundle' !== substr($suffix, -6)) {
+        $suffix = $parts[\count($parts) - 1];
+        $endOfWord = substr($suffix, -6);
+
+        if ($isSyliusPlugin) {
+            if ('Bundle' !== $endOfWord && 'Plugin' !== $endOfWord) {
+                $suffix .= 'Bundle';
+            }
+        } elseif ('Bundle' !== $endOfWord) {
             $suffix .= 'Bundle';
         }
+
         $classes = [$class.$suffix];
         $acc = '';
-        foreach (array_slice($parts, 0, -1) as $part) {
-            if ('Bundle' === $part) {
+        foreach (\array_slice($parts, 0, -1) as $part) {
+            if ('Bundle' === $part || ($isSyliusPlugin && 'Plugin' === $part)) {
                 continue;
             }
             $classes[] = $class.$part.$suffix;
@@ -86,16 +89,16 @@ class SymfonyBundle
             $classes[] = $class.$acc.$suffix;
         }
 
-        return $classes;
+        return array_unique($classes);
     }
 
     private function checkClassExists(string $class, string $path, bool $isPsr4): bool
     {
         $classPath = ($this->vendorDir ? $this->vendorDir.'/' : '').$this->package->getPrettyName().'/'.$path.'/';
         $parts = explode('\\', $class);
-        $class = $parts[count($parts) - 1];
+        $class = $parts[\count($parts) - 1];
         if (!$isPsr4) {
-            $classPath .= str_replace('\\', '', implode('/', array_slice($parts, 0, -1))).'/';
+            $classPath .= str_replace('\\', '', implode('/', \array_slice($parts, 0, -1))).'/';
         }
         $classPath .= str_replace('\\', '/', $class).'.php';
 

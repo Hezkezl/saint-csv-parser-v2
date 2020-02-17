@@ -14,16 +14,21 @@
         }
     ],
     "support": {
+        "docs": "https://csv.thephpleague.com",
         "forum": "https://groups.google.com/forum/#!forum/thephpleague",
-        "issues": "https://github.com/thephpleague/csv/issues"
+        "issues": "https://github.com/thephpleague/csv/issues",
+        "rss": "https://github.com/thephpleague/csv/releases.atom",
+        "source": "https://github.com/thephpleague/csv"
     },
     "require": {
         "php" : ">=7.0.10",
+        "ext-dom" : "*",
+        "ext-json" : "*",
         "ext-mbstring" : "*"
     },
     "require-dev": {
         "ext-curl" : "*",
-        "friendsofphp/php-cs-fixer": "^2.0",
+        "friendsofphp/php-cs-fixer": "^2.12",
         "phpunit/phpunit" : "^6.0",
         "phpstan/phpstan": "^0.9.2",
         "phpstan/phpstan-strict-rules": "^0.9.0",
@@ -41,19 +46,27 @@
         }
     },
     "scripts": {
-        "phpcs": "php-cs-fixer fix -v --diff --dry-run --allow-risky=yes;",
-        "phpstan-src": "phpstan analyse -l 7 -c phpstan.src.neon src",
-        "phpstan-tests": "phpstan analyse -l 7 -c phpstan.tests.neon tests",
+        "phpcs": "php-cs-fixer fix -v --diff --dry-run --allow-risky=yes --ansi",
+        "phpstan-src": "phpstan analyse -l max -c phpstan.src.neon src --ansi",
+        "phpstan-tests": "phpstan analyse -l max -c phpstan.tests.neon tests --ansi",
         "phpstan": [
             "@phpstan-src",
             "@phpstan-tests"
         ],
         "phpunit": "phpunit --coverage-text",
         "test": [
-            "@phpunit",
             "@phpcs",
-            "@phpstan"
+            "@phpstan",
+            "@phpunit"
         ]
+    },
+    "scripts-descriptions": {
+        "phpcs": "Runs coding style test suite",
+        "phpstan": "Runs complete codebase static analysis",
+        "phpstan-src": "Runs source code static analysis",
+        "phpstan-test": "Runs test suite static analysis",
+        "phpunit": "Runs unit and functional testing",
+        "test": "Runs full test suite"
     },
     "suggest": {
         "ext-iconv" : "Needed to ease transcoding CSV using iconv stream filters"

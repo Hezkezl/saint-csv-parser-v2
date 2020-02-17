@@ -19,6 +19,8 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
  *
  * It provides methods to common features needed in controllers.
  *
+ * @deprecated since Symfony 4.2, use "Symfony\Bundle\FrameworkBundle\Controller\AbstractController" instead.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 abstract class Controller implements ContainerAwareInterface

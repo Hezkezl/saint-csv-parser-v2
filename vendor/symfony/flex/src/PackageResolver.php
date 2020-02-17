@@ -22,7 +22,6 @@ class PackageResolver
 {
     private static $SYMFONY_VERSIONS = ['lts', 'previous', 'stable', 'next'];
     private static $aliases;
-    private static $versions;
     private $downloader;
 
     public function __construct(Downloader $downloader)
@@ -48,7 +47,7 @@ class PackageResolver
         // second pass to resolve package names
         $packages = [];
         foreach ($explodedArguments as $i => $argument) {
-            if (false === strpos($argument, '/') && !preg_match(PlatformRepository::PLATFORM_PACKAGE_REGEX, $argument)) {
+            if (false === strpos($argument, '/') && !preg_match(PlatformRepository::PLATFORM_PACKAGE_REGEX, $argument) && !\in_array($argument, ['mirrors', 'nothing'])) {
                 if (null === self::$aliases) {
                     self::$aliases = $this->downloader->get('/aliases.json')->getBody();
                 }
@@ -61,7 +60,7 @@ class PackageResolver
                         $versionParser->parseConstraints($argument);
                     } catch (\UnexpectedValueException $e) {
                         // is it a special Symfony version?
-                        if (!in_array($argument, self::$SYMFONY_VERSIONS, true)) {
+                        if (!\in_array($argument, self::$SYMFONY_VERSIONS, true)) {
                             $this->throwAlternatives($argument, $i);
                         }
                     }
@@ -80,33 +79,31 @@ class PackageResolver
         return array_unique($requires);
     }
 
-    private function parseVersion(string $package, string $version, bool $isRequire): string
+    public function parseVersion(string $package, string $version, bool $isRequire): string
     {
         if (0 !== strpos($package, 'symfony/')) {
             return $version ? ':'.$version : '';
         }
 
-        if (null === self::$versions) {
-            self::$versions = $this->downloader->get('/versions.json')->getBody();
-        }
+        $versions = $this->downloader->getVersions();
 
-        if (!isset(self::$versions['splits'][$package])) {
+        if (!isset($versions['splits'][$package])) {
             return $version ? ':'.$version : '';
         }
 
-        if (!$version) {
+        if (!$version || '*' === $version) {
             try {
                 $config = @json_decode(file_get_contents(Factory::getComposerFile()), true);
             } finally {
-                if (!$isRequire || !isset($config['require']['symfony/framework-bundle'])) {
+                if (!$isRequire || !(isset($config['extra']['symfony']['require']) || isset($config['require']['symfony/framework-bundle']))) {
                     return '';
                 }
             }
-            $version = $config['require']['symfony/framework-bundle'];
+            $version = $config['extra']['symfony']['require'] ?? $config['require']['symfony/framework-bundle'];
         } elseif ('next' === $version) {
-            $version = '^'.self::$versions[$version].'@dev';
-        } elseif (in_array($version, self::$SYMFONY_VERSIONS, true)) {
-            $version = '^'.self::$versions[$version];
+            $version = '^'.$versions[$version].'@dev';
+        } elseif (\in_array($version, self::$SYMFONY_VERSIONS, true)) {
+            $version = '^'.$versions[$version];
         }
 
         return ':'.$version;
@@ -120,7 +117,7 @@ class PackageResolver
         $alternatives = [];
         foreach (self::$aliases as $alias => $package) {
             $lev = levenshtein($argument, $alias);
-            if ($lev <= strlen($argument) / 3 || false !== strpos($alias, $argument)) {
+            if ($lev <= \strlen($argument) / 3 || false !== strpos($alias, $argument)) {
                 $alternatives[$package][] = $alias;
             }
         }
@@ -129,7 +126,7 @@ class PackageResolver
         if ($alternatives || 0 === $position) {
             $message = sprintf('"%s" is not a valid alias.', $argument);
             if ($alternatives) {
-                if (1 === count($alternatives)) {
+                if (1 === \count($alternatives)) {
                     $message .= " Did you mean this:\n";
                 } else {
                     $message .= " Did you mean one of these:\n";

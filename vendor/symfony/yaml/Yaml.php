@@ -33,15 +33,15 @@ class Yaml
     const PARSE_CONSTANT = 256;
     const PARSE_CUSTOM_TAGS = 512;
     const DUMP_EMPTY_ARRAY_AS_SEQUENCE = 1024;
+    const DUMP_NULL_AS_TILDE = 2048;
 
     /**
      * Parses a YAML file into a PHP value.
      *
-     *  Usage:
-     *  <code>
-     *   $array = Yaml::parseFile('config.yml');
-     *   print_r($array);
-     *  </code>
+     * Usage:
+     *
+     *     $array = Yaml::parseFile('config.yml');
+     *     print_r($array);
      *
      * @param string $filename The path to the YAML file to be parsed
      * @param int    $flags    A bit field of PARSE_* constants to customize the YAML parser behavior

@@ -15,6 +15,8 @@ namespace Symfony\Component\Config\Exception;
  * Exception class for when a resource cannot be loaded or imported.
  *
  * @author Ryan Weaver <ryan@thatsquality.com>
+ *
+ * @deprecated since Symfony 4.2, use LoaderLoadException instead.
  */
 class FileLoaderLoadException extends \Exception
 {
@@ -22,10 +24,10 @@ class FileLoaderLoadException extends \Exception
      * @param string     $resource       The resource that could not be imported
      * @param string     $sourceResource The original resource importing the new resource
      * @param int        $code           The error code
-     * @param \Exception $previous       A previous exception
+     * @param \Throwable $previous       A previous exception
      * @param string     $type           The type of resource
      */
-    public function __construct(string $resource, string $sourceResource = null, int $code = null, \Exception $previous = null, string $type = null)
+    public function __construct(string $resource, string $sourceResource = null, int $code = null, \Throwable $previous = null, string $type = null)
     {
         $message = '';
         if ($previous) {
@@ -42,22 +44,22 @@ class FileLoaderLoadException extends \Exception
 
             // show tweaked trace to complete the human readable sentence
             if (null === $sourceResource) {
-                $message .= sprintf('(which is loaded in resource "%s")', $this->varToString($resource));
+                $message .= sprintf('(which is loaded in resource "%s")', $resource);
             } else {
-                $message .= sprintf('(which is being imported from "%s")', $this->varToString($sourceResource));
+                $message .= sprintf('(which is being imported from "%s")', $sourceResource);
             }
             $message .= '.';
 
         // if there's no previous message, present it the default way
         } elseif (null === $sourceResource) {
-            $message .= sprintf('Cannot load resource "%s".', $this->varToString($resource));
+            $message .= sprintf('Cannot load resource "%s".', $resource);
         } else {
-            $message .= sprintf('Cannot import resource "%s" from "%s".', $this->varToString($resource), $this->varToString($sourceResource));
+            $message .= sprintf('Cannot import resource "%s" from "%s".', $resource, $sourceResource);
         }
 
         // Is the resource located inside a bundle?
         if ('@' === $resource[0]) {
-            $parts = explode(DIRECTORY_SEPARATOR, $resource);
+            $parts = explode(\DIRECTORY_SEPARATOR, $resource);
             $bundle = substr($parts[0], 1);
             $message .= sprintf(' Make sure the "%s" bundle is correctly registered and loaded in the application kernel class.', $bundle);
             $message .= sprintf(' If the bundle is registered, make sure the bundle path "%s" is not empty.', $resource);
@@ -75,12 +77,12 @@ class FileLoaderLoadException extends \Exception
 
     protected function varToString($var)
     {
-        if (is_object($var)) {
-            return sprintf('Object(%s)', get_class($var));
+        if (\is_object($var)) {
+            return sprintf('Object(%s)', \get_class($var));
         }
 
-        if (is_array($var)) {
-            $a = array();
+        if (\is_array($var)) {
+            $a = [];
             foreach ($var as $k => $v) {
                 $a[] = sprintf('%s => %s', $k, $this->varToString($v));
             }
@@ -88,7 +90,7 @@ class FileLoaderLoadException extends \Exception
             return sprintf('Array(%s)', implode(', ', $a));
         }
 
-        if (is_resource($var)) {
+        if (\is_resource($var)) {
             return sprintf('Resource(%s)', get_resource_type($var));
         }
 

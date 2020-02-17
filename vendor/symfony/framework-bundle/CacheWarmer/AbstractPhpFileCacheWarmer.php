@@ -11,11 +11,10 @@
 
 namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 
-use Psr\Cache\CacheItemPoolInterface;
-use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
-use Symfony\Component\Cache\Adapter\ProxyAdapter;
+use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 /**
@@ -24,19 +23,13 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
 {
     private $phpArrayFile;
-    private $fallbackPool;
 
     /**
-     * @param string                 $phpArrayFile The PHP file where metadata are cached
-     * @param CacheItemPoolInterface $fallbackPool The pool where runtime-discovered metadata are cached
+     * @param string $phpArrayFile The PHP file where metadata are cached
      */
-    public function __construct(string $phpArrayFile, CacheItemPoolInterface $fallbackPool)
+    public function __construct(string $phpArrayFile)
     {
         $this->phpArrayFile = $phpArrayFile;
-        if (!$fallbackPool instanceof AdapterInterface) {
-            $fallbackPool = new ProxyAdapter($fallbackPool);
-        }
-        $this->fallbackPool = $fallbackPool;
     }
 
     /**
@@ -54,13 +47,13 @@ abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
     {
         $arrayAdapter = new ArrayAdapter();
 
-        spl_autoload_register(array(PhpArrayAdapter::class, 'throwOnRequiredClass'));
+        spl_autoload_register([ClassExistenceResource::class, 'throwOnRequiredClass']);
         try {
             if (!$this->doWarmUp($cacheDir, $arrayAdapter)) {
                 return;
             }
         } finally {
-            spl_autoload_unregister(array(PhpArrayAdapter::class, 'throwOnRequiredClass'));
+            spl_autoload_unregister([ClassExistenceResource::class, 'throwOnRequiredClass']);
         }
 
         // the ArrayAdapter stores the values serialized
@@ -68,13 +61,7 @@ abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
         // so here we un-serialize the values first
         $values = array_map(function ($val) { return null !== $val ? unserialize($val) : null; }, $arrayAdapter->getValues());
 
-        $this->warmUpPhpArrayAdapter(new PhpArrayAdapter($this->phpArrayFile, $this->fallbackPool), $values);
-
-        foreach ($values as $k => $v) {
-            $item = $this->fallbackPool->getItem($k);
-            $this->fallbackPool->saveDeferred($item->set($v));
-        }
-        $this->fallbackPool->commit();
+        $this->warmUpPhpArrayAdapter(new PhpArrayAdapter($this->phpArrayFile, new NullAdapter()), $values);
     }
 
     protected function warmUpPhpArrayAdapter(PhpArrayAdapter $phpArrayAdapter, array $values)
@@ -83,8 +70,18 @@ abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
     }
 
     /**
-     * @param string       $cacheDir
-     * @param ArrayAdapter $arrayAdapter
+     * @internal
+     */
+    final protected function ignoreAutoloadException(string $class, \Exception $exception): void
+    {
+        try {
+            ClassExistenceResource::throwOnRequiredClass($class, $exception);
+        } catch (\ReflectionException $e) {
+        }
+    }
+
+    /**
+     * @param string $cacheDir
      *
      * @return bool false if there is nothing to warm-up
      */

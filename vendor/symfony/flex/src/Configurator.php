@@ -41,25 +41,27 @@ class Configurator
             'makefile' => Configurator\MakefileConfigurator::class,
             'composer-scripts' => Configurator\ComposerScriptsConfigurator::class,
             'gitignore' => Configurator\GitignoreConfigurator::class,
+            'dockerfile' => Configurator\DockerfileConfigurator::class,
+            'docker-compose' => Configurator\DockerComposeConfigurator::class,
         ];
     }
 
-    public function install(Recipe $recipe)
+    public function install(Recipe $recipe, Lock $lock, array $options = [])
     {
         $manifest = $recipe->getManifest();
         foreach (array_keys($this->configurators) as $key) {
             if (isset($manifest[$key])) {
-                $this->get($key)->configure($recipe, $manifest[$key]);
+                $this->get($key)->configure($recipe, $manifest[$key], $lock, $options);
             }
         }
     }
 
-    public function unconfigure(Recipe $recipe)
+    public function unconfigure(Recipe $recipe, Lock $lock)
     {
         $manifest = $recipe->getManifest();
         foreach (array_keys($this->configurators) as $key) {
             if (isset($manifest[$key])) {
-                $this->get($key)->unconfigure($recipe, $manifest[$key]);
+                $this->get($key)->unconfigure($recipe, $manifest[$key], $lock);
             }
         }
     }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Flex\Configurator;
 
+use Symfony\Flex\Lock;
 use Symfony\Flex\Recipe;
 
 /**
@@ -18,7 +19,7 @@ use Symfony\Flex\Recipe;
  */
 class BundlesConfigurator extends AbstractConfigurator
 {
-    public function configure(Recipe $recipe, $bundles)
+    public function configure(Recipe $recipe, $bundles, Lock $lock, array $options = [])
     {
         $this->write('Enabling the package as a Symfony bundle');
         $file = $this->getConfFile();
@@ -38,7 +39,7 @@ class BundlesConfigurator extends AbstractConfigurator
         $this->dump($file, $registered);
     }
 
-    public function unconfigure(Recipe $recipe, $bundles)
+    public function unconfigure(Recipe $recipe, $bundles, Lock $lock)
     {
         $this->write('Disabling the Symfony bundle');
         $file = $this->getConfFile();
@@ -68,7 +69,7 @@ class BundlesConfigurator extends AbstractConfigurator
     private function load(string $file): array
     {
         $bundles = file_exists($file) ? (require $file) : [];
-        if (!is_array($bundles)) {
+        if (!\is_array($bundles)) {
             $bundles = [];
         }
 
@@ -80,26 +81,27 @@ class BundlesConfigurator extends AbstractConfigurator
         $contents = "<?php\n\nreturn [\n";
         foreach ($bundles as $class => $envs) {
             $contents .= "    $class::class => [";
-            foreach (array_keys($envs) as $env) {
-                $contents .= "'$env' => true, ";
+            foreach ($envs as $env => $value) {
+                $booleanValue = var_export($value, true);
+                $contents .= "'$env' => $booleanValue, ";
             }
             $contents = substr($contents, 0, -2)."],\n";
         }
         $contents .= "];\n";
 
-        if (!is_dir(dirname($file))) {
-            mkdir(dirname($file), 0777, true);
+        if (!is_dir(\dirname($file))) {
+            mkdir(\dirname($file), 0777, true);
         }
 
         file_put_contents($file, $contents);
 
-        if (function_exists('opcache_invalidate')) {
+        if (\function_exists('opcache_invalidate')) {
             opcache_invalidate($file);
         }
     }
 
     private function getConfFile(): string
     {
-        return $this->options->expandTargetDir('%CONFIG_DIR%/bundles.php');
+        return $this->options->get('root-dir').'/'.$this->options->expandTargetDir('%CONFIG_DIR%/bundles.php');
     }
 }

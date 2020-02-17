@@ -16,8 +16,8 @@ use Composer\EventDispatcher\ScriptExecutionException;
 use Composer\IO\IOInterface;
 use Composer\Semver\Constraint\EmptyConstraint;
 use Composer\Util\ProcessExecutor;
-use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 /**
@@ -48,7 +48,7 @@ class ScriptExecutor
             return;
         }
 
-        $cmdOutput = new StreamOutput(fopen('php://memory', 'rw'), OutputInterface::VERBOSITY_VERBOSE, $this->io->isDecorated());
+        $cmdOutput = new StreamOutput(fopen('php://temp', 'rw'), OutputInterface::VERBOSITY_VERBOSE, $this->io->isDecorated());
         $outputHandler = function ($type, $buffer) use ($cmdOutput) {
             $cmdOutput->write($buffer, false, OutputInterface::OUTPUT_RAW);
         };
@@ -56,7 +56,7 @@ class ScriptExecutor
         $this->io->writeError(sprintf('Executing script %s', $parsedCmd), $this->io->isVerbose());
         $exitCode = $this->executor->execute($expandedCmd, $outputHandler);
 
-        $code = 0 === $exitCode ? ' <info>[OK]</info>' : ' <error>[KO]</error>';
+        $code = 0 === $exitCode ? ' <info>[OK]</>' : ' <error>[KO]</>';
 
         if ($this->io->isVerbose()) {
             $this->io->writeError(sprintf('Executed script %s %s', $cmd, $code));
@@ -65,8 +65,8 @@ class ScriptExecutor
         }
 
         if (0 !== $exitCode) {
-            $this->io->writeError(' <error>[KO]</error>');
-            $this->io->writeError(sprintf('<error>Script %s returned with error code %s</error>', $cmd, $exitCode));
+            $this->io->writeError(' <error>[KO]</>');
+            $this->io->writeError(sprintf('<error>Script %s returned with error code %s</>', $cmd, $exitCode));
             fseek($cmdOutput->getStream(), 0);
             foreach (explode("\n", stream_get_contents($cmdOutput->getStream())) as $line) {
                 $this->io->writeError('!!  '.$line);
@@ -86,7 +86,7 @@ class ScriptExecutor
             case 'script':
                 return $cmd;
             default:
-                throw new \InvalidArgumentException(sprintf('Command type "%s" is not valid.', $type));
+                throw new \InvalidArgumentException(sprintf('Invalid symfony/flex auto-script in composer.json: "%s" is not a valid type of command.', $type));
         }
     }
 
@@ -94,12 +94,12 @@ class ScriptExecutor
     {
         $repo = $this->composer->getRepositoryManager()->getLocalRepository();
         if (!$repo->findPackage('symfony/console', new EmptyConstraint())) {
-            $this->io->writeError(sprintf('<warning>Skipping "%s" (needs symfony/console to run).</warning>', $cmd));
+            $this->io->writeError(sprintf('<warning>Skipping "%s" (needs symfony/console to run).</>', $cmd));
 
             return null;
         }
 
-        $console = escapeshellarg($this->options->get('bin-dir').'/console');
+        $console = ProcessExecutor::escape($this->options->get('root-dir').'/'.$this->options->get('bin-dir').'/console');
         if ($this->io->isDecorated()) {
             $console .= ' --ansi';
         }
@@ -127,8 +127,8 @@ class ScriptExecutor
             $arguments[] = '--php-ini='.$ini;
         }
 
-        $phpArgs = implode(' ', array_map('escapeshellarg', $arguments));
+        $phpArgs = implode(' ', array_map([ProcessExecutor::class, 'escape'], $arguments));
 
-        return escapeshellarg($php).($phpArgs ? ' '.$phpArgs : '').' '.$cmd;
+        return ProcessExecutor::escape($php).($phpArgs ? ' '.$phpArgs : '').' '.$cmd;
     }
 }

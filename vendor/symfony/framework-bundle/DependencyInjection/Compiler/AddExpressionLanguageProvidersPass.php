@@ -11,8 +11,9 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddExpressionLanguageProvidersPass as SecurityExpressionLanguageProvidersPass;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -22,6 +23,17 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class AddExpressionLanguageProvidersPass implements CompilerPassInterface
 {
+    private $handleSecurityLanguageProviders;
+
+    public function __construct(bool $handleSecurityLanguageProviders = true)
+    {
+        if ($handleSecurityLanguageProviders) {
+            @trigger_error(sprintf('Registering services tagged "security.expression_language_provider" with "%s" is deprecated since Symfony 4.2, use the "%s" instead.', __CLASS__, SecurityExpressionLanguageProvidersPass::class), E_USER_DEPRECATED);
+        }
+
+        $this->handleSecurityLanguageProviders = $handleSecurityLanguageProviders;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -31,15 +43,15 @@ class AddExpressionLanguageProvidersPass implements CompilerPassInterface
         if ($container->has('router')) {
             $definition = $container->findDefinition('router');
             foreach ($container->findTaggedServiceIds('routing.expression_language_provider', true) as $id => $attributes) {
-                $definition->addMethodCall('addExpressionLanguageProvider', array(new Reference($id)));
+                $definition->addMethodCall('addExpressionLanguageProvider', [new Reference($id)]);
             }
         }
 
         // security
-        if ($container->has('security.expression_language')) {
+        if ($this->handleSecurityLanguageProviders && $container->has('security.expression_language')) {
             $definition = $container->findDefinition('security.expression_language');
             foreach ($container->findTaggedServiceIds('security.expression_language_provider', true) as $id => $attributes) {
-                $definition->addMethodCall('registerProvider', array(new Reference($id)));
+                $definition->addMethodCall('registerProvider', [new Reference($id)]);
             }
         }
     }
