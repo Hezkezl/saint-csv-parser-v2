@@ -17,9 +17,6 @@ symfony.lock
 symfony.lock
 vendor/*
 symfony.lock
-cache*
-output*
-input*
 bin/*
 composer*
 old *
