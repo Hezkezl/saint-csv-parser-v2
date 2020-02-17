@@ -44,7 +44,7 @@ class Minions implements ParseInterface
 {Bottom}";
     public function parse()
     {
-        $Patch = '5.2';
+        $patch = '5.2';
         // if I want to use pywikibot to create these pages, this should be true. Otherwise if I want to create pages
         // manually, set to false
         $Bot = "true";
@@ -148,10 +148,10 @@ class Minions implements ParseInterface
 
             // change the top and bottom code depending on if I want to bot the pages up or not. Places Patch on subpage
             if ($Bot == "true") {
-                $Top = "{{-start-}}\n'''$Name (Minion)/Patch'''\n$Patch\n{{-stop-}}{{-start-}}\n'''$Name (Minion)'''\n";
+                $Top = "{{-start-}}\n'''$Name (Minion)/Patch'''\n$patch\n{{-stop-}}{{-start-}}\n'''$Name (Minion)'''\n";
                 $Bottom = "{{-stop-}}";
             } else {
-                $Top = "http://ffxiv.gamerescape.com/wiki/$Name (Minion)\Patch?action=edit\n$Patch\nhttp://ffxiv.gamerescape.com/wiki/$Name (Minion)?action=edit\n";
+                $Top = "http://ffxiv.gamerescape.com/wiki/$Name (Minion)\Patch?action=edit\n$patch\nhttp://ffxiv.gamerescape.com/wiki/$Name (Minion)?action=edit\n";
                 $Bottom = "";
             };
 
@@ -159,7 +159,7 @@ class Minions implements ParseInterface
             $data = [
                 '{Top}' => $Top,
                 '{Name}' => $Name,
-                '{Patch}' => $Patch,
+                '{Patch}' => $patch,
                 '{Description}' => $Description,
                 '{Quote}' => $Quote,
                 '{Behaviour}' => $Behaviour,

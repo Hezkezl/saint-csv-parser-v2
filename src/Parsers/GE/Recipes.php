@@ -111,7 +111,7 @@ class Recipes implements ParseInterface
         // save our data to the filename: GeRecipeWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save('GeItemWiki - '. $patch .'.txt', 999999);
+        $info = $this->save('GeRecipeWiki - '. $patch .'.txt', 999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],

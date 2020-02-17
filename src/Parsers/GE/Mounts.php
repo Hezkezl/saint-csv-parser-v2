@@ -27,7 +27,7 @@ class Mounts implements ParseInterface
 }}{Bottom}";
     public function parse()
     {
-        $Patch = '5.2';
+        $patch = '5.2';
         // if I want to use pywikibot to create these pages, this should be true. Otherwise if I want to create pages
         // manually, set to false
         $Bot = "true";
@@ -100,10 +100,10 @@ class Mounts implements ParseInterface
 
             // change the top and bottom code depending on if I want to bot the pages up or not. Places Patch on subpage
             if ($Bot == "true") {
-                $Top = "{{-start-}}\n'''$Name (Mount)/Patch'''\n$Patch\n{{-stop-}}{{-start-}}\n'''$Name (Mount)'''\n";
+                $Top = "{{-start-}}\n'''$Name (Mount)/Patch'''\n$patch\n{{-stop-}}{{-start-}}\n'''$Name (Mount)'''\n";
                 $Bottom = "{{-stop-}}";
             } else {
-                $Top = "http://ffxiv.gamerescape.com/wiki/$Name (Mount)\Patch?action=edit\n$Patch\nhttp://ffxiv.gamerescape.com/wiki/$Name (Mount)?action=edit\n";
+                $Top = "http://ffxiv.gamerescape.com/wiki/$Name (Mount)\Patch?action=edit\n$patch\nhttp://ffxiv.gamerescape.com/wiki/$Name (Mount)?action=edit\n";
                 $Bottom = "";
             };
 
@@ -111,7 +111,7 @@ class Mounts implements ParseInterface
             $data = [
                 '{Top}' => $Top,
                 '{Name}' => $Name,
-                '{Patch}' => $Patch,
+                '{Patch}' => $patch,
                 '{Index}' => $Mount['id'],
                 '{Description}' => $Description,
                 '{Quote}' => $Quote,

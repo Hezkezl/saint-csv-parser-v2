@@ -41,6 +41,7 @@ class Satisfaction implements ParseInterface
 
     public function parse()
     {
+        $patch = '5.2';
 
         // grab CSV files
         $SatisfactionNpcCsv = $this->csv('SatisfactionNpc');
@@ -60,30 +61,44 @@ class Satisfaction implements ParseInterface
             // Actual code definition begins below!
             //---------------------------------------------------------------------------------
 
-            $Satisfaction = [];
+            $Satisfaction = false;
 
-                if ($item["Item"] > 0) {
-                    $Name = $ItemCsv->at($item["Item"])['Name'];
+            // need to build a switch based off of the Key/id of Satisfaction Supply and have it
+            // look in SatisfactionNpc's columns of "SupplyIndex" [0] through [5] to match up to
+            // get the NPC name
 
-                    $BaseCollect = $item["Collectability{Base}[$i]"];
-                    $BaseScrip = $item["Reward{Scrips}[$i]"];
-                    $Bonus1Collect = $item["Collectability{Bonus}[$i]"];
-                    $Bonus2Collect = $item["Collectability{HighBonus}[$i]"];
-                    $Bonus2Scrip = floor($BaseScrip * ($BonusMultiplier["CurrencyMultiplier[0]"]/1000));
-                    $string = "{{-start-}}\n'''". $Name ."'''\n{{ARR Infobox Collectable\n";
-                    $string .= "|Class = ". $Class ."\n|Level = ". $Level ."\n|Name = ". $Name ."\n|Scrip = ". $Currency ."\n";
-                    $string .= "|Base = ". $BaseCollect ."\n|Base Scrip = ". $BaseScrip ."\n|Base EXP = ". $BaseEXP ."\n";
-                    $string .= "|Bonus2 = ". $Bonus2Collect ."\n|Bonus2 Scrip = ". $Bonus2Scrip ."\n|Bonus2 EXP = ". $Bonus2EXP ."\n}}{{-stop-}}";
-                    $Satisfaction[] = $string;
+            // skip ones without a name
+            if (empty($item['Item'])) {
+                continue;
+            } else {
+                $Name = $ItemCsv->at($item["Item"])['Name'];
+                $location = "Blank";
+                $chance = $item["Probability<%>"];
+                $collectlow = $item["Collectability{Low}"];
+                $collectmid = $item["Collectability{Mid}"];
+                $collecthigh = $item["Collectability{High}"];
+                //$reward = $SatisfactionSupplyRewardCsv->at($item["Reward"]);
+                $satisfylow = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Satisfaction{Low}"];
+                $satisfymid = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Satisfaction{Mid}"];
+                $satisfyhigh = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Satisfaction{High}"];
+                $gillow = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Gil{Low}"];
+                $gilmid = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Gil{Mid}"];
+                $gilhigh = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Gil{High}"];
+                $yellowlow = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Quantity{Low}[0]"];
+                $yellowmid = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Quantity{Mid}[0]"];
+                $yellowhigh = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Quantity{High}[0]"];
+                $whitelow = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Quantity{Low}[1]"];
+                $whitemid = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Quantity{Mid}[1]"];
+                $whitehigh = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Quantity{High}[1]"];
+                $yellowtype = $ItemCsv->at($CurrencyCsv->at($SatisfactionSupplyRewardCsv->at($item["Reward"])["Reward{Currency}[0]"])["Item"])["Name"];
+                $whitetype = $ItemCsv->at($CurrencyCsv->at($SatisfactionSupplyRewardCsv->at($item["Reward"])["Reward{Currency}[1]"])["Item"])["Name"];
                 }
-
-            $Satisfaction = implode("\n", $Satisfaction);
 
             //---------------------------------------------------------------------------------
 
             $data = [
-                '{item}' => $item,
-                '{npc}' => $npc,
+                '{item}' => $Name,
+                //'{npc}' => $npc,
                 '{location}' => $location,
                 '{id}' => $id,
                 '{chance}' => $chance,
@@ -113,7 +128,7 @@ class Satisfaction implements ParseInterface
         // save our data to the filename: GeSatisfactionWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save('GeSatisfactionWiki.txt');
+        $info = $this->save('GeSatisfactionWiki - '. $patch .'.txt', 999999);
 
         $this->io->table(
             ['Filename', 'Data Count', 'File Size'],

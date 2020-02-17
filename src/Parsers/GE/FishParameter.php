@@ -108,7 +108,6 @@ class FishParameter implements ParseInterface
 
         // save
         $this->io->text('Saving data ...');
-        $this->save('FishParameter.txt');
         $info = $this->save('GeFishParameterWiki - '. $patch .'.txt', 999999);
     }
 }
