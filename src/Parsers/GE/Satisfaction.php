@@ -6,6 +6,10 @@ use App\Parsers\CsvParseTrait;
 use App\Parsers\ParseInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 
+/**
+ * php bin/console app:parse:csv GE:Satisfaction
+ */
+
 class Satisfaction implements ParseInterface
 {
     use CsvParseTrait;
@@ -46,6 +50,7 @@ class Satisfaction implements ParseInterface
         // grab CSV files
         $SatisfactionNpcCsv = $this->csv('SatisfactionNpc');
         $SatisfactionSupplyCsv = $this->csv('SatisfactionSupply');
+        $ENpcResidentCsv = $this->csv('ENpcResident');
         $SatisfactionSupplyRewardCsv = $this->csv('SatisfactionSupplyReward');
         $ItemCsv = $this->csv('Item');
         $CurrencyCsv = $this->csv('Currency');
@@ -65,12 +70,26 @@ class Satisfaction implements ParseInterface
 
             // need to build a switch based off of the Key/id of Satisfaction Supply and have it
             // look in SatisfactionNpc's columns of "SupplyIndex" [0] through [5] to match up to
-            // get the NPC name
 
             // skip ones without a name
             if (empty($item['Item'])) {
                 continue;
             } else {
+                // get the NPC name
+                $npcid = floor($item['id']);
+                if ($npcid > 25) {
+                    $npcid = $npcid - 25;
+                } elseif ($npcid > 20) {
+                    $npcid = $npcid - 20;
+                } elseif ($npcid > 15) {
+                    $npcid = $npcid - 15;
+                } elseif ($npcid > 10) {
+                    $npcid = $npcid - 10;
+                } elseif ($npcid > 5) {
+                    $npcid = $npcid - 5;
+                }
+                $npc = $ENpcResidentCsv->at($SatisfactionNpcCsv->at($npcid)['Npc'])['Singular'];
+
                 $Name = $ItemCsv->at($item["Item"])['Name'];
                 $location = "Blank";
                 $chance = $item["Probability<%>"];
@@ -98,7 +117,7 @@ class Satisfaction implements ParseInterface
 
             $data = [
                 '{item}' => $Name,
-                //'{npc}' => $npc,
+                '{npc}' => $npc,
                 '{location}' => $location,
                 '{id}' => $id,
                 '{chance}' => $chance,
