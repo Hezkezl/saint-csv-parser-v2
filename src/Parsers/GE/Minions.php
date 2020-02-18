@@ -145,6 +145,29 @@ class Minions implements ParseInterface
 
             $Strengths = "". $gate ."". $eye ."". $shield ."". $arcana ."";
 
+            $SmallIcon = $Minion["Icon"];
+            $Icon2 = substr($SmallIcon, -3);
+            $LargeIcon = str_pad($Icon2, "6", "068", STR_PAD_LEFT);
+
+            // ensure output directory exists
+            $IconoutputDirectory = $this->getOutputFolder() . '/MinionIcons';
+            // if it doesn't exist, make it
+            if (!is_dir($IconoutputDirectory)) {
+                mkdir($IconoutputDirectory, 0777, true);
+            }
+
+            // build icon input folder paths
+            $LargeIconPath = $this->getInputFolder() .'/icon/'. $this->iconize($LargeIcon);
+            $SmallIconPath = $this->getInputFolder() .'/icon/'. $this->iconize($Minion["Icon"]);
+
+            // give correct file names to icons for output
+            $LargeIconFileName = "{$IconoutputDirectory}/$Name (Minion) Patch.png";
+            $SmallIconFileName = "{$IconoutputDirectory}/$Name (Minion) Icon.png";
+            // actually copy the icons
+            copy($SmallIconPath, $SmallIconFileName);
+            if (file_exists($LargeIconPath)) {
+                copy($LargeIconPath, $LargeIconFileName);
+            };
 
             // change the top and bottom code depending on if I want to bot the pages up or not. Places Patch on subpage
             if ($Bot == "true") {
@@ -194,5 +217,32 @@ class Minions implements ParseInterface
             [ 'Filename', 'Data Count', 'File Size' ],
             $info
         );
+    }
+
+    /**
+     * Converts SE icon "number" into a proper path
+     */
+    private function iconize($number, $hq = false)
+    {
+        $number = intval($number);
+        $extended = (strlen($number) >= 6);
+
+        if ($number == 0) {
+            return null;
+        }
+
+        // create icon filename
+        $icon = $extended ? str_pad($number, 5, "0", STR_PAD_LEFT) : '0' . str_pad($number, 5, "0", STR_PAD_LEFT);
+
+        // create icon path
+        $path = [];
+        $path[] = $extended ? $icon[0] . $icon[1] . $icon[2] .'000' : '0'. $icon[1] . $icon[2] .'000';
+
+        $path[] = $icon;
+
+        // combine
+        $icon = implode('/', $path) .'.png';
+
+        return $icon;
     }
 }

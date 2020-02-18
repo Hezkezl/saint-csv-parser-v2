@@ -73,7 +73,6 @@ class Mounts implements ParseInterface
             $SmallIcon = $Mount["Icon"];
             $Icon2 = substr($SmallIcon, -3);
             $LargeIcon = str_pad($Icon2, "6", "068", STR_PAD_LEFT);
-            $LargeIcon2 = str_pad($Icon2, "6", "077", STR_PAD_LEFT);
 
             // ensure output directory exists
             $IconoutputDirectory = $this->getOutputFolder() . '/MountIcons';
@@ -84,7 +83,6 @@ class Mounts implements ParseInterface
 
             // build icon input folder paths
             $LargeIconPath = $this->getInputFolder() .'/icon/'. $this->iconize($LargeIcon);
-            $LargeIconPath2 = $this->getInputFolder() .'/icon/'. $this->iconize($LargeIcon2);
             $SmallIconPath = $this->getInputFolder() .'/icon/'. $this->iconize($Mount["Icon"]);
 
             // give correct file names to icons for output
@@ -94,8 +92,6 @@ class Mounts implements ParseInterface
             copy($SmallIconPath, $SmallIconFileName);
             if (file_exists($LargeIconPath)) {
                 copy($LargeIconPath, $LargeIconFileName);
-            } else {
-                copy($LargeIconPath2, $LargeIconFileName);
             };
 
             // change the top and bottom code depending on if I want to bot the pages up or not. Places Patch on subpage
