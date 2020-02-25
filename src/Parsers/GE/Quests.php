@@ -23,8 +23,9 @@ class Quests implements ParseInterface
         |Level = {level}
 {requiredclass}
         |Required Affiliation =
-        |Quest Number ={number}{instancecontent1}{instancecontent2}{instancecontent3}
+        |Quest Number ={number}
 
+        |Dungeon Requirement = 
         |Required Quests ={prevquestspace1}{prevquest2}{prevquest3}
         |Unlocks Quests =
 
@@ -48,7 +49,7 @@ class Quests implements ParseInterface
         }}
 {{-stop-}}{{-start-}}
 '''Loremonger:{name}'''
-<noinclude>{{Lorempageturn|prev={prevquest1}|next=}}{{Loremquestheader|{name}|Mined=X|Summary=}}</noinclude>
+<noinclude>{{Lorempageturn|prev={prevquest1}|prev2={prevquest2}|prev3={prevquest3}|prev4={prevquest4}|next=}}{{Loremquestheader|{name}|Mined=X|Summary=}}</noinclude>
 {{LoremLoc|Location=Hydaelyn}}<!-- Replace 'Hydaelyn' here with proper location where first dialogue is said -->
 {dialogue}{battletalk}{{-stop-}}
 {{-start-}}
@@ -399,9 +400,10 @@ class Quests implements ParseInterface
             $prevquest3 = str_replace(",", "&#44;", ($questCsv->at($quest['PreviousQuest[2]'])['Name']));
 
             // Show the names of Required Dungeons to Unlock this quest.
-            $InstanceContent1 = $InstanceContentCsv->at($quest['InstanceContent[0]'])['Name'];
-            $InstanceContent2 = $InstanceContentCsv->at($quest['InstanceContent[1]'])['Name'];
-            $InstanceContent3 = $InstanceContentCsv->at($quest['InstanceContent[2]'])['Name'];
+            // Uncommented out as of Patch 5.2 with the InstanceContent name removal
+            //$InstanceContent1 = $InstanceContentCsv->at($quest['InstanceContent[0]'])['Name'];
+            //$InstanceContent2 = $InstanceContentCsv->at($quest['InstanceContent[1]'])['Name'];
+            //$InstanceContent3 = $InstanceContentCsv->at($quest['InstanceContent[2]'])['Name'];
 
             // Array of names that should not be capitalized
             $IncorrectNames = array(" De ", " Bas ", " Mal ", " Van ", " Cen ", " Sas ", " Tol ", " Zos ", " Yae ", " The ", " Of The ", " Of ",
@@ -609,9 +611,9 @@ class Quests implements ParseInterface
                 '{faction}' => $faction,
                 '{requiredclass}' => $requiredclass,
                 '{number}' => $quest['id'],
-                '{instancecontent1}' => $InstanceContent1 ? "\n|Dungeon Requirement = ". $InstanceContent1 : "",
-                '{instancecontent2}' => $InstanceContent2 ? ", ". $InstanceContent2 : "",
-                '{instancecontent3}' => $InstanceContent3 ? ", ". $InstanceContent3 : "",
+                //'{instancecontent1}' => $InstanceContent1 ? "\n|Dungeon Requirement = ". $InstanceContent1 : "",
+                //'{instancecontent2}' => $InstanceContent2 ? ", ". $InstanceContent2 : "",
+                //'{instancecontent3}' => $InstanceContent3 ? ", ". $InstanceContent3 : "",
                 '{prevquestspace1}' => $prevquestspace1 ? " ". $prevquestspace1 : "",
                 '{prevquest1}' => $prevquest1 ? $prevquest1 : "",
                 '{prevquest2}' => $prevquest2 ? ", ". $prevquest2 : "",
