@@ -391,11 +391,12 @@ class Quests implements ParseInterface
                 $repeatable = $string;
             }
 
-            //Show the Previous Quest(s) correct Name by looking them up.
-            $prevquest1 = $questCsv->at($quest['PreviousQuest[0]'])['Name'];
-            $prevquestspace1 = $questCsv->at($quest['PreviousQuest[0]'])['Name'];
-            $prevquest2 = $questCsv->at($quest['PreviousQuest[1]'])['Name'];
-            $prevquest3 = $questCsv->at($quest['PreviousQuest[2]'])['Name'];
+            //Show the Previous Quest(s) correct Name by looking them up. Also replace any commas in the name with &#44;
+            //(the "html code" for a comma.
+            $prevquest1 = str_replace(",", "&#44;", ($questCsv->at($quest['PreviousQuest[0]'])['Name']));
+            $prevquestspace1 = str_replace(",", "&#44;", ($questCsv->at($quest['PreviousQuest[0]'])['Name']));
+            $prevquest2 = str_replace(",", "&#44;", ($questCsv->at($quest['PreviousQuest[1]'])['Name']));
+            $prevquest3 = str_replace(",", "&#44;", ($questCsv->at($quest['PreviousQuest[2]'])['Name']));
 
             // Show the names of Required Dungeons to Unlock this quest.
             $InstanceContent1 = $InstanceContentCsv->at($quest['InstanceContent[0]'])['Name'];

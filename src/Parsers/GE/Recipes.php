@@ -15,7 +15,7 @@ class Recipes implements ParseInterface
 
     // the wiki output format / template we shall use
     const WIKI_FORMAT = "{{-start-}}
-'''{result}/Recipe'''
+'''{result}/Recipe/{skill}'''
 {{ARR Infobox Recipe
 |Recipe ID           = {index}
 |Result              = {result}{resultcount}{unlockbook}{specialist}

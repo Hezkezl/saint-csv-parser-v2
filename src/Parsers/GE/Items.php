@@ -62,7 +62,10 @@ class Items implements ParseInterface
             if (empty($item['Name'])) {
                 continue;
             }
-            $Name = $item['Name'];
+
+            // remove Emphasis, comma, and wiki italic '' code in names
+            $Name = preg_replace("/<Emphasis>|<\/Emphasis>|,|''/", "",$item['Name']);
+            //$Name = str_replace("&", "and", $Name);
 
             // change the top and bottom code depending on if I want to bot the pages up or not
             if ($Bot == "true") {
@@ -782,6 +785,11 @@ class Items implements ParseInterface
 
             $ItemAction = implode("\n",$ItemAction);
 
+            // Remove En-dash and Em-dash from Subheading name
+            $SubHeadingReplaceSearch = array("–", "—");
+            $SubHeadingReplaceText = array("-", "-");
+            $Subheading = str_replace($SubHeadingReplaceSearch, $SubHeadingReplaceText, $itemUiCategory['Name']);
+
             // Save some data
             $data = [
                 '{Top}' => $Top,
@@ -789,7 +797,7 @@ class Items implements ParseInterface
                 '{id}' => $item['id'],
                 '{rarity}' => $item['Rarity'],
                 '{name}' => $Name,
-                '{subheading}' => $itemUiCategory['Name'],
+                '{subheading}' => $Subheading,
                 '{description}' => $Description ? $Description : "",
                 '{slots}' => ($item['MateriaSlotCount'] > 0) ? "\n| Slots          = ". $item['MateriaSlotCount'] : "",
                 '{advancedmelding}' => ($item['MateriaSlotCount'] > 0) && ($item['IsAdvancedMeldingPermitted'] == "False") ? "\n| Advanced Melds = False" : "",
