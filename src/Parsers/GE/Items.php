@@ -289,7 +289,8 @@ class Items implements ParseInterface
 
             // Eureka Gear stats
             $EurekaBonus = [];
-            if ($item['ItemSpecialBonus'] == 7) {
+            // fucked if I know why I can't just put "$item['ItemSpecialBonus'] == 7" and have it work...
+            if (($item['ItemSpecialBonus'] > 6) && ($item['ItemSpecialBonus'] < 8)) {
                 foreach (range(0, 5) as $i) {
                     if (!empty($item["BaseParam[$i]"])) {
                         $BonusStatName = str_replace(" ", "_", $BaseParamCsv->at($item["BaseParam[$i]"])['Name']);
@@ -308,7 +309,7 @@ class Items implements ParseInterface
 
             // Bonus Stat Code for normal items
             $BonusStat = [];
-            if ($item['CanBeHq'] == "True" && !empty($item['BaseParam[0]'] && !$item['ItemSpecialBonus'] == 7)) {
+            if (($item['CanBeHq'] == "True") && (!empty($item['BaseParam[0]'])) && ($item['ItemSpecialBonus'] != 7)) {
                 foreach (range(0, 5) as $i) {
                     if (!empty($item["BaseParam[$i]"])) {
                         $BonusStatName = str_replace(" ", "_", $BaseParamCsv->at($item["BaseParam[$i]"])['Name']);
@@ -320,7 +321,7 @@ class Items implements ParseInterface
                         }
                     }
                 }
-            } elseif ($item['CanBeHq'] == "False" && !empty($item['BaseParam[0]'] && !$item['ItemSpecialBonus'] == 7)) {
+            } elseif (($item['CanBeHq'] == "False") && (!empty($item['BaseParam[0]'])) && ($item['ItemSpecialBonus'] != 7)) {
                 foreach (range(0, 5) as $i) {
                     if (!empty($item["BaseParam[$i]"])) {
                         $BonusStatName = str_replace(" ", "_", $BaseParamCsv->at($item["BaseParam[$i]"])['Name']);
@@ -340,8 +341,8 @@ class Items implements ParseInterface
 
             // Item Action
             $ItemAction = [];
-            $stringtype1 = false;
-            $stringtype2 = false;
+            //$stringtype1 = false;
+            //$stringtype2 = false;
             $outputstring = false;
             $outputstring0 = false;
             $outputstring1 = false;
