@@ -143,7 +143,7 @@ class Items implements ParseInterface
                         $Description = "\n| Fits           = Au Ra\n| Gender         = Female";
                         break;
                     case 'Fits: Game Masters';
-                        $Description = "\n| Fits           = Game Masters";
+                        $Description = "\n| | FitsGM       = Game Masters";
                         break;
                     case NULL:
                         break;
