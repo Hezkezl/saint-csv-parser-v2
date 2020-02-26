@@ -154,7 +154,7 @@ class Items implements ParseInterface
                         $SpecialDescription = "\n| FitsGM         = Game Masters";;
                         break;
                     default:
-                        $SpecialDescription = "";
+                        $SpecialDescription = "\n| Description    = ". $item['Description'];
                         break;
                 }
             }
