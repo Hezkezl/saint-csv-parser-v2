@@ -17,7 +17,7 @@ class Items implements ParseInterface
         | Index          = {id}
         | Rarity         = {rarity}
         | Name           = {name}
-        | Subheading     = {subheading}{description}{slots}{advancedmelding}{stack}{requires}
+        | Subheading     = {subheading}{description}{SpecialDescription}{slots}{advancedmelding}{stack}{requires}
         | Required Level = {level}
         | Item Level     = {itemlevel}{untradable}{unique}{convertible}{sells}{dyeallowed}{crestallowed}{glamour}{desynthesis}{repair}{setbonus}{setbonusgc}{sanction}{bonus}{eureka}{physicaldamage}{magicdamage}{defense}{block}{itemaction}{MarketProhib}
         }}{Bottom}";
@@ -139,9 +139,6 @@ class Items implements ParseInterface
                     case '17':
                         $Description = "\n| Fits           = Viera";
                         break;
-                    case 'Fits: Game Masters';
-                        $Description = "\n| | FitsGM       = Game Masters";
-                        break;
                     case NULL:
                         break;
                     default:
@@ -149,23 +146,18 @@ class Items implements ParseInterface
                         break;
                 }
             }
-            // dont need this
-            //$SpecialDescription = false;
-            //if (!empty($item['EquipSlotCategory'])) {
-            //    switch ($item['EquipSlotCategory']) {
-            //        case "16":
-            //            $SpecialDescription = "\n| Other Conditions = Cannot equip gear to hands, legs, and feet.";
-            //            break;
-            //        case "15":
-            //            $SpecialDescription = "\n| Other Conditions = Cannot equip gear to head.";
-            //            break;
-            //        case NULL:
-            //            break;
-            //        default:
-            //            $SpecialDescription = "";
-            //            break;
-            //    }
-            //}
+            // GM Code
+            $SpecialDescription = false;
+            if (!empty($item['Description'])) {
+                switch ($item['Description']) {
+                    case 'Fits: Game Masters';
+                        $SpecialDescription = "\n| FitsGM         = Game Masters";;
+                        break;
+                    default:
+                        $SpecialDescription = "";
+                        break;
+                }
+            }
 
 
             // don't display Dye status for equipment that its not applicable to, and do show Crest/Dye for Shield/Head/Body
@@ -826,6 +818,7 @@ class Items implements ParseInterface
                 '{name}' => $Name,
                 '{subheading}' => $Subheading,
                 '{description}' => $Description ? $Description : "",
+                '{SpecialDescription}' => $SpecialDescription,
                 '{slots}' => ($item['MateriaSlotCount'] > 0) ? "\n| Slots          = ". $item['MateriaSlotCount'] : "",
                 '{advancedmelding}' => ($item['MateriaSlotCount'] > 0) && ($item['IsAdvancedMeldingPermitted'] == "False") ? "\n| Advanced Melds = False" : "",
                 '{stack}' => ($item['StackSize'] > 1) ? "\n| Stack          = ". $item['StackSize'] : "",
