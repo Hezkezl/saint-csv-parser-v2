@@ -310,14 +310,26 @@ class Items implements ParseInterface
             $BonusStat = [];
             if (($item['CanBeHq'] == "True") && (!empty($item['BaseParam[0]'])) && ($item['ItemSpecialBonus'] != 7)) {
                 foreach (range(0, 5) as $i) {
-                    if (!empty($item["BaseParam[$i]"])) {
+                    if ((!empty($item["BaseParam[$i]"])) && (!empty($item["BaseParamValue[$i]"]))) {
                         $BonusStatName = str_replace(" ", "_", $BaseParamCsv->at($item["BaseParam[$i]"])['Name']);
-                        $BonusStat[0] ="\n";
+                        $BonusStat[0] = "\n";
                         $BonusStat[] = "| Bonus " . $BonusStatName . " = +" . $item["BaseParamValue[$i]"];
-                        if (!empty($item['BaseParamValue{Special}[' . ($i+2) . ']'])) {
-                            $BonusStat[] = '| Bonus ' . $BonusStatName . ' HQ = +'.
-                                ($item["BaseParamValue[$i]"] + $item['BaseParamValue{Special}[' . ($i+2) . ']']);
+                        // create a different loop from the foreach above that goes from 0 to 5. For each one of those numbers
+                        // (which will be the number in the BaseParamSpecial[X] column) match up the "foreach" loop number
+                        // with the "for" loop number and print the stats. Complicated asfuck but should fix SE's retardedness with
+                        // making BaseParam columns not matching up with +2 of foreach in the BaseParamValue{Special} column...
+                        // not perfect, still doesn't post stats that have 0 NQ and +1 or more HQ. But should fix the missing
+                        // HQ stats for the final stat, usually Vitality, on HQ crafted accessories and other items.
+                        for ($x = 0; $x <= 5; $x++) {
+                            if ($item["BaseParam[$i]"] == $item["BaseParam{Special}[$x]"]) {
+                                $BonusStat[] = '| Bonus ' . $BonusStatName . ' HQ = +' . ($item["BaseParamValue[$i]"] + $item["BaseParamValue{Special}[$x]"]);
+                            }
                         }
+                            // old HQ stat code. Obsolete-ish now with the 'for' loop up above. Saving code just in case.
+                            //if (!empty($item['BaseParamValue{Special}[' . ($i+2) . ']'])) {
+                            //    $BonusStat[] = '| Bonus ' . $BonusStatName . ' HQ = +'.
+                            //        ($item["BaseParamValue[$i]"] + $item['BaseParamValue{Special}[' . ($i+2) . ']']);
+                            //}
                     }
                 }
             } elseif (($item['CanBeHq'] == "False") && (!empty($item['BaseParam[0]'])) && ($item['ItemSpecialBonus'] != 7)) {
