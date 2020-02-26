@@ -289,8 +289,7 @@ class Items implements ParseInterface
 
             // Eureka Gear stats
             $EurekaBonus = [];
-            // fucked if I know why I can't just put "$item['ItemSpecialBonus'] == 7" and have it work...
-            if (($item['ItemSpecialBonus'] > 6) && ($item['ItemSpecialBonus'] < 8)) {
+            if ($item['ItemSpecialBonus'] == 7) {
                 foreach (range(0, 5) as $i) {
                     if (!empty($item["BaseParam[$i]"])) {
                         $BonusStatName = str_replace(" ", "_", $BaseParamCsv->at($item["BaseParam[$i]"])['Name']);
