@@ -17,7 +17,7 @@ class Items implements ParseInterface
         | Index          = {id}
         | Rarity         = {rarity}
         | Name           = {name}
-        | Subheading     = {subheading}{description}{specialdescription}{slots}{advancedmelding}{stack}{requires}
+        | Subheading     = {subheading}{description}{slots}{advancedmelding}{stack}{requires}
         | Required Level = {level}
         | Item Level     = {itemlevel}{untradable}{unique}{convertible}{sells}{dyeallowed}{crestallowed}{glamour}{desynthesis}{repair}{setbonus}{setbonusgc}{sanction}{bonus}{eureka}{physicaldamage}{magicdamage}{defense}{block}{itemaction}{MarketProhib}
         }}{Bottom}";
@@ -149,23 +149,23 @@ class Items implements ParseInterface
                         break;
                 }
             }
-            // change Fits/Gender to wiki-specific parameters
-            $SpecialDescription = false;
-            if (!empty($item['EquipSlotCategory'])) {
-                switch ($item['EquipSlotCategory']) {
-                    case "16":
-                        $SpecialDescription = "\n| Other Conditions = Cannot equip gear to hands, legs, and feet.";
-                        break;
-                    case "15":
-                        $SpecialDescription = "\n| Other Conditions = Cannot equip gear to head.";
-                        break;
-                    case NULL:
-                        break;
-                    default:
-                        $SpecialDescription = "";
-                        break;
-                }
-            }
+            // dont need this
+            //$SpecialDescription = false;
+            //if (!empty($item['EquipSlotCategory'])) {
+            //    switch ($item['EquipSlotCategory']) {
+            //        case "16":
+            //            $SpecialDescription = "\n| Other Conditions = Cannot equip gear to hands, legs, and feet.";
+            //            break;
+            //        case "15":
+            //            $SpecialDescription = "\n| Other Conditions = Cannot equip gear to head.";
+            //            break;
+            //        case NULL:
+            //            break;
+            //        default:
+            //            $SpecialDescription = "";
+            //            break;
+            //    }
+            //}
 
 
             // don't display Dye status for equipment that its not applicable to, and do show Crest/Dye for Shield/Head/Body
@@ -826,7 +826,6 @@ class Items implements ParseInterface
                 '{name}' => $Name,
                 '{subheading}' => $Subheading,
                 '{description}' => $Description ? $Description : "",
-                '{specialdescription}' => $SpecialDescription,
                 '{slots}' => ($item['MateriaSlotCount'] > 0) ? "\n| Slots          = ". $item['MateriaSlotCount'] : "",
                 '{advancedmelding}' => ($item['MateriaSlotCount'] > 0) && ($item['IsAdvancedMeldingPermitted'] == "False") ? "\n| Advanced Melds = False" : "",
                 '{stack}' => ($item['StackSize'] > 1) ? "\n| Stack          = ". $item['StackSize'] : "",
