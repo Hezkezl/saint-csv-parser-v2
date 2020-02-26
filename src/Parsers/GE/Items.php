@@ -17,7 +17,7 @@ class Items implements ParseInterface
         | Index          = {id}
         | Rarity         = {rarity}
         | Name           = {name}
-        | Subheading     = {subheading}{description}{slots}{advancedmelding}{stack}{requires}
+        | Subheading     = {subheading}{description}{specialdescription}{slots}{advancedmelding}{stack}{requires}
         | Required Level = {level}
         | Item Level     = {itemlevel}{untradable}{unique}{convertible}{sells}{dyeallowed}{crestallowed}{glamour}{desynthesis}{repair}{setbonus}{setbonusgc}{sanction}{bonus}{eureka}{physicaldamage}{magicdamage}{defense}{block}{itemaction}{MarketProhib}
         }}{Bottom}";
@@ -89,58 +89,55 @@ class Items implements ParseInterface
 
             // change Fits/Gender to wiki-specific parameters
             $Description = false;
-            if (!empty($item['Description'])) {
-                switch ($item['Description']) {
-                    case 'Fits: All ♂':
+            if (!empty($item['EquipRestriction'])) {
+                switch ($item['EquipRestriction']) {
+                    case '2':
                         $Description = "\n| Gender         = Male";
                         break;
-                    case 'Fits: All ♀':
+                    case '3':
                         $Description = "\n| Gender         = Female";
                         break;
-                    case "Fits: All ♀\nCannot equip gear to hands, legs, and feet.":
-                        $Description = "\n| Gender         = Female\n| Other Conditions = Cannot equip gear to hands, legs, and feet.";
-                        break;
-                    case "Fits: All ♂\nCannot equip gear to head.":
-                        $Description = "\n| Gender         = Male\n| Other Conditions = Cannot equip gear to head.";
-                        break;
-                    case "Fits: All ♂\nCannot equip gear to hands, legs, and feet.":
-                        $Description = "\n| Gender         = Male\n| Other Conditions = Cannot equip gear to hands, legs, and feet.";
-                        break;
-                    case 'Fits: Hyur ♂':
+                    case '4':
                         $Description = "\n| Fits           = Hyur\n| Gender         = Male";
                         break;
-                    case 'Fits: Hyur ♀':
+                    case '5':
                         $Description = "\n| Fits           = Hyur\n| Gender         = Female";
                         break;
-                    case 'Fits: Elezen ♂':
+                    case '6':
                         $Description = "\n| Fits           = Elezen\n| Gender         = Male";
                         break;
-                    case 'Fits: Elezen ♀':
+                    case '7':
                         $Description = "\n| Fits           = Elezen\n| Gender         = Female";
                         break;
-                    case 'Fits: Lalafell ♂':
+                    case '8':
                         $Description = "\n| Fits           = Lalafell\n| Gender         = Male";
                         break;
-                    case 'Fits: Lalafell ♀':
+                    case '9':
                         $Description = "\n| Fits           = Lalafell\n| Gender         = Female";
                         break;
-                    case 'Fits: Miqo\'te ♂':
+                    case '10':
                         $Description = "\n| Fits           = Miqo\'te\n| Gender         = Male";
                         break;
-                    case 'Fits: Miqo\'te ♀':
+                    case '11':
                         $Description = "\n| Fits           = Miqo\'te\n| Gender         = Female";
                         break;
-                    case 'Fits: Roegadyn ♂':
+                    case '12':
                         $Description = "\n| Fits           = Roegadyn\n| Gender         = Male";
                         break;
-                    case 'Fits: Roegadyn ♀':
+                    case '13':
                         $Description = "\n| Fits           = Roegadyn\n| Gender         = Female";
                         break;
-                    case 'Fits: Au Ra ♂':
+                    case '14':
                         $Description = "\n| Fits           = Au Ra\n| Gender         = Male";
                         break;
-                    case 'Fits: Au Ra ♀':
+                    case '15':
                         $Description = "\n| Fits           = Au Ra\n| Gender         = Female";
+                        break;
+                    case '16':
+                        $Description = "\n| Fits           = Hrothgar";
+                        break;
+                    case '17':
+                        $Description = "\n| Fits           = Viera";
                         break;
                     case 'Fits: Game Masters';
                         $Description = "\n| | FitsGM       = Game Masters";
@@ -152,6 +149,24 @@ class Items implements ParseInterface
                         break;
                 }
             }
+            // change Fits/Gender to wiki-specific parameters
+            $SpecialDescription = false;
+            if (!empty($item['EquipSlotCategory'])) {
+                switch ($item['EquipSlotCategory']) {
+                    case "16":
+                        $SpecialDescription = "\n| Other Conditions = Cannot equip gear to hands, legs, and feet.";
+                        break;
+                    case "15":
+                        $SpecialDescription = "\n| Other Conditions = Cannot equip gear to head.";
+                        break;
+                    case NULL:
+                        break;
+                    default:
+                        $SpecialDescription = "";
+                        break;
+                }
+            }
+
 
             // don't display Dye status for equipment that its not applicable to, and do show Crest/Dye for Shield/Head/Body
             $Dye = false;
@@ -811,6 +826,7 @@ class Items implements ParseInterface
                 '{name}' => $Name,
                 '{subheading}' => $Subheading,
                 '{description}' => $Description ? $Description : "",
+                '{specialdescription}' => $SpecialDescription,
                 '{slots}' => ($item['MateriaSlotCount'] > 0) ? "\n| Slots          = ". $item['MateriaSlotCount'] : "",
                 '{advancedmelding}' => ($item['MateriaSlotCount'] > 0) && ($item['IsAdvancedMeldingPermitted'] == "False") ? "\n| Advanced Melds = False" : "",
                 '{stack}' => ($item['StackSize'] > 1) ? "\n| Stack          = ". $item['StackSize'] : "",
