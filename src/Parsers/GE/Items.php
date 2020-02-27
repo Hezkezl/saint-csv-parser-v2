@@ -68,7 +68,7 @@ class Items implements ParseInterface
 
             // add Desynth template and page if item can be Desynthesized
             $DesynthTop = false;
-            $Desynth = (($item['Salvage'] > 0 && $item['ClassJob{Repair}'] > 0) || ($item['Salvage'] > 0 && $item['ItemUICategory'] == 47))
+            $Desynth = (($item['ClassJob{Repair}'] > 0) && ($SalvageCsv->at($item['Salvage'])['OptimalSkill'] > 0))
                 ? "{{ARR Infobox Desynth\n|Item            = ". $item['Name'] ."\n|Primary Skill   = ".
                 ucwords(strtolower($ClassJobCsv->at($item['ClassJob{Repair}'])['Name'])) ."\n|Result 1        = \n".""
                 ."|Result 1 Amount = \n|Result 2        = \n|Result 2 Amount = \n|Result 3        = \n".""
@@ -76,7 +76,7 @@ class Items implements ParseInterface
                 ."|Result 5 Amount = \n|Result 6        = \n|Result 6 Amount = \n}}"
                 : false;
 
-            if (($Bot == "true") && (($item['Salvage'] > 0 && $item['ClassJob{Repair}'] > 0) || ($item['Salvage'] > 0 && $item['ItemUICategory'] == 47))) {
+            if (($Bot == "true") && (($item['ClassJob{Repair}'] > 0) && ($SalvageCsv->at($item['Salvage'])['OptimalSkill'] > 0))) {
                 $DesynthTop = "{{-start-}}\n'''$Name/Desynth'''\n$Desynth{{-stop-}}";
             } elseif (($item['Salvage'] > 0 && $item['ClassJob{Repair}'] > 0) || ($item['Salvage'] > 0 && $item['ItemUICategory'] == 47)) {
                 $DesynthTop = "http://ffxiv.gamerescape.com/wiki/$Name/Desynth\n$Desynth";
@@ -751,7 +751,7 @@ class Items implements ParseInterface
                 '{glamour}' => ($item['IsGlamourous'] == "True")
                     ? "\n| Projectable    = Yes"
                     : "",
-                '{desynthesis}' => (($item['Salvage'] > 0 && $item['ClassJob{Repair}'] > 0) || ($item['Salvage'] > 0 && $item['ItemUICategory'] == 47))
+                '{desynthesis}' => (($item['ClassJob{Repair}'] > 0) && ($SalvageCsv->at($item['Salvage'])['OptimalSkill'] > 0))
                     ? "\n| Desynthesizable= Yes\n| Desynth Level  = ". $SalvageCsv->at($item['Salvage'])['OptimalSkill']
                     : "\n| Desynthesizable= No",
                 '{repair}' => $Repair,
