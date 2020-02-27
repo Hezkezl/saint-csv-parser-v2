@@ -344,13 +344,14 @@ class Items implements ParseInterface
             $outputstring0 = false;
             $outputstring1 = false;
             $outputstring2 = false;
+            $HQString = false;
             if ($item['ItemAction'] > 0) {
 
                 $ItemActionNumber = $item["ItemAction"];
                 $ItemActionType = $ItemActionCsv->at($ItemActionNumber)["Type"];
                 //start of each itemaction code
 
-                //start of 842 (remove status code)
+                //start of 842 (Remove Status code)
                 if ($ItemActionType == 842) {
 
                     //NQ
@@ -374,7 +375,7 @@ class Items implements ParseInterface
                     $outputstring = "\n". $stringtype1 ."" . $ItemActionEffect . "". $stringtype2 ."";
 
                 }
-                //end of single type code
+                //end of Remove Status code
 
                 //start of 1013 (Barding code)
                 if ($ItemActionType == 1013) {
@@ -390,7 +391,7 @@ class Items implements ParseInterface
                     $outputstring = "\n". $stringtype1 ."" . $ItemActionEffect . "". $stringtype2 ."";
 
                 }
-                //end of single type code
+                //end of Barding code
 
                  //start of 1055 (Restore GP code)
                 if ($ItemActionType == 1055) {
@@ -402,23 +403,23 @@ class Items implements ParseInterface
                     //start text for string
                     $stringtype1 = "| Consumable Restores_GP = ";
                     //end text for string
-                    $stringtype2 = "";
+                    $stringtype2 = false;
 
                     //HQ - If there is no HQ it will not add anything extra
                     $ItemActionEffectHQRaw = $ItemActionCsv->at($ItemActionNumber)["Data{HQ}[0]"];
-                    if ($ItemActionEffectHQRaw !== 0) {
-                        $ItemActionEffectHQ = $ItemActionEffectHQRaw;
-                        $HQString = "\n| Consumable Restores_GP HQ = " . $ItemActionEffectHQ . "";
-                    } elseif ($ItemActionEffectHQRaw == 0) {
-                        $ItemActionEffectHQ = "";
-                        $HQString = "";
+                    switch ($ItemActionEffectHQRaw) {
+                        case 0:
+                            break;
+                        default:
+                            $ItemActionEffectHQ = $ItemActionEffectHQRaw;
+                            $HQString = "\n| Consumable Restores_GP HQ = " . $ItemActionEffectHQ;
+                            break;
                     }
                     $outputstring = "\n". $stringtype1 ."" . $ItemActionEffect . "". $stringtype2 ."". $HQString ."";
-
                 }
-                //end of single type code
+                //end of Restore GP code
 
-                //start of 1322 (Whistle to mount code)
+                //start of 1322 (Whistle to Mount code)
                 if ($ItemActionType == 1322) {
 
                     //NQ
@@ -432,9 +433,9 @@ class Items implements ParseInterface
                     $outputstring = "\n". $stringtype1 ."" . $ItemActionEffect . "". $stringtype2 ."";
 
                 }
-                //end of single type code
+                //end of Whistle to Mount code
 
-                //start of 2136 (Unlocks Master Recipes)
+                //start of 2136 (Master Recipes)
                 if ($ItemActionType == 2136) {
 
                     //NQ
@@ -448,7 +449,7 @@ class Items implements ParseInterface
                     $outputstring = "\n". $stringtype1 ."" . $ItemActionEffect . "". $stringtype2 ."";
 
                 }
-                //end of single type code
+                //end of Master Recipes code
 
                 //start of 2633 (Unlocks emotes etc)
                 //if ($ItemActionType == 2633) {
@@ -463,7 +464,7 @@ class Items implements ParseInterface
                 //    $stringtype2 = "";
                 //    $outputstring = "\n". $stringtype1 ."" . $ItemActionEffect . "". $stringtype2 ."";
                 //}
-                //end of single type code
+                //end of Emotes etc code
 
                 //start of 3357 (TripleTriad Card)
                 if ($ItemActionType == 3357) {
@@ -481,9 +482,9 @@ class Items implements ParseInterface
                     $outputstring = "\n". $stringtype1 ."" . $ItemActionEffect . "". $stringtype2 ."";
 
                 }
-                //end of single type code
+                //end of TripleTriad Card code
 
-                //start of 3800 (gives mgp)
+                //start of 3800 (gives MGP)
                 if ($ItemActionType == 3800) {
 
                     //NQ
@@ -497,7 +498,7 @@ class Items implements ParseInterface
                     $outputstring = "\n". $stringtype1 ."" . $ItemActionEffectRaw . "". $stringtype2 ."";
 
                 }
-                //end of single type code
+                //end of MGP code
 
                 //start of 4107 (Tome of Folklore)
                 if ($ItemActionType == 4107) {
@@ -513,9 +514,9 @@ class Items implements ParseInterface
                     $outputstring = "\n". $stringtype1 ."" . $ItemActionEffect . "". $stringtype2 ."";
 
                 }
-                //end of single type code
+                //end of Tome of Folklore code
 
-                //start of 5845 (Orc Scrolls)
+                //start of 5845 (Orchestrion Rolls)
                 if ($ItemActionType == 5845) {
 
                     //NQ
@@ -527,17 +528,16 @@ class Items implements ParseInterface
                     //end text for string
                     $stringtype2 = "_Orchestrion_Roll";
                     $outputstring = "\n". $stringtype1 ."" . $ItemActionEffect . "". $stringtype2 ."";
-
                 }
-                //end of single type code
+                //end of Orchestrion Rolls code
 
-                //start of 844, 845 and 846 (Battle Food/gathering food/attrib potions)
+                //start of 844, 845 and 846 (Battle Food/gathering food/attribute potions)
                 if (($ItemActionType == 844) || ($ItemActionType == 845) || ($ItemActionType == 846)) {
                     //NQ
                     //item status effect
                     $ItemActionEffectStatus = $StatusCsv->at($ItemActionCsv->at($ItemActionNumber)["Data[0]"])["Name"];
                     $ItemActionEffectStatusReplace = str_replace(" ", "_", $ItemActionEffectStatus);
-                    $ItemActionEffectStatusFmt = "\n| Consumable Adds_". $ItemActionEffectStatusReplace ."=&nbsp;";
+                    $ItemActionEffectStatusFmt = "\n| Consumable Adds_$ItemActionEffectStatusReplace = &nbsp;";
                     $ItemActionEffectRaw = $ItemActionCsv->at($ItemActionNumber)["Data[1]"];
                     $ItemActionSeconds = $ItemActionCsv->at($ItemActionNumber)["Data[2]"];
                     //$ItemActionEffect = $ItemFoodCsv->at($ItemActionEffectRaw)["EXPBonus%"];
@@ -551,17 +551,11 @@ class Items implements ParseInterface
                     $DurationFormat = str_replace("m0s", "m", $DurationFormat1);
                     //$DurationFormat = str_replace("0m", "", $DurationString);
                     //$DurationFormatCut = substr($DurationFormat, 0, -3);
-                    $Duration = "\n\n| Duration =". $DurationFormat. "";
+                    $Duration = "\n\n| Duration =$DurationFormat";
                     //exp
                     $EXPBonus = $ItemFoodCsv->at($ItemActionEffectRaw)["EXPBonus%"];
 
-
-                    if ($ItemActionType == 846) {
-                        $EXPBonusFmt = "";
-                    } elseif ($ItemActionType !== 846) {
-                        $EXPBonusFmt = "| Consumable EXP_Bonus = +". $EXPBonus ."%";
-                    }
-
+                    $EXPBonusFmt = ($ItemActionType == 846) ? false : "| Consumable EXP_Bonus = +$EXPBonus%";
 
                     $RecastNQ = $item['Cooldown<s>'];
                     $RecastHQpercent = ($RecastNQ * 0.1);
@@ -589,9 +583,9 @@ class Items implements ParseInterface
                     //Start of base 0
                     $RelativeSwitchBool = $ItemFoodCsv->at($ItemActionEffectRaw)["IsRelative[0]"];
                     //switch to percentage if true and flat if false
-                    if ($RelativeSwitchBool = True) {
+                    if ($RelativeSwitchBool = true) {
                         $RelativeSwitch = "%";
-                    } elseif ($RelativeSwitchBool = False) {
+                    } elseif ($RelativeSwitchBool = false) {
                         $RelativeSwitch = "";
                     }
                     $BaseStat = str_replace(" ", "_", $BaseParamCsv->at($ItemFoodCsv->at($ItemActionEffectRaw)["BaseParam[0]"])["Name"]);
@@ -605,7 +599,7 @@ class Items implements ParseInterface
                         $BaseValueFmt = "". $BaseStatFmt ."+". $BaseValue ."". $RelativeSwitch ."\n";
 
                     $BaseMax = $ItemFoodCsv->at($ItemActionEffectRaw)["Max[0]"];
-                        $BaseMaxFmt = "". $BaseStatCapFmt ."+". $BaseMax ."\n";
+                    $BaseMaxFmt = "". $BaseStatCapFmt ."+". $BaseMax ."\n";
 
                     $BaseValueHQ = $ItemFoodCsv->at($ItemActionEffectRaw)["Value{HQ}[0]"];
                         $BaseValueHQFmt = "". $BaseStatHQFmt ."+". $BaseValueHQ ."". $RelativeSwitch ."\n";
@@ -624,9 +618,9 @@ class Items implements ParseInterface
                     //Start of base 1
                     $RelativeSwitchBool1 = $ItemFoodCsv->at($ItemActionEffectRaw)["IsRelative[1]"];
                     //switch to percentage if true and flat if false
-                    if ($RelativeSwitchBool1 = True) {
+                    if ($RelativeSwitchBool1 = true) {
                         $RelativeSwitch1 = "%";
-                    } elseif ($RelativeSwitchBool1 = False) {
+                    } elseif ($RelativeSwitchBool1 = false) {
                         $RelativeSwitch1 = "";
                     }
                     $BaseStat1 = str_replace(" ", "_", $BaseParamCsv->at($ItemFoodCsv->at($ItemActionEffectRaw)["BaseParam[1]"])["Name"]);
@@ -659,9 +653,9 @@ class Items implements ParseInterface
                     //Start of base 2
                     $RelativeSwitchBool2 = $ItemFoodCsv->at($ItemActionEffectRaw)["IsRelative[2]"];
                     //switch to percentage if true and flat if false
-                    if ($RelativeSwitchBool2 = True) {
+                    if ($RelativeSwitchBool2 = true) {
                         $RelativeSwitch2 = "%";
-                    } elseif ($RelativeSwitchBool1 = False) {
+                    } elseif ($RelativeSwitchBool1 = false) {
                         $RelativeSwitch2 = "";
                     }
                     $BaseStat2 = str_replace(" ", "_", $BaseParamCsv->at($ItemFoodCsv->at($ItemActionEffectRaw)["BaseParam[2]"])["Name"]);
@@ -696,9 +690,9 @@ class Items implements ParseInterface
                     $stringtype2 = "";
                     $outputstring = "\n". $Duration ."" . $Recast . "". $outputstring0 ."". $outputstring1 ."". $outputstring2 ."". $EXPBonusFmt ."". $ItemActionEffectStatusFmt. "";
                 }
-                //end of single type code
+                //end of Battle Food/gathering food/attribute potions code
 
-                //start of 847 848 (HP/Mp Potions)
+                //start of 847 848 (HP/MP Potions)
                 if (($ItemActionType == 847) || ($ItemActionType == 848)) {
 
                 if ($ItemActionType == 847) {
@@ -746,15 +740,13 @@ class Items implements ParseInterface
                 $RecastFormatHQ1 = str_replace(" 0m", " ", $RecastStringHQ);
                 $RecastFormatHQ = str_replace("m0s", "m", $RecastFormatHQ1);
 
-                $Recast = "\n| Recast = ". $RecastFormatNQ ."\n| Recast HQ = ". $RecastFormatHQ ."";
+                $Recast = "\n| Recast = $RecastFormatNQ\n| Recast HQ = $RecastFormatHQ";
 
                 if (empty($ItemActionEffectRaw)) continue;
                 //start text for string
                 $outputstring = "\n" . $Recast . "". $outputstring0 ."";
-
                 }
-                //end of single type code
-
+                //end of HP/MP Potions code
 
                 //start of 853 (Minions)
                 if ($ItemActionType == 853) {
@@ -763,21 +755,14 @@ class Items implements ParseInterface
                     $ItemActionEffectRaw = $ItemActionCsv->at($ItemActionNumber)["Data[0]"];
                     $ItemActionEffect = ucwords(strtolower($CompanionCsv->at($ItemActionEffectRaw)["Singular"]));
                     if (empty($ItemActionEffect)) continue;
-                    //start text for string
-                    $stringtype1 = "| Grants = ";
-                    //end text for string
-                    $stringtype2 = "_(Minion)";
-                    $outputstring = "\n". $stringtype1 ."" . $ItemActionEffect . "". $stringtype2 ."";
-
+                    $outputstring = "\n| Grants = " . $ItemActionEffect . "_(Minion)";
                 }
-                //end of single type code
-
-                //end of each itemaction code
+                //end of Minions code
+                //end of ItemAction code
 
                 if ((empty($ItemActionEffect)) || ($ItemActionEffectRaw == 0)) {continue;}
                 $ItemAction1[0] ="\n";
-                $ItemAction[] = "". $outputstring ."";
-
+                $ItemAction[] = $outputstring;
             }
 
             $ItemAction = implode("\n",$ItemAction);
