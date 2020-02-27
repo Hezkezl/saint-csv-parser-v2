@@ -157,13 +157,12 @@ class Items implements ParseInterface
                 case 33; case 39; case 40; case 41; case 42; case 43; case 44; case 45; case 46; case 47;
                 case 48; case 49; case 50; case 51; case 52; case 53; case 54; case 55; case 56; case 58;
                 case 59; case 60; case 61; case 62; case 63; case 64; case 71; case 73; case 74; case 75;
-                case 81; case 82; case 83; case 85; case 86; case 94; case 95; case 99; case 100; case 101;
-                case 102; case 103; case 104;
-                break;
+                case 81; case 82; case 83; case 85; case 86; case 94; case 95; case 99; case 100;
+                    break;
                 case 11; case 34; case 35;
-                $Crest = "\n| Crest Allowed  = ". $item['IsCrestWorthy'];
-                $Dye = "\n| Dye Allowed    = ". $item['IsDyeable'];
-                break;
+                    $Crest = "\n| Crest Allowed  = ". $item['IsCrestWorthy'];
+                    $Dye = "\n| Dye Allowed    = ". $item['IsDyeable'];
+                    break;
                 case NULL:
                     break;
                 default:
@@ -323,11 +322,11 @@ class Items implements ParseInterface
                                 $BonusStat[] = '| Bonus ' . $BonusStatName . ' HQ = +' . ($item["BaseParamValue[$i]"] + $item["BaseParamValue{Special}[$x]"]);
                             }
                         }
-                        // old HQ stat code. Obsolete-ish now with the 'for' loop up above. Saving code just in case.
-                        //if (!empty($item['BaseParamValue{Special}[' . ($i+2) . ']'])) {
-                        //    $BonusStat[] = '| Bonus ' . $BonusStatName . ' HQ = +'.
-                        //        ($item["BaseParamValue[$i]"] + $item['BaseParamValue{Special}[' . ($i+2) . ']']);
-                        //}
+                            // old HQ stat code. Obsolete-ish now with the 'for' loop up above. Saving code just in case.
+                            //if (!empty($item['BaseParamValue{Special}[' . ($i+2) . ']'])) {
+                            //    $BonusStat[] = '| Bonus ' . $BonusStatName . ' HQ = +'.
+                            //        ($item["BaseParamValue[$i]"] + $item['BaseParamValue{Special}[' . ($i+2) . ']']);
+                            //}
                     }
                 }
             } elseif (($item['CanBeHq'] == "False") && (!empty($item['BaseParam[0]'])) && ($item['ItemSpecialBonus'] != 7)) {
@@ -350,6 +349,8 @@ class Items implements ParseInterface
 
             // Item Action
             $ItemAction = [];
+            //$stringtype1 = false;
+            //$stringtype2 = false;
             $outputstring = false;
             $outputstring0 = false;
             $outputstring1 = false;
@@ -402,10 +403,9 @@ class Items implements ParseInterface
                 }
                 //end of single type code
 
-                //start of 1055 (Restore GP code)
+                 //start of 1055 (Restore GP code)
                 if ($ItemActionType == "1055") {
 
-                    $HQString = false;
                     //NQ
                     $ItemActionEffectRaw = $ItemActionCsv->at($ItemActionNumber)["Data[0]"];
                     $ItemActionEffect = $ItemActionEffectRaw;
@@ -421,8 +421,8 @@ class Items implements ParseInterface
                         $ItemActionEffectHQ = $ItemActionEffectHQRaw;
                         $HQString = "\n| Consumable Restores_GP HQ = " . $ItemActionEffectHQ . "";
                     } elseif ($ItemActionEffectHQRaw == "0") {
-                        $ItemActionEffectHQ = false;
-                        $HQString = false;
+                        $ItemActionEffectHQ = "";
+                        $HQString = "";
                     }
                     $outputstring = "\n". $stringtype1 ."" . $ItemActionEffect . "". $stringtype2 ."". $HQString ."";
 
@@ -481,8 +481,8 @@ class Items implements ParseInterface
 
                     //NQ
                     $ItemActionEffectRaw1 = $ItemActionCsv->at($ItemActionNumber)["Data[0]"];
-                    $ItemActionEffectRaw = str_replace("&", "and", $ItemActionEffectRaw1);
                     $ItemActionEffect = ucwords(strtolower($TripleTriadCardCsv->at($ItemActionEffectRaw)["Name"]));
+                    $ItemActionEffectRaw = str_replace("&", "and", $ItemActionEffectRaw1);
                     if (empty($ItemActionEffect)) continue;
 
                     //start text for string
@@ -591,7 +591,7 @@ class Items implements ParseInterface
                     $RecastFormatHQ = str_replace("m0s", "m", $RecastFormatHQ1);
 
                     if ($ItemActionType == "846") {
-                        $Recast = "\n| Recast = ". $RecastFormatNQ ."\n| Recast HQ = ". $RecastFormatHQ ."";
+                    $Recast = "\n| Recast = ". $RecastFormatNQ ."\n| Recast HQ = ". $RecastFormatHQ ."";
                     } elseif (($ItemActionType == "844") || ($ItemActionType == "845")) {
                         $Recast = "";
                     }
@@ -600,10 +600,10 @@ class Items implements ParseInterface
                     //Start of base 0
                     $RelativeSwitchBool = $ItemFoodCsv->at($ItemActionEffectRaw)["IsRelative[0]"];
                     //switch to percentage if true and flat if false
-                    if ($RelativeSwitchBool = true) {
+                    if ($RelativeSwitchBool = True) {
                         $RelativeSwitch = "%";
-                    } else {
-                        $RelativeSwitch = false;
+                    } elseif ($RelativeSwitchBool = False) {
+                        $RelativeSwitch = "";
                     }
                     $BaseStat = str_replace(" ", "_", $BaseParamCsv->at($ItemFoodCsv->at($ItemActionEffectRaw)["BaseParam[0]"])["Name"]);
                     if (!empty($BaseStat)) {
@@ -612,19 +612,19 @@ class Items implements ParseInterface
                         $BaseStatCapFmt = "| Consumable ". $BaseStat ." Cap = ";
                         $BaseStatHQCapFmt = "| Consumable ". $BaseStat ." Cap HQ = ";
 
-                        $BaseValue = $ItemFoodCsv->at($ItemActionEffectRaw)["Value[0]"];
+                    $BaseValue = $ItemFoodCsv->at($ItemActionEffectRaw)["Value[0]"];
                         $BaseValueFmt = "". $BaseStatFmt ."+". $BaseValue ."". $RelativeSwitch ."\n";
 
-                        $BaseMax = $ItemFoodCsv->at($ItemActionEffectRaw)["Max[0]"];
+                    $BaseMax = $ItemFoodCsv->at($ItemActionEffectRaw)["Max[0]"];
                         $BaseMaxFmt = "". $BaseStatCapFmt ."+". $BaseMax ."\n";
 
-                        $BaseValueHQ = $ItemFoodCsv->at($ItemActionEffectRaw)["Value{HQ}[0]"];
+                    $BaseValueHQ = $ItemFoodCsv->at($ItemActionEffectRaw)["Value{HQ}[0]"];
                         $BaseValueHQFmt = "". $BaseStatHQFmt ."+". $BaseValueHQ ."". $RelativeSwitch ."\n";
 
-                        $BaseMaxHQ = $ItemFoodCsv->at($ItemActionEffectRaw)["Max{HQ}[0]"];
-                        $BaseMaxHQFmt = "". $BaseStatHQCapFmt ."+". $BaseMaxHQ ."\n";
+                    $BaseMaxHQ = $ItemFoodCsv->at($ItemActionEffectRaw)["Max{HQ}[0]"];
+                    $BaseMaxHQFmt = "". $BaseStatHQCapFmt ."+". $BaseMaxHQ ."\n";
 
-                        $outputstring0 = "\n". $BaseValueFmt ."". $BaseMaxFmt ."" . $BaseValueHQFmt . "". $BaseMaxHQFmt ."";
+                    $outputstring0 = "\n". $BaseValueFmt ."". $BaseMaxFmt ."" . $BaseValueHQFmt . "". $BaseMaxHQFmt ."";
                     }
 
                     elseif (empty($BaseStat)) {
@@ -635,9 +635,9 @@ class Items implements ParseInterface
                     //Start of base 1
                     $RelativeSwitchBool1 = $ItemFoodCsv->at($ItemActionEffectRaw)["IsRelative[1]"];
                     //switch to percentage if true and flat if false
-                    if ($RelativeSwitchBool1 = true) {
+                    if ($RelativeSwitchBool1 = True) {
                         $RelativeSwitch1 = "%";
-                    } elseif ($RelativeSwitchBool1 = false) {
+                    } elseif ($RelativeSwitchBool1 = False) {
                         $RelativeSwitch1 = "";
                     }
                     $BaseStat1 = str_replace(" ", "_", $BaseParamCsv->at($ItemFoodCsv->at($ItemActionEffectRaw)["BaseParam[1]"])["Name"]);
@@ -670,9 +670,9 @@ class Items implements ParseInterface
                     //Start of base 2
                     $RelativeSwitchBool2 = $ItemFoodCsv->at($ItemActionEffectRaw)["IsRelative[2]"];
                     //switch to percentage if true and flat if false
-                    if ($RelativeSwitchBool2 = true) {
+                    if ($RelativeSwitchBool2 = True) {
                         $RelativeSwitch2 = "%";
-                    } elseif ($RelativeSwitchBool1 = false) {
+                    } elseif ($RelativeSwitchBool1 = False) {
                         $RelativeSwitch2 = "";
                     }
                     $BaseStat2 = str_replace(" ", "_", $BaseParamCsv->at($ItemFoodCsv->at($ItemActionEffectRaw)["BaseParam[2]"])["Name"]);
@@ -712,56 +712,56 @@ class Items implements ParseInterface
                 //start of 847 848 (HP/Mp Potions)
                 if (($ItemActionType == "847") || ($ItemActionType == "848")) {
 
-                    if ($ItemActionType == "847") {
-                        $BaseStat = "Restores_HP";
-                    } elseif ($ItemActionType == "848") {
-                        $BaseStat = "Restores_MP";
-                    }
+                if ($ItemActionType == "847") {
+                    $BaseStat = "Restores_HP";
+                } elseif ($ItemActionType == "848") {
+                    $BaseStat = "Restores_MP";
+                }
 
-                    //NQ
-                    $ItemActionEffectRaw = $ItemActionCsv->at($ItemActionNumber)["Data[0]"];
-                    $ItemActionEffectCapRaw = $ItemActionCsv->at($ItemActionNumber)["Data[1]"];
-                    //HQ
-                    $ItemActionEffectHQRaw = $ItemActionCsv->at($ItemActionNumber)["Data{HQ}[0]"];
-                    $ItemActionEffectCapHQRaw = $ItemActionCsv->at($ItemActionNumber)["Data{HQ}[1]"];
+                //NQ
+                $ItemActionEffectRaw = $ItemActionCsv->at($ItemActionNumber)["Data[0]"];
+                $ItemActionEffectCapRaw = $ItemActionCsv->at($ItemActionNumber)["Data[1]"];
+                //HQ
+                $ItemActionEffectHQRaw = $ItemActionCsv->at($ItemActionNumber)["Data{HQ}[0]"];
+                $ItemActionEffectCapHQRaw = $ItemActionCsv->at($ItemActionNumber)["Data{HQ}[1]"];
 
-                    $ItemActionEffectRawString = "| Consumable ". $BaseStat ." = ";
-                    $ItemActionEffectCapRawString = "| Consumable ". $BaseStat ." Cap = ";
-                    $ItemActionEffectHQRawString = "| Consumable ". $BaseStat ." HQ = ";
-                    $ItemActionEffectCapHQRawString = "| Consumable ". $BaseStat ." Cap HQ = ";
+                $ItemActionEffectRawString = "| Consumable ". $BaseStat ." = ";
+                $ItemActionEffectCapRawString = "| Consumable ". $BaseStat ." Cap = ";
+                $ItemActionEffectHQRawString = "| Consumable ". $BaseStat ." HQ = ";
+                $ItemActionEffectCapHQRawString = "| Consumable ". $BaseStat ." Cap HQ = ";
 
-                    $BaseValueFmt = "". $ItemActionEffectRawString ."+". $ItemActionEffectRaw ."%\n";
+                        $BaseValueFmt = "". $ItemActionEffectRawString ."+". $ItemActionEffectRaw ."%\n";
 
-                    $BaseValueCapFmt = "". $ItemActionEffectCapRawString ."+". $ItemActionEffectCapRaw ."\n";
+                        $BaseValueCapFmt = "". $ItemActionEffectCapRawString ."+". $ItemActionEffectCapRaw ."\n";
 
-                    $BaseValueHQFmt = "". $ItemActionEffectHQRawString ."+". $ItemActionEffectHQRaw ."%\n";
+                        $BaseValueHQFmt = "". $ItemActionEffectHQRawString ."+". $ItemActionEffectHQRaw ."%\n";
 
-                    $BaseValueHQCapFmt = "". $ItemActionEffectCapHQRawString ."+". $ItemActionEffectCapHQRaw ."\n";
+                        $BaseValueHQCapFmt = "". $ItemActionEffectCapHQRawString ."+". $ItemActionEffectCapHQRaw ."\n";
 
-                    $outputstring0 = "\n". $BaseValueFmt ."". $BaseValueCapFmt ."" . $BaseValueHQFmt . "". $BaseValueHQCapFmt ."";
+                $outputstring0 = "\n". $BaseValueFmt ."". $BaseValueCapFmt ."" . $BaseValueHQFmt . "". $BaseValueHQCapFmt ."";
 
-                    //Recast
-                    $RecastNQ = $item['Cooldown<s>'];
-                    $RecastHQpercent = ($RecastNQ * 0.1);
-                    $RecastHQ = ($RecastNQ - $RecastHQpercent);
+                //Recast
+                $RecastNQ = $item['Cooldown<s>'];
+                $RecastHQpercent = ($RecastNQ * 0.1);
+                $RecastHQ = ($RecastNQ - $RecastHQpercent);
 
-                    $RecastMinutes = floor(($RecastNQ / 60) % 60);
-                    $RecastSeconds = $RecastNQ % 60;
-                    $RecastString = " ". $RecastMinutes ."m". $RecastSeconds ."s";
-                    $RecastFormatNQ1 = str_replace(" 0m", " ", $RecastString);
-                    $RecastFormatNQ = str_replace("m0s", "m", $RecastFormatNQ1);
+                $RecastMinutes = floor(($RecastNQ / 60) % 60);
+                $RecastSeconds = $RecastNQ % 60;
+                $RecastString = " ". $RecastMinutes ."m". $RecastSeconds ."s";
+                $RecastFormatNQ1 = str_replace(" 0m", " ", $RecastString);
+                $RecastFormatNQ = str_replace("m0s", "m", $RecastFormatNQ1);
 
-                    $RecastMinutesHQ = floor(($RecastHQ / 60) % 60);
-                    $RecastSecondsHQ = $RecastHQ % 60;
-                    $RecastStringHQ = " ". $RecastMinutesHQ ."m". $RecastSecondsHQ ."s";
-                    $RecastFormatHQ1 = str_replace(" 0m", " ", $RecastStringHQ);
-                    $RecastFormatHQ = str_replace("m0s", "m", $RecastFormatHQ1);
+                $RecastMinutesHQ = floor(($RecastHQ / 60) % 60);
+                $RecastSecondsHQ = $RecastHQ % 60;
+                $RecastStringHQ = " ". $RecastMinutesHQ ."m". $RecastSecondsHQ ."s";
+                $RecastFormatHQ1 = str_replace(" 0m", " ", $RecastStringHQ);
+                $RecastFormatHQ = str_replace("m0s", "m", $RecastFormatHQ1);
 
-                    $Recast = "\n| Recast = ". $RecastFormatNQ ."\n| Recast HQ = ". $RecastFormatHQ ."";
+                $Recast = "\n| Recast = ". $RecastFormatNQ ."\n| Recast HQ = ". $RecastFormatHQ ."";
 
-                    if (empty($ItemActionEffectRaw)) continue;
-                    //start text for string
-                    $outputstring = "\n" . $Recast . "". $outputstring0 ."";
+                if (empty($ItemActionEffectRaw)) continue;
+                //start text for string
+                $outputstring = "\n" . $Recast . "". $outputstring0 ."";
 
                 }
                 //end of single type code
@@ -845,7 +845,7 @@ class Items implements ParseInterface
 
             // format using Gamer Escape formatter and add to data array
             // need to look into using item-specific regex, if required.
-            $this->data[] = GeFormatter::format(self::WIKI_FORMAT, $data);
+             $this->data[] = GeFormatter::format(self::WIKI_FORMAT, $data);
         }
 
         // save our data to the filename: GeItemWiki.txt
