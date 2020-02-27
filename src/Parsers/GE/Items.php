@@ -19,7 +19,7 @@ class Items implements ParseInterface
         | Name           = {name}
         | Subheading     = {subheading}{description}{slots}{advancedmelding}{stack}{requires}
         | Required Level = {level}
-        | Item Level     = {itemlevel}{untradable}{unique}{convertible}{sells}{dyeallowed}{crestallowed}{glamour}{desynthesis}{repair}{setbonus}{setbonusgc}{sanction}{bonus}{eureka}{physicaldamage}{magicdamage}{defense}{block}{itemaction}{MarketProhib}
+        | Item Level     = {itemlevel}{untradable}{unique}{convertible}{sells}{dyeallowed}{crestallowed}{glamour}{desynthesis}{repair}{MarketProhib}{setbonus}{bonus}{physicaldamage}{magicdamage}{defense}{block}{itemaction}
         }}{Bottom}";
 
     public function parse()
@@ -37,7 +37,6 @@ class Items implements ParseInterface
         $OrchestrionCsv = $this->csv('Orchestrion');
         $GatheringSubCategoryCsv = $this->csv('GatheringSubCategory');
         $MountCsv = $this->csv('Mount');
-        //$LogMessageCsv = $this->csv('LogMessage');
         $SecretRecipeBookCsv = $this->csv('SecretRecipeBook');
         $ItemActionCsv = $this->csv('ItemAction');
         $ItemFoodCsv = $this->csv('ItemFood');
@@ -74,7 +73,7 @@ class Items implements ParseInterface
                 $Bottom = "{{-stop-}}";
             } else {
                 $Top = "http://ffxiv.gamerescape.com/wiki/$Name?action=edit\n";
-                $Bottom = "";
+                $Bottom = false;
             };
 
             // grab item ui category for this item
@@ -233,69 +232,62 @@ class Items implements ParseInterface
                 $Defense .= "\n| Magic Defense = ". $item['Defense{Mag}'];
             }
 
-            // Set Bonus stats for Grand Company gear
-            $SetBonusGC = [];
-            if ($item['ItemSpecialBonus'] == 2) {
-                $SetBonusGC[0] = "\n\n| Other Conditions = ". $ItemSeriesCsv->at($item['ItemSeries'])['Name'] ."";
-                $SetBonusGC[1] = "| Set              = ". $ItemSeriesCsv->at($item['ItemSeries'])['Name'] ."";
-                $SetBonusGC[2] = "| Set Bonus        =<br>";
-                foreach(range(0,5) as $i) {
-                    if(!empty($item["BaseParam{Special}[$i]"])) {
-                        $SetBonusGC[] = ":". ($i+2) ." Equipped: [[". $BaseParamCsv->at($item["BaseParam{Special}[$i]"])
-                            ['Name'] ."]] +". $item["BaseParamValue{Special}[$i]"];
-                    }
-                }
-            }
-            $SetBonusGC = implode("\n", $SetBonusGC);
-
-            // Sanction Code (Sanction item gives you bonus on some GC gear)
-            $Sanction = [];
-            if ($item['ItemSpecialBonus'] == 4) {
-                foreach(range(0,5) as $i) {
-                    if(!empty($item["BaseParam{Special}[$i]"])) {
-                        //$ParamName = $BaseParamCsv->at($item["BaseParam{Special}[$i]"])['Name'];
-                        $ParamName = str_replace(" ", "_", $BaseParamCsv->at($item["BaseParam{Special}[$i]"])['Name']);
-                        $Sanction[0] = "\n";
-                        $Sanction[] = "| Latent ". $ParamName ." = +". $item["BaseParamValue{Special}[$i]"];
-                        $Sanction[] = "| Latent ". $ParamName ." Latent = Yes";
-                        $Sanction[] = "| Latent ". $ParamName ." Conditions = Sanction";
-                    }
-                }
-            }
-            $Sanction = implode("\n",$Sanction);
-
-            // Set Bonus stats for Mog Station gear
+            // switch code for GC gear, Sanction gear, Mog Station Gear, and Eureka Gear
             $SetBonus = [];
-            if ($item['ItemSpecialBonus'] == 6) {
-                $SetBonus[0] = "\n\n| SetBonus Set_Bonus_(Capped):=\n:[[". $ItemSeriesCsv->at($item['ItemSeries'])['Name'] ."]]";
-                $SetBonus[1] = ":Active Under Lv. ". $item['ItemSpecialBonus{Param}'];
-                foreach(range(0,5) as $i) {
-                    if(!empty($item["BaseParam{Special}[$i]"])) {
-                        $SetBonus[] = ":". ($i+2) ." Equipped: [[". $BaseParamCsv->at($item["BaseParam{Special}[$i]"])
-                            ['Name'] ."]] +". $item["BaseParamValue{Special}[$i]"];
+            switch ($item['ItemSpecialBonus']) {
+                case 2: // GC Gear
+                    $SetBonus[0] = "\n\n| Other Conditions = ". $ItemSeriesCsv->at($item['ItemSeries'])['Name'] ."";
+                    $SetBonus[1] = "| Set              = ". $ItemSeriesCsv->at($item['ItemSeries'])['Name'] ."";
+                    $SetBonus[2] = "| Set Bonus        =<br>";
+                    foreach(range(0,5) as $i) {
+                        if(!empty($item["BaseParam{Special}[$i]"])) {
+                            $ParamName = $BaseParamCsv->at($item["BaseParam{Special}[$i]"])['Name'];
+                            $SetBonus[] = ":". ($i+2) ." Equipped: [[$ParamName]] +". $item["BaseParamValue{Special}[$i]"];
+                        }
                     }
-                }
-            }
-            $SetBonus = implode("\n", $SetBonus);
-
-            // Eureka Gear stats
-            $EurekaBonus = [];
-            if ($item['ItemSpecialBonus'] == 7) {
-                foreach (range(0, 5) as $i) {
-                    if (!empty($item["BaseParam[$i]"])) {
-                        $BonusStatName = str_replace(" ", "_", $BaseParamCsv->at($item["BaseParam[$i]"])['Name']);
-                        $EurekaBonus[0] = "\n";
-                        $EurekaBonus[] = "| Bonus ". $BonusStatName ." = +". $item["BaseParamValue[$i]"];
+                    break;
+                case 4: // Sanction Gear
+                    foreach(range(0,5) as $i) {
+                        if(!empty($item["BaseParam{Special}[$i]"])) {
+                            $ParamName = str_replace(" ", "_", $BaseParamCsv->at($item["BaseParam{Special}[$i]"])['Name']);
+                            $SetBonus[0] = "\n";
+                            $SetBonus[] = "| Latent ". $ParamName ." = +". $item["BaseParamValue{Special}[$i]"];
+                            $SetBonus[] = "| Latent ". $ParamName ." Latent = Yes";
+                            $SetBonus[] = "| Latent ". $ParamName ." Conditions = Sanction";
+                        }
                     }
-                } foreach (range(0,5) as $i) {
+                    break;
+                case 6: // Mog Station Gear
+                    $SetBonus[0] = "\n\n| SetBonus Set_Bonus_(Capped):=\n:[[". $ItemSeriesCsv->at($item['ItemSeries'])['Name'] ."]]";
+                    $SetBonus[1] = ":Active Under Lv. ". $item['ItemSpecialBonus{Param}'];
+                    foreach(range(0,5) as $i) {
+                        if(!empty($item["BaseParam{Special}[$i]"])) {
+                            $ParamName = $BaseParamCsv->at($item["BaseParam{Special}[$i]"])['Name'];
+                            $SetBonus[] = ":". ($i+2) ." Equipped: [[$ParamName]] +". $item["BaseParamValue{Special}[$i]"];
+                        }
+                    }
+                    break;
+                case 7: // Eureka Gear
+                    foreach (range(0, 5) as $i) {
+                        if (!empty($item["BaseParam[$i]"])) {
+                            $ParamName = str_replace(" ", "_", $BaseParamCsv->at($item["BaseParam[$i]"])['Name']);
+                            $SetBonus[0] = "\n";
+                            $SetBonus[] = "| Bonus $ParamName = +". $item["BaseParamValue[$i]"];
+                        }
+                    } foreach (range(0,5) as $i) {
                     if (!empty($item["BaseParam{Special}[$i]"])) {
-                        ($item["BaseParamValue{Special}[$i]"] > 0) ? $BonusStatValue = "+" : $BonusStatValue = false;
-                        $BonusStatName = str_replace(" ", "_", $BaseParamCsv->at($item["BaseParam{Special}[$i]"])['Name']);
-                        $EurekaBonus[] = "| Eureka ". $BonusStatName ." = $BonusStatValue". $item["BaseParamValue{Special}[$i]"];
+                        $BonusStatValue = ($item["BaseParamValue{Special}[$i]"] > 0) ? "+" : false;
+                        $ParamName = str_replace(" ", "_", $BaseParamCsv->at($item["BaseParam{Special}[$i]"])['Name']);
+                        $SetBonus[0] = "\n";
+                        $SetBonus[] = "| Eureka $ParamName = $BonusStatValue". $item["BaseParamValue{Special}[$i]"];
                     }
                 }
+                    break;
+                default:
+                    break;
             }
-            $EurekaBonus = implode("\n",$EurekaBonus);
+
+            $SetBonus = implode("\n", $SetBonus);
 
             // Bonus Stat Code for normal items
             $BonusStat = [];
@@ -348,8 +340,6 @@ class Items implements ParseInterface
 
             // Item Action
             $ItemAction = [];
-            $stringtype1 = false;
-            $stringtype2 = false;
             $outputstring = false;
             $outputstring0 = false;
             $outputstring1 = false;
@@ -480,8 +470,8 @@ class Items implements ParseInterface
 
                     //NQ
                     $ItemActionEffectRaw1 = $ItemActionCsv->at($ItemActionNumber)["Data[0]"];
-                    $ItemActionEffect = ucwords(strtolower($TripleTriadCardCsv->at($ItemActionEffectRaw)["Name"]));
                     $ItemActionEffectRaw = str_replace("&", "and", $ItemActionEffectRaw1);
+                    $ItemActionEffect = ucwords(strtolower($TripleTriadCardCsv->at($ItemActionEffectRaw)["Name"]));
                     if (empty($ItemActionEffect)) continue;
 
                     //start text for string
@@ -843,10 +833,7 @@ class Items implements ParseInterface
                 '{block}' => $Block,
                 '{defense}' => $Defense,
                 '{setbonus}' => $SetBonus,
-                '{setbonusgc}' => $SetBonusGC,
-                '{sanction}' => $Sanction,
                 '{bonus}' => $BonusStat,
-                '{eureka}' => $EurekaBonus,
                 '{itemaction}' => $ItemAction,
                 '{MarketProhib}' => $MarketProhib,
                 '{Bottom}' => $Bottom,
@@ -860,7 +847,7 @@ class Items implements ParseInterface
         // save our data to the filename: GeItemWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save('CordialGeItemWiki - '. $patch .'.txt', 999999);
+        $info = $this->save('GeItemWiki - '. $patch .'.txt', 999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],
