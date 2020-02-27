@@ -80,13 +80,10 @@ class Items implements ParseInterface
             // grab item ui category for this item
             $itemUiCategory = $ItemUiCategoryCsv->at($item['ItemUICategory']);
 
-            // grab the Required Classes needed to equip this item
-            $RequiredClasses = false;
-            if ($item['ClassJobCategory'] > 0) {
-                $ClassNames = $ClassJobCategoryCsv->at($item['ClassJobCategory'])['Name'];
-                $ClassNames = preg_replace("/([A-Z]{3})\s/", "$1, ", $ClassNames);
-                $RequiredClasses = "\n| Requires       = " . $ClassNames;
-            }
+            // if multiple Required Classes separate with commas, otherwise 3 capital letters. If no classes, null
+            $RequiredClasses = ($item['ClassJobCategory'] > 0)
+                ? "\n| Requires       = " . preg_replace("/([A-Z]{3})\s/", "$1, ", ($ClassJobCategoryCsv->at($item['ClassJobCategory'])['Name']))
+                : false;
 
             // change Fits/Gender to wiki-specific parameters
             $Description = false;
@@ -191,9 +188,7 @@ class Items implements ParseInterface
                 $Delay = round(($item["Delay<ms>"]/1000),2,PHP_ROUND_HALF_UP);
                 $PhysicalDamageHQ = $item['BaseParamValue{Special}[0]'] + $item['Damage{Phys}'];
                 $MagicDamageHQ = $item['BaseParamValue{Special}[1]'] + $item['Damage{Mag}'];
-                //$AutoattackHQ = round((($Delay/3) * $PhysicalDamageHQ),2,PHP_ROUND_HALF_DOWN);
                 $AutoattackHQ = (floor((($item["Delay<ms>"]/1000)/3)*$PhysicalDamageHQ*100)/100);
-                //$Autoattack = round((($Delay/3) * $item['Damage{Phys}']),2,PHP_ROUND_HALF_DOWN);
                 $Autoattack = (floor((($item["Delay<ms>"]/1000)/3)*$item['Damage{Phys}']*100)/100);
                 $PhysicalDamage = "\n\n| Physical Damage    = " . $item['Damage{Phys}'] . "\n| Physical Damage HQ = " . $PhysicalDamageHQ;
                 $MagicDamage = "\n| Magic Damage    = ". $item['Damage{Mag}'] ."\n| Magic Damage HQ = ". $MagicDamageHQ;
@@ -201,14 +196,13 @@ class Items implements ParseInterface
                 $MagicDamage .= "\n| Auto-attack    = ". $Autoattack ."\n| Auto-attack HQ = ". $AutoattackHQ;
             }   elseif (($item['Damage{Phys}'] > 0 || $item['Damage{Mag}'] > 0) && $item['CanBeHq'] == "False") {
                 $Delay = round(($item["Delay<ms>"]/1000),2,PHP_ROUND_HALF_UP);
-                //$Autoattack = round((($Delay/3) * $item['Damage{Phys}']),2,PHP_ROUND_HALF_DOWN);
                 $Autoattack = (floor((($item["Delay<ms>"]/1000)/3)*$item['Damage{Phys}']*100)/100);
                 $PhysicalDamage = "\n\n| Physical Damage = ". $item['Damage{Phys}'];
                 $MagicDamage = "\n| Magic Damage    = ". $item['Damage{Mag}'];
                 $MagicDamage .= "\n| Delay       = ". $Delay ."\n| Auto-attack = ". $Autoattack;
             }
 
-            // display Block stats. Also display HQ stats if item is HQ
+            // display Block/BlockRate and Block HQ/BlockRate HQ stats
             $Block = false;
             if (($item['Block'] > 0 || $item['BlockRate'] > 0) && $item['CanBeHq'] == "True") {
                 $BlockStrengthHQ = $item['BaseParamValue{Special}[1]'] + $item['Block'];
@@ -238,20 +232,6 @@ class Items implements ParseInterface
                 $Defense = "\n\n| Defense       = ". $item['Defense{Phys}'];
                 $Defense .= "\n| Magic Defense = ". $item['Defense{Mag}'];
             }
-
-            // Set Bonus stats for Mog Station gear
-            $SetBonus = [];
-            if ($item['ItemSpecialBonus'] == 6) {
-                $SetBonus[0] = "\n\n| SetBonus Set_Bonus_(Capped):=\n:[[". $ItemSeriesCsv->at($item['ItemSeries'])['Name'] ."]]";
-                $SetBonus[1] = ":Active Under Lv. ". $item['ItemSpecialBonus{Param}'];
-                foreach(range(0,5) as $i) {
-                    if(!empty($item["BaseParam{Special}[$i]"])) {
-                        $SetBonus[] = ":". ($i+2) ." Equipped: [[". $BaseParamCsv->at($item["BaseParam{Special}[$i]"])
-                            ['Name'] ."]] +". $item["BaseParamValue{Special}[$i]"];
-                    }
-                }
-            }
-            $SetBonus = implode("\n", $SetBonus);
 
             // Set Bonus stats for Grand Company gear
             $SetBonusGC = [];
@@ -283,6 +263,20 @@ class Items implements ParseInterface
                 }
             }
             $Sanction = implode("\n",$Sanction);
+
+            // Set Bonus stats for Mog Station gear
+            $SetBonus = [];
+            if ($item['ItemSpecialBonus'] == 6) {
+                $SetBonus[0] = "\n\n| SetBonus Set_Bonus_(Capped):=\n:[[". $ItemSeriesCsv->at($item['ItemSeries'])['Name'] ."]]";
+                $SetBonus[1] = ":Active Under Lv. ". $item['ItemSpecialBonus{Param}'];
+                foreach(range(0,5) as $i) {
+                    if(!empty($item["BaseParam{Special}[$i]"])) {
+                        $SetBonus[] = ":". ($i+2) ." Equipped: [[". $BaseParamCsv->at($item["BaseParam{Special}[$i]"])
+                            ['Name'] ."]] +". $item["BaseParamValue{Special}[$i]"];
+                    }
+                }
+            }
+            $SetBonus = implode("\n", $SetBonus);
 
             // Eureka Gear stats
             $EurekaBonus = [];
@@ -347,10 +341,15 @@ class Items implements ParseInterface
             }
             $MarketProhib = implode("\n", $MarketProhib);
 
+            // Remove En-dash and Em-dash from Subheading name
+            $SubHeadingReplaceSearch = array("–", "—");
+            $SubHeadingReplaceText = array("-", "-");
+            $Subheading = str_replace($SubHeadingReplaceSearch, $SubHeadingReplaceText, $itemUiCategory['Name']);
+
             // Item Action
             $ItemAction = [];
-            //$stringtype1 = false;
-            //$stringtype2 = false;
+            $stringtype1 = false;
+            $stringtype2 = false;
             $outputstring = false;
             $outputstring0 = false;
             $outputstring1 = false;
@@ -362,7 +361,7 @@ class Items implements ParseInterface
                 //start of each itemaction code
 
                 //start of 842 (remove status code)
-                if ($ItemActionType == "842") {
+                if ($ItemActionType == 842) {
 
                     //NQ
                     $ItemActionEffectRaw = $ItemActionCsv->at($ItemActionNumber)["Data[0]"];
@@ -375,10 +374,10 @@ class Items implements ParseInterface
 
                     //HQ - If there is no HQ it will not add anything extra
                     //$ItemActionEffectHQRaw = $ItemActionCsv->at($ItemActionNumber)["Data{HQ}[0]"];
-                    //if ($ItemActionEffectHQRaw !== "0") {
+                    //if ($ItemActionEffectHQRaw !== 0) {
                     //    $ItemActionEffectHQ = $StatusCsv->at($ItemActionEffectHQRaw)["Name"];
                     //    $HQString = "\n". $stringtype1HQ ."" . $ItemActionEffectHQ . "". $stringtype2 ."";
-                    //} elseif ($ItemActionEffectHQRaw == "0") {
+                    //} elseif ($ItemActionEffectHQRaw == 0) {
                     //    $ItemActionEffectHQ = "";
                     //    $HQString = "";
                     //}
@@ -388,7 +387,7 @@ class Items implements ParseInterface
                 //end of single type code
 
                 //start of 1013 (Barding code)
-                if ($ItemActionType == "1013") {
+                if ($ItemActionType == 1013) {
 
                     //NQ
                     $ItemActionEffectRaw = $ItemActionCsv->at($ItemActionNumber)["Data[0]"];
@@ -404,7 +403,7 @@ class Items implements ParseInterface
                 //end of single type code
 
                  //start of 1055 (Restore GP code)
-                if ($ItemActionType == "1055") {
+                if ($ItemActionType == 1055) {
 
                     //NQ
                     $ItemActionEffectRaw = $ItemActionCsv->at($ItemActionNumber)["Data[0]"];
@@ -417,10 +416,10 @@ class Items implements ParseInterface
 
                     //HQ - If there is no HQ it will not add anything extra
                     $ItemActionEffectHQRaw = $ItemActionCsv->at($ItemActionNumber)["Data{HQ}[0]"];
-                    if ($ItemActionEffectHQRaw !== "0") {
+                    if ($ItemActionEffectHQRaw !== 0) {
                         $ItemActionEffectHQ = $ItemActionEffectHQRaw;
                         $HQString = "\n| Consumable Restores_GP HQ = " . $ItemActionEffectHQ . "";
-                    } elseif ($ItemActionEffectHQRaw == "0") {
+                    } elseif ($ItemActionEffectHQRaw == 0) {
                         $ItemActionEffectHQ = "";
                         $HQString = "";
                     }
@@ -430,7 +429,7 @@ class Items implements ParseInterface
                 //end of single type code
 
                 //start of 1322 (Whistle to mount code)
-                if ($ItemActionType == "1322") {
+                if ($ItemActionType == 1322) {
 
                     //NQ
                     $ItemActionEffectRaw = $ItemActionCsv->at($ItemActionNumber)["Data[0]"];
@@ -446,7 +445,7 @@ class Items implements ParseInterface
                 //end of single type code
 
                 //start of 2136 (Unlocks Master Recipes)
-                if ($ItemActionType == "2136") {
+                if ($ItemActionType == 2136) {
 
                     //NQ
                     $ItemActionEffectRaw = $ItemActionCsv->at($ItemActionNumber)["Data[0]"];
@@ -462,7 +461,7 @@ class Items implements ParseInterface
                 //end of single type code
 
                 //start of 2633 (Unlocks emotes etc)
-                //if ($ItemActionType == "2633") {
+                //if ($ItemActionType == 2633) {
                 //    //NQ
                 //    $ItemActionEffectRaw = $ItemActionCsv->at($ItemActionNumber)["Data[0]"];
                 //    $ItemActionEffect = $LogMessageCsv->at($ItemActionEffectRaw)["Text"];
@@ -477,7 +476,7 @@ class Items implements ParseInterface
                 //end of single type code
 
                 //start of 3357 (TripleTriad Card)
-                if ($ItemActionType == "3357") {
+                if ($ItemActionType == 3357) {
 
                     //NQ
                     $ItemActionEffectRaw1 = $ItemActionCsv->at($ItemActionNumber)["Data[0]"];
@@ -495,7 +494,7 @@ class Items implements ParseInterface
                 //end of single type code
 
                 //start of 3800 (gives mgp)
-                if ($ItemActionType == "3800") {
+                if ($ItemActionType == 3800) {
 
                     //NQ
                     $ItemActionEffectRaw = $ItemActionCsv->at($ItemActionNumber)["Data[0]"];
@@ -511,7 +510,7 @@ class Items implements ParseInterface
                 //end of single type code
 
                 //start of 4107 (Tome of Folklore)
-                if ($ItemActionType == "4107") {
+                if ($ItemActionType == 4107) {
 
                     //NQ
                     $ItemActionEffectRaw = $ItemActionCsv->at($ItemActionNumber)["Data[0]"];
@@ -527,7 +526,7 @@ class Items implements ParseInterface
                 //end of single type code
 
                 //start of 5845 (Orc Scrolls)
-                if ($ItemActionType == "5845") {
+                if ($ItemActionType == 5845) {
 
                     //NQ
                     $ItemActionEffectRaw = $ItemActionCsv->at($ItemActionNumber)["Data[0]"];
@@ -543,7 +542,7 @@ class Items implements ParseInterface
                 //end of single type code
 
                 //start of 844, 845 and 846 (Battle Food/gathering food/attrib potions)
-                if (($ItemActionType == "844") || ($ItemActionType == "845") || ($ItemActionType == "846")) {
+                if (($ItemActionType == 844) || ($ItemActionType == 845) || ($ItemActionType == 846)) {
                     //NQ
                     //item status effect
                     $ItemActionEffectStatus = $StatusCsv->at($ItemActionCsv->at($ItemActionNumber)["Data[0]"])["Name"];
@@ -567,9 +566,9 @@ class Items implements ParseInterface
                     $EXPBonus = $ItemFoodCsv->at($ItemActionEffectRaw)["EXPBonus%"];
 
 
-                    if ($ItemActionType == "846") {
+                    if ($ItemActionType == 846) {
                         $EXPBonusFmt = "";
-                    } elseif ($ItemActionType !== "846") {
+                    } elseif ($ItemActionType !== 846) {
                         $EXPBonusFmt = "| Consumable EXP_Bonus = +". $EXPBonus ."%";
                     }
 
@@ -590,9 +589,9 @@ class Items implements ParseInterface
                     $RecastFormatHQ1 = str_replace(" 0m", " ", $RecastStringHQ);
                     $RecastFormatHQ = str_replace("m0s", "m", $RecastFormatHQ1);
 
-                    if ($ItemActionType == "846") {
+                    if ($ItemActionType == 846) {
                     $Recast = "\n| Recast = ". $RecastFormatNQ ."\n| Recast HQ = ". $RecastFormatHQ ."";
-                    } elseif (($ItemActionType == "844") || ($ItemActionType == "845")) {
+                    } elseif (($ItemActionType == 844) || ($ItemActionType == 845)) {
                         $Recast = "";
                     }
 
@@ -710,11 +709,11 @@ class Items implements ParseInterface
                 //end of single type code
 
                 //start of 847 848 (HP/Mp Potions)
-                if (($ItemActionType == "847") || ($ItemActionType == "848")) {
+                if (($ItemActionType == 847) || ($ItemActionType == 848)) {
 
-                if ($ItemActionType == "847") {
+                if ($ItemActionType == 847) {
                     $BaseStat = "Restores_HP";
-                } elseif ($ItemActionType == "848") {
+                } elseif ($ItemActionType == 848) {
                     $BaseStat = "Restores_MP";
                 }
 
@@ -768,7 +767,7 @@ class Items implements ParseInterface
 
 
                 //start of 853 (Minions)
-                if ($ItemActionType == "853") {
+                if ($ItemActionType == 853) {
 
                     //NQ
                     $ItemActionEffectRaw = $ItemActionCsv->at($ItemActionNumber)["Data[0]"];
@@ -785,19 +784,13 @@ class Items implements ParseInterface
 
                 //end of each itemaction code
 
-                if (empty($ItemActionEffect)) {continue;}
-                if ($ItemActionEffectRaw == "0") {continue;}
+                if ((empty($ItemActionEffect)) || ($ItemActionEffectRaw == 0)) {continue;}
                 $ItemAction1[0] ="\n";
                 $ItemAction[] = "". $outputstring ."";
 
             }
 
             $ItemAction = implode("\n",$ItemAction);
-
-            // Remove En-dash and Em-dash from Subheading name
-            $SubHeadingReplaceSearch = array("–", "—");
-            $SubHeadingReplaceText = array("-", "-");
-            $Subheading = str_replace($SubHeadingReplaceSearch, $SubHeadingReplaceText, $itemUiCategory['Name']);
 
             // Save some data
             $data = [
@@ -807,15 +800,29 @@ class Items implements ParseInterface
                 '{rarity}' => $item['Rarity'],
                 '{name}' => $Name,
                 '{subheading}' => $Subheading,
-                '{description}' => $Description ? $Description : "",
-                '{slots}' => ($item['MateriaSlotCount'] > 0) ? "\n| Slots          = ". $item['MateriaSlotCount'] : "",
-                '{advancedmelding}' => ($item['MateriaSlotCount'] > 0) && ($item['IsAdvancedMeldingPermitted'] == "False") ? "\n| Advanced Melds = False" : "",
-                '{stack}' => ($item['StackSize'] > 1) ? "\n| Stack          = ". $item['StackSize'] : "",
-                '{requires}' => $RequiredClasses ? $RequiredClasses : "",
+                '{description}' => $Description
+                    ? $Description
+                    : "",
+                '{slots}' => ($item['MateriaSlotCount'] > 0)
+                    ? "\n| Slots          = ". $item['MateriaSlotCount']
+                    : "",
+                '{advancedmelding}' => ($item['MateriaSlotCount'] > 0) && ($item['IsAdvancedMeldingPermitted'] == "False")
+                    ? "\n| Advanced Melds = False"
+                    : "",
+                '{stack}' => ($item['StackSize'] > 1)
+                    ? "\n| Stack          = ". $item['StackSize']
+                    : "",
+                '{requires}' => $RequiredClasses
+                    ? $RequiredClasses
+                    : "",
                 '{level}' => $item['Level{Equip}'],
                 '{itemlevel}' => $item['Level{Item}'],
-                '{untradable}' => ($item['IsUntradable'] == "True") ? "\n| Untradable     = Yes" : "",
-                '{unique}' => ($item['IsUnique'] == "True") ? "\n| Unique         = Yes" : "",
+                '{untradable}' => ($item['IsUntradable'] == "True")
+                    ? "\n| Untradable     = Yes"
+                    : "",
+                '{unique}' => ($item['IsUnique'] == "True")
+                    ? "\n| Unique         = Yes"
+                    : "",
                 '{convertible}' => ($item['MaterializeType'] > 0)
                     ? "\n| Convertible    = Yes"
                     : "\n| Convertible    = No",
@@ -824,7 +831,9 @@ class Items implements ParseInterface
                     : "\n| Sells          = No\n| HQ             = ". $item['CanBeHq'],
                 '{dyeallowed}' => $Dye,
                 '{crestallowed}' => $Crest,
-                '{glamour}' => ($item['IsGlamourous'] == "True") ? "\n| Projectable    = Yes" : "",
+                '{glamour}' => ($item['IsGlamourous'] == "True")
+                    ? "\n| Projectable    = Yes"
+                    : "",
                 '{desynthesis}' => (($item['Salvage'] > 0 && $item['ClassJob{Repair}'] > 0) || ($item['Salvage'] > 0 && $item['ItemUICategory'] == 47))
                     ? "\n| Desynthesizable= Yes\n| Desynth Level  = ". $SalvageCsv->at($item['Salvage'])['OptimalSkill']
                     : "\n| Desynthesizable= No",
@@ -851,7 +860,7 @@ class Items implements ParseInterface
         // save our data to the filename: GeItemWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save('GeItemWiki - '. $patch .'.txt', 999999);
+        $info = $this->save('CordialGeItemWiki - '. $patch .'.txt', 999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],
