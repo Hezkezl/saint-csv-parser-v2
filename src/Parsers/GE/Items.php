@@ -586,12 +586,11 @@ class Items implements ParseInterface
                     //Start of base parameters
                     for ($k = 0; $k < 3; $k++) {
                         ${"outputstring$k"} = false;
-                        $RelativeStat = false;
 
                         $BaseStat = str_replace(" ", "_", $BaseParamCsv->at($ItemFoodCsv->at($ItemActionEffectRaw)["BaseParam[$k]"])["Name"]);
                         if (!empty($BaseStat)) {
                             //switch to percentage if true and flat if false
-                            $RelativeStat = ($ItemFoodCsv->at($ItemActionEffectRaw)["IsRelative[$k]"] == "True") ? "%" : false;
+                            $Relative = ($ItemFoodCsv->at($ItemActionEffectRaw)["IsRelative[$k]"] == "True") ? "%" : false;
 
                             $BaseStatFmt = "| Consumable " . $BaseStat . " = ";
                             $BaseStatHQFmt = "| Consumable " . $BaseStat . " HQ = ";
@@ -601,8 +600,8 @@ class Items implements ParseInterface
                             $BaseValueHQ = $ItemFoodCsv->at($ItemActionEffectRaw)["Value{HQ}[$k]"];
                             $BaseMaxHQ = $ItemFoodCsv->at($ItemActionEffectRaw)["Max{HQ}[$k]"];
 
-                            $BaseValueFmt = "" . $BaseStatFmt . "+" . $BaseValue . "" . $RelativeStat . "\n";
-                            $BaseValueHQFmt = "" . $BaseStatHQFmt . "+" . $BaseValueHQ . "" . $RelativeStat . "\n";
+                            $BaseValueFmt = "" . $BaseStatFmt . "+" . $BaseValue . "" . $Relative . "\n";
+                            $BaseValueHQFmt = "" . $BaseStatHQFmt . "+" . $BaseValueHQ . "" . $Relative . "\n";
 
                             // don't display Cap if it's going to be +0
                             $BaseStatCapFmt = ($BaseMax > 0) ? "| Consumable " . $BaseStat . " Cap = " : false;
