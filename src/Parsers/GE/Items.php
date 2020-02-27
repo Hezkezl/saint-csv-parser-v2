@@ -341,6 +341,9 @@ class Items implements ParseInterface
             // Item Action
             $ItemAction = [];
             $outputstring = false;
+            $outputstring0 = false;
+            $outputstring1 = false;
+            $outputstring2 = false;
             $HQString = false;
             $BaseStat = false;
             $Recast = false;
@@ -534,10 +537,6 @@ class Items implements ParseInterface
                 if (($ItemActionType == 844) || ($ItemActionType == 845) || ($ItemActionType == 846)) {
                     $BaseMaxFmt = false;
                     $BaseMaxHQFmt = false;
-                    $BaseMaxFmt1 = false;
-                    $BaseMaxHQFmt1 = false;
-                    $BaseMaxFmt2 = false;
-                    $BaseMaxHQFmt2 = false;
 
                     //NQ
                     //item status effect
@@ -552,14 +551,14 @@ class Items implements ParseInterface
 
                     $DurationMinutes = floor(($ItemActionSeconds / 60) % 60);
                     $DurationSeconds = $ItemActionSeconds % 60;
-                    $DurationString = " ". $DurationMinutes ."m". $DurationSeconds ."s";
+                    $DurationString = " " . $DurationMinutes . "m" . $DurationSeconds . "s";
                     $DurationFormat1 = str_replace(" 0m", " ", $DurationString);
                     $DurationFormat = str_replace("m0s", "m", $DurationFormat1);
                     $Duration = ($DurationFormat == 30) ? "\n\n| Duration =$DurationFormat/60m" : "\n\n| Duration =$DurationFormat";
 
                     //exp
                     $EXPBonus = $ItemFoodCsv->at($ItemActionEffectRaw)["EXPBonus%"];
-                    $EXPBonusFmt = ($ItemActionType == 846) ? false : "| Consumable EXP_Bonus = +$EXPBonus%";
+                    $EXPBonusFmt = ($ItemActionType == 846) ? false : "\n| Consumable EXP_Bonus = +$EXPBonus%";
 
                     //recast
                     $RecastNQ = $item['Cooldown<s>'];
@@ -568,122 +567,60 @@ class Items implements ParseInterface
 
                     $RecastMinutes = floor(($RecastNQ / 60) % 60);
                     $RecastSeconds = $RecastNQ % 60;
-                    $RecastString = " ". $RecastMinutes ."m". $RecastSeconds ."s";
+                    $RecastString = " " . $RecastMinutes . "m" . $RecastSeconds . "s";
                     $RecastFormatNQ1 = str_replace(" 0m", " ", $RecastString);
                     $RecastFormatNQ = str_replace("m0s", "m", $RecastFormatNQ1);
 
                     $RecastMinutesHQ = floor(($RecastHQ / 60) % 60);
                     $RecastSecondsHQ = $RecastHQ % 60;
-                    $RecastStringHQ = " ". $RecastMinutesHQ ."m". $RecastSecondsHQ ."s";
+                    $RecastStringHQ = " " . $RecastMinutesHQ . "m" . $RecastSecondsHQ . "s";
                     $RecastFormatHQ1 = str_replace(" 0m", " ", $RecastStringHQ);
                     $RecastFormatHQ = str_replace("m0s", "m", $RecastFormatHQ1);
 
                     if ($ItemActionType == 846) {
-                    $Recast = "\n| Recast = ". $RecastFormatNQ ."\n| Recast HQ = ". $RecastFormatHQ ."";
+                        $Recast = "\n| Recast = " . $RecastFormatNQ . "\n| Recast HQ = " . $RecastFormatHQ . "";
                     } elseif (($ItemActionType == 844) || ($ItemActionType == 845)) {
                         $Recast = false;
                     }
 
-                    //each param value
-                    //Start of baseparam[0]
-                    //switch to percentage if true and flat if false
-                    $RelativeSwitch = ($ItemFoodCsv->at($ItemActionEffectRaw)["IsRelative[0]"] = true) ? "%" : false;
+                    //Start of base parameters
+                    for ($k = 0; $k < 3; $k++) {
+                        ${"outputstring$k"} = false;
+                        $RelativeStat = false;
 
-                    $BaseStat = str_replace(" ", "_", $BaseParamCsv->at($ItemFoodCsv->at($ItemActionEffectRaw)["BaseParam[0]"])["Name"]);
-                    if (!empty($BaseStat)) {
-                        $BaseStatFmt = "| Consumable ". $BaseStat ." = ";
-                        $BaseStatHQFmt = "| Consumable ". $BaseStat ." HQ = ";
+                        $BaseStat = str_replace(" ", "_", $BaseParamCsv->at($ItemFoodCsv->at($ItemActionEffectRaw)["BaseParam[$k]"])["Name"]);
+                        if (!empty($BaseStat)) {
+                            //switch to percentage if true and flat if false
+                            $RelativeStat = ($ItemFoodCsv->at($ItemActionEffectRaw)["IsRelative[$k]"] == "True") ? "%" : false;
 
-                        $BaseMax = $ItemFoodCsv->at($ItemActionEffectRaw)["Max[0]"];
-                        $BaseValue = $ItemFoodCsv->at($ItemActionEffectRaw)["Value[0]"];
-                        $BaseValueHQ = $ItemFoodCsv->at($ItemActionEffectRaw)["Value{HQ}[0]"];
-                        $BaseMaxHQ = $ItemFoodCsv->at($ItemActionEffectRaw)["Max{HQ}[0]"];
+                            $BaseStatFmt = "| Consumable " . $BaseStat . " = ";
+                            $BaseStatHQFmt = "| Consumable " . $BaseStat . " HQ = ";
 
-                        $BaseValueFmt = "". $BaseStatFmt ."+". $BaseValue ."". $RelativeSwitch ."\n";
-                        $BaseValueHQFmt = "". $BaseStatHQFmt ."+". $BaseValueHQ ."". $RelativeSwitch ."\n";
+                            $BaseMax = $ItemFoodCsv->at($ItemActionEffectRaw)["Max[$k]"];
+                            $BaseValue = $ItemFoodCsv->at($ItemActionEffectRaw)["Value[$k]"];
+                            $BaseValueHQ = $ItemFoodCsv->at($ItemActionEffectRaw)["Value{HQ}[$k]"];
+                            $BaseMaxHQ = $ItemFoodCsv->at($ItemActionEffectRaw)["Max{HQ}[$k]"];
 
-                        // don't display Cap if it's going to be +0
-                        if ($BaseMax > 0) {
-                            $BaseStatCapFmt = ($BaseMax > 0) ? "| Consumable " . $BaseStat . " Cap = " : "";
-                            $BaseStatHQCapFmt = ($BaseMax > 0) ? "| Consumable " . $BaseStat . " Cap HQ = " : "";
-                            $BaseMaxFmt = ($BaseMax > 0) ? "" . $BaseStatCapFmt . "+" . $BaseMax . "\n" : "";
-                            $BaseMaxHQFmt = ($BaseMaxHQ > 0 ) ? "". $BaseStatHQCapFmt ."+". $BaseMaxHQ ."\n" : "";
+                            $BaseValueFmt = "" . $BaseStatFmt . "+" . $BaseValue . "" . $RelativeStat . "\n";
+                            $BaseValueHQFmt = "" . $BaseStatHQFmt . "+" . $BaseValueHQ . "" . $RelativeStat . "\n";
+
+                            // don't display Cap if it's going to be +0
+                            $BaseStatCapFmt = ($BaseMax > 0) ? "| Consumable " . $BaseStat . " Cap = " : false;
+                            $BaseStatHQCapFmt = ($BaseMax > 0) ? "| Consumable " . $BaseStat . " Cap HQ = " : false;
+                            $BaseMaxFmt = ($BaseMax > 0) ? "" .  $BaseStatCapFmt . "+" . $BaseMax . "\n" : false;
+                            $BaseMaxHQFmt = ($BaseMax > 0) ? "" . $BaseStatHQCapFmt . "+" . $BaseMaxHQ . "\n" : false;
+
+                            ${"outputstring$k"} = "\n" . $BaseValueFmt . "" . $BaseMaxFmt . "" . $BaseValueHQFmt . "" . $BaseMaxHQFmt . "";
                         }
+                        //End of base parameters
 
-                        $outputstring0 = "\n". $BaseValueFmt ."". $BaseMaxFmt ."" . $BaseValueHQFmt . "". $BaseMaxHQFmt ."";
-                    } else {
-                        $outputstring0 = false;
+                        //end text for string
+                        $outputstring = "\n" . $Duration . "" . $Recast . "" . $outputstring0 . "" . $outputstring1 . "" . $outputstring2 . "" . $EXPBonusFmt . "" . $ItemActionEffectStatusFmt . "";
                     }
-                    //End of baseparam[0]
-
-                    //Start of baseparam[1]
-                    //switch to percentage if true and flat if false
-                    $RelativeSwitch1 = ($ItemFoodCsv->at($ItemActionEffectRaw)["IsRelative[1]"] = true) ? "%" : false;
-
-                    $BaseStat1 = str_replace(" ", "_", $BaseParamCsv->at($ItemFoodCsv->at($ItemActionEffectRaw)["BaseParam[1]"])["Name"]);
-                    if (!empty($BaseStat1)) {
-                        $BaseStatFmt1 = "| Consumable ". $BaseStat1 ." = ";
-                        $BaseStatHQFmt1 = "| Consumable ". $BaseStat1 ." HQ = ";
-
-                        $BaseMax1 = $ItemFoodCsv->at($ItemActionEffectRaw)["Max[1]"];
-                        $BaseValue1 = $ItemFoodCsv->at($ItemActionEffectRaw)["Value[1]"];
-                        $BaseValueHQ1 = $ItemFoodCsv->at($ItemActionEffectRaw)["Value{HQ}[1]"];
-                        $BaseMaxHQ1 = $ItemFoodCsv->at($ItemActionEffectRaw)["Max{HQ}[1]"];
-
-                        $BaseValueFmt1 = "". $BaseStatFmt1 ."+". $BaseValue1 ."". $RelativeSwitch1 ."\n";
-                        $BaseValueHQFmt1 = "". $BaseStatHQFmt1 ."+". $BaseValueHQ1 ."". $RelativeSwitch1 ."\n";
-
-                        // don't display Cap if it's going to be +0
-                        if ($BaseMax1 > 0) {
-                            $BaseStatCapFmt1 = ($BaseMax1 > 0) ? "| Consumable " . $BaseStat1 . " Cap = " : "";
-                            $BaseStatHQCapFmt1 = ($BaseMax1 > 0) ? "| Consumable " . $BaseStat1 . " Cap HQ = " : "";
-                            $BaseMaxFmt1 = ($BaseMax1 > 0) ? "" . $BaseStatCapFmt1 . "+" . $BaseMax1 . "\n" : "";
-                            $BaseMaxHQFmt1 = ($BaseMaxHQ1 > 0 ) ? "". $BaseStatHQCapFmt1 ."+". $BaseMaxHQ1 ."\n" : "";
-                        }
-
-                        $outputstring1 = "\n". $BaseValueFmt1 ."". $BaseMaxFmt1 ."" . $BaseValueHQFmt1 . "". $BaseMaxHQFmt1 ."";
-                    } else {
-                        $outputstring1 = false;
-                    }
-                    //End of baseparam[1]
-
-                    //Start of baseparam[2]
-                    //switch to percentage if true and flat if false
-                    $RelativeSwitch2 = ($ItemFoodCsv->at($ItemActionEffectRaw)["IsRelative[2]"] = true) ? "%" : false;
-
-                    $BaseStat2 = str_replace(" ", "_", $BaseParamCsv->at($ItemFoodCsv->at($ItemActionEffectRaw)["BaseParam[2]"])["Name"]);
-                    if (!empty($BaseStat2)) {
-                        $BaseStatFmt2 = "| Consumable ". $BaseStat2 ." = ";
-                        $BaseStatHQFmt2 = "| Consumable ". $BaseStat2 ." HQ = ";
-
-                        $BaseMax2 = $ItemFoodCsv->at($ItemActionEffectRaw)["Max[2]"];
-                        $BaseValue2 = $ItemFoodCsv->at($ItemActionEffectRaw)["Value[2]"];
-                        $BaseValueHQ2 = $ItemFoodCsv->at($ItemActionEffectRaw)["Value{HQ}[2]"];
-                        $BaseMaxHQ2 = $ItemFoodCsv->at($ItemActionEffectRaw)["Max{HQ}[2]"];
-
-                        $BaseValueFmt2 = "". $BaseStatFmt2 ."+". $BaseValue2 ."". $RelativeSwitch2 ."\n";
-                        $BaseValueHQFmt2 = "". $BaseStatHQFmt2 ."+". $BaseValueHQ2 ."". $RelativeSwitch2 ."\n";
-
-                        // don't display Cap if it's going to be +0
-                        if ($BaseMax2 > 0) {
-                            $BaseStatCapFmt2 = ($BaseMax2 > 0) ? "| Consumable " . $BaseStat2 . " Cap = " : "";
-                            $BaseStatHQCapFmt2 = ($BaseMax2 > 0) ? "| Consumable " . $BaseStat2 . " Cap HQ = " : "";
-                            $BaseMaxFmt2 = ($BaseMax2 > 0) ? "" . $BaseStatCapFmt2 . "+" . $BaseMax2 . "\n" : "";
-                            $BaseMaxHQFmt2 = ($BaseMaxHQ2 > 0 ) ? "". $BaseStatHQCapFmt2 ."+". $BaseMaxHQ2 ."\n" : "";
-                        }
-
-                        $outputstring2 = "\n". $BaseValueFmt2 ."". $BaseMaxFmt2 ."" . $BaseValueHQFmt2 . "". $BaseMaxHQFmt2 ."";
-                    } else {
-                        $outputstring2 = false;
-                    }
-                    //End of baseparam[2]
-
-                    //end text for string
-                    $outputstring = "\n". $Duration ."" . $Recast . "". $outputstring0 ."". $outputstring1 ."". $outputstring2 ."". $EXPBonusFmt ."". $ItemActionEffectStatusFmt. "";
+                    //end of Battle Food/gathering food/attribute potions code
                 }
-                //end of Battle Food/gathering food/attribute potions code
 
-                //start of 847 848 (HP/MP Potions)
+                //start of HP/MP Potions
                 if (($ItemActionType == 847) || ($ItemActionType == 848)) {
 
                 if ($ItemActionType == 847) {
