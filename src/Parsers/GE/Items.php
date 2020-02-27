@@ -342,6 +342,8 @@ class Items implements ParseInterface
             $ItemAction = [];
             $outputstring = false;
             $HQString = false;
+            $BaseStat = false;
+            $Recast = false;
             if ($item['ItemAction'] > 0) {
 
                 $ItemActionNumber = $item["ItemAction"];
@@ -366,8 +368,8 @@ class Items implements ParseInterface
                     //    $ItemActionEffectHQ = $StatusCsv->at($ItemActionEffectHQRaw)["Name"];
                     //    $HQString = "\n". $stringtype1HQ ."" . $ItemActionEffectHQ . "". $stringtype2 ."";
                     //} elseif ($ItemActionEffectHQRaw == 0) {
-                    //    $ItemActionEffectHQ = "";
-                    //    $HQString = "";
+                    //    $ItemActionEffectHQ = false;
+                    //    $HQString = false;
                     //}
                     $outputstring = "\n". $stringtype1 ."" . $ItemActionEffect . "". $stringtype2 ."";
 
@@ -384,7 +386,7 @@ class Items implements ParseInterface
                     //start text for string
                     $stringtype1 = "| Grantsnewitem = ";
                     //end text for string
-                    $stringtype2 = "";
+                    $stringtype2 = false;
                     $outputstring = "\n". $stringtype1 ."" . $ItemActionEffect . "". $stringtype2 ."";
 
                 }
@@ -458,7 +460,7 @@ class Items implements ParseInterface
                 //    //start text for string
                 //    $stringtype1 = "| Text = ";
                 //    //end text for string
-                //    $stringtype2 = "";
+                //    $stringtype2 = false;
                 //    $outputstring = "\n". $stringtype1 ."" . $ItemActionEffect . "". $stringtype2 ."";
                 //}
                 //end of Emotes etc code
@@ -491,7 +493,7 @@ class Items implements ParseInterface
                     //start text for string
                     $stringtype1 = "| Consumable Grants_MGP = ";
                     //end text for string
-                    $stringtype2 = "";
+                    $stringtype2 = false;
                     $outputstring = "\n". $stringtype1 ."" . $ItemActionEffectRaw . "". $stringtype2 ."";
 
                 }
@@ -530,6 +532,9 @@ class Items implements ParseInterface
 
                 //start of 844, 845 and 846 (Battle Food/gathering food/attribute potions)
                 if (($ItemActionType == 844) || ($ItemActionType == 845) || ($ItemActionType == 846)) {
+                    $BaseMaxFmt = false;
+                    $BaseMaxHQFmt = false;
+
                     //NQ
                     //item status effect
                     $ItemActionEffectStatus = $StatusCsv->at($ItemActionCsv->at($ItemActionNumber)["Data[0]"])["Name"];
@@ -546,14 +551,13 @@ class Items implements ParseInterface
                     $DurationString = " ". $DurationMinutes ."m". $DurationSeconds ."s";
                     $DurationFormat1 = str_replace(" 0m", " ", $DurationString);
                     $DurationFormat = str_replace("m0s", "m", $DurationFormat1);
-                    //$DurationFormat = str_replace("0m", "", $DurationString);
-                    //$DurationFormatCut = substr($DurationFormat, 0, -3);
-                    $Duration = "\n\n| Duration =$DurationFormat";
+                    $Duration = ($DurationFormat == 30) ? "\n\n| Duration =$DurationFormat/60m" : "\n\n| Duration =$DurationFormat";
+
                     //exp
                     $EXPBonus = $ItemFoodCsv->at($ItemActionEffectRaw)["EXPBonus%"];
-
                     $EXPBonusFmt = ($ItemActionType == 846) ? false : "| Consumable EXP_Bonus = +$EXPBonus%";
 
+                    //recast
                     $RecastNQ = $item['Cooldown<s>'];
                     $RecastHQpercent = ($RecastNQ * 0.1);
                     $RecastHQ = ($RecastNQ - $RecastHQpercent);
@@ -577,37 +581,36 @@ class Items implements ParseInterface
                     }
 
                     //each param value
-                    //Start of base 0
+                    //Start of baseparam[0]
                     //switch to percentage if true and flat if false
-                    if ($ItemFoodCsv->at($ItemActionEffectRaw)["IsRelative[0]"] = true) {
-                        $RelativeSwitch = "%";
-                    } else {
-                        $RelativeSwitch = false;
-                    }
+                    $RelativeSwitch = ($ItemFoodCsv->at($ItemActionEffectRaw)["IsRelative[0]"] = true) ? "%" : false;
+
                     $BaseStat = str_replace(" ", "_", $BaseParamCsv->at($ItemFoodCsv->at($ItemActionEffectRaw)["BaseParam[0]"])["Name"]);
                     if (!empty($BaseStat)) {
                         $BaseStatFmt = "| Consumable ". $BaseStat ." = ";
                         $BaseStatHQFmt = "| Consumable ". $BaseStat ." HQ = ";
-                        $BaseStatCapFmt = "| Consumable ". $BaseStat ." Cap = ";
-                        $BaseStatHQCapFmt = "| Consumable ". $BaseStat ." Cap HQ = ";
 
-                    $BaseValue = $ItemFoodCsv->at($ItemActionEffectRaw)["Value[0]"];
+                        $BaseMax = $ItemFoodCsv->at($ItemActionEffectRaw)["Max[0]"];
+                        $BaseValue = $ItemFoodCsv->at($ItemActionEffectRaw)["Value[0]"];
+                        $BaseValueHQ = $ItemFoodCsv->at($ItemActionEffectRaw)["Value{HQ}[0]"];
+                        $BaseMaxHQ = $ItemFoodCsv->at($ItemActionEffectRaw)["Max{HQ}[0]"];
+
                         $BaseValueFmt = "". $BaseStatFmt ."+". $BaseValue ."". $RelativeSwitch ."\n";
-
-                    $BaseMax = $ItemFoodCsv->at($ItemActionEffectRaw)["Max[0]"];
-                    $BaseMaxFmt = "". $BaseStatCapFmt ."+". $BaseMax ."\n";
-
-                    $BaseValueHQ = $ItemFoodCsv->at($ItemActionEffectRaw)["Value{HQ}[0]"];
                         $BaseValueHQFmt = "". $BaseStatHQFmt ."+". $BaseValueHQ ."". $RelativeSwitch ."\n";
 
-                    $BaseMaxHQ = $ItemFoodCsv->at($ItemActionEffectRaw)["Max{HQ}[0]"];
-                    $BaseMaxHQFmt = "". $BaseStatHQCapFmt ."+". $BaseMaxHQ ."\n";
+                        // don't display Cap if it's going to be +0
+                        if ($BaseMax > 0) {
+                            $BaseStatCapFmt = ($BaseMax > 0) ? "| Consumable " . $BaseStat . " Cap = " : "";
+                            $BaseStatHQCapFmt = ($BaseMax > 0) ? "| Consumable " . $BaseStat . " Cap HQ = " : "";
+                            $BaseMaxFmt = ($BaseMax > 0) ? "" . $BaseStatCapFmt . "+" . $BaseMax . "\n" : "";
+                            $BaseMaxHQFmt = ($BaseMaxHQ > 0 ) ? "". $BaseStatHQCapFmt ."+". $BaseMaxHQ ."\n" : "";
+                        }
 
-                    $outputstring0 = "\n". $BaseValueFmt ."". $BaseMaxFmt ."" . $BaseValueHQFmt . "". $BaseMaxHQFmt ."";
+                        $outputstring0 = "\n". $BaseValueFmt ."". $BaseMaxFmt ."" . $BaseValueHQFmt . "". $BaseMaxHQFmt ."";
                     } else {
                         $outputstring0 = false;
                     }
-                    //End of base 0
+                    //End of baseparam[0]
 
                     //Start of base 1
                     //switch to percentage if true and flat if false
@@ -670,12 +673,11 @@ class Items implements ParseInterface
 
                         $outputstring2 = "\n". $BaseValueFmt2 ."". $BaseMaxFmt2 ."" . $BaseValueHQFmt2 . "". $BaseMaxHQFmt2 ."";
                     } else {
-                        $outputstring2 = "";
+                        $outputstring2 = false;
                     }
                     //End of base 2
 
                     //end text for string
-                    $stringtype2 = "";
                     $outputstring = "\n". $Duration ."" . $Recast . "". $outputstring0 ."". $outputstring1 ."". $outputstring2 ."". $EXPBonusFmt ."". $ItemActionEffectStatusFmt. "";
                 }
                 //end of Battle Food/gathering food/attribute potions code
