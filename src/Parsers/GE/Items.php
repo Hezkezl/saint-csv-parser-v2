@@ -554,7 +554,7 @@ class Items implements ParseInterface
                     $DurationString = " " . $DurationMinutes . "m" . $DurationSeconds . "s";
                     $DurationFormat1 = str_replace(" 0m", " ", $DurationString);
                     $DurationFormat = str_replace("m0s", "m", $DurationFormat1);
-                    $Duration = ($DurationFormat == 30) ? "\n\n| Duration =$DurationFormat/60m" : "\n\n| Duration =$DurationFormat";
+                    $Duration = ($DurationFormat == 30) ? "\n| Duration =$DurationFormat/60m" : "\n\n| Duration =$DurationFormat";
 
                     //exp
                     $EXPBonus = $ItemFoodCsv->at($ItemActionEffectRaw)["EXPBonus%"];
