@@ -341,9 +341,6 @@ class Items implements ParseInterface
             // Item Action
             $ItemAction = [];
             $outputstring = false;
-            $outputstring0 = false;
-            $outputstring1 = false;
-            $outputstring2 = false;
             $HQString = false;
             if ($item['ItemAction'] > 0) {
 
@@ -576,17 +573,16 @@ class Items implements ParseInterface
                     if ($ItemActionType == 846) {
                     $Recast = "\n| Recast = ". $RecastFormatNQ ."\n| Recast HQ = ". $RecastFormatHQ ."";
                     } elseif (($ItemActionType == 844) || ($ItemActionType == 845)) {
-                        $Recast = "";
+                        $Recast = false;
                     }
 
                     //each param value
                     //Start of base 0
-                    $RelativeSwitchBool = $ItemFoodCsv->at($ItemActionEffectRaw)["IsRelative[0]"];
                     //switch to percentage if true and flat if false
-                    if ($RelativeSwitchBool = true) {
+                    if ($ItemFoodCsv->at($ItemActionEffectRaw)["IsRelative[0]"] = true) {
                         $RelativeSwitch = "%";
-                    } elseif ($RelativeSwitchBool = false) {
-                        $RelativeSwitch = "";
+                    } else {
+                        $RelativeSwitch = false;
                     }
                     $BaseStat = str_replace(" ", "_", $BaseParamCsv->at($ItemFoodCsv->at($ItemActionEffectRaw)["BaseParam[0]"])["Name"]);
                     if (!empty($BaseStat)) {
@@ -608,20 +604,17 @@ class Items implements ParseInterface
                     $BaseMaxHQFmt = "". $BaseStatHQCapFmt ."+". $BaseMaxHQ ."\n";
 
                     $outputstring0 = "\n". $BaseValueFmt ."". $BaseMaxFmt ."" . $BaseValueHQFmt . "". $BaseMaxHQFmt ."";
-                    }
-
-                    elseif (empty($BaseStat)) {
-                        $outputstring0 = "";
+                    } else {
+                        $outputstring0 = false;
                     }
                     //End of base 0
 
                     //Start of base 1
-                    $RelativeSwitchBool1 = $ItemFoodCsv->at($ItemActionEffectRaw)["IsRelative[1]"];
                     //switch to percentage if true and flat if false
-                    if ($RelativeSwitchBool1 = true) {
+                    if ($ItemFoodCsv->at($ItemActionEffectRaw)["IsRelative[1]"] = true) {
                         $RelativeSwitch1 = "%";
-                    } elseif ($RelativeSwitchBool1 = false) {
-                        $RelativeSwitch1 = "";
+                    } else {
+                        $RelativeSwitch1 = false;
                     }
                     $BaseStat1 = str_replace(" ", "_", $BaseParamCsv->at($ItemFoodCsv->at($ItemActionEffectRaw)["BaseParam[1]"])["Name"]);
                     if (!empty($BaseStat1)) {
@@ -643,20 +636,17 @@ class Items implements ParseInterface
                         $BaseMaxHQFmt1 = "". $BaseStatHQCapFmt1 ."+". $BaseMaxHQ1 ."\n";
 
                         $outputstring1 = "\n". $BaseValueFmt1 ."". $BaseMaxFmt1 ."" . $BaseValueHQFmt1 . "". $BaseMaxHQFmt1 ."";
-                    }
-
-                    elseif (empty($BaseStat1)) {
-                        $outputstring1 = "";
+                    } else {
+                        $outputstring1 = false;
                     }
                     //End of base 1
 
                     //Start of base 2
-                    $RelativeSwitchBool2 = $ItemFoodCsv->at($ItemActionEffectRaw)["IsRelative[2]"];
                     //switch to percentage if true and flat if false
-                    if ($RelativeSwitchBool2 = true) {
+                    if ($ItemFoodCsv->at($ItemActionEffectRaw)["IsRelative[2]"] = true) {
                         $RelativeSwitch2 = "%";
-                    } elseif ($RelativeSwitchBool1 = false) {
-                        $RelativeSwitch2 = "";
+                    } else {
+                        $RelativeSwitch2 = false;
                     }
                     $BaseStat2 = str_replace(" ", "_", $BaseParamCsv->at($ItemFoodCsv->at($ItemActionEffectRaw)["BaseParam[2]"])["Name"]);
                     if (!empty($BaseStat2)) {
@@ -679,9 +669,7 @@ class Items implements ParseInterface
                         $BaseMaxHQFmt2 = "". $BaseStatHQCapFmt2 ."+". $BaseMaxHQ2 ."\n";
 
                         $outputstring2 = "\n". $BaseValueFmt2 ."". $BaseMaxFmt2 ."" . $BaseValueHQFmt2 . "". $BaseMaxHQFmt2 ."";
-                    }
-
-                    elseif (empty($BaseStat2)) {
+                    } else {
                         $outputstring2 = "";
                     }
                     //End of base 2
