@@ -66,14 +66,29 @@ class Items implements ParseInterface
             $Name = preg_replace("/<Emphasis>|<\/Emphasis>|,|''/", "", $item['Name']);
             //$Name = str_replace("&", "and", $Name);
 
+            // add Desynth template and page if item can be Desynthesized
+            $DesynthTop = false;
+            $Desynth = (($item['Salvage'] > 0 && $item['ClassJob{Repair}'] > 0) || ($item['Salvage'] > 0 && $item['ItemUICategory'] == 47))
+                ? "{{ARR Infobox Desynth\n|Item            = ". $item['Name'] ."\n|Primary Skill   = ".
+                ucwords(strtolower($ClassJobCsv->at($item['ClassJob{Repair}'])['Name'])) ."\n|Result 1        = \n".""
+                ."|Result 1 Amount = \n|Result 2        = \n|Result 2 Amount = \n|Result 3        = \n".""
+                ."|Result 3 Amount = \n|Result 4        = \n|Result 4 Amount = \n|Result 5        = \n".""
+                ."|Result 5 Amount = \n|Result 6        = \n|Result 6 Amount = \n}}"
+                : false;
+            if (($Bot == "true") && (($item['Salvage'] > 0 && $item['ClassJob{Repair}'] > 0) || ($item['Salvage'] > 0 && $item['ItemUICategory'] == 47))) {
+                $DesynthTop = "\n'''$Name/Desynth'''\n$Desynth";
+            } elseif (($item['Salvage'] > 0 && $item['ClassJob{Repair}'] > 0) || ($item['Salvage'] > 0 && $item['ItemUICategory'] == 47)) {
+                $DesynthTop = "http://ffxiv.gamerescape.com/wiki/$Name/Desynth\n$Desynth";
+            }
+
             // change the top and bottom code depending on if I want to bot the pages up or not
             if ($Bot == "true") {
                 $Top = "{{-start-}}\n'''$Name/Patch'''\n$patch\n<noinclude>[[Category:Patch Subpages]]</noinclude>\n{{-stop-}}{{-start-}}\n'''$Name'''\n";
                 //$Top = "{{-start-}}\n'''$Name'''\n";
-                $Bottom = "{{-stop-}}";
+                $Bottom = "{{-stop-}}$DesynthTop";
             } else {
                 $Top = "http://ffxiv.gamerescape.com/wiki/$Name?action=edit\n";
-                $Bottom = false;
+                $Bottom = $DesynthTop;
             };
 
             // grab item ui category for this item
@@ -535,8 +550,6 @@ class Items implements ParseInterface
 
                 //start of 844, 845 and 846 (Battle Food/gathering food/attribute potions)
                 if (($ItemActionType == 844) || ($ItemActionType == 845) || ($ItemActionType == 846)) {
-                    $BaseMaxFmt = false;
-                    $BaseMaxHQFmt = false;
 
                     //NQ
                     //item status effect
@@ -546,7 +559,7 @@ class Items implements ParseInterface
                     $ItemActionEffectRaw = $ItemActionCsv->at($ItemActionNumber)["Data[1]"];
                     $ItemActionSeconds = $ItemActionCsv->at($ItemActionNumber)["Data[2]"];
                     //$ItemActionEffect = $ItemFoodCsv->at($ItemActionEffectRaw)["EXPBonus%"];
-                    if (empty($ItemActionEffect)) continue;
+                    //if (empty($ItemActionEffect)) continue;
                     //String for duration
 
                     $DurationMinutes = floor(($ItemActionSeconds / 60) % 60);
@@ -630,6 +643,7 @@ class Items implements ParseInterface
 
                 //NQ
                 $ItemActionEffectRaw = $ItemActionCsv->at($ItemActionNumber)["Data[0]"];
+                if ($ItemActionEffectRaw == 0) {continue;}
                 $ItemActionEffectCapRaw = $ItemActionCsv->at($ItemActionNumber)["Data[1]"];
                 //HQ
                 $ItemActionEffectHQRaw = $ItemActionCsv->at($ItemActionNumber)["Data{HQ}[0]"];
@@ -687,7 +701,7 @@ class Items implements ParseInterface
                 //end of Minions code
                 //end of ItemAction code
 
-                if ((empty($ItemActionEffect)) || ($ItemActionEffectRaw == 0)) {continue;}
+                if (empty($ItemActionEffect)) {continue;}
                 $ItemAction1[0] ="\n";
                 $ItemAction[] = $outputstring;
             }
