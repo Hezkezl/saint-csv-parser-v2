@@ -75,8 +75,9 @@ class Items implements ParseInterface
                 ."|Result 3 Amount = \n|Result 4        = \n|Result 4 Amount = \n|Result 5        = \n".""
                 ."|Result 5 Amount = \n|Result 6        = \n|Result 6 Amount = \n}}"
                 : false;
+
             if (($Bot == "true") && (($item['Salvage'] > 0 && $item['ClassJob{Repair}'] > 0) || ($item['Salvage'] > 0 && $item['ItemUICategory'] == 47))) {
-                $DesynthTop = "\n'''$Name/Desynth'''\n$Desynth";
+                $DesynthTop = "{{-start-}}\n'''$Name/Desynth'''\n$Desynth{{-stop-}}";
             } elseif (($item['Salvage'] > 0 && $item['ClassJob{Repair}'] > 0) || ($item['Salvage'] > 0 && $item['ItemUICategory'] == 47)) {
                 $DesynthTop = "http://ffxiv.gamerescape.com/wiki/$Name/Desynth\n$Desynth";
             }
