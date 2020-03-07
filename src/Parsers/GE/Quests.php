@@ -298,9 +298,9 @@ class Quests implements ParseInterface
             }
 
             // Show EXPReward if more than zero and round it down. Otherwise, blank it.
-            if ($this->getQuestExp($quest) > 0) {
+            if (($quest['ClassJobLevel[0]'] < 70) && ($this->getQuestExp($quest) > 0)) {
                 $expreward = "\n\n|EXPReward = ". floor($this->getQuestExp($quest)); //{{Information Needed}}";//
-            } elseif ($quest['ClassJobLevel[0]'] > 69) {
+            } elseif (($quest['ClassJobLevel[0]'] > 69) && ($this->getQuestExp($quest) > 0)) {
                 $expreward = "\n\n|EXPReward = {{Information Needed}}";
             } else {
                 $expreward = "\n\n|EXPReward =";
@@ -515,7 +515,6 @@ class Quests implements ParseInterface
                                 }
 							    $npclocend[] = $string;
                             }
-
 
                 $npclocend = implode($npclocend);
 
