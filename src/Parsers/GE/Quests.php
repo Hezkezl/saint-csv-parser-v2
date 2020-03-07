@@ -504,18 +504,19 @@ class Quests implements ParseInterface
 
                 //do the questname/NPCs page for each quest
                 $npclocend = [];
+                    //the below if statement isn't actually needed. All quests that have an ID have an 'End' NPC
                     //if (!empty($quest["Target{End}"])) {
-                                if (!empty($ENpcResidentCsv->at($quest["Target{End}"])['Singular'])) {
-                                    $npcname = str_replace($IncorrectNames, $correctnames, ucwords(strtolower($ENpcResidentCsv->at($quest["Target{End}"])['Singular'])));
+                if (!empty($ENpcResidentCsv->at($quest["Target{End}"])['Singular'])) {
+                    $npcname = str_replace($IncorrectNames, $correctnames, ucwords(strtolower($ENpcResidentCsv->at($quest["Target{End}"])['Singular'])));
                                     //attempt: //look through level.csv and find the row which has the enpc number
-                                    $npcid = $quest["Target{End}"];
+                    $npcid = $quest["Target{End}"];
 
-                                        $string =
-                                            "{{QuestNPC|Name=". $npcname ."|ID=". $npcid ."|Quest=". $quest['Name'] ."|Questend=True}}\n";
+                    $string =
+                        "{{QuestNPC|Name=". $npcname ."|ID=". $npcid ."|Quest=". $quest['Name'] ."|Questend=True}}\n";
                                     //"\n{{QuestNPC|Name={$NpcMapName}|}}";
                                     //"{{QuestNPC|Name=". $NpcName ."|Loc=". $NpcPlaceName ."|Coordinates=". round($NpcLocX, 1) ."-". round($NpcLocY, 1)."|ID=". $npcid ."|Quest=". $quest['Name'] ."}}\n";
-                                }
-							    $npclocend[] = $string;
+                    }
+                    $npclocend[] = $string;
                             //}
 
                 $npclocend = implode($npclocend);
