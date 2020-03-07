@@ -29,13 +29,14 @@ class Quests implements ParseInterface
         |Unlocks Quests =
 
         |Objectives =
-{objectives}{expreward}{gilreward}{sealsreward}
+{objectives}
+
+        |Description = {description}{expreward}{gilreward}{sealsreward}
 {tomestones}{relations}{instanceunlock}{questrewards}{catalystrewards}{guaranteeditem7}{guaranteeditem8}{guaranteeditem9}{guaranteeditem11}{questoptionrewards}{trait}
         |Issuing NPC = {questgiver}
         |NPC Location ={npcs}
         |Mobs Involved ={items}
 
-        |Description = {description}
         |Journal =
 {journal}
 
@@ -298,11 +299,11 @@ class Quests implements ParseInterface
 
             // Show EXPReward if more than zero and round it down. Otherwise, blank it.
             if ($this->getQuestExp($quest) > 0) {
-                $string = "\n\n|EXPReward = {{Information Needed}}";//. floor($this->getQuestExp($quest));
-                $expreward = $string;
+                $expreward = "\n\n|EXPReward = {{Information Needed}}";//. floor($this->getQuestExp($quest)); //{{Information Needed}}";//
+            //} elseif ($quest['ClassJobLevel[0]'] > 69) {
+                //$expreward = "\n\n|EXPReward = {{Information Needed}}";
             } else {
-                $string = "\n\n|EXPReward =";
-                $expreward = $string;
+                $expreward = "\n\n|EXPReward =";
             }
 
             //Stores entire row of JournalGenre in $JournalGenre
@@ -400,9 +401,11 @@ class Quests implements ParseInterface
             $questgiver = str_replace($IncorrectNames, $correctnames, $questgiver);
 
             // Start Quest Objectives / Journal Entry / Dialogue code
+            $description = false;
             $objectives = [];
             $dialogue = [];
             $journal = [];
+            $prejournal = [];
             $battletalk = [];
             $system = [];
 
@@ -454,7 +457,8 @@ class Quests implements ParseInterface
 
                     // add journal
                     if ($textgroup->type == 'journal' && strlen($text) > 1) {
-                        $journal[] = '*' .$text;
+                        //$journal[] = '*' .$text;
+                        $prejournal[] = '*' .$text;
                     }
 
                     // add battletalk
@@ -577,6 +581,10 @@ class Quests implements ParseInterface
                         ? "\n|Items Involved = $KeyItemsInvolved"
                         : "\n|Items Involved =");
 
+                $description = array_slice($prejournal, 0, 1);
+                $journal = array_merge(array_diff($prejournal, $description));
+                $description = implode("\n", str_replace("*", "", $description));
+
             }
             //---------------------------------------------------------------------------------
 
@@ -624,6 +632,7 @@ class Quests implements ParseInterface
                 '{system}' => implode("\n", $system),
                 '{trait}' => $TraitRewardName,
                 '{items}' => $ItemsInvolved,
+                '{description}' => $description,
                 '{npcs}' => "\n\n|NPCs Involved = $NpcsInvolved",
                 '{npcloc}' => $npcloc,
                 '{npclocend}' => $npclocend,
