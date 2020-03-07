@@ -299,9 +299,9 @@ class Quests implements ParseInterface
 
             // Show EXPReward if more than zero and round it down. Otherwise, blank it.
             if ($this->getQuestExp($quest) > 0) {
-                $expreward = "\n\n|EXPReward = {{Information Needed}}";//. floor($this->getQuestExp($quest)); //{{Information Needed}}";//
-            //} elseif ($quest['ClassJobLevel[0]'] > 69) {
-                //$expreward = "\n\n|EXPReward = {{Information Needed}}";
+                $expreward = "\n\n|EXPReward = ". floor($this->getQuestExp($quest)); //{{Information Needed}}";//
+            } elseif ($quest['ClassJobLevel[0]'] > 69) {
+                $expreward = "\n\n|EXPReward = {{Information Needed}}";
             } else {
                 $expreward = "\n\n|EXPReward =";
             }
