@@ -25,7 +25,6 @@ class Quests implements ParseInterface
         |Required Affiliation =
         |Quest Number = {number}
 
-        |Dungeon Requirement = 
         |Required Quests ={prevquestspace1}{prevquest2}{prevquest3}
         |Unlocks Quests =
 
@@ -36,7 +35,7 @@ class Quests implements ParseInterface
         |NPC Location ={npcs}
         |Mobs Involved ={items}
 
-        |Description =
+        |Description = {description}
         |Journal =
 {journal}
 
@@ -74,12 +73,12 @@ class Quests implements ParseInterface
         $ClassJobCsv = $this->csv('ClassJob');
         $ActionCsv = $this->csv('Action');
         $OtherRewardCsv = $this->csv('QuestRewardOther');
-        $InstanceContentCsv = $this->csv('InstanceContent');
         $BeastReputationRankCsv = $this->csv('BeastReputationRank');
         $BeastTribeCsv = $this->csv('BeastTribe');
         $TraitCsv = $this->csv('Trait');
         $EventIconTypeCsv = $this->csv('EventIconType');
         $KeyItemCsv = $this->csv('EventItem');
+        //$InstanceContentCsv = $this->csv('InstanceContent');
         //$LevelCsv = $this->csv('Level');
         //$MapCsv = $this->csv('Map');
 
@@ -158,16 +157,16 @@ class Quests implements ParseInterface
 
                 // if optional item count is greater than zero, show the reward.
                 if ($quest["ItemCount{Reward}[1][{$i}]"] > 0) {
-                    $string = "\n|QuestRewardOption ". ($i+1) ." = ". $optionalitemname;
+                    $string = "\n|QuestRewardOption ". ($i+1) ." = $optionalitemname";
 
                     // If Qty is greater than 1, show Qty.
                     if ($quest["ItemCount{Reward}[1][{$i}]"] > 1) {
-                        $string .= "\n|QuestRewardOption ". ($i+1) ." Count = ". $quest["ItemCount{Reward}[1][{$i}]"] ."\n";
+                        $string .= "\n|QuestRewardOption ". ($i+1) ." Count = ". $quest["ItemCount{Reward}[1][{$i}]"] ."";
                     }
 
                     // If reward is HQ, show HQ.
                     if ($quest["IsHQ{Reward}[1][{$i}]"] === "True") {
-                        $string .= "\n|QuestRewardOption ". ($i+1) ." HQ = x\n";
+                        $string .= "\n|QuestRewardOption ". ($i+1) ." HQ = x";
                     }
 
                     $questoptionRewards[] = $string;
@@ -272,9 +271,10 @@ class Quests implements ParseInterface
 
             // If you unlock a Dungeon during this quest, show the Name.
             $instanceunlock = false;
-            if ($quest['InstanceContent{Unlock}']) {
-                $instanceunlock = "\n|Misc Reward = [[". $InstanceContentCsv->at($quest['InstanceContent{Unlock}'])['Name'] ."]] unlocked.";
-            }
+            //commenting out because of the Patch 5.2 change to InstanceContent and the removal of 'Name'
+            //if ($quest['InstanceContent{Unlock}']) {
+                //$instanceunlock = "\n|Misc Reward = [[". $InstanceContentCsv->at($quest['InstanceContent{Unlock}'])['Name'] ."]] unlocked.";
+            //}
 
             // Display Grand Company Seal Reward if it's more than zero.
             $sealsreward = false;
@@ -367,7 +367,7 @@ class Quests implements ParseInterface
             }
 
             //Show the Previous Quest(s) correct Name by looking them up. Also replace any commas in the name with &#44;
-            //(the "html code" for a comma.
+            //(the "html code" for a comma.)
             $prevquest1 = str_replace(",", "&#44;", ($questCsv->at($quest['PreviousQuest[0]'])['Name']));
             $prevquestspace1 = str_replace(",", "&#44;", ($questCsv->at($quest['PreviousQuest[0]'])['Name']));
             $prevquest2 = str_replace(",", "&#44;", ($questCsv->at($quest['PreviousQuest[1]'])['Name']));
@@ -411,7 +411,6 @@ class Quests implements ParseInterface
             if (!empty($quest['Id'])) {
                 $folder = substr(explode('_', $quest['Id'])[1], 0, 3);
                 $textdata = $this->csv("quest/{$folder}/{$quest['Id']}");
-                //print_r($textdata);die;
 
                 foreach($textdata->data as $i => $entry) {
                     // grab files to a friendlier variable name
@@ -566,7 +565,6 @@ class Quests implements ParseInterface
                 //$questscripts = implode("\n", $questscripts);
                 $ItemsInvolved = implode(", ",$ItemsInvolved);
                 $KeyItemsInvolved = implode(", ", $KeyItemsInvolved);
-                //$NpcsInvolved = implode(", ", $NpcsInvolved);
                 // Remove the Quest Giver from the Involvement array, then make sure that there are unique/non-repeating
                 // names in NPCsInvolved, then separate each NPC with a comma if there's more than 1 left
                 $NpcsInvolved = implode(", ", array_unique(array_merge(array_diff($NpcsInvolved, array("$questgiver")))));
