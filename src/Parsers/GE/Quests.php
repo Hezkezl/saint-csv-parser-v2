@@ -23,7 +23,7 @@ class Quests implements ParseInterface
         |Level = {level}
 {requiredclass}
         |Required Affiliation =
-        |Quest Number ={number}
+        |Quest Number = {number}
 
         |Dungeon Requirement = 
         |Required Quests ={prevquestspace1}{prevquest2}{prevquest3}
@@ -34,7 +34,7 @@ class Quests implements ParseInterface
 {tomestones}{relations}{instanceunlock}{questrewards}{catalystrewards}{guaranteeditem7}{guaranteeditem8}{guaranteeditem9}{guaranteeditem11}{questoptionrewards}{trait}
         |Issuing NPC = {questgiver}
         |NPC Location ={npcs}
-        |Mobs Involved ={items}{keyitems}
+        |Mobs Involved ={items}
 
         |Description =
         |Journal =
@@ -49,7 +49,7 @@ class Quests implements ParseInterface
         }}
 {{-stop-}}{{-start-}}
 '''Loremonger:{name}'''
-<noinclude>{{Lorempageturn|prev={prevquest1}|prev2={prevquest2}|prev3={prevquest3}|prev4={prevquest4}|next=}}{{Loremquestheader|{name}|Mined=X|Summary=}}</noinclude>
+<noinclude>{{Lorempageturn|prev={prevquest1}{prev2}{prev3}|next=}}{{Loremquestheader|{name}|Mined=X|Summary=}}</noinclude>
 {{LoremLoc|Location=Hydaelyn}}<!-- Replace 'Hydaelyn' here with proper location where first dialogue is said -->
 {dialogue}{battletalk}{{-stop-}}
 {{-start-}}
@@ -118,7 +118,7 @@ class Quests implements ParseInterface
                 $guaranteeditemname = $ItemCsv->at($quest["Item{Reward}[0][{$i}]"])['Name'];
                 if ($quest["ItemCount{Reward}[0][{$i}]"] > 0) {
                     $RewardNumber = ($RewardNumber + 1);
-                    $string = "\n\n|QuestReward ". $RewardNumber ." = ". $guaranteeditemname;
+                    $string = "\n|QuestReward ". $RewardNumber ." = ". $guaranteeditemname;
 
                     // Show the Qty if more than 1 is received.
                     if ($quest["ItemCount{Reward}[0][{$i}]"] > 1) {
@@ -179,18 +179,14 @@ class Quests implements ParseInterface
             $guaranteedreward7 = false;
             if ($quest['Emote{Reward}']) {
                 $RewardNumber = ($RewardNumber + 1);
-                $emoterewardname = $EmoteCsv->at($quest["Emote{Reward}"])['Name'];
-                $string = "\n|QuestReward ". $RewardNumber ." = ". $emoterewardname;
-                $guaranteedreward7 = $string;
+                $guaranteedreward7 = "\n|QuestReward ". $RewardNumber ." = ". $EmoteCsv->at($quest["Emote{Reward}"])['Name'];
             }
 
             // If Class/Job Action is rewarded, display Action Name from Action.csv
             $guaranteedreward8 = false;
             if ($quest['Action{Reward}']) {
                 $RewardNumber = ($RewardNumber + 1);
-                $ActionRewardName = $ActionCsv->at($quest['Action{Reward}'])['Name'];
-                $string = "\n|QuestReward ". $RewardNumber ." = ". $ActionRewardName;
-                $guaranteedreward8 = $string;
+                $guaranteedreward8 = "\n|QuestReward ". $RewardNumber ." = ". $ActionCsv->at($quest['Action{Reward}'])['Name'];
             }
 
             //If General Action is rewarded, display Action Name from Action.csv (different from above)
@@ -198,9 +194,8 @@ class Quests implements ParseInterface
             foreach(range(0,1) as $i) {
                 if ($quest["GeneralAction{Reward}[{$i}]"] > 0){
                     $RewardNumber = ($RewardNumber + 1);
-                    $GeneralActionRewardName = $ActionCsv->at($quest["GeneralAction{Reward}[{$i}]"])['Name'];
-                    $string = "\n|QuestReward ". $RewardNumber ." = ". $GeneralActionRewardName;
-                    $guaranteedreward9[] = $string;
+                    $guaranteedreward9[] = "\n|QuestReward ". $RewardNumber ." = ".
+                        $ActionCsv->at($quest["GeneralAction{Reward}[{$i}]"])['Name'];
                 }
             }
 
@@ -210,9 +205,8 @@ class Quests implements ParseInterface
             $guaranteedreward11 = false;
             if ($quest['Other{Reward}']) {
                 $RewardNumber = ($RewardNumber + 1);
-                $OtherRewardName = $OtherRewardCsv->at($quest['Other{Reward}'])['Name'];
-                $string = "\n|QuestReward ". $RewardNumber ." = ". $OtherRewardName;
-                $guaranteedreward11 = $string;
+                $guaranteedreward11 = "\n|QuestReward ". $RewardNumber ." = ".
+                    $OtherRewardCsv->at($quest['Other{Reward}'])['Name'];
             }
 
             $TraitRewardName = false;
@@ -220,8 +214,7 @@ class Quests implements ParseInterface
             //if ($TraitReward[0]['id'] > 0) {
             if (isset($TraitReward[0]) && $TraitReward[0]['id'] > 0) {
                 $RewardNumber = ($RewardNumber + 1);
-                $string = "\n|QuestReward ". $RewardNumber ." = ". $TraitReward[0]['Name'];
-                $TraitRewardName = $string;
+                $TraitRewardName = "\n|QuestReward ". $RewardNumber ." = ". $TraitReward[0]['Name'];
             }
 
             // If Event Icon greater than 0 (ie: not blank) then convert it to the appropriate event with a
@@ -254,15 +247,13 @@ class Quests implements ParseInterface
             // with "Quest Name Image.png" as default location for the filename to be saved.
             $smallimage = false;
             if ($quest['Icon'] > 0) {
-                $string = "\n\n|Header Image = ". $quest['Icon'] .".png";
-                $smallimage = $string;
+                $smallimage = "\n\n|Header Image = ". $quest['Icon'] .".png";
             }
 
             // If Beast Tribe Action is defined, show it. Otherwise don't.
             $faction = false;
             if ($quest['BeastTribe']) {
-                $string = "\n|Faction = ". ucwords(strtolower($BeastTribeCsv->at($quest['BeastTribe'])['Name']));
-                $faction = $string;
+                $faction = "\n|Faction = ". ucwords(strtolower($BeastTribeCsv->at($quest['BeastTribe'])['Name']));
             }
 
             // If "Beast Tribe Reputation Required" equals "None", don't display. Otherwise show it.
@@ -270,46 +261,39 @@ class Quests implements ParseInterface
             $reputation = false;
             if ($BeastReputationRankCsv->at($quest['BeastReputationRank'])['Name'] === "None") {
             } else {
-                $string = "\n|Required Reputation = ". $BeastReputationRankCsv->at($quest['BeastReputationRank'])['Name'];
-                $reputation = $string;
+                $reputation = "\n|Required Reputation = ". $BeastReputationRankCsv->at($quest['BeastReputationRank'])['Name'];
             }
 
             // If Beast Tribe Currency is received, show it.
             $relations = false;
             if ($quest['ReputationReward'] > 0) {
-                $string = "\n|Relations = ". $quest['ReputationReward'];
-                $relations = $string;
+                $relations = "\n|Relations = ". $quest['ReputationReward'];
             }
 
             // If you unlock a Dungeon during this quest, show the Name.
             $instanceunlock = false;
             if ($quest['InstanceContent{Unlock}']) {
-                $string = "\n|Misc Reward = [[". $InstanceContentCsv->at($quest['InstanceContent{Unlock}'])['Name'] ."]] unlocked.";
-                $instanceunlock = $string;
+                $instanceunlock = "\n|Misc Reward = [[". $InstanceContentCsv->at($quest['InstanceContent{Unlock}'])['Name'] ."]] unlocked.";
             }
 
             // Display Grand Company Seal Reward if it's more than zero.
             $sealsreward = false;
             if ($quest['GCSeals'] > 0) {
-                $string = "\n|SealsReward = ". $quest['GCSeals'];
-                $sealsreward = $string;
+                $sealsreward = "\n|SealsReward = ". $quest['GCSeals'];
             }
 
             // don't display Required Class if equal to "adventurer". Otherwise, show its proper/capitalized Name.
             $requiredclass = false;
             if ($ClassJobCsv->at($quest['ClassJob{Required}'])['Name{English}'] === "Adventurer") {
             } else {
-                $string = "\n|Required Class = ". $ClassJobCsv->at($quest['ClassJob{Required}'])['Name{English}'];
-                $requiredclass = $string;
+                $requiredclass = "\n|Required Class = ". $ClassJobCsv->at($quest['ClassJob{Required}'])['Name{English}'];
             }
 
             // Show GilReward if more than zero. Otherwise, blank it.
             if ($quest['GilReward'] > 0) {
-                $string = "\n|GilReward = ". $quest['GilReward'];
-                $gilreward = $string;
+                $gilreward = "\n|GilReward = ". $quest['GilReward'];
             } else {
-                $string = "\n|GilReward =";
-                $gilreward = $string;
+                $gilreward = "\n|GilReward =";
             }
 
             // Show EXPReward if more than zero and round it down. Otherwise, blank it.
@@ -361,35 +345,25 @@ class Quests implements ParseInterface
             // commenting out MSQ for a test
             //$JournalSectionName === "Main Scenario (ARR/Heavensward/Stormblood)" || $JournalSectionName === "Main Scenario (Shadowbringers)" ||
             if ($JournalSectionName === "Chronicles of a New Era") {
-                $string = "\n|Section = ". $JournalSectionName;
-                $string .= "\n|Type = ". $JournalCategoryName;
-                $types = $string;
+                $types = "\n|Section = $JournalSectionName\n|Type = $JournalCategoryName";
 
                 // Else if $JournalSectionName is Sidequests and $JournalCategoryName is not equal to Side Story Quests
                 // show Type, Subtype, and Subtype2 (Placename for SubType2 since all Sidequests except SSQ show it.)
             } elseif ($JournalSectionName === "Sidequests" && $JournalCategoryName != "Side Story Quests") {
                 $QuestPlaceName = $PlaceNameCsv->at($quest['PlaceName'])['Name'];
-                $string = "\n|Type = ". $JournalSectionName;
-                $string .= "\n|Subtype = ". $JournalCategoryName;
-                $string .= "\n|Subtype2 = ". $QuestPlaceName;
-                $types = $string;
+                $types = "\n|Type = $JournalSectionName\n|Subtype = $JournalCategoryName\n|Subtype2 = $QuestPlaceName";
 
                 // Otherwise, for everything else show Section, Type, and Subtype.
             } else {
-                $string = "\n|Section = ". $JournalSectionName;
-                $string .= "\n|Type = ". $JournalCategoryName;
-                $string .= "\n|Subtype = ". $JournalGenreName;
-                $types = $string;
+                $types = "\n|Section = $JournalSectionName\n|Type = $JournalCategoryName\n|Subtype = $JournalGenreName";
             }
 
             // Show Repeatable as 'Yes' for instantly repeatable quests, or 'Daily' for dailies, or none
             $repeatable = false;
             if (($quest['IsRepeatable'] === "True") && ($quest['RepeatIntervalType'] == 1)) {
-                $string = "\n|Repeatable = Daily";
-                $repeatable = $string;
+                $repeatable = "\n|Repeatable = Daily";
             } elseif (($quest['IsRepeatable'] === "True") && ($quest['RepeatIntervalType'] == 0)) {
-                $string = "\n|Repeatable = Yes";
-                $repeatable = $string;
+                $repeatable = "\n|Repeatable = Yes";
             }
 
             //Show the Previous Quest(s) correct Name by looking them up. Also replace any commas in the name with &#44;
@@ -592,7 +566,18 @@ class Quests implements ParseInterface
                 //$questscripts = implode("\n", $questscripts);
                 $ItemsInvolved = implode(", ",$ItemsInvolved);
                 $KeyItemsInvolved = implode(", ", $KeyItemsInvolved);
-                $NpcsInvolved = implode(", ", $NpcsInvolved);
+                //$NpcsInvolved = implode(", ", $NpcsInvolved);
+                // Remove the Quest Giver from the Involvement array, then make sure that there are unique/non-repeating
+                // names in NPCsInvolved, then separate each NPC with a comma if there's more than 1 left
+                $NpcsInvolved = implode(", ", array_unique(array_merge(array_diff($NpcsInvolved, array("$questgiver")))));
+                // Display Items or Key Items involved (or both) depending on what's needed
+                $ItemsInvolved = (!empty($ItemsInvolved))
+                    ? ((!empty($KeyItemsInvolved))
+                        ? "\n|Items Involved = $ItemsInvolved, $KeyItemsInvolved"
+                        : "\n|Items Involved = $ItemsInvolved")
+                    : ((!empty($KeyItemsInvolved))
+                        ? "\n|Items Involved = $KeyItemsInvolved"
+                        : "\n|Items Involved =");
 
             }
             //---------------------------------------------------------------------------------
@@ -618,6 +603,8 @@ class Quests implements ParseInterface
                 '{prevquest1}' => $prevquest1 ? $prevquest1 : "",
                 '{prevquest2}' => $prevquest2 ? ", ". $prevquest2 : "",
                 '{prevquest3}' => $prevquest3 ? ", ". $prevquest3 : "",
+                '{prev2}' => (!empty($prevquest2)) ? "|prev2=$prevquest2" : "",
+                '{prev3}' => (!empty($prevquest3)) ? "|prev3=$prevquest3" : "",
                 '{expreward}' => $expreward,
                 '{gilreward}' => $gilreward,
                 '{sealsreward}' => $sealsreward,
@@ -638,8 +625,7 @@ class Quests implements ParseInterface
                 '{battletalk}' => implode("\n", $battletalk),
                 '{system}' => implode("\n", $system),
                 '{trait}' => $TraitRewardName,
-                '{items}' => (!empty($ItemsInvolved)) ? "\n|Items Involved = $ItemsInvolved" : "\n|Items Involved =",
-                '{keyitems}' => (!empty($KeyItemsInvolved)) ? "\n|Key Items Involved = $KeyItemsInvolved" : "",
+                '{items}' => $ItemsInvolved,
                 '{npcs}' => "\n\n|NPCs Involved = $NpcsInvolved",
                 '{npcloc}' => $npcloc,
                 '{npclocend}' => $npclocend,

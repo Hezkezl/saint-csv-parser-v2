@@ -57,10 +57,11 @@ class Items implements ParseInterface
         foreach ($ItemCsv->data as $id => $item) {
             $this->io->progressAdvance();
 
-            // skip ones without a name. other commented code is for temp bot run with convertible items
-            if (empty($item['Name'])) {//||  ($item['MaterializeType'] == 0)) {
+            // skip ones without a name
+            if (empty($item['Name'])) {
                 continue;
             }
+            if (($item['ClassJob{Repair}'] == 0) || ($SalvageCsv->at($item['Salvage'])['OptimalSkill'] == 0)) {continue;}
 
             // remove Emphasis, comma, and wiki italic '' code in names
             $Name = preg_replace("/<Emphasis>|<\/Emphasis>|,|''/", "", $item['Name']);
@@ -656,11 +657,9 @@ class Items implements ParseInterface
                 $ItemActionEffectCapHQRawString = "| Consumable ". $BaseStat ." Cap HQ = ";
 
                         $BaseValueFmt = "". $ItemActionEffectRawString ."+". $ItemActionEffectRaw ."%\n";
-
                         $BaseValueCapFmt = "". $ItemActionEffectCapRawString ."+". $ItemActionEffectCapRaw ."\n";
 
                         $BaseValueHQFmt = "". $ItemActionEffectHQRawString ."+". $ItemActionEffectHQRaw ."%\n";
-
                         $BaseValueHQCapFmt = "". $ItemActionEffectCapHQRawString ."+". $ItemActionEffectCapHQRaw ."\n";
 
                 $outputstring0 = "\n". $BaseValueFmt ."". $BaseValueCapFmt ."" . $BaseValueHQFmt . "". $BaseValueHQCapFmt ."";
@@ -774,7 +773,7 @@ class Items implements ParseInterface
         // save our data to the filename: GeItemWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save('GeItemWiki - '. $patch .'.txt', 999999);
+        $info = $this->save('DesynthGeItemWiki - '. $patch .'.txt', 999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],
