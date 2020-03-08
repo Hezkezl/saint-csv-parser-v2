@@ -303,6 +303,11 @@ class Quests implements ParseInterface
             //Show EXPReward if more than zero and round it down (if needed) Otherwise, blank it.
             $paramGrow  = $paramGrowCsv->at($quest['ClassJobLevel[0]']);
             $QuestEXP = floor(($quest['ExpFactor'] * $paramGrow['ScaledQuestXP'] * $paramGrow['QuestExpModifier']) / 100);
+            if ($quest['Level{Max}'] > 0) {
+                $paramGrowMaxLevel = $paramGrowCsv->at($quest['Level{Max}']);
+                $QuestEXPMaxLevel = floor(($quest['ExpFactor'] * $paramGrowMaxLevel['ScaledQuestXP'] * $paramGrowMaxLevel['QuestExpModifier']) / 100);
+                $QuestEXP = "$QuestEXP-$QuestEXPMaxLevel";
+            }
 
             /* commenting out exp code check (done in ternary form at the bottom of code)
              if ($QuestEXP > 0) {
