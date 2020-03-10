@@ -24,7 +24,7 @@ class Items implements ParseInterface
 
     public function parse()
     {
-        $patch = '5.2';
+        $patch = '5.21';
 
         // if I want to use pywikibot to create these pages, this should be true. Otherwise if I want to create pages
         // manually, set to false
@@ -71,12 +71,8 @@ class Items implements ParseInterface
             $Desynth = false;
             $DesynthText = false;
             $DesynthTop = false;
-            if ($SalvageCsv->at($item['Salvage'])['OptimalSkill'] > 0) {
-                if ($item['ItemUICategory'] == 47) {
-                    $Desynth = "Yes";
-                } elseif ($item['ClassJob{Repair}'] > 0) {
-                    $Desynth = "Yes";
-                }
+            if (($SalvageCsv->at($item['Salvage'])['OptimalSkill'] > 0) && ($item['ItemUICategory'] == 47 || $item['ClassJob{Repair}'] > 0)) {
+                $Desynth = "Yes";
             };
 
             // add Desynth template and page if item can be Desynthesized
@@ -762,7 +758,7 @@ class Items implements ParseInterface
                     ? "\n| Projectable    = Yes"
                     : "",
                 '{desynthesis}' => ($Desynth == "Yes")
-                    ? "\n| Desynthesizable= Yes\n| Desynth Level  = ". $SalvageCsv->at($item['Salvage'])['OptimalSkill']
+                    ? "\n| Desynthesizable= Yes\n| Desynth Level  = ". $item['Level{Item}']
                     : "\n| Desynthesizable= No",
                 '{repair}' => $Repair,
                 '{physicaldamage}' => $PhysicalDamage,

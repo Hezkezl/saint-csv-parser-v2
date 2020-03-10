@@ -20,7 +20,7 @@ class Collectable implements ParseInterface
     public function parse()
     {
 
-        $patch = 5.2;
+        $patch = '5.21';
 
         // grab CSV files
         $MasterpieceCsv = $this->csv('MasterpieceSupplyDuty');

@@ -27,7 +27,7 @@ class TripleTriad implements ParseInterface
 }}{Bottom}";
     public function parse()
     {
-        $Patch = '5.1';
+        $patch = '5.21';
         // if I want to use pywikibot to create these pages, this should be true. Otherwise if I want to create pages
         // manually, set to false
         $Bot = "true";
@@ -95,7 +95,7 @@ class TripleTriad implements ParseInterface
             $data = [
                 '{Top}' => $Top,
                 '{Name}' => $Name,
-                '{Patch}' => $Patch,
+                '{Patch}' => $patch,
                 '{Index}' => $TripleTriad['id'],
                 '{Rarity}' => $Rarity,
                 '{Family}' => ($TripleTriadCardResidentCsv->at($TripleTriad['id'])['TripleTriadCardType'] > 0)
@@ -118,7 +118,7 @@ class TripleTriad implements ParseInterface
         // save our data to the filename: GeTripleTriadWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save('GeTripleTriadWiki.txt', 2000);
+        $info = $this->save("GeTripleTriadWikiBot - ". $patch .".txt", 9999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],
