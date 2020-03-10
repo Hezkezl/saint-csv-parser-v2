@@ -61,26 +61,37 @@ class Items implements ParseInterface
             if (empty($item['Name'])) {
                 continue;
             }
-            if (($item['ClassJob{Repair}'] == 0) || ($SalvageCsv->at($item['Salvage'])['OptimalSkill'] == 0)) {continue;}
+            //if (($item['ClassJob{Repair}'] == 0) || ($SalvageCsv->at($item['Salvage'])['OptimalSkill'] == 0)) {continue;}
 
             // remove Emphasis, comma, and wiki italic '' code in names
             $Name = preg_replace("/<Emphasis>|<\/Emphasis>|,|''/", "", $item['Name']);
             //$Name = str_replace("&", "and", $Name);
 
-            // add Desynth template and page if item can be Desynthesized
+            // check if item can be Desynthesized
+            $Desynth = false;
+            $DesynthText = false;
             $DesynthTop = false;
-            $Desynth = (($item['ClassJob{Repair}'] > 0) && ($SalvageCsv->at($item['Salvage'])['OptimalSkill'] > 0))
-                ? "{{ARR Infobox Desynth\n|Item            = ". $item['Name'] ."\n|Primary Skill   = ".
-                ucwords(strtolower($ClassJobCsv->at($item['ClassJob{Repair}'])['Name'])) ."\n|Result 1        = \n".""
-                ."|Result 1 Amount = \n|Result 2        = \n|Result 2 Amount = \n|Result 3        = \n".""
-                ."|Result 3 Amount = \n|Result 4        = \n|Result 4 Amount = \n|Result 5        = \n".""
-                ."|Result 5 Amount = \n|Result 6        = \n|Result 6 Amount = \n}}"
-                : false;
+            if ($SalvageCsv->at($item['Salvage'])['OptimalSkill'] > 0) {
+                if ($item['ItemUICategory'] == 47) {
+                    $Desynth = "Yes";
+                } elseif ($item['ClassJob{Repair}'] > 0) {
+                    $Desynth = "Yes";
+                }
+            };
 
-            if (($Bot == "true") && (($item['ClassJob{Repair}'] > 0) && ($SalvageCsv->at($item['Salvage'])['OptimalSkill'] > 0))) {
-                $DesynthTop = "{{-start-}}\n'''$Name/Desynth'''\n$Desynth{{-stop-}}";
-            } elseif (($item['Salvage'] > 0 && $item['ClassJob{Repair}'] > 0) || ($item['Salvage'] > 0 && $item['ItemUICategory'] == 47)) {
-                $DesynthTop = "http://ffxiv.gamerescape.com/wiki/$Name/Desynth\n$Desynth";
+            // add Desynth template and page if item can be Desynthesized
+            if ($Desynth == "Yes") {
+                $DesynthText = "{{ARR Infobox Desynth\n|Item            = " . $item['Name'] . "\n|Primary Skill   = " .
+                    ucwords(strtolower($ClassJobCsv->at($item['ClassJob{Repair}'])['Name'])) . "\n|Result 1        = \n" . ""
+                    . "|Result 1 Amount = \n|Result 2        = \n|Result 2 Amount = \n|Result 3        = \n" . ""
+                    . "|Result 3 Amount = \n|Result 4        = \n|Result 4 Amount = \n|Result 5        = \n" . ""
+                    . "|Result 5 Amount = \n|Result 6        = \n|Result 6 Amount = \n}}";
+            };
+
+            if (($Bot == "true") && ($Desynth == "Yes")) {
+                $DesynthTop = "{{-start-}}\n'''$Name/Desynth'''\n$DesynthText{{-stop-}}";
+            } elseif (($Bot != "true") && ($Desynth == "Yes")) {
+                $DesynthTop = "http://ffxiv.gamerescape.com/wiki/$Name/Desynth\n$DesynthText";
             }
 
             // change the top and bottom code depending on if I want to bot the pages up or not
@@ -750,7 +761,7 @@ class Items implements ParseInterface
                 '{glamour}' => ($item['IsGlamourous'] == "True")
                     ? "\n| Projectable    = Yes"
                     : "",
-                '{desynthesis}' => (($item['ClassJob{Repair}'] > 0) && ($SalvageCsv->at($item['Salvage'])['OptimalSkill'] > 0))
+                '{desynthesis}' => ($Desynth == "Yes")
                     ? "\n| Desynthesizable= Yes\n| Desynth Level  = ". $SalvageCsv->at($item['Salvage'])['OptimalSkill']
                     : "\n| Desynthesizable= No",
                 '{repair}' => $Repair,
@@ -773,7 +784,7 @@ class Items implements ParseInterface
         // save our data to the filename: GeItemWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save('DesynthGeItemWiki - '. $patch .'.txt', 999999);
+        $info = $this->save('GeItemWiki - '. $patch .'.txt', 999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],
