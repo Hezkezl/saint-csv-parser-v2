@@ -71,7 +71,7 @@ class Items implements ParseInterface
             $Desynth = false;
             $DesynthText = false;
             $DesynthTop = false;
-            if (($SalvageCsv->at($item['Salvage'])['OptimalSkill'] > 0) && ($item['ItemUICategory'] == 47 || $item['ClassJob{Repair}'] > 0)) {
+            if (($SalvageCsv->at($item['Salvage'])['OptimalSkill'] > 1) && ($item['ItemUICategory'] == 47 || $item['ClassJob{Repair}'] > 0)) {
                 $Desynth = "Yes";
             };
 
