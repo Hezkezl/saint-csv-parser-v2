@@ -515,7 +515,6 @@ class Quests implements ParseInterface
                     $npcname = str_replace($IncorrectNames, $correctnames, ucwords(strtolower($ENpcResidentCsv->at($quest["Target{End}"])['Singular'])));
                                     //attempt: //look through level.csv and find the row which has the enpc number
                     $npcid = $quest["Target{End}"];
-
                     $string =
                         "{{QuestNPC|Name=". $npcname ."|ID=". $npcid ."|Quest=". $quest['Name'] ."|Questend=True}}\n";
                                     //"\n{{QuestNPC|Name={$NpcMapName}|}}";
@@ -609,6 +608,7 @@ class Quests implements ParseInterface
                 $description = implode("\n", str_replace("*", "", $description));
 
             }
+
             //---------------------------------------------------------------------------------
 
             $data = [
@@ -708,6 +708,12 @@ class Quests implements ParseInterface
 
         // split command
         $command = explode('_', $command);
+
+        // bug fix for me being fuckin stupid and not updating the /cache/quests/ files on a new patch
+        // gives an 'undefined index: 4' error if those aren't updated, due to blank quest info file... whups.
+        //if (!isset($command[1])) {
+        //    return $data;
+        //}
 
         // special one (npc battle talk)
         if ($command[4] == 'BATTLETALK') {
