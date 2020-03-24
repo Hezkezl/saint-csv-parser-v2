@@ -173,7 +173,7 @@ class SpecialShop implements ParseInterface
                 //Quest item?
                 $QuestItem = $QuestCsv->at($SpecialShop["Quest{Item}[$i]"])["Name"];
                 if (!empty($QuestItem)) {
-                    $QuestItem =  "\n    |Quest = ".$QuestItem;
+                    $QuestItem =  "\n    |Requirement=".$QuestItem;
                 } elseif (empty($QuestItem)) {
                     $QuestItem = "";
                 }
@@ -181,7 +181,7 @@ class SpecialShop implements ParseInterface
                 //Item is Unlocked from Achievement
                 $AchievementUnlock = $AchievementCsv->at($SpecialShop["AchievementUnlock[$i]"])["Name"];
                 if (!empty($AchievementUnlock)) {
-                    $AchievementUnlock =  "\n    |Achievement = ". $AchievementUnlock ."";
+                    $AchievementUnlock =  "\n    |Requirement=". $AchievementUnlock ."";
                 } elseif (empty($AchievementUnlock)) {
                     $AchievementUnlock = "";
                 }
