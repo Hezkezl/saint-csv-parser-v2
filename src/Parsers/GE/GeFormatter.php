@@ -52,6 +52,7 @@ class GeFormatter
         $format = str_replace("= False\n", "= No\n", $format);
         $format = str_replace("= True\n", "= Yes\n", $format);
         $format = str_replace("|Section = Class & Job Quests", "|Section = Class and Job Quests", $format);
+        $format = preg_replace("/(Survey target areas.|Gather items at all the specified locations.)\nEvaluation Bonus:\n(\d+)～ \\+(\d+)%\n(\d+)～ \\+(\d+)%\n(\d+)～  \\+(\d+)%/", "\n*$1\n*Evaluation Bonus:\n**$2～ +$3%\n**$4～ +$5%\n**$6～  +$7%", $format);
 
         return trim($format) . "\n\n";
     }
