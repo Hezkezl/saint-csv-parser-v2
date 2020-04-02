@@ -424,7 +424,7 @@ class Quests implements ParseInterface
                 $folder = substr(explode('_', $quest['Id'])[1], 0, 3);
                 $textdata = $this->csv("quest/{$folder}/{$quest['Id']}");
 
-                foreach($textdata->data as $i => $entry) {
+                foreach ($textdata->data as $i => $entry) {
                     //grab files to a friendlier variable name
                     //$id = $entry['id'];
                     $command = $entry['unknown_1'];
@@ -452,51 +452,51 @@ class Quests implements ParseInterface
 
                     //add objective
                     if ($textgroup->type == 'todo' && strlen($text) > 1) {
-                        $objectives[] = '*'. $text;
+                        $objectives[] = '*' . $text;
                     }
 
                     //add dialogue
                     if ($textgroup->type == 'dialogue' && strlen($text) > 1) {
                         //example: NPC says: Blah blah blah
-                        $dialogue[] = '{{Loremquote|'. $textgroup->npc .'|link=y|'. $text .'}}';
+                        $dialogue[] = '{{Loremquote|' . $textgroup->npc . '|link=y|' . $text . '}}';
                     }
 
                     //add journal
                     if ($textgroup->type == 'journal' && strlen($text) > 1) {
                         //$journal[] = '*' .$text;
-                        $prejournal[] = '*'. $text;
+                        $prejournal[] = '*' . $text;
                     }
 
                     //add battletalk
                     if ($textgroup->type == 'battle_talk' && strlen($text) > 1) {
                         $battletalk[0] = "\n\n=== Battle Dialogue ===";
-                        $battletalk[] = '{{Loremquote|'. $textgroup->npc .'|link=y|'. $text .'}}';
+                        $battletalk[] = '{{Loremquote|' . $textgroup->npc . '|link=y|' . $text . '}}';
                     }
 
                     //add system messages
                     if ($textgroup->type == 'system' && strlen($text) > 1) {
-                        $system[] = "\n<div>'''". $text ."'''</div>";
+                        $system[] = "\n<div>'''" . $text . "'''</div>";
                     }
                 }
 
                 //do the $quest['Name']/NPCs page for each quest
                 $npcloc = [];
-                foreach(range(0,49) as $i) {
+                foreach (range(0, 49) as $i) {
                     if (!empty($quest["Script{Instruction}[$i]"])) {
 
                         //Look up the NPC and save ID and Name
-                        foreach(range(0,31) as $key) {
+                        foreach (range(0, 31) as $key) {
                             if ($quest["Script{Instruction}[$i]"] == "ACTOR{$key}") {
                                 if (!empty($ENpcResidentCsv->at($quest["Script{Arg}[$i]"])['Singular'])) {
                                     $npcname = str_replace($IncorrectNames, $correctnames, ucwords(strtolower($ENpcResidentCsv->at($quest["Script{Arg}[$i]"])['Singular'])));
                                     //attempt: //look through level.csv and find the row which has the enpc number
                                     $npcid = $quest["Script{Arg}[$i]"];
                                     $string =
-                                    //"\n{{QuestNPC|Name={$NpcMapName}|}}";
-                                    //"{{QuestNPC|Name=". $NpcName ."|Loc=". $NpcPlaceName ."|Coordinates=". round($NpcLocX, 1) ."-". round($NpcLocY, 1)."|ID=". $npcid ."|Quest=". $quest['Name'] ."}}\n";
-                                    "{{QuestNPC|Name=". $npcname ."|ID=". $npcid ."|Quest=". $quest['Name'] ."}}\n";
+                                        //"\n{{QuestNPC|Name={$NpcMapName}|}}";
+                                        //"{{QuestNPC|Name=". $NpcName ."|Loc=". $NpcPlaceName ."|Coordinates=". round($NpcLocX, 1) ."-". round($NpcLocY, 1)."|ID=". $npcid ."|Quest=". $quest['Name'] ."}}\n";
+                                        "{{QuestNPC|Name=" . $npcname . "|ID=" . $npcid . "|Quest=" . $quest['Name'] . "}}\n";
                                 }
-							    $npcloc[] = $string;
+                                $npcloc[] = $string;
                             }
                         }
                     }
@@ -505,18 +505,18 @@ class Quests implements ParseInterface
 
                 //do the questname/NPCs page for each quest
                 $npclocend = [];
-                    //the below if statement isn't actually needed. All quests that have an ID have an 'End' NPC
-                    //if (!empty($quest["Target{End}"])) {
+                //the below if statement isn't actually needed. All quests that have an ID have an 'End' NPC
+                //if (!empty($quest["Target{End}"])) {
                 if (!empty($ENpcResidentCsv->at($quest["Target{End}"])['Singular'])) {
                     $npcname = str_replace($IncorrectNames, $correctnames, ucwords(strtolower($ENpcResidentCsv->at($quest["Target{End}"])['Singular'])));
-                                    //attempt: //look through level.csv and find the row which has the enpc number
+                    //attempt: //look through level.csv and find the row which has the enpc number
                     $npcid = $quest["Target{End}"];
-                    $string = "{{QuestNPC|Name=". $npcname ."|ID=". $npcid ."|Quest=". $quest['Name'] ."|Questend=True}}\n";
-                        //"\n{{QuestNPC|Name={$NpcMapName}|}}";
-                        //"{{QuestNPC|Name=". $NpcName ."|Loc=". $NpcPlaceName ."|Coordinates=". round($NpcLocX, 1) ."-". round($NpcLocY, 1)."|ID=". $npcid ."|Quest=". $quest['Name'] ."}}\n";
-                    }
-                    $npclocend[] = $string;
-                            //}
+                    $string = "{{QuestNPC|Name=" . $npcname . "|ID=" . $npcid . "|Quest=" . $quest['Name'] . "|Questend=True}}\n";
+                    //"\n{{QuestNPC|Name={$NpcMapName}|}}";
+                    //"{{QuestNPC|Name=". $NpcName ."|Loc=". $NpcPlaceName ."|Coordinates=". round($NpcLocX, 1) ."-". round($NpcLocY, 1)."|ID=". $npcid ."|Quest=". $quest['Name'] ."}}\n";
+                }
+                $npclocend[] = $string;
+                //}
 
                 $npclocend = implode($npclocend);
 
@@ -534,30 +534,30 @@ class Quests implements ParseInterface
                 */
 
                 //Look up the Quest Scripts looking through the columns "Script{Instruction}[0-49]"
-                foreach(range(0,49) as $i) {
+                foreach (range(0, 49) as $i) {
                     if (!empty($quest["Script{Instruction}[$i]"])) {
                         //Show "|Quest Script =" along with a full list of the Quest instructions and Arguments.
                         //$string = "|Quest Script = ". $quest["Script{Instruction}[$i]"] ." = ". $quest["Script{Arg}[$i]"];
                         //$questscripts[] = $string;
 
                         //Look up the Required Items (RITEM[0-5]) using the Name value from ItemCsv
-                        foreach(range(0,5) as $key) {
+                        foreach (range(0, 5) as $key) {
                             if ($quest["Script{Instruction}[$i]"] == "RITEM{$key}") {
-                                $string =  $ItemCsv->at($quest["Script{Arg}[$i]"])['Name'];
+                                $string = $ItemCsv->at($quest["Script{Arg}[$i]"])['Name'];
                                 $ItemsInvolved[] = $string;
                             }
                         }
 
                         //Look up the Required Key Items (ITEM[0-6]) using the Name value from KeyItemCsv
-                        foreach(range(0,6) as $key) {
+                        foreach (range(0, 6) as $key) {
                             if ($quest["Script{Instruction}[$i]"] == "ITEM{$key}") {
-                                $string =  $KeyItemCsv->at($quest["Script{Arg}[$i]"])['Name'];
+                                $string = $KeyItemCsv->at($quest["Script{Arg}[$i]"])['Name'];
                                 $KeyItemsInvolved[] = $string;
                             }
                         }
 
                         //Look up all of the NPCS Involved (Actor[0-31]) and convert to their proper Singular name.
-                        foreach(range(0,31) as $key) {
+                        foreach (range(0, 31) as $key) {
                             if ($quest["Script{Instruction}[$i]"] == "ACTOR{$key}") {
                                 if (!empty($ENpcResidentCsv->at($quest["Script{Arg}[$i]"])['Singular'])) {
                                     $string = str_replace($IncorrectNames, $correctnames, ucwords(strtolower($ENpcResidentCsv->at($quest["Script{Arg}[$i]"])['Singular'])));
@@ -569,7 +569,7 @@ class Quests implements ParseInterface
                 }
 
                 //$questscripts = implode("\n", $questscripts);
-                $ItemsInvolved = implode(", ",$ItemsInvolved);
+                $ItemsInvolved = implode(", ", $ItemsInvolved);
                 $KeyItemsInvolved = implode(", ", $KeyItemsInvolved);
 
                 /* Remove the Quest Giver from the Involvement array, then make sure that there are only unique/
@@ -606,6 +606,34 @@ class Quests implements ParseInterface
                 //remove the asterisk at the beginning of the description (added from prejournal)
                 $description = implode("\n", str_replace("*", "", $description));
 
+                //quest header image copying code. Should probably comment this out most of the time with /* before
+                //the beginning of the code and put */ after the code for easier commenting, as compared to
+                //putting // in front of every line. ie:  */ commented out code here <line breaks etc/everything too> /*
+                if (!empty($quest['Icon'])) {
+                    if (!file_exists($this->getOutputFolder() . "/questheadericons/{$quest['Icon']}.png")) {
+                        // ensure output directory exists
+                        $QuestIconOutputDirectory = $this->getOutputFolder() . '/questheadericons';
+                        if (!is_dir($QuestIconOutputDirectory)) {
+                            mkdir($QuestIconOutputDirectory, 0777, true);
+                        }
+
+                        // build icon input folder paths
+                        $questIcon = $this->getInputFolder() . '/icon/' . $this->iconize($quest['Icon']);
+
+                        // if icon doesn't exist (not in the input folder icon list), then skip
+                        //if (!file_exists($questIcon)) continue;
+
+                        $questiconFileName = "{$QuestIconOutputDirectory}/{$quest['Icon']}.png";
+
+                        // inform console what item we're copying
+                        //$this->io->text("Ability: <comment>{$quest['Name']}</comment>");
+                        //$this->io->text(
+                        //sprintf('- copy <info>%s</info> to <info>%s</info>', $questIcon, $questiconFileName));
+
+                        // copy the input icon to the output filename
+                        copy($questIcon, $questiconFileName);
+                    }
+                }
             }
 
             //---------------------------------------------------------------------------------
@@ -798,35 +826,31 @@ class Quests implements ParseInterface
 
         return $data;
     }
-    /** this chunk of code is completely obsolete. New EXP code is:
-     ($quest['EXPFactor'] * $paramGrow['ScaledQuestXP'] * $paramGrow['QuestExpModifier']) / 100
-    private function getQuestExp($quest)
+
+    /**
+     * Converts SE icon "number" into a proper path
+     */
+    private function iconize($number)
     {
-        $paramGrow  = $this->csv("ParamGrow")->at($quest['ClassJobLevel[0]']);
+        $number = intval($number);
+        $extended = (strlen($number) >= 6);
 
-        // Base EXP (1-49)
-        $EXP = $quest['ExpFactor'] * $paramGrow['QuestExpModifier'] * (45 + (5 * $quest['ClassJobLevel[0]'])) / 100;
-
-        // Quest lv 50
-        if (in_array($quest['ClassJobLevel[0]'], [50])) {
-            $EXP = $EXP + ((400 * ($quest['ExpFactor'] / 100)) + (($quest['ClassJobLevel[0]'] - 50) * (400 * ($quest['ExpFactor'] / 100))));
+        if ($number == 0) {
+            return null;
         }
 
-        // Quest lv 51
-        else if (in_array($quest['ClassJobLevel[0]'], [51])) {
-            $EXP = $EXP + ((800 * ($quest['ExpFactor'] / 100)) + (($quest['ClassJobLevel[0]'] - 50) * (400 * ($quest['ExpFactor'] / 100))));
-        }
+        // create icon filename
+        $icon = $extended ? str_pad($number, 5, "0", STR_PAD_LEFT) : '0' . str_pad($number, 5, "0", STR_PAD_LEFT);
 
-        // Quest lv 52-59
-        else if (in_array($quest['ClassJobLevel[0]'], [52,53,54,55,56,57,58,59])) {
-            $EXP = $EXP + ((2000  * ($quest['ExpFactor'] / 100)) + (($quest['ClassJobLevel[0]'] - 52) * (2000  * ($quest['ExpFactor'] / 100))));
-        }
+        // create icon path
+        $path = [];
+        $path[] = $extended ? $icon[0] . $icon[1] . $icon[2] .'000' : '0'. $icon[1] . $icon[2] .'000';
 
-        // Quest EXP 60-69
-        else if (in_array($quest['ClassJobLevel[0]'], [60,61,62,63,64,65,66,67,68,69])) {
-            $EXP = $EXP + ((37125  * ($quest['ExpFactor'] / 100)) + (($quest['ClassJobLevel[0]'] - 60) * (3375  * ($quest['ExpFactor'] / 100))));
-        }
-     *
-        return $EXP;
-    }  */
+        $path[] = $icon;
+
+        // combine
+        $icon = implode('/', $path) .'.png';
+
+        return $icon;
+    }
 }
