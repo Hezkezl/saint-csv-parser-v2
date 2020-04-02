@@ -63,8 +63,9 @@ class RaceAbility implements ParseInterface
                 $type = "Ability";
             } else {
                 $type = "Trait";
+            }
 
-}            if (!empty($ability['Icon'])) {
+            if (!empty($ability['Icon'])) {
 
                 // ensure output directory exists
                 $EventIconoutputDirectory = $this->getOutputFolder() . '/chocoboabilityicon';

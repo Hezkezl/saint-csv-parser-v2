@@ -12,7 +12,7 @@ class Quests implements ParseInterface
 {
     use CsvParseTrait;
 
-    // the wiki output format / template we shall use
+    //the wiki output format / template we shall use
     const WIKI_FORMAT = "{{-start-}}
 '''{name}'''
         {{ARR Infobox Quest
@@ -61,7 +61,7 @@ class Quests implements ParseInterface
     {
         $patch = '5.2';
 
-        // grab CSV files
+        //grab CSV files
         $questCsv = $this->csv('Quest');
         $ENpcResidentCsv = $this->csv('ENpcResident');
         $ItemCsv = $this->csv('Item');
@@ -87,18 +87,18 @@ class Quests implements ParseInterface
 
         $this->io->progressStart($questCsv->total);
 
-        // loop through quest data
+        //loop through quest data
         foreach($questCsv->data as $id => $quest) {
-            // ---------------------------------------------------------
+            //---------------------------------------------------------
             $this->io->progressAdvance();
 
-            // skip ones without a name
+            //skip ones without a name
             if (empty($quest['Name']) || $quest['Name'] === "Testdfghjkl;") {
                 continue;
             }
 
             //---------------------------------------------------------------------------------
-            // Actual code definition begins below!
+            //Actual code definition begins below!
             //---------------------------------------------------------------------------------
 
             //Grab the correct EventIconType which should then show the correct Icon for a quest
@@ -251,7 +251,7 @@ class Quests implements ParseInterface
                 $smallimage = "\n\n|Header Image = ". $quest['Icon'] .".png";
             }
 
-            //If Beast Tribe Action is defined, show it. Otherwise don't.
+            //If Beast Tribe Faction is defined, show it. Otherwise don't.
             $faction = false;
             if ($quest['BeastTribe']) {
                 $faction = "\n|Faction = ". ucwords(strtolower($BeastTribeCsv->at($quest['BeastTribe'])['Name']));
@@ -259,7 +259,6 @@ class Quests implements ParseInterface
 
             //If "Beast Tribe Reputation Required" equals "None", don't display. Otherwise show it.
             //Used for Beast quests that have a specific Reputation required to receive Quest.
-
             $reputation = false;
             if ($BeastReputationRankCsv->at($quest['BeastReputationRank'])['Name'] === "None") {
             } else {
@@ -434,13 +433,13 @@ class Quests implements ParseInterface
                     //get the text group from the command
                     $textgroup = $this->getTextGroup($i, $command);
 
-                    // ---------------------------------------------------------------
-                    // Handle quest text data
-                    // ---------------------------------------------------------------
+                    //---------------------------------------------------------------
+                    //Handle quest text data
+                    //---------------------------------------------------------------
 
                     /**
                      * Textgroup provides details on the command type, eg:
-                     * type: (npc, question, todo, scene, etc
+                     * type: (npc, question, to do, scene, etc
                      * npc: if "type == dialogue", then npc be the npc name!
                      * order: the entry order, might not need
                      *
@@ -453,36 +452,34 @@ class Quests implements ParseInterface
 
                     //add objective
                     if ($textgroup->type == 'todo' && strlen($text) > 1) {
-                        $objectives[] = '*' .$text;
+                        $objectives[] = '*'. $text;
                     }
 
                     //add dialogue
                     if ($textgroup->type == 'dialogue' && strlen($text) > 1) {
                         //example: NPC says: Blah blah blah
-                        $dialogue[] = '{{Loremquote|' .$textgroup->npc .'|link=y|'. $text .'}}';
+                        $dialogue[] = '{{Loremquote|'. $textgroup->npc .'|link=y|'. $text .'}}';
                     }
 
                     //add journal
                     if ($textgroup->type == 'journal' && strlen($text) > 1) {
                         //$journal[] = '*' .$text;
-                        $prejournal[] = '*' .$text;
+                        $prejournal[] = '*'. $text;
                     }
 
                     //add battletalk
                     if ($textgroup->type == 'battle_talk' && strlen($text) > 1) {
                         $battletalk[0] = "\n\n=== Battle Dialogue ===";
-                        $battletalk[] = '{{Loremquote|' .$textgroup->npc .'|link=y|'. $text .'}}';
+                        $battletalk[] = '{{Loremquote|'. $textgroup->npc .'|link=y|'. $text .'}}';
                     }
 
                     //add system messages
                     if ($textgroup->type == 'system' && strlen($text) > 1) {
                         $system[] = "\n<div>'''". $text ."'''</div>";
                     }
-
-                    // ---------------------------------------------------------------
                 }
 
-                //do the questname/NPCs page for each quest
+                //do the $quest['Name']/NPCs page for each quest
                 $npcloc = [];
                 foreach(range(0,49) as $i) {
                     if (!empty($quest["Script{Instruction}[$i]"])) {
@@ -494,8 +491,7 @@ class Quests implements ParseInterface
                                     $npcname = str_replace($IncorrectNames, $correctnames, ucwords(strtolower($ENpcResidentCsv->at($quest["Script{Arg}[$i]"])['Singular'])));
                                     //attempt: //look through level.csv and find the row which has the enpc number
                                     $npcid = $quest["Script{Arg}[$i]"];
-
-                                        $string =
+                                    $string =
                                     //"\n{{QuestNPC|Name={$NpcMapName}|}}";
                                     //"{{QuestNPC|Name=". $NpcName ."|Loc=". $NpcPlaceName ."|Coordinates=". round($NpcLocX, 1) ."-". round($NpcLocY, 1)."|ID=". $npcid ."|Quest=". $quest['Name'] ."}}\n";
                                     "{{QuestNPC|Name=". $npcname ."|ID=". $npcid ."|Quest=". $quest['Name'] ."}}\n";
@@ -515,10 +511,9 @@ class Quests implements ParseInterface
                     $npcname = str_replace($IncorrectNames, $correctnames, ucwords(strtolower($ENpcResidentCsv->at($quest["Target{End}"])['Singular'])));
                                     //attempt: //look through level.csv and find the row which has the enpc number
                     $npcid = $quest["Target{End}"];
-                    $string =
-                        "{{QuestNPC|Name=". $npcname ."|ID=". $npcid ."|Quest=". $quest['Name'] ."|Questend=True}}\n";
-                                    //"\n{{QuestNPC|Name={$NpcMapName}|}}";
-                                    //"{{QuestNPC|Name=". $NpcName ."|Loc=". $NpcPlaceName ."|Coordinates=". round($NpcLocX, 1) ."-". round($NpcLocY, 1)."|ID=". $npcid ."|Quest=". $quest['Name'] ."}}\n";
+                    $string = "{{QuestNPC|Name=". $npcname ."|ID=". $npcid ."|Quest=". $quest['Name'] ."|Questend=True}}\n";
+                        //"\n{{QuestNPC|Name={$NpcMapName}|}}";
+                        //"{{QuestNPC|Name=". $NpcName ."|Loc=". $NpcPlaceName ."|Coordinates=". round($NpcLocX, 1) ."-". round($NpcLocY, 1)."|ID=". $npcid ."|Quest=". $quest['Name'] ."}}\n";
                     }
                     $npclocend[] = $string;
                             //}
@@ -529,7 +524,6 @@ class Quests implements ParseInterface
                 $KeyItemsInvolved = [];
                 $NpcsInvolved = [];
                 /*
-                $npcloc = [];
                 $questscripts = [];
                 $NpcLevelX = false;
                 $NpcLevelZ = false;
@@ -577,9 +571,11 @@ class Quests implements ParseInterface
                 //$questscripts = implode("\n", $questscripts);
                 $ItemsInvolved = implode(", ",$ItemsInvolved);
                 $KeyItemsInvolved = implode(", ", $KeyItemsInvolved);
-                /* Remove the Quest Giver from the Involvement array, then make sure that there are unique/non-repeating
-                names in NPCsInvolved, then separate each NPC with a comma if there's more than 1 left */
+
+                /* Remove the Quest Giver from the Involvement array, then make sure that there are only unique/
+                non-repeating names in NPCsInvolved, then separate each NPC with a comma if there's more than 1 left */
                 $NpcsInvolved = implode(", ", array_unique(array_merge(array_diff($NpcsInvolved, array("$questgiver")))));
+
                 //Display Items or Key Items involved (or both) depending on what's needed
                 if (!empty($ItemsInvolved)) {
                     if (!empty($KeyItemsInvolved)) {
@@ -603,8 +599,11 @@ class Quests implements ParseInterface
                         : "\n|Items Involved =");
                 */
 
+                //delete the first array entry from the journal and place it in $description instead
                 $description = array_slice($prejournal, 0, 1);
+                //create $journal without the first line that was placed in $description
                 $journal = array_merge(array_diff($prejournal, $description));
+                //remove the asterisk at the beginning of the description (added from prejournal)
                 $description = implode("\n", str_replace("*", "", $description));
 
             }

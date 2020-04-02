@@ -18,7 +18,7 @@ class SmallIconConverter implements ParseInterface
     public function parse()
     {
         // ensure output directory exists
-        $outputDirectory = $this->getOutputFolder() . '/icon';
+        $outputDirectory = $this->getOutputFolder() . '/40pxitemicons';
         if (!is_dir($outputDirectory)) {
             mkdir($outputDirectory, 0777, true);
         }
