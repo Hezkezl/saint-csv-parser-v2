@@ -44,6 +44,7 @@ class Leves implements ParseInterface
     {
         // grab CSV files we want to use
         $LeveCsv = $this->csv('Leve');
+        $LeveVfxCsv = $this->csv('LeveVfx');
         $LeveClientCsv = $this->csv('LeveClient');
         $LeveAssignmentCsv = $this->csv('LeveAssignmentType');
         $ItemCsv = $this->csv('Item');
@@ -211,6 +212,7 @@ class Leves implements ParseInterface
 
             // Levequest Reward List. Need a double foreach here.
             foreach(range(0,7) as $i) {
+                $GroupNumber = $i + 1;
                 foreach(range(0,8) as $a) {
 
                     //|LevequestReward 3        = item name
@@ -224,7 +226,9 @@ class Leves implements ParseInterface
                     $RewardNumber = ($RewardNumber + 1);
 
                     //probability
-                    $RewardChance = $LeveRewardItemCsv->at($leve['LeveRewardItem'])["Probability<%>[$i]"];
+                    $GroupChance = ($LeveRewardItemCsv->at($leve['LeveRewardItem'])["Probability<%>[$i]"]);
+                    //trying to figure out how to "count" all the reward columns for group and then make that a percentage, example 3 different items in a group would turn out to be 33% chance to get.
+                    $RewardChance = $RewardNumber;
 
                     //is the item HQ?
                     if ($LeveRewardItemGroupCsv->at($LeveRewardItemCsv->at($leve['LeveRewardItem'])["LeveRewardItemGroup[$i]"])["HQ[$a]"] == "False") {
@@ -236,7 +240,9 @@ class Leves implements ParseInterface
                     //string
                     $RewardItem[0] = "\n";
                     $RewardItem[] =
-                        "|LevequestReward ". $RewardNumber ."        = ". $RewardItemName
+                        "\n|GroupNumber = ". $GroupNumber
+                        ."\n|GroupChance = ". $GroupChance . "%"
+                        ."\n|LevequestReward ". $RewardNumber ."        = ". $RewardItemName
                         ."\n|LevequestReward ". $RewardNumber ." Count  = ". $ItemRewardAmount
                         ."\n|LevequestReward ". $RewardNumber ." Chance = ". $RewardChance ."%". $RewardHQ;
                 }
@@ -447,9 +453,10 @@ class Leves implements ParseInterface
             $Map[] = "\n|LeveMeteID = ". $LevelMete ."\n|levelX = ". $LevelX ."\n|levelY = ". $LevelY ."\n". $LevelTeriString ."|levelObject = ". $LevelObject ."\n|ENpcName = ". $ObjectName;
 
             //images (super impose and header image)
-            $VFXOuter = "\n\n|Frame = ". $guildtype[$leve['LeveVfx{Frame}']] .".png";
-            $VFXInner = "\n|Image = ". $guildtype[$leve['LeveVfx']] .".png";
-            $VFXTown = "\n|Town  = ". $TownCsv->at($leve['Town'])['Name'] ." Leve.png";
+            //added sprintf("%06d", ....) which will always keep it a 6 didget number with 0 infront for icons
+            $VFXOuter = "\n\n|Frame = ". sprintf("%06d", $LeveVfxCsv->at($leve['LeveVfx{Frame}'])['Icon']) .".png";
+            $VFXInner = "\n|Image = ". sprintf("%06d", $LeveVfxCsv->at($leve['LeveVfx'])['Icon']) .".png";
+            $VFXTown = "\n|Town  = ". sprintf("%06d", $leve['Icon{CityState}']) .".png";
             $VFXImage = "". $VFXOuter ."". $VFXInner ."". $VFXTown ."";
 
             //header image
