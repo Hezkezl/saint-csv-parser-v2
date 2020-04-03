@@ -224,10 +224,22 @@ class Leves implements ParseInterface
                     //skip if the reward is zero therefore no reward then increase the Reward number by 1
                     if ($ItemRewardAmount == 0) continue;
                     $RewardNumber = ($RewardNumber + 1);
+                    $count = 0;
+
+                    foreach(range(0,8) as $c) {
+                        //just dead variable so "count" can see if it exists or not
+                        $defitem = $LeveRewardItemGroupCsv->at($LeveRewardItemCsv->at($leve['LeveRewardItem'])["LeveRewardItemGroup[$i]"])["Item[$c]"];
+                        if ($defitem != 0) {
+                            //up the count by 1 every time defitem isnt 0
+                            $count++;
+                        }
+                    }
+
+                    $ItemChance = floor(100/$count);
 
                     //probability
                     $GroupChance = ($LeveRewardItemCsv->at($leve['LeveRewardItem'])["Probability<%>[$i]"]);
-                    //trying to figure out how to "count" all the reward columns for group and then make that a percentage, example 3 different items in a group would turn out to be 33% chance to get.
+
                     $RewardChance = $RewardNumber;
 
                     //is the item HQ?
@@ -240,11 +252,11 @@ class Leves implements ParseInterface
                     //string
                     $RewardItem[0] = "\n";
                     $RewardItem[] =
-                        "\n|GroupNumber = ". $GroupNumber
-                        ."\n|GroupChance = ". $GroupChance . "%"
+                         "\n|Group = ". $GroupNumber
+                        ."\n|Group ". $GroupNumber ." Chance = ". $GroupChance ."%"
                         ."\n|LevequestReward ". $RewardNumber ."        = ". $RewardItemName
                         ."\n|LevequestReward ". $RewardNumber ." Count  = ". $ItemRewardAmount
-                        ."\n|LevequestReward ". $RewardNumber ." Chance = ". $RewardChance ."%". $RewardHQ;
+                        ."\n|LevequestReward ". $RewardNumber ." Chance = ". $ItemChance ."%". $RewardHQ;
                 }
             }
 
