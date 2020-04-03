@@ -240,7 +240,7 @@ class Leves implements ParseInterface
                     //probability
                     $GroupChance = ($LeveRewardItemCsv->at($leve['LeveRewardItem'])["Probability<%>[$i]"]);
 
-                    $RewardChance = $RewardNumber;
+                    $TotalChance = round($GroupChance / $count, 1);
 
                     //is the item HQ?
                     if ($LeveRewardItemGroupCsv->at($LeveRewardItemCsv->at($leve['LeveRewardItem'])["LeveRewardItemGroup[$i]"])["HQ[$a]"] == "False") {
@@ -252,11 +252,9 @@ class Leves implements ParseInterface
                     //string
                     $RewardItem[0] = "\n";
                     $RewardItem[] =
-                         "\n|Group = ". $GroupNumber
-                        ."\n|Group ". $GroupNumber ." Chance = ". $GroupChance ."%"
-                        ."\n|LevequestReward ". $RewardNumber ."        = ". $RewardItemName
+                        "|LevequestReward ". $RewardNumber ."        = ". $RewardItemName
                         ."\n|LevequestReward ". $RewardNumber ." Count  = ". $ItemRewardAmount
-                        ."\n|LevequestReward ". $RewardNumber ." Chance = ". $ItemChance ."%". $RewardHQ;
+                        ."\n|LevequestReward ". $RewardNumber ." Chance = ". $TotalChance ."%". $RewardHQ;
                 }
             }
 
