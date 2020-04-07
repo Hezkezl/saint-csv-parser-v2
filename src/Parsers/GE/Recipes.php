@@ -31,7 +31,7 @@ class Recipes implements ParseInterface
 
     public function parse()
     {
-        $patch = '5.2';
+        $patch = '5.21';
 
         // grab CSV files we want to use
         $RecipeCsv = $this->csv('Recipe');

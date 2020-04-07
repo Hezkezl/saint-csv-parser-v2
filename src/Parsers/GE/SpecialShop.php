@@ -21,7 +21,7 @@ class SpecialShop implements ParseInterface
 
     public function parse()
     {
-        $patch = '5.2';
+        $patch = '5.21';
 
         $SpecialShopCsv = $this->csv('SpecialShop');
         $ItemCsv = $this->csv('Item');

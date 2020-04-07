@@ -34,7 +34,7 @@ class Achievement implements ParseInterface
 }}{Bottom}";
     public function parse()
     {
-        $Patch = '5.21';
+        $patch = '5.21';
 
         // grab CSV files we want to use
         $AchievementCsv = $this->csv('Achievement');
@@ -75,7 +75,7 @@ class Achievement implements ParseInterface
                     $description = str_ireplace($questname, "[[". $questname ."]]", $description);
                 }
             }
-            //if its a type 2 change description like above then add the link for required achivement
+            //if its a type 2 change description like above then add the link for required achievement
             $reqachievement = [];
             if ($Achievement['Type'] == 2) {
                 $reqachievement[0] = "". $AchievementCsv->at($Achievement["Key"])['Name'] ."";
@@ -114,10 +114,10 @@ class Achievement implements ParseInterface
 
             // change the top and bottom code depending on if I want to bot the pages up or not. Places Patch on subpage
             if ($Bot == "true") {
-                $Top = "{{-start-}}\n'''$name/Patch'''\n$Patch\n{{-stop-}}{{-start-}}\n'''$name'''\n";
+                $Top = "{{-start-}}\n'''$name/Patch'''\n$patch\n{{-stop-}}{{-start-}}\n'''$name'''\n";
                 $Bottom = "{{-stop-}}";
             } else {
-                $Top = "http://ffxiv.gamerescape.com/wiki/$name\Patch?action=edit\n$Patch\nhttp://ffxiv.gamerescape.com/wiki/$name?action=edit\n";
+                $Top = "http://ffxiv.gamerescape.com/wiki/$name\Patch?action=edit\n$patch\nhttp://ffxiv.gamerescape.com/wiki/$name?action=edit\n";
                 $Bottom = "";
             };
 
@@ -125,7 +125,7 @@ class Achievement implements ParseInterface
             $data = [
                 '{Top}' => $Top,
                 '{index}' => $index,
-                '{patch}' => $Patch,
+                '{patch}' => $patch,
                 '{name}' => $name,
                 '{item}' => $item,
                 '{icon}' => $icon,
@@ -147,7 +147,8 @@ class Achievement implements ParseInterface
         // save our data to the filename: GeMountWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save('Achievement.txt', 20000);
+        //$info = $this->save('Achievement.txt', 20000);
+        $info = $this->save("GeAchievementWiki - ". $patch .".txt", 9999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],

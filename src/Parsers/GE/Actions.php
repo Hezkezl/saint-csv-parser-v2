@@ -47,7 +47,7 @@ class Actions implements ParseInterface
         $ClassJobCsv = $this->csv('ClassJob');
         $ClassJobCategoryCsv = $this->csv('ClassJobCategory');
 
-        $patch = '5.11';
+        $patch = '5.21';
         // if I want to use pywikibot to create these pages, this should be true. Otherwise if I want to create pages
         // manually, set to false
         $Bot = "false";

@@ -45,7 +45,7 @@ class Satisfaction implements ParseInterface
 
     public function parse()
     {
-        $patch = '5.2';
+        $patch = '5.21';
 
         // grab CSV files
         $SatisfactionNpcCsv = $this->csv('SatisfactionNpc');

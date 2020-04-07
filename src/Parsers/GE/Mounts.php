@@ -27,7 +27,7 @@ class Mounts implements ParseInterface
 }}{Bottom}";
     public function parse()
     {
-        $patch = '5.2';
+        $patch = '5.21';
         // if I want to use pywikibot to create these pages, this should be true. Otherwise if I want to create pages
         // manually, set to false
         $Bot = "true";
