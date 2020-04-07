@@ -219,7 +219,7 @@ class Quests implements ParseInterface
                 $TraitRewardName = "\n|QuestReward ". $RewardNumber ." = ". $TraitReward[0]['Name'];
             }
 
-            //If Event Icon greater than 0 (ie: not blank) then convert it to the appropriate event with a placeholder year
+            //Convert Event Icon parameter to the appropriate event with a placeholder year (except Heavensturn)
             $eventicon = [
                 80101 => "\n|Event = Moonfire Faire (2020)",
                 80102 => "\n|Event = Lightning Strikes (2020)",
@@ -299,21 +299,17 @@ class Quests implements ParseInterface
                 $gilreward = "\n|GilReward =";
             }
 
+            //Need to add the ClassJobLevel[0] value to the LevelOffset value to get the actual level of the quest
+            $QuestLevel = ($quest['ClassJobLevel[0]'] + $quest['QuestLevelOffset']);
+
             //Show EXPReward if more than zero and round it down (if needed) Otherwise, blank it.
-            $paramGrow  = $paramGrowCsv->at($quest['ClassJobLevel[0]']);
+            $paramGrow  = $paramGrowCsv->at($QuestLevel);
             $QuestEXP = floor(($quest['ExpFactor'] * $paramGrow['ScaledQuestXP'] * $paramGrow['QuestExpModifier']) / 100);
             if ($quest['Level{Max}'] > 0) {
                 $paramGrowMaxLevel = $paramGrowCsv->at($quest['Level{Max}']);
                 $QuestEXPMaxLevel = floor(($quest['ExpFactor'] * $paramGrowMaxLevel['ScaledQuestXP'] * $paramGrowMaxLevel['QuestExpModifier']) / 100);
                 $QuestEXP = "$QuestEXP-$QuestEXPMaxLevel";
             }
-
-            /* commenting out exp code check (done in ternary form at the bottom of code)
-             if ($QuestEXP > 0) {
-                $expreward = "\n\n|EXPReward = $QuestEXP";
-            } else {
-                $expreward = "\n\n|EXPReward = ";
-            } */
 
             //Stores entire row of JournalGenre in $JournalGenre
             $JournalGenreRow = $JournalGenreCsv->at($quest['JournalGenre']);
@@ -646,7 +642,7 @@ class Quests implements ParseInterface
                 '{questicontype}' => $EventIconType,
                 '{eventicon}' => $quest['Icon{Special}'] ? $eventicon[$quest['Icon{Special}']] : '',
                 '{smallimage}' => $smallimage,
-                '{level}' => $quest['ClassJobLevel[0]'],
+                '{level}' => $QuestLevel,
                 '{reputationrank}' => $reputation,
                 '{repeatable}' => $repeatable,
                 '{faction}' => $faction,
@@ -709,7 +705,7 @@ class Quests implements ParseInterface
     }
 
     /**
-     * This is from XIVDB v3 and will be maintained there.
+     * This is from XIVDB v3.
      * Supports:
      * - BattleTalk
      * - Journal
