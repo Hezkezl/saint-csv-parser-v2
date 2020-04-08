@@ -77,7 +77,7 @@ class Leves implements ParseInterface
 
         // if I want to use pywikibot to create these pages, this should be true. Otherwise if I want to create pages
         // manually, set to false
-        $Bot = "false";
+        $Bot = "true";
 
         // loop through data
         foreach ($LeveCsv->data as $id => $leve) {
@@ -95,7 +95,7 @@ class Leves implements ParseInterface
 
             // change the top and bottom code depending on if I want to bot the pages up or not
             if ($Bot == "true") {
-                $Top = "{{-start-}}\n'''$Name/Patch'''\n$patch\n<noinclude>[[Category:Patch Subpages]]</noinclude>\n{{-stop-}}{{-start-}}\n'''$Name'''\n";
+                $Top = "{{-start-}}\n'''$Name'''\n";
                 $Bottom = "{{-stop-}}";
             } else {
                 $Top = "http://ffxiv.gamerescape.com/wiki/$Name?action=edit\n";
@@ -280,11 +280,11 @@ class Leves implements ParseInterface
                 }
                 $NpcName = $ENpcResidentCsv->at($LevelCsv->at($leve['Level{Levemete}'])['Object'])['Singular'];
                 if ($CraftLeveItemQty > 1) {
-                    $TradecraftObjective = "\n|Objectives = Deliver [[$Item|$ItemPlural]] to {{NPCLink|$NpcName}}. 0/$CraftLeveItemQty";
+                    $TradecraftObjective = "\n|Objectives =\n*Deliver [[$Item|$ItemPlural]] to {{NPCLink|$NpcName}}. 0/$CraftLeveItemQty";
                 } elseif ($ItemVowel == "0" && $CraftLeveItemQty == "1") {
-                    $TradecraftObjective = "\n|Objectives = Deliver a [[$Item|$ItemSingle]] to {{NPCLink|$NpcName}}. 0/$CraftLeveItemQty";
+                    $TradecraftObjective = "\n|Objectives =\n*Deliver a [[$Item|$ItemSingle]] to {{NPCLink|$NpcName}}. 0/$CraftLeveItemQty";
                 } elseif ($ItemVowel == "1" && $CraftLeveItemQty == "1") {
-                    $TradecraftObjective = "\n|Objectives = Deliver an [[$Item|$ItemSingle]] to {{NPCLink|$NpcName}}. 0/$CraftLeveItemQty";
+                    $TradecraftObjective = "\n|Objectives =\n*Deliver an [[$Item|$ItemSingle]] to {{NPCLink|$NpcName}}. 0/$CraftLeveItemQty";
                 }
             } elseif ($levetype == "Battlecraft") {
                 foreach(range(0,7) as $i) {
@@ -490,6 +490,7 @@ class Leves implements ParseInterface
             //make it fit for wiki template
 
             //levequest header image copying code.
+            /*
             if (!empty($Header)) {
                 if (!file_exists($this->getOutputFolder() . "/questheadericons/{$Header}.png")) {
                     // ensure output directory exists
@@ -514,8 +515,7 @@ class Leves implements ParseInterface
                     // copy the input icon to the output filename
                     copy($levequestIcon, $levequesticonFileName);
                 }
-            }
-
+            }*/
 
             // Save some data
             $data = [
