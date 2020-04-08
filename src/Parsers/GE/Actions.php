@@ -4,7 +4,6 @@ namespace App\Parsers\GE;
 
 use App\Parsers\CsvParseTrait;
 use App\Parsers\ParseInterface;
-use Symfony\Component\Config\Resource\FileResource;
 
 /**
  * php bin/console app:parse:csv GE:Actions
@@ -47,10 +46,15 @@ class Actions implements ParseInterface
         $ClassJobCsv = $this->csv('ClassJob');
         $ClassJobCategoryCsv = $this->csv('ClassJobCategory');
 
+        $Range = false;
+        $Recast = false;
+        $CastTime = false;
+        $npcif = false;
+
         $patch = '5.21';
         // if I want to use pywikibot to create these pages, this should be true. Otherwise if I want to create pages
         // manually, set to false
-        $Bot = "false";
+        // $Bot = "false";
 
         // (optional) start a progress bar
         $this->io->progressStart($ActionCsv->total);
@@ -59,16 +63,16 @@ class Actions implements ParseInterface
         foreach ($ActionCsv->data as $id => $Action) {
             $this->io->progressAdvance();
             $index = $Action['id'];
+            //$Name = $Action['Name'];
 
-            $Name = $Action['Name'];
-
-            if ($Bot == "true") {
+            //commenting this code out. Will need to uncomment out the '{name}' code at bottom if $Name actually needs using
+            /*if ($Bot == "true") {
                 $Top = "{{-start-}}\n'''$Name/Patch'''\n$patch\n<noinclude>[[Category:Patch Subpages]]</noinclude>\n{{-stop-}}{{-start-}}\n'''$Name'''\n";
                 $Bottom = "{{-stop-}}";
             } else {
                 $Top = "http://ffxiv.gamerescape.com/wiki/$Name?action=edit\n";
                 $Bottom = "";
-            };
+            };*/
 
             $Type = $ActionCategoryCsv->at($Action['ActionCategory'])['Name'];
             //add "NPC SKILL" if it's an npc so we can sort
@@ -81,7 +85,6 @@ class Actions implements ParseInterface
            	$ClassJobLong = ucwords(strtolower($ClassJobCsv->at($Action['ClassJob'])['Name']));
            	$ClassJobShort = str_replace(" ",",",$ClassJobCategoryCsv->at($Action['ClassJobCategory'])['Name']);
            	$Level = $Action['ClassJobLevel'];
-
 
            	if ($Action['Range'] == "-1") {
            		$Range = "3";
@@ -112,7 +115,8 @@ class Actions implements ParseInterface
                 $Recast = str_replace("m0s", "m", $ReCastFormat1);
                 //$Recast = $ReCastTimeRaw;
            	}
-           	$StatusGainedRaw = $Action['Status{GainSelf}'];
+
+           	//$StatusGainedRaw = $Action['Status{GainSelf}'];
            	//$Duration = $StatusCsv->at($DurationRaw)['']
            	//$StatusGainedName = $
            	$Description = $ActionTransientCsv->at($Action['id'])['Description'];
@@ -120,13 +124,13 @@ class Actions implements ParseInterface
            	$Combo = $ActionCsv->at($Action['Action{Combo}'])['Name'];
 
 
-
             // Save some data
             $data = [
                 //'{top}' => $Top,
                 //'{bottom}' => $Bottom,
                 '{patch}' => $patch,
-                '{name}' => $Name,
+                //'{name}' => $Name,
+                '{name}' => $Action['Name'],
                 '{type}' => $Type,
                 '{classjoblong}' => $ClassJobLong,
                 '{level}' => $Level,
@@ -149,7 +153,7 @@ class Actions implements ParseInterface
         // save our data to the filename: GeRecipeWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save("Actions - ". $patch .".txt", 999999999);
+        $info = $this->save("GeActionsWiki - ". $patch .".txt", 999999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],
