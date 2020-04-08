@@ -14,19 +14,21 @@ class Leves implements ParseInterface
 
     // the wiki output format / template we shall use
     const WIKI_FORMAT = "{Top}{{ARR Infobox Levequest
+|Index = {index}
 |Name  = {name}
 |Patch = {patch}
-|Level = {level}{Card}
+|Level = {level}{card}
 
 |Guildleve Type     = {guildtype}
 |Levequest Type     = {levetype}{duration}
-|Levequest Location = {Location}
+|Levequest Location = {location}
+|Header Image       = {header}.png
 
 |Recommended Classes = {classes}
 {trdobjective}{fldobjective}{mobobjective}{description}{turnins}
 
 |EXPReward = {exp}
-|GilReward = ~{gil}{seals}{Reward}{npc}
+|GilReward = ~{gil}{seals}{reward}{npc}
 |Client = {client}
 
 |NPCs Involved  = {npcinvolve}<!-- List of NPCs involved (besides the quest giver,) comma separated-->
@@ -62,10 +64,11 @@ class Leves implements ParseInterface
         $LeveStringCsv = $this->csv('LeveString');
         $TerritoryTypeCsv = $this->csv('TerritoryType');
         $GatheringLeveRouteCsv = $this->csv('GatheringLeveRoute');
-        $TownCsv = $this->csv('Town');
+        //$TownCsv = $this->csv('Town');
         $GatheringPointCsv = $this->csv('GatheringPoint');
         $GatheringPointBaseCsv = $this->csv('GatheringPointBase');
         $GatheringItemCsv = $this->csv('GatheringItem');
+        $LevemetePatchCsv = $this->csv('LevemetePatch');
 
         // (optional) start a progress bar
         $this->io->progressStart($LeveCsv->total);
@@ -85,6 +88,10 @@ class Leves implements ParseInterface
             if ((empty($Name)) || (preg_match("/[\x{30A0}-\x{30FF}\x{3040}-\x{309F}\x{4E00}-\x{9FBF}]+/u", $Name))) {
                 continue;
             }
+
+            //get the Patch and Issuing NPC from a separate file called LevemetePatch.csv which was custom made
+            $Patch = $LevemetePatchCsv->at($leve['Name'])['Patch'];
+            $Npc = $LevemetePatchCsv->at($leve['Name'])['Levemete'];
 
             // change the top and bottom code depending on if I want to bot the pages up or not
             if ($Bot == "true") {
@@ -194,7 +201,6 @@ class Leves implements ParseInterface
             $FieldcraftObjective = false;
             $BattleObjective = false;
             $Item = false;
-            $Npc = false;
             $NpcName = false;
             $RewardNumber = false;
             $TargetNumber = false;
@@ -212,7 +218,7 @@ class Leves implements ParseInterface
 
             // Levequest Reward List. Need a double foreach here.
             foreach(range(0,7) as $i) {
-                $GroupNumber = $i + 1;
+                //$GroupNumber = $i + 1;
                 foreach(range(0,8) as $a) {
 
                     //|LevequestReward 3        = item name
@@ -235,9 +241,8 @@ class Leves implements ParseInterface
                         }
                     }
 
-                    $ItemChance = floor(100/$count);
-
                     //probability
+                    //$ItemChance = floor(100/$count);
                     $GroupChance = ($LeveRewardItemCsv->at($leve['LeveRewardItem'])["Probability<%>[$i]"]);
 
                     $TotalChance = round($GroupChance / $count, 1);
@@ -463,14 +468,14 @@ class Leves implements ParseInterface
             $Map[] = "\n|LeveMeteID = ". $LevelMete ."\n|levelX = ". $LevelX ."\n|levelY = ". $LevelY ."\n". $LevelTeriString ."|levelObject = ". $LevelObject ."\n|ENpcName = ". $ObjectName;
 
             //images (super impose and header image)
-            //added sprintf("%06d", ....) which will always keep it a 6 didget number with 0 infront for icons
+            //added sprintf("%06d", ....) which will always keep it a 6 digit number with 0 in front for icons
             $VFXOuter = "\n\n|Frame = ". sprintf("%06d", $LeveVfxCsv->at($leve['LeveVfx{Frame}'])['Icon']) .".png";
             $VFXInner = "\n|Image = ". sprintf("%06d", $LeveVfxCsv->at($leve['LeveVfx'])['Icon']) .".png";
             $VFXTown = "\n|Town  = ". sprintf("%06d", $leve['Icon{CityState}']) .".png";
             $VFXImage = "". $VFXOuter ."". $VFXInner ."". $VFXTown ."";
 
             //header image
-            //$VFXHeader = $leve['Icon{Issuer}'];
+            $Header = $leve['Icon{Issuer}'];
 
             $MobInvolvement = array_unique($MobInvolvement);
             $MobInvolvement = implode(", ", $MobInvolvement);
@@ -484,10 +489,38 @@ class Leves implements ParseInterface
             //are we doing CompanyLeve?
             //make it fit for wiki template
 
+            //levequest header image copying code.
+            if (!empty($Header)) {
+                if (!file_exists($this->getOutputFolder() . "/questheadericons/{$Header}.png")) {
+                    // ensure output directory exists
+                    $QuestIconOutputDirectory = $this->getOutputFolder() . '/levequestheaderpics';
+                    if (!is_dir($QuestIconOutputDirectory)) {
+                        mkdir($QuestIconOutputDirectory, 0777, true);
+                    }
+
+                    // build icon input folder paths
+                    $levequestIcon = $this->getInputFolder() . '/icon/' . $this->iconize($Header);
+
+                    $levequesticonFileName = "{$QuestIconOutputDirectory}/{$Header}.png";
+
+                    // if icon exists, then skip
+                    if (file_exists($levequesticonFileName)) continue;
+
+                    // inform console what item we're copying
+                    $this->io->text("Ability: <comment>{$leve['Name']}</comment>");
+                    $this->io->text(
+                    sprintf('- copy <info>%s</info> to <info>%s</info>', $levequestIcon, $levequesticonFileName));
+
+                    // copy the input icon to the output filename
+                    copy($levequestIcon, $levequesticonFileName);
+                }
+            }
+
+
             // Save some data
             $data = [
                 '{Top}' => $Top,
-                '{patch}' => $patch,
+                '{patch}' => $Patch,
                 '{index}' => $leve['id'],
                 '{name}' => $leve['Name'],
                 '{level}' => $leve['ClassJobLevel'],
@@ -511,11 +544,12 @@ class Leves implements ParseInterface
                 '{mobinvolve}' => $MobInvolvement,
                 '{item}' => $Item,
                 '{Bottom}' => $Bottom,
-                '{Reward}' => $RewardItem,
+                '{reward}' => $RewardItem,
                 '{Map}' => $Map,
-                '{Location}' => $PlaceNameStart,
+                '{location}' => $PlaceNameStart,
+                '{header}' => $Header,
                 '{FieldLeveMap}' => $FieldLeveMap,
-                '{Card}' => $VFXImage,
+                '{card}' => $VFXImage,
                 '{turnins}' => $MoreTradein,
                 '{wanted}' => ($levetype == "Battlecraft") ? "\n|Wanted Target  =  <!-- Usually found during Battlecraft leves -->" : "",
             ];
@@ -534,5 +568,32 @@ class Leves implements ParseInterface
             [ 'Filename', 'Data Count', 'File Size' ],
             $info
         );
+    }
+
+    /**
+     * Converts SE icon "number" into a proper path
+     */
+    private function iconize($number)
+    {
+        $number = intval($number);
+        $extended = (strlen($number) >= 6);
+
+        if ($number == 0) {
+            return null;
+        }
+
+        // create icon filename
+        $icon = $extended ? str_pad($number, 5, "0", STR_PAD_LEFT) : '0' . str_pad($number, 5, "0", STR_PAD_LEFT);
+
+        // create icon path
+        $path = [];
+        $path[] = $extended ? $icon[0] . $icon[1] . $icon[2] .'000' : '0'. $icon[1] . $icon[2] .'000';
+
+        $path[] = $icon;
+
+        // combine
+        $icon = implode('/', $path) .'.png';
+
+        return $icon;
     }
 }
