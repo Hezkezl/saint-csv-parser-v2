@@ -25,7 +25,7 @@ class Leves implements ParseInterface
 |Header Image       = {header}.png
 
 |Recommended Classes = {classes}
-{trdobjective}{fldobjective}{mobobjective}{description}{turnins}
+{trdobjective}{fldobjective}{mobobjectivelist}{mobobjective}{description}{turnins}
 
 |EXPReward = {exp}
 |GilReward = ~{gil}{seals}{reward}{npc}
@@ -33,6 +33,8 @@ class Leves implements ParseInterface
 
 |NPCs Involved  = {npcinvolve}<!-- List of NPCs involved (besides the quest giver,) comma separated-->
 |Items Involved = {item}<!-- List any items used, comma separated-->{wanted}
+{mobinvolve}
+
 
 |Strategy =
 |Walkthrough =
@@ -209,12 +211,14 @@ class Leves implements ParseInterface
             $MoreTradein = false;
             $FieldLeveItemQty = false;
             $RewardHQ = false;
+            $MobsInvolvedArr = [];
             $LevelMete = false;
             $MobInvolvement = [];
             $InvolvementObjective = [];
             $RewardItem = [];
             $Map = [];
             $FieldLeveMap = [];
+            $MobObjectiveList = [];
 
             // Levequest Reward List. Need a double foreach here.
             foreach(range(0,7) as $i) {
@@ -296,7 +300,10 @@ class Leves implements ParseInterface
 
                         $TargetNumber = ($TargetNumber + 1);
                         $BNpcName = "\n|Target " . $TargetNumber . " Name     = " . ucwords(strtolower($BNpcNameCsv->at($BattleLeveCsv->at($leve['DataId'])["BNpcName[$i]"])['Singular']));
+                        $MobsInvolved = ucwords(strtolower($BNpcNameCsv->at($BattleLeveCsv->at($leve['DataId'])["BNpcName[$i]"])['Singular']));
 
+                        $MobsInvolvedArr[0] = "|Mobs Involved = ";
+                        $MobsInvolvedArr[] = "" .$MobsInvolved .", ";
                         //Data per monster
                         //$BCTime = "\n|Target " . $TargetNumber . " Time     = " . $BattleLeveCsv->at($leve['DataId'])["Time[$i]"];
                         //$BCBaseID = "\n|Target " . $TargetNumber . " ID       = " . $BattleLeveCsv->at($leve['DataId'])["BaseID[$i]"];
@@ -344,8 +351,11 @@ class Leves implements ParseInterface
                         } elseif (!empty($ObjectiveText2)) {
                             $BattleObjective = "\n|Objectives = " . $ObjectiveText . "\n|Objective Sub = " . $ObjectiveText2 . "";
                         }
+                        $MobObjectiveList[0] = "\n";
+                        $MobObjectiveList[] = "**". $MobsInvolved .": 0/". $BattleLeveCsv->at($leve['DataId'])["ToDoNumberInvolved[$i]"] ."";
 
-                        $InvolvementObjective[0] = $BattleObjective;
+                        //i have an issue here where i need to put $MobObjectiveList AFTER [0] but before the next line. if you have any ideas let me know
+                        $InvolvementObjective[0] = "". $BattleObjective. "";
                         $InvolvementObjective[] = "" . $BNpcName . "" . $BCLevel . "" . $BCItemsInvolved . "" . $BCItemQTY . "" . $BCItemDropRate . "" . $BCToDoNumber . "";
                     }
                 }
@@ -479,8 +489,12 @@ class Leves implements ParseInterface
 
             $MobInvolvement = array_unique($MobInvolvement);
             $MobInvolvement = implode(", ", $MobInvolvement);
+            $MobsInvolvedArr = array_unique($MobsInvolvedArr);
+            $MobsInvolvedArr = implode("", $MobsInvolvedArr);
+            $MobsInvolvedArr = substr($MobsInvolvedArr, 0, -2);
             $InvolvementObjective = array_unique($InvolvementObjective);
             $MobObjective = implode("\n", $InvolvementObjective);
+            $MobObjectiveList = implode("\n", $MobObjectiveList);
             $RewardItem = implode("\n", $RewardItem);
             $Map = implode("", $Map);
             $FieldLeveMap = implode("", $FieldLeveMap);
@@ -541,7 +555,8 @@ class Leves implements ParseInterface
                 '{npc}' => "\n\n|Issuing NPC = $Npc",
                 '{client}' => $LeveClientCsv->at($leve['LeveClient'])['Name'],
                 '{npcinvolve}' => $NpcName,
-                '{mobinvolve}' => $MobInvolvement,
+                '{mobinvolve}' => $MobsInvolvedArr,
+                '{mobobjectivelist}' => $MobObjectiveList,
                 '{item}' => $Item,
                 '{Bottom}' => $Bottom,
                 '{reward}' => $RewardItem,
