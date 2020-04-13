@@ -699,7 +699,6 @@ class Items implements ParseInterface
                 //start of 853 (Minions)
                 if ($ItemActionType == 853) {
 
-                    //NQ
                     $ItemActionEffectRaw = $ItemActionCsv->at($ItemActionNumber)["Data[0]"];
                     $ItemActionEffect = ucwords(strtolower($CompanionCsv->at($ItemActionEffectRaw)["Singular"]));
                     if (empty($ItemActionEffect)) continue;
@@ -708,7 +707,10 @@ class Items implements ParseInterface
                 //end of Minions code
                 //end of ItemAction code
 
-                if (empty($ItemActionEffect)) {continue;}
+                //breaks item output by not outputting item ID#'s 4551-4563 (potion, ether, etc) because they don't
+                //give a status effect when they're used. So commenting this out for now (and likely will delete later)
+                //if (empty($ItemActionEffect)) {continue;}
+
                 $ItemAction1[0] ="\n";
                 $ItemAction[] = $outputstring;
             }
