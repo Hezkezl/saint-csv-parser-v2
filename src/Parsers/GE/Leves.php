@@ -25,16 +25,14 @@ class Leves implements ParseInterface
 |Header Image       = {header}.png
 
 |Recommended Classes = {classes}
-{trdobjective}{fldobjective}{mobobjectivelist}{mobobjective}{description}{turnins}
+{trdobjective}{fldobjective}{mobobjective}{mobobjectivelist}{description}{turnins}
 
 |EXPReward = {exp}
 |GilReward = ~{gil}{seals}{reward}{npc}
 |Client = {client}
 
 |NPCs Involved  = {npcinvolve}<!-- List of NPCs involved (besides the quest giver,) comma separated-->
-|Items Involved = {item}<!-- List any items used, comma separated-->{wanted}
-{mobinvolve}
-
+|Items Involved = {item}<!-- List any items used, comma separated-->{mobinvolve}{wanted}
 
 |Strategy =
 |Walkthrough =
@@ -57,7 +55,6 @@ class Leves implements ParseInterface
         $BattleLeveCsv = $this->csv('BattleLeve');
         $BNpcNameCsv = $this->csv('BNpcName');
         $LevelCsv = $this->csv('Level');
-        $MapCsv = $this->csv('Map');
         $PlaceNameCsv = $this->csv('PlaceName');
         $ENpcResidentCsv = $this->csv('ENpcResident');
         $EventItemCsv = $this->csv('EventItem');
@@ -66,6 +63,7 @@ class Leves implements ParseInterface
         $LeveStringCsv = $this->csv('LeveString');
         $TerritoryTypeCsv = $this->csv('TerritoryType');
         $GatheringLeveRouteCsv = $this->csv('GatheringLeveRoute');
+        //$MapCsv = $this->csv('Map');
         //$TownCsv = $this->csv('Town');
         $GatheringPointCsv = $this->csv('GatheringPoint');
         $GatheringPointBaseCsv = $this->csv('GatheringPointBase');
@@ -135,7 +133,7 @@ class Leves implements ParseInterface
                 7 => "Tenacity (Guildleve)",
                 8 => "Wisdom",
                 9 => "Justice",
-                10 => "Dilligence",
+                10 => "Diligence",
                 11 => "Temperance (Guildleve)",
                 12 => "Devotion (Guildleve)",
                 13 => "Veracity",
@@ -206,8 +204,8 @@ class Leves implements ParseInterface
             $NpcName = false;
             $RewardNumber = false;
             $TargetNumber = false;
-            $RouteNumber = false;
-            $GatheringLeveNumber = false;
+            //$RouteNumber = false;
+            //$GatheringLeveNumber = false;
             $MoreTradein = false;
             $FieldLeveItemQty = false;
             $RewardHQ = false;
@@ -297,12 +295,13 @@ class Leves implements ParseInterface
                         $BCItemsInvolved = false;
                         $BCItemQTY = false;
                         $BCItemDropRate = false;
+                        $ItemIFSingular = false;
 
                         $TargetNumber = ($TargetNumber + 1);
                         $BNpcName = "\n|Target " . $TargetNumber . " Name     = " . ucwords(strtolower($BNpcNameCsv->at($BattleLeveCsv->at($leve['DataId'])["BNpcName[$i]"])['Singular']));
                         $MobsInvolved = ucwords(strtolower($BNpcNameCsv->at($BattleLeveCsv->at($leve['DataId'])["BNpcName[$i]"])['Singular']));
 
-                        $MobsInvolvedArr[0] = "|Mobs Involved = ";
+                        $MobsInvolvedArr[0] = "\n|Mobs Involved  = ";
                         $MobsInvolvedArr[] = "" .$MobsInvolved .", ";
                         //Data per monster
                         //$BCTime = "\n|Target " . $TargetNumber . " Time     = " . $BattleLeveCsv->at($leve['DataId'])["Time[$i]"];
@@ -326,20 +325,28 @@ class Leves implements ParseInterface
 
                          // THIS is where i was working on the "replace SE text to displace correctly" stuff but its a mess
                         foreach(range(0,7) as $j) {
-                            $ItemIF = $EventItemCsv->at($BattleLeveCsv->at($leve['DataId'])["ItemsInvolved[$j]"])['Name'];
+                            //this empty check needs to be here otherwise the pacify/beckon/true form objectives default
+                            //to empty (since [7] is the last one checked, and the game only uses [0],[1],[2] for items
+                            //involved right now (could change in future), so even though 0-7 are available and 7 is
+                            //empty/0 so that's what gets used instead of the true value we're looking for.)
+                            if (empty($BattleLeveCsv->at($leve['DataId'])["ItemsInvolved[$j]"])) continue;
+                            else {
+                                $ItemIF = $EventItemCsv->at($BattleLeveCsv->at($leve['DataId'])["ItemsInvolved[$j]"])['Name'];
+                                $ItemIFSingular = $EventItemCsv->at($BattleLeveCsv->at($leve['DataId'])["ItemsInvolved[$j]"])['Singular'];
+                            }
                         }
 
                         $ObjectiveTextKey = $BattleLeveCsv->at($leve['DataId'])["Objective[0]"];
-                        if ($ObjectiveTextKey == "5") {
+                        if ($ObjectiveTextKey == 5) {
                             if (!empty($ItemIF)) {
-                                $ObjectiveText = "Weaken target and then pacify it using [[". $ItemIF ."|". $ItemIF ."]].";
-                            } elseif (empty($ItemIF)) {
+                                $ObjectiveText = "Weaken target and then pacify it using the [[". $ItemIF ."|". $ItemIFSingular ."]].";
+                            } else {
                                 $ObjectiveText = "Weaken target and then pacify it using the /soothe emote.";
                             }
                         } elseif ($ObjectiveTextKey == "6") {
                             if (!empty($ItemIF)) {
-                                $ObjectiveText = "Use [[". $ItemIF ."|". $ItemIF ."]] to reveal target's true form, then defeat it.";
-                            } elseif (empty($ItemIF)) {
+                                $ObjectiveText = "Use the [[". $ItemIF ."|". $ItemIFSingular ."]] to reveal target's true form, then defeat it.";
+                            } else  {
                                 $ObjectiveText = "Attack target to reveal its true form, then defeat it.";
                             }
                         } elseif ($ObjectiveTextKey == "9") {
@@ -347,12 +354,15 @@ class Leves implements ParseInterface
                         }
 
                         if (empty($ObjectiveText2)) {
-                            $BattleObjective = "\n|Objectives = " . $ObjectiveText . "";
-                        } elseif (!empty($ObjectiveText2)) {
-                            $BattleObjective = "\n|Objectives = " . $ObjectiveText . "\n|Objective Sub = " . $ObjectiveText2 . "";
+                            $BattleObjective = "\n|Objectives = \n*" . $ObjectiveText . "";
+                        } else {
+                            $BattleObjective = "\n|Objectives = \n*" . $ObjectiveText . "\n|Objective Sub = " . $ObjectiveText2 . "";
                         }
+
                         $MobObjectiveList[0] = "\n";
-                        $MobObjectiveList[] = "**". $MobsInvolved .": 0/". $BattleLeveCsv->at($leve['DataId'])["ToDoNumberInvolved[$i]"] ."";
+                        if ($BattleLeveCsv->at($leve['DataId'])["ToDoNumberInvolved[$i]"] > 0) {
+                            $MobObjectiveList[] = "**" . $MobsInvolved . ": 0/" . $BattleLeveCsv->at($leve['DataId'])["ToDoNumberInvolved[$i]"] . "";
+                        }
 
                         //i have an issue here where i need to put $MobObjectiveList AFTER [0] but before the next line. if you have any ideas let me know
                         $InvolvementObjective[0] = "". $BattleObjective. "";
@@ -409,6 +419,7 @@ class Leves implements ParseInterface
                 }
 
             //maps for fieldleve
+                /*commenting out for now since this isn't used anywhere
                 foreach (range(0,3) as $c) { // 4 of GatheringLeve
                     $GatheringLeveNumber = ($GatheringLeveNumber + 1);
                     foreach (range(0,11) as $s) { //12 of LeveRoute
@@ -449,6 +460,7 @@ class Leves implements ParseInterface
                         $FieldLeveMap[] = "". $PopRange2 ."\n";
                     }
                 }
+                */
             }
 
 
@@ -487,8 +499,9 @@ class Leves implements ParseInterface
             //header image
             $Header = $leve['Icon{Issuer}'];
 
-            $MobInvolvement = array_unique($MobInvolvement);
-            $MobInvolvement = implode(", ", $MobInvolvement);
+            //$MobInvolvement = implode(", ", array_unique($MobInvolvement));
+            //$MobInvolvement = array_unique($MobInvolvement);
+            //$MobInvolvement = implode(", ", $MobInvolvement);
             $MobsInvolvedArr = array_unique($MobsInvolvedArr);
             $MobsInvolvedArr = implode("", $MobsInvolvedArr);
             $MobsInvolvedArr = substr($MobsInvolvedArr, 0, -2);
@@ -566,7 +579,7 @@ class Leves implements ParseInterface
                 '{FieldLeveMap}' => $FieldLeveMap,
                 '{card}' => $VFXImage,
                 '{turnins}' => $MoreTradein,
-                '{wanted}' => ($levetype == "Battlecraft") ? "\n|Wanted Target  =  <!-- Usually found during Battlecraft leves -->" : "",
+                '{wanted}' => ($levetype == "Battlecraft") ? "\n|Wanted Target  = <!-- Usually found during Battlecraft leves -->" : "",
             ];
 
             // format using Gamer Escape formatter and add to data array
