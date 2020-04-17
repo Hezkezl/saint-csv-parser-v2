@@ -21,18 +21,18 @@ class Leves implements ParseInterface
 
 |Guildleve Type     = {guildtype}
 |Levequest Type     = {levetype}{duration}
-|Levequest Location = {location}
+|Levequest Location = {location}{grandcompany}
 |Header Image       = {header}.png
 
 |Recommended Classes = {classes}
-{trdobjective}{fldobjective}{mobobjective}{mobobjectivelist}{description}{turnins}
+{trdobjective}{fldobjective}{mobobjectivelist}{mobobjective}{description}{turnins}
 
 |EXPReward = {exp}
 |GilReward = ~{gil}{seals}{reward}{npc}
 |Client = {client}
 
 |NPCs Involved  = {npcinvolve}<!-- List of NPCs involved (besides the quest giver,) comma separated-->
-|Items Involved = {item}<!-- List any items used, comma separated-->{mobinvolve}{wanted}
+|Items Involved = {item}<!-- List any items used, comma separated-->{mobinvolve}
 
 |Strategy =
 |Walkthrough =
@@ -107,10 +107,13 @@ class Leves implements ParseInterface
             switch ($leve['LeveAssignmentType']) {
                 case 0: case 13: case 14: case 15:
                     break;
-                case 1: case 16: case 17: case 18:
+                case 1:
                     $levetype = "Battlecraft";
                     break;
-                case 2:case 3:case 4:
+                case 16: case 17: case 18:
+                    $levetype = "Grand Company";
+                    break;
+                case 2: case 3: case 4:
                     $levetype = "Fieldcraft";
                     break;
                 case 5: case 6: case 7: case 8: case 9:
@@ -206,12 +209,12 @@ class Leves implements ParseInterface
             $TargetNumber = false;
             //$RouteNumber = false;
             //$GatheringLeveNumber = false;
+            //$MobInvolvement = [];
             $MoreTradein = false;
             $FieldLeveItemQty = false;
             $RewardHQ = false;
-            $MobsInvolvedArr = [];
             $LevelMete = false;
-            $MobInvolvement = [];
+            $MobsInvolvedArr = [];
             $InvolvementObjective = [];
             $RewardItem = [];
             $Map = [];
@@ -298,11 +301,11 @@ class Leves implements ParseInterface
                         $ItemIFSingular = false;
 
                         $TargetNumber = ($TargetNumber + 1);
-                        $BNpcName = "\n|Target " . $TargetNumber . " Name     = " . ucwords(strtolower($BNpcNameCsv->at($BattleLeveCsv->at($leve['DataId'])["BNpcName[$i]"])['Singular']));
+                        $BNpcName = "|Target " . $TargetNumber . " Name     = " . ucwords(strtolower($BNpcNameCsv->at($BattleLeveCsv->at($leve['DataId'])["BNpcName[$i]"])['Singular']));
                         $MobsInvolved = ucwords(strtolower($BNpcNameCsv->at($BattleLeveCsv->at($leve['DataId'])["BNpcName[$i]"])['Singular']));
 
-                        $MobsInvolvedArr[0] = "\n|Mobs Involved  = ";
-                        $MobsInvolvedArr[] = "" .$MobsInvolved .", ";
+                        $MobsInvolvedArr[] = $MobsInvolved;
+
                         //Data per monster
                         //$BCTime = "\n|Target " . $TargetNumber . " Time     = " . $BattleLeveCsv->at($leve['DataId'])["Time[$i]"];
                         //$BCBaseID = "\n|Target " . $TargetNumber . " ID       = " . $BattleLeveCsv->at($leve['DataId'])["BaseID[$i]"];
@@ -312,16 +315,17 @@ class Leves implements ParseInterface
                             $BCItemQTY = "\n|Target " . $TargetNumber . " QTY      = " . $BattleLeveCsv->at($leve['DataId'])["ItemsInvolvedQty[$i]"];
                             $BCItemDropRate = "\n|Target " . $TargetNumber . " DropRate = " . $BattleLeveCsv->at($leve['DataId'])["ItemDropRate[$i]"] ."%";
                         }
-                        $NumberInvolved = $BattleLeveCsv->at($leve['DataId'])["ToDoNumberInvolved[$i]"];
-                        if ($NumberInvolved > 0) {
+
+                        if ($BattleLeveCsv->at($leve['DataId'])["ToDoNumberInvolved[$i]"] > 0) {
                             $BCToDoNumber = "\n|Target " . $TargetNumber . " Required Amount = " . $BattleLeveCsv->at($leve['DataId'])["ToDoNumberInvolved[$i]"];
                             //$BCToDoParam = "\n|Target " . $TargetNumber . " Param    = " . $BattleLeveCsv->at($leve['DataId'])["ToDoParam[$i]"];
                         }
-                        $MobInvolvement[] = $BNpcName;
+
+                        //$MobInvolvement[] = $BNpcName;
                         $BNpcNameObjective = ucwords(strtolower($BNpcNameCsv->at($BattleLeveCsv->at($leve['DataId'])["BNpcName[0]"])['Singular']));
 
                         $ObjectiveText = $LeveStringCsv->at($BattleLeveCsv->at($leve['DataId'])["Objective[0]"])['Objective'];
-                        $ObjectiveText2 = $LeveStringCsv->at($BattleLeveCsv->at($leve['DataId'])["Objective[1]"])['Objective'];
+                        //$ObjectiveText2 = $LeveStringCsv->at($BattleLeveCsv->at($leve['DataId'])["Objective[1]"])['Objective'];
 
                          // THIS is where i was working on the "replace SE text to displace correctly" stuff but its a mess
                         foreach(range(0,7) as $j) {
@@ -343,33 +347,32 @@ class Leves implements ParseInterface
                             } else {
                                 $ObjectiveText = "Weaken target and then pacify it using the /soothe emote.";
                             }
-                        } elseif ($ObjectiveTextKey == "6") {
+                        } elseif ($ObjectiveTextKey == 6) {
                             if (!empty($ItemIF)) {
                                 $ObjectiveText = "Use the [[". $ItemIF ."|". $ItemIFSingular ."]] to reveal target's true form, then defeat it.";
                             } else  {
                                 $ObjectiveText = "Attack target to reveal its true form, then defeat it.";
                             }
-                        } elseif ($ObjectiveTextKey == "9") {
+                        } elseif ($ObjectiveTextKey == 9) {
                             $ObjectiveText = "Use the /beckon emote to lead [[". $BNpcNameObjective ."]] safely to the specified location.";
                         }
 
-                        if (empty($ObjectiveText2)) {
-                            $BattleObjective = "\n|Objectives = \n*" . $ObjectiveText . "";
-                        } else {
-                            $BattleObjective = "\n|Objectives = \n*" . $ObjectiveText . "\n|Objective Sub = " . $ObjectiveText2 . "";
-                        }
-
-                        $MobObjectiveList[0] = "\n";
+                        $MobObjectiveList[0] = "\n|Objectives =\n*" . $ObjectiveText;
                         if ($BattleLeveCsv->at($leve['DataId'])["ToDoNumberInvolved[$i]"] > 0) {
                             $MobObjectiveList[] = "**" . $MobsInvolved . ": 0/" . $BattleLeveCsv->at($leve['DataId'])["ToDoNumberInvolved[$i]"] . "";
                         }
 
+                        //$BattleObjective = "\n|Objectives = \n*" . $ObjectiveText;
+
                         //i have an issue here where i need to put $MobObjectiveList AFTER [0] but before the next line. if you have any ideas let me know
-                        $InvolvementObjective[0] = "". $BattleObjective. "";
+                        //  fixed
+                        //$InvolvementObjective[0] = "". $BattleObjective. "";
+                        $InvolvementObjective[0] = "\n";
                         $InvolvementObjective[] = "" . $BNpcName . "" . $BCLevel . "" . $BCItemsInvolved . "" . $BCItemQTY . "" . $BCItemDropRate . "" . $BCToDoNumber . "";
                     }
                 }
-            } elseif ($levetype == "Fieldcraft") {
+            }
+            elseif ($levetype == "Fieldcraft") {
                 $NpcName = $ENpcResidentCsv->at($LevelCsv->at($leve['Level{Levemete}'])['Object'])['Singular'];
 
                 // Fishing leves are literally crafting leves, so copying modified code here from Tradecraft section above
@@ -499,12 +502,11 @@ class Leves implements ParseInterface
             //header image
             $Header = $leve['Icon{Issuer}'];
 
-            //$MobInvolvement = implode(", ", array_unique($MobInvolvement));
             //$MobInvolvement = array_unique($MobInvolvement);
             //$MobInvolvement = implode(", ", $MobInvolvement);
             $MobsInvolvedArr = array_unique($MobsInvolvedArr);
-            $MobsInvolvedArr = implode("", $MobsInvolvedArr);
-            $MobsInvolvedArr = substr($MobsInvolvedArr, 0, -2);
+            $MobsInvolvedArr = implode(", ", $MobsInvolvedArr);
+            //$MobsInvolvedArr = substr($MobsInvolvedArr, 0, -2);
             $InvolvementObjective = array_unique($InvolvementObjective);
             $MobObjective = implode("\n", $InvolvementObjective);
             $MobObjectiveList = implode("\n", $MobObjectiveList);
@@ -552,11 +554,10 @@ class Leves implements ParseInterface
                 '{name}' => $leve['Name'],
                 '{level}' => $leve['ClassJobLevel'],
                 '{guildtype}' => $guildtype[$leve['LeveVfx']],
-                '{duration}' => ($levetype == "Battlecraft") ? "\n|Leve Duration      = ". $leve['TimeLimit'] ."" : "",
+                '{duration}' => ($leve['TimeLimit'] > 0) ? "\n|Leve Duration      = ". $leve['TimeLimit'] : "",
                 '{levetype}' => $levetype,
-                '{seals}' => (!empty($grandcompany)) ? "\n|SealsReward =  <!-- Raw number, no commas. Delete if not needed -->" : "",
-                '{grandcompany}' => ($leve['LeveAssignmentType'] == 16 || $leve['LeveAssignmentType'] == 17 || $leve['LeveAssignmentType'] == 18)
-                    ? "\n|Grand Company      = ". $grandcompany : "",
+                '{seals}' => $grandcompany ? "\n|SealsReward =  <!-- Raw number, no commas. Delete if not needed -->" : "",
+                '{grandcompany}' => $grandcompany ? "\n|Grand Company      = ". $grandcompany : "",
                 '{classes}' => $classes,
                 '{trdobjective}' => $TradecraftObjective,
                 '{fldobjective}' => $FieldcraftObjective,
@@ -568,7 +569,7 @@ class Leves implements ParseInterface
                 '{npc}' => "\n\n|Issuing NPC = $Npc",
                 '{client}' => $LeveClientCsv->at($leve['LeveClient'])['Name'],
                 '{npcinvolve}' => $NpcName,
-                '{mobinvolve}' => $MobsInvolvedArr,
+                '{mobinvolve}' => $MobsInvolvedArr ? "\n|Mobs Involved  = $MobsInvolvedArr\n|Wanted Target  = <!-- Usually found during Battlecraft leves -->" : "",
                 '{mobobjectivelist}' => $MobObjectiveList,
                 '{item}' => $Item,
                 '{Bottom}' => $Bottom,
@@ -579,7 +580,7 @@ class Leves implements ParseInterface
                 '{FieldLeveMap}' => $FieldLeveMap,
                 '{card}' => $VFXImage,
                 '{turnins}' => $MoreTradein,
-                '{wanted}' => ($levetype == "Battlecraft") ? "\n|Wanted Target  = <!-- Usually found during Battlecraft leves -->" : "",
+                //'{wanted}' => ($levetype == "Battlecraft") ? "\n|Wanted Target  = <!-- Usually found during Battlecraft leves -->" : "",
             ];
 
             // format using Gamer Escape formatter and add to data array
@@ -601,6 +602,7 @@ class Leves implements ParseInterface
     /**
      * Converts SE icon "number" into a proper path
      */
+    /* delete this line and the other * below to uncomment this out
     private function iconize($number)
     {
         $number = intval($number);
@@ -624,4 +626,5 @@ class Leves implements ParseInterface
 
         return $icon;
     }
+    */
 }
