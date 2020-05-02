@@ -3,7 +3,6 @@ namespace App\Parsers\GE;
 
 use App\Parsers\CsvParseTrait;
 use App\Parsers\ParseInterface;
-use Symfony\Component\Config\Resource\FileResource;
 
 /**
  * php bin/console app:parse:csv GE:GENPCEquipment
@@ -19,8 +18,7 @@ class GENPCEquipment implements ParseInterface
 {bodyoutput}{equipmentoutput}
 }}
 {test}
-{bottom}
-    ";
+{bottom}";
 
     public function parse()
     {
@@ -48,11 +46,11 @@ class GENPCEquipment implements ParseInterface
         $buffer = unpack("C*",file_get_contents($CMPfile));
         $buffer = array_chunk($buffer, 4);
         foreach ($buffer as $i => $rgba) {
-          [$r, $g, $b, $a] = $rgba;
+            [$r, $g, $b, $a] = $rgba;
 
-          $hex = sprintf("%02x%02x%02x", $r, $g, $b,);
+            $hex = sprintf("%02x%02x%02x", $r, $g, $b,);
 
-          $buffer[$i] = $hex;
+            $buffer[$i] = $hex;
         }
         //file_put_contents(__DIR__.'/human.cmp.json', json_encode($buffer, JSON_PRETTY_PRINT));
 
@@ -84,15 +82,15 @@ class GENPCEquipment implements ParseInterface
 
         // loop through data
         foreach ($ENpcBaseCsv->data as $id => $EnpcBase) {
-          	$this->io->progressAdvance();
-          	$Index = $EnpcBase['id'];
+            $this->io->progressAdvance();
+            $Index = $EnpcBase['id'];
 
             $debug = false;
             //if ($Index != 1009441) continue; // for debug
             //var_dump($Index);
 
 
-          	$Name = $ENpcResidentCsv->at($Index)['Singular'];
+            $Name = $ENpcResidentCsv->at($Index)['Singular'];
             //Array of names that should not be capitalized
             $IncorrectNames = array(" De ", " Bas ", " Mal ", " Van ", " Cen ", " Sas ", " Tol ", " Zos ", " Yae ", " The ", " Of The ", " Of ",
                 "A-ruhn-senna", "A-towa-cant", "Bea-chorr", "Bie-zumm", "Bosta-bea", "Bosta-loe", "Chai-nuzz", "Chei-ladd", "Chora-kai", "Chora-lue",
@@ -117,38 +115,38 @@ class GENPCEquipment implements ParseInterface
             }
             $Name = str_replace($IncorrectNames, $correctnames, $NpcName);
             $Name = preg_replace('/[^\x00-\x7F]+/', '', $Name);
-          	//comment out the below line to allow for all humanoid npcs
-          	if (empty($Name)) continue;
-          	if (empty($ENpcResidentCsv->at($Index)['Title'])) {
-          	  $Title = "";
-          	} elseif (!empty($ENpcResidentCsv->at($Index)['Title'])) {
-          	  $Title = "\n< ". $ENpcResidentCsv->at($Index)['Title'] ." >";
-          	}
-          	$Race = $RaceCsv->at($EnpcBase['Race'])['Masculine'];
-          	if (empty($Race)) continue;
+            //comment out the below line to allow for all humanoid npcs
+            if (empty($Name)) continue;
+            if (empty($ENpcResidentCsv->at($Index)['Title'])) {
+                $Title = false;
+            } elseif (!empty($ENpcResidentCsv->at($Index)['Title'])) {
+                $Title = "\n< ". $ENpcResidentCsv->at($Index)['Title'] ." >";
+            }
+            $Race = $RaceCsv->at($EnpcBase['Race'])['Masculine'];
+            if (empty($Race)) continue;
 
             $genderBase = $EnpcBase['Gender'];
-          	$Gender = $EnpcBase['Gender'];
-          	if ($Gender == 0) {
-          		$Gender = "Male";
-          	} elseif ($Gender == 1) {
-          		$Gender = "Female";
-          	}
+            $Gender = $EnpcBase['Gender'];
+            if ($Gender == 0) {
+                $Gender = "Male";
+            } elseif ($Gender == 1) {
+                $Gender = "Female";
+            }
 
             if ($Bot == "true") {
                 $Top = "{{-start-}}\n'''$Name/Appearance'''\n";
                 $Bottom = "{{-stop-}}";
             } else {
-                $Top = "http://ffxiv.gamerescape.com/wiki/$Name/Appearance'?action=edit\n";
-                $Bottom = "";
+                $Top = "http://ffxiv.gamerescape.com/wiki/$Name/Appearance?action=edit\n";
+                $Bottom = false;
             };
 
             $BaseFace = $EnpcBase['Face'];
             $face = null;
             $face = $BaseFace % 100; // Value matches the asset number, % 100 approximate face # nicely.
 
-          	$BodyTypeBase = $EnpcBase['BodyType'];
-          	switch ($BodyTypeBase)
+            $BodyTypeBase = $EnpcBase['BodyType'];
+            switch ($BodyTypeBase)
             {
                 case 1:
                     $BodyType = "Adult";
@@ -166,18 +164,18 @@ class GENPCEquipment implements ParseInterface
                     $BodyType = "Unknown";
                     break;
             }
-          	$Height = $EnpcBase['Height'];
-          	$Tribe = $TribeCsv->at($EnpcBase['Tribe'])['Masculine'];
+            $Height = $EnpcBase['Height'];
+            $Tribe = $TribeCsv->at($EnpcBase['Tribe'])['Masculine'];
 
-          	$HairStyle = $EnpcBase['HairStyle'];
+            $HairStyle = $EnpcBase['HairStyle'];
 
             $GenderCalc = $EnpcBase['Gender'];
             $TribeCalc = $EnpcBase['Tribe'];
             if (($GenderCalc = 0) && ($TribeCalc = 1)) {
-              $Calc = "";
+                $Calc = false;
             }
             if (($GenderCalc = 1) && ($TribeCalc = 1)) {
-              $Calc = "10";
+                $Calc = "10";
             }
 
 
@@ -240,28 +238,29 @@ class GENPCEquipment implements ParseInterface
                     $tribeKeyCalc = ($isMale == "true") ? 30 : 31;
                     break;
             }
-//face/fur/tail icons
+
+            //face/fur/tail icons
             $BaseFaceCalc = $face - 1;
             $race = $EnpcBase['Race'];
             //var_dump($race);
-            $warning = "";
-            $warningGen = "";
+            $warning = false;
+            $warningGen = false;
             if ($face > 6) {
-              $warning = "\n|Custom Face = yes";
-              $BaseFaceCalc = 1;
+                $warning = "\n|Custom Face = yes";
+                $BaseFaceCalc = 1;
             }
             if ($BaseFaceCalc < 1) {
-              $warning = "\n|Custom Face = yes";
-              $BaseFaceCalc = 1;
+                $warning = "\n|Custom Face = yes";
+                $BaseFaceCalc = 1;
             }
             $tailOrEarShape = $extraFeatureShape -1;
             if ($tailOrEarShape > 50) {
-              $warningGen = " - Custom ?";
-              $tailOrEarShape = 1;
+                $warningGen = " - Custom ?";
+                $tailOrEarShape = 1;
             }
             if ($tailOrEarShape < 1) {
-              $warningGen = " - Custom ?";
-              $tailOrEarShape = 1;
+                $warningGen = " - Custom ?";
+                $tailOrEarShape = 1;
             }
             switch ($tribeKey)
             {
@@ -342,10 +341,7 @@ class GENPCEquipment implements ParseInterface
             }
 
 
-
-
-//HairColor
-
+            //HairColor
             $GenderValue = ($isMale == "true") ? 0 : 1;
             $listIndex = ($tribeKey * 2 + $GenderValue) * 5 + 4;
             $hairIndex = $listIndex * 256;
@@ -354,34 +350,34 @@ class GENPCEquipment implements ParseInterface
             $hairColorIndex = $hairIndex + $hairColorBase;
             $hairColor = $buffer[$hairColorIndex];
 
-            $hairHighlightColor = "";
+            $hairHighlightColor = false;
             if ($EnpcBase['HairHighlightColor'] != 0) {
-              $HairHighlightColorOffset = 1 * 256;
-              $hairHighlightColorBase = $EnpcBase['HairHighlightColor'];
-              $hairHighlightColorIndex = $HairHighlightColorOffset + $hairHighlightColorBase;
-              $hairHighlightColor = $buffer[$hairHighlightColorIndex];
+                $HairHighlightColorOffset = 1 * 256;
+                $hairHighlightColorBase = $EnpcBase['HairHighlightColor'];
+                $hairHighlightColorIndex = $HairHighlightColorOffset + $hairHighlightColorBase;
+                $hairHighlightColor = $buffer[$hairHighlightColorIndex];
             }
 
-//HairStyle
+            //HairStyle
             $hairStyleBase = $EnpcBase['HairStyle'];
-            $warningHair = "";
+            $warningHair = false;
             if ($hairStyleBase > 200) {
-              $hairStyleBase = 1;
-              $warningHair = "\n|Custom Hair = yes";
+                $hairStyleBase = 1;
+                $warningHair = "\n|Custom Hair = yes";
             }
             $hairStyleRaw = $hairStyles[$tribeCode][$hairStyleBase];
 
             $hairStyleIcon = "".$hairStyleRaw['Icon'] .".png".$warningHair ."";
 
-//Skin Colour
+            //Skin Colour
             $listIndex = ($tribeKey * 2 + $GenderValue) * 5 + 3;
             $skinIndex = $listIndex * 256;
 
             $skinColorBase = $EnpcBase['SkinColor'];
             $skinColorIndex = $skinIndex + $skinColorBase;
             $skinColor = $buffer[$skinColorIndex];
-//Eyes
 
+            //Eyes
             $EyeColorOffset = 0 * 256;
             $eyeColorBase = $EnpcBase['EyeColor'];
             $eyeColorBuffer = $eyeColorBase + $EyeColorOffset;
@@ -390,47 +386,48 @@ class GENPCEquipment implements ParseInterface
             $heterochromiaColor ="";
             $eyeHeterochromia = $EnpcBase['EyeHeterochromia'];
             if ($eyeHeterochromia != $eyeColorBase) {
-              $heterochromiaBuffer = $eyeHeterochromia + $EyeColorOffset;
-              $heterochromiaColor = $buffer[$heterochromiaBuffer];
+                $heterochromiaBuffer = $eyeHeterochromia + $EyeColorOffset;
+                $heterochromiaColor = $buffer[$heterochromiaBuffer];
             }
             $eyeSize = "Large";
             $eyeShapeBase = $EnpcBase['EyeShape'];
             $eyeShape = $eyeShapeBase + 1;
             if ($eyeShapeBase >= 128) {
-              $eyeShape = ($eyeShapeBase - 128) + 1;
-              $eyeSize = "Small";
+                $eyeShape = ($eyeShapeBase - 128) + 1;
+                $eyeSize = "Small";
             }
-//Mouth and Lips
+
+            //Mouth and Lips
             $LightLipFacePaintColorOffset = 7 * 256;
             $DarkLipFacePaintColorOffset = 2 * 256;
 
-            
+
 
             $mouthShape = $EnpcBase['Mouth'];
             if ($tribeKey == 13 || 14) {
-              $lipColourBase = $EnpcBase['LipColor'];
-              $mouthData = "|Mouth = ". $mouthShape ."\n|FurType = ". $lipColourBase ."";
+                $lipColourBase = $EnpcBase['LipColor'];
+                $mouthData = "|Mouth = ". $mouthShape ."\n|FurType = ". $lipColourBase ."";
             }
             if ($mouthShape >= 128) {
-              $mouthShape = 1 + ($mouthShape - 128);
-              if ($EnpcBase['LipColor'] >= 128) {
-                $lipShade = "Light";
-                $lipColourCalc = $EnpcBase['LipColor'] + $LightLipFacePaintColorOffset;
-                $lipColour = $buffer[$lipColourCalc];
-              } elseif ($EnpcBase['LipColor'] < 128){
-                $lipShade = "Dark";
-                $lipColourCalc = $EnpcBase['LipColor'] + $DarkLipFacePaintColorOffset;
-                $lipColour = $buffer[$lipColourCalc];
-              }
-              $mouthData = "|Mouth = ". $mouthShape ."\n|Lip Color = ". $lipColour ."\n|Lip Shade = ". $lipShade ."";
+                $mouthShape = 1 + ($mouthShape - 128);
+                if ($EnpcBase['LipColor'] >= 128) {
+                    $lipShade = "Light";
+                    $lipColourCalc = $EnpcBase['LipColor'] + $LightLipFacePaintColorOffset;
+                    $lipColour = $buffer[$lipColourCalc];
+                } elseif ($EnpcBase['LipColor'] < 128){
+                    $lipShade = "Dark";
+                    $lipColourCalc = $EnpcBase['LipColor'] + $DarkLipFacePaintColorOffset;
+                    $lipColour = $buffer[$lipColourCalc];
+                }
+                $mouthData = "|Mouth = ". $mouthShape ."\n|Lip Color = ". $lipColour ."\n|Lip Shade = ". $lipShade ."";
             } elseif ($mouthShape < 128) {
-              $mouthShape = $mouthShape + 1;
-              $lipShade = "";
-              $lipColour = "";
-              $mouthData = "|Mouth = ". $mouthShape ."";
+                $mouthShape = $mouthShape + 1;
+                $lipShade = false;
+                $lipColour = false;
+                $mouthData = "|Mouth = ". $mouthShape ."";
             }
 
-//Face Paint
+            //Face Paint
             //get facepaint keys based on gender/race
             $baseRowKey = 1600;
             switch ($tribeKey)
@@ -464,47 +461,48 @@ class GENPCEquipment implements ParseInterface
                     $FacePaintCustomizeIndex = 2950;
                     break;
             }
-    //Face Paint Color
+            //Face Paint Color
 
             $facePaintColorBase = $EnpcBase['FacePaintColor'];
-            $facePaintColor = "";
+            $facePaintColor = false;
             $facePaintColorShade = "Light";
             if ($facePaintColorBase >= 128) {
-              $facePaintColorShade = "Light";
-              $facePaintColourIndex = 1 + ($facePaintColorBase - 128);
-              $facePaintColourCalc = $EnpcBase['FacePaintColor'] + $LightLipFacePaintColorOffset;
-              $facePaintColorRGB = $buffer[$facePaintColourCalc];
-              $facePaintColor = "|Face Paint Color = ". $facePaintColorRGB ."\n|Face Paint Shade = ". $facePaintColorShade ."";
+                $facePaintColorShade = "Light";
+                $facePaintColourIndex = 1 + ($facePaintColorBase - 128);
+                $facePaintColourCalc = $EnpcBase['FacePaintColor'] + $LightLipFacePaintColorOffset;
+                $facePaintColorRGB = $buffer[$facePaintColourCalc];
+                $facePaintColor = "|Face Paint Color = ". $facePaintColorRGB ."\n|Face Paint Shade = ". $facePaintColorShade ."";
             } elseif ($facePaintColorBase < 128) {
-              $facePaintColorShade = "Dark";
-              $facePaintColourCalc = $EnpcBase['FacePaintColor'] + $DarkLipFacePaintColorOffset;
-              $facePaintColorRGB = $buffer[$facePaintColourCalc];
-              $facePaintColor = "|Face Paint Color = ". $facePaintColorRGB ."\n|Face Paint Shade = ". $facePaintColorShade ."";
-            }
-    //Face Paint Icon
-            $facePaintBase = $EnpcBase['FacePaint'] + 1;
-            $facePaintIcon = "";
-            if ($facePaintBase >= 128) {
-              $facePaint = 1 + ($facePaintBase - 128);
-              $facePaintReverse = "|Face Paint Reversed = True";
-              $facePaintIconIndex = $FacePaintCustomizeIndex + $facePaint;
-              $facePaintIconImage = $CharaMakeCustomizeCsv->at($facePaintIconIndex)['Icon'];
-              if ($facePaintIconImage > 0) {
-                $facePaint = $facePaintIconImage;
-                $facePaintIcon = "|Face Paint = ". $facePaintIconImage ."\n". $facePaintReverse ."";
-              }
-            } elseif ($facePaintBase < 128) {
-               $facePaintIconIndex = $FacePaintCustomizeIndex + $facePaintBase;
-               $facePaintIconImage = $CharaMakeCustomizeCsv->at($facePaintIconIndex)['Icon'];
-               $facePaint = $facePaintIconImage;
-               $facePaintReverse = "|Face Paint Reversed = False";
-               if ($facePaintIconImage > 0) {
-                $facePaint = $facePaintIconImage;
-                $facePaintIcon = "|Face Paint = ". $facePaintIconImage ."\n". $facePaintReverse ."\n". $facePaintColor ."";
-              }
+                $facePaintColorShade = "Dark";
+                $facePaintColourCalc = $EnpcBase['FacePaintColor'] + $DarkLipFacePaintColorOffset;
+                $facePaintColorRGB = $buffer[$facePaintColourCalc];
+                $facePaintColor = "|Face Paint Color = ". $facePaintColorRGB ."\n|Face Paint Shade = ". $facePaintColorShade ."";
             }
 
-//Extra Features
+            //Face Paint Icon
+            $facePaintBase = $EnpcBase['FacePaint'] + 1;
+            $facePaintIcon = false;
+            if ($facePaintBase >= 128) {
+                $facePaint = 1 + ($facePaintBase - 128);
+                $facePaintReverse = "|Face Paint Reversed = True";
+                $facePaintIconIndex = $FacePaintCustomizeIndex + $facePaint;
+                $facePaintIconImage = $CharaMakeCustomizeCsv->at($facePaintIconIndex)['Icon'];
+                if ($facePaintIconImage > 0) {
+                    $facePaint = $facePaintIconImage;
+                    $facePaintIcon = "|Face Paint = ". $facePaintIconImage ."\n". $facePaintReverse ."";
+                }
+            } elseif ($facePaintBase < 128) {
+                $facePaintIconIndex = $FacePaintCustomizeIndex + $facePaintBase;
+                $facePaintIconImage = $CharaMakeCustomizeCsv->at($facePaintIconIndex)['Icon'];
+                $facePaint = $facePaintIconImage;
+                $facePaintReverse = "|Face Paint Reversed = False";
+                if ($facePaintIconImage > 0) {
+                    $facePaint = $facePaintIconImage;
+                    $facePaintIcon = "|Face Paint = ". $facePaintIconImage ."\n". $facePaintReverse ."\n". $facePaintColor ."";
+                }
+            }
+
+            //Extra Features
             $raceKey = $EnpcBase['Race'];
             switch ($raceKey)
             {
@@ -526,15 +524,15 @@ class GENPCEquipment implements ParseInterface
                     break;
             }
             // Bust & Muscles - flex fields.
-            $bust = "";
-            $bustAndMuscle = "";
+            $bust = false;
+            $bustAndMuscle = false;
             if ($raceKey == 5 || $raceKey == 1)
             {
                 // Roegadyn & Hyur
-                $bust = "";
+                $bust = false;
                 $muscle = $EnpcBase["BustOrTone1"];
                 if ($isMale == "false"){
-                  $bust = "\n|BustSize = ". $EnpcBase["ExtraFeature2OrBust"] ."";
+                    $bust = "\n|BustSize = ". $EnpcBase["ExtraFeature2OrBust"] ."";
                 }
                 $bustAndMuscle = "\n|Muscles = ". $muscle ."". $bust ."";
             }
@@ -550,12 +548,12 @@ class GENPCEquipment implements ParseInterface
                 $bust = $EnpcBase["BustOrTone1"];
                 $bustAndMuscle = "\n|BustSize = ". $bust ."";
             }
-            $extraFeature = "";
+            $extraFeature = false;
             if ($extraFeatureName != null) {
-              $extraFeature = "\n|". $extraFeatureName ." Length = ". $extraFeatureSize ."";
+                $extraFeature = "\n|". $extraFeatureName ." Length = ". $extraFeatureSize ."";
             }
 
-//Facial Feature
+            //Facial Feature
             $facialFeature = null;
             $facialFeatureArray = null;
             $facialFeatureArray = [];
@@ -563,16 +561,14 @@ class GENPCEquipment implements ParseInterface
             $facialFeatureBasePad = null;
             $facialFeatureIcon = null;
             $facialFeatureIcon = [];
-            // ^ i couldnt find the cause so i emptied out all values ^
+            // ^ i couldn't find the cause so i emptied out all values ^
             $facialFeatureBase = $EnpcBase['FacialFeature'];
             $facialFeatureArray = array(($facialFeatureBase & 1) == 1, ($facialFeatureBase & 2) == 2, ($facialFeatureBase & 4) == 4, ($facialFeatureBase & 8) == 8, ($facialFeatureBase & 16) == 16, ($facialFeatureBase & 32) == 32, ($facialFeatureBase & 64) == 64, ($facialFeatureBase & 128) == 128);
             $facialFeatureArraysplit = str_split($facialFeatureBasePad);
-            
+
+
             //facial features
-
-  // colors
-
-
+            // colors
             $listIndex = ($tribeKey * 2 + $GenderValue) * 5 + 4;
             $facialFeatureIndex = $listIndex * 256;
             $facialFeatureColorBase = $EnpcBase['FacialFeatureColor'];
@@ -581,7 +577,7 @@ class GENPCEquipment implements ParseInterface
 
             $tribe = $EnpcBase['Tribe'];
             switch ($tribeKey)
-                {
+            {
                 case 1: // Midlander
                 case 2: // Highlander
                 case 3: // Wildwood
@@ -604,109 +600,109 @@ class GENPCEquipment implements ParseInterface
                 case 16: // Veena
                     $facialFace = $face - 1;
                     break;
-                }
+            }
             if ($face < 7) {
-              for ($i=0; $i < 5; $i++) {
-                if ($facialFeatureArray[$i] == 1) {
-                  $facialFeatureIcon[$i] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
+                for ($i=0; $i < 5; $i++) {
+                    if ($facialFeatureArray[$i] == 1) {
+                        $facialFeatureIcon[$i] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
+                    }
                 }
-              }
             } elseif ($face > 6) {
-              $facialFeatureicon = [];
+                $facialFeatureicon = [];
             }
 
 
             if (!empty($facialFeatureIcon)) {
-              $facialFeature = implode(",", $facialFeatureIcon);
+                $facialFeature = implode(",", $facialFeatureIcon);
             }
             //tattoos
-            $facialFeatureExtraPre = "";
-            $facialFeatureExtraImplode = "";
-            $facialFeatureExtraColor = "";
+            $facialFeatureExtraPre = false;
+            $facialFeatureExtraImplode = false;
+            $facialFeatureExtraColor = false;
             $facialFeatureExtra = [];
             if ($face < 7) {
-            for ($i=5; $i < 7; $i++) {
-              if ($facialFeatureArray[$i] == 1) {
+                for ($i=5; $i < 7; $i++) {
+                    if ($facialFeatureArray[$i] == 1) {
 
-                switch ($tribeKey)
-                {
-                case 1: // Midlander
-                case 2: // Highlander
-                  $facialFeatureExtraPre = "\n|Tattoos = ";
-                  $facialFeatureExtraColor = "\n|Tattoo Color = ". $facialFeatureColor ."";
-                  $facialFeatureExtra[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
-                    break;
-                case 3: // Wildwood
-                  $facialFeatureExtraPre = "\n|Ear Clasp = ";
-                  $facialFeatureExtraColor = "\n|Ear Clasp Color = ". $facialFeatureColor ."";
-                  $facialFeatureExtra[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
-                    break;
-                case 4: // Duskwight
-                case 5: // Plainsfolks
-                case 6: // Dunesfolk
-                case 7: // Seeker of the Sun
-                  $facialFeatureExtraPre = "\n|Tattoos = ";
-                  $facialFeatureExtraColor = "\n|Tattoo Color = ". $facialFeatureColor ."";
-                  $facialFeatureExtra[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
-                    break;
-                case 8: // Keeper of the Moon
-                      if ($GenderCalc == 0) {
-                        $facialFeatureExtraPre = "\n|Tattoos = ";
-                        $facialFeatureExtraColor = "\n|Tattoo Color = ". $facialFeatureColor ."";
-                        $facialFeatureExtra[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
-                      } elseif ($GenderCalc == 1) {
-                        $facialFeatureExtraPre = "\n|Ear Clasp = ";
-                        $facialFeatureExtraColor = "\n|Ear Clasp Color = ". $facialFeatureColor ."";
-                        $facialFeatureExtra[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
-                      }
-                      break;
-                case 9: // Sea Wolf
-                case 10: // Hellsguard
-                  $facialFeatureExtraPre = "\n|Tattoos = ";
-                  $facialFeatureExtraColor = "\n|Tattoo Color = ". $facialFeatureColor ."";
-                  $facialFeatureExtra[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
-                  break;
-                case 11: // Raen
-                case 12: // Xaela
-                  $facialFeatureExtraPre = "\n|Limbal Rings = ";
-                  $facialFeatureExtraColor = "\n|Limbal Ring Color = ". $facialFeatureColor ."";
-                  $facialFeatureExtra[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
-                    break;
-                case 13: // Helions
-                case 14: // The Lost
-                  $facialFeatureExtraPre = "\n|Tattoos = ";
-                  $facialFeatureExtraColor = "";
-                  $facialFeatureExtra[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
-                    break;
-                case 15: // Rava
-                case 16: // Veena
-                  $facialFeatureExtraPre = "\n|Tattoos = ";
-                  $facialFeatureExtraColor = "\n|Tattoo Color = ". $facialFeatureColor ."";
-                  $facialFeatureExtra[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
-                    break;
+                        switch ($tribeKey)
+                        {
+                            case 1: // Midlander
+                            case 2: // Highlander
+                                $facialFeatureExtraPre = "\n|Tattoos = ";
+                                $facialFeatureExtraColor = "\n|Tattoo Color = ". $facialFeatureColor ."";
+                                $facialFeatureExtra[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
+                                break;
+                            case 3: // Wildwood
+                                $facialFeatureExtraPre = "\n|Ear Clasp = ";
+                                $facialFeatureExtraColor = "\n|Ear Clasp Color = ". $facialFeatureColor ."";
+                                $facialFeatureExtra[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
+                                break;
+                            case 4: // Duskwight
+                            case 5: // Plainsfolks
+                            case 6: // Dunesfolk
+                            case 7: // Seeker of the Sun
+                                $facialFeatureExtraPre = "\n|Tattoos = ";
+                                $facialFeatureExtraColor = "\n|Tattoo Color = ". $facialFeatureColor ."";
+                                $facialFeatureExtra[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
+                                break;
+                            case 8: // Keeper of the Moon
+                                if ($GenderCalc == 0) {
+                                    $facialFeatureExtraPre = "\n|Tattoos = ";
+                                    $facialFeatureExtraColor = "\n|Tattoo Color = ". $facialFeatureColor ."";
+                                    $facialFeatureExtra[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
+                                } elseif ($GenderCalc == 1) {
+                                    $facialFeatureExtraPre = "\n|Ear Clasp = ";
+                                    $facialFeatureExtraColor = "\n|Ear Clasp Color = ". $facialFeatureColor ."";
+                                    $facialFeatureExtra[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
+                                }
+                                break;
+                            case 9: // Sea Wolf
+                            case 10: // Hellsguard
+                                $facialFeatureExtraPre = "\n|Tattoos = ";
+                                $facialFeatureExtraColor = "\n|Tattoo Color = ". $facialFeatureColor ."";
+                                $facialFeatureExtra[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
+                                break;
+                            case 11: // Raen
+                            case 12: // Xaela
+                                $facialFeatureExtraPre = "\n|Limbal Rings = ";
+                                $facialFeatureExtraColor = "\n|Limbal Ring Color = ". $facialFeatureColor ."";
+                                $facialFeatureExtra[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
+                                break;
+                            case 13: // Helions
+                            case 14: // The Lost
+                                $facialFeatureExtraPre = "\n|Tattoos = ";
+                                $facialFeatureExtraColor = false;
+                                $facialFeatureExtra[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
+                                break;
+                            case 15: // Rava
+                            case 16: // Veena
+                                $facialFeatureExtraPre = "\n|Tattoos = ";
+                                $facialFeatureExtraColor = "\n|Tattoo Color = ". $facialFeatureColor ."";
+                                $facialFeatureExtra[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
+                                break;
+                        }
+                    }
                 }
-              }
-            }
-          } elseif ($face > 6) {
-              $facialFeatureicon = [];
+            } elseif ($face > 6) {
+                $facialFeatureicon = [];
             }
             if (!empty($facialFeatureExtra)) {
-            $facialFeatureExtraImplode = implode(",", $facialFeatureExtra);
+                $facialFeatureExtraImplode = implode(",", $facialFeatureExtra);
             }
             $facialFeatureExtra = "". $facialFeatureExtraPre ."". $facialFeatureExtraImplode ."". $facialFeatureExtraColor ."";
             if ($headIcon < 1) {
-              $headIcon = "CustomFace";
+                $headIcon = "CustomFace";
             }
 
 
-//pure debugging of certain strings
+            //pure debugging of certain strings
             if ($debug == true) {
-            var_dump($facialFeatureBase);
-            var_dump($facialFeatureArray);
-            var_dump($facialFeatureBasePad);
+                var_dump($facialFeatureBase);
+                var_dump($facialFeatureArray);
+                var_dump($facialFeatureBasePad);
 
-              $ex = $EnpcBase['FacialFeature'];
-$cusomizekeystring = "
+                $ex = $EnpcBase['FacialFeature'];
+                $cusomizekeystring = "
 tribeCode > ". $tribeCode ."
 isMale  > ". $isMale ."
 FacePaintCustomizeIndex > ". $FacePaintCustomizeIndex ."
@@ -733,8 +729,8 @@ BaseFaceCalc > ". $BaseFaceCalc ."
 
 
             }
-             if ($debug == false) {
-              $cusomizekeystring = "";
+            if ($debug == false) {
+                $cusomizekeystring = false;
             }
 
 
@@ -744,477 +740,478 @@ BaseFaceCalc > ". $BaseFaceCalc ."
             $noseBase = $EnpcBase['Nose'];
             $Nose = $noseBase + 1;
             $jawBase = $EnpcBase['Jaw'];
-          	$Jaw = $jawBase + 1;
-
-//Equipment
-//Mainhand/Offhand
+            $Jaw = $jawBase + 1;
 
 
+            //Equipment
+            //Mainhand/Offhand
             $MainHandBase = str_replace(", ", "-", $EnpcBase['Model{MainHand}']);
-            $guess = "";
+            $guess = false;
             if ($MainHandBase == 0) {
-              $MainHand = "";
-              if ($NpcEquipCsv->at($EnpcBase['NpcEquip'])['Model{MainHand}'] != 0) {
-                $MainHandBase = str_replace(", ", "-", $NpcEquipCsv->at($EnpcBase['NpcEquip'])['Model{MainHand}']);
-                $MainHandDyeBase = $NpcEquipCsv->at($EnpcBase['NpcEquip'])['Dye{MainHand}'];
-              }
+                $MainHand = false;
+                if ($NpcEquipCsv->at($EnpcBase['NpcEquip'])['Model{MainHand}'] != 0) {
+                    $MainHandBase = str_replace(", ", "-", $NpcEquipCsv->at($EnpcBase['NpcEquip'])['Model{MainHand}']);
+                    $MainHandDyeBase = $NpcEquipCsv->at($EnpcBase['NpcEquip'])['Dye{MainHand}'];
+                }
             }
             if ($MainHandBase > 0) {
-              $MainHandmodmain = explode("-", $MainHandBase);
-              $MainHanda = $MainHandmodmain[0];
-              $MainHandb = $MainHandmodmain[1];
-              $MainHandc = $MainHandmodmain[2];
-              $MainHandd = $MainHandmodmain[3];
-              $MainHandModela = $MainHanda;
-              if ($MainHandModela < 8999) {
-              $ModelbOrigin = $MainHandb;
-              $MainHandModel = "". $MainHanda ."-". $MainHandb ."-". $MainHandc ."-". $MainHandd ."";
-              if (empty($weaponArray[$MainHandModel]["Name"])) {
-                do {
-                  $MainHandb++;
-                  $MainHandModel = "". $MainHanda ."-". $MainHandb ."-". $MainHandc ."-". $MainHandd ."";
-                  $guess = "\n|Main Hand Guess = yes";
-                  if ($MainHandb > 300) {
-                    break;
-                  }
-                } while (empty($weaponArray[$MainHandModel]["Name"]));
-              }
-              if (empty($weaponArray[$MainHandModel]["Name"])) {
-                $MainHandb = $ModelbOrigin;
-                do {
-                  $MainHandb--;
-                  if ($MainHandb < 0) {
-                      break;
-                  }
-                  $MainHandModel = "". $MainHanda ."-". $MainHandb ."-". $MainHandc ."-". $MainHandd ."";
-                  $guess = "\n|Main Hand Guess = yes";
-                  if ($MainHandb > $ModelbOrigin) {
-                      break;
-                  }
-                } while (empty($weaponArray[$MainHandModel]["Name"]));
-              }
-              if ($MainHanda < 8999) {
-                if ($MainHandb >= 0) {
-                  $MainHandModel = "". $MainHanda ."-". $MainHandb ."-". $MainHandc ."-". $MainHandd ."";
-                  $MainHand = "". $weaponArray[$MainHandModel]["Name"] ."". $guess ."";
+                $MainHandmodmain = explode("-", $MainHandBase);
+                $MainHanda = $MainHandmodmain[0];
+                $MainHandb = $MainHandmodmain[1];
+                $MainHandc = $MainHandmodmain[2];
+                $MainHandd = $MainHandmodmain[3];
+                $MainHandModela = $MainHanda;
+                if ($MainHandModela < 8999) {
+                    $ModelbOrigin = $MainHandb;
+                    $MainHandModel = "". $MainHanda ."-". $MainHandb ."-". $MainHandc ."-". $MainHandd ."";
+                    if (empty($weaponArray[$MainHandModel]["Name"])) {
+                        do {
+                            $MainHandb++;
+                            $MainHandModel = "". $MainHanda ."-". $MainHandb ."-". $MainHandc ."-". $MainHandd ."";
+                            $guess = "\n|Main Hand Guess = yes";
+                            if ($MainHandb > 300) {
+                                break;
+                            }
+                        } while (empty($weaponArray[$MainHandModel]["Name"]));
+                    }
+                    if (empty($weaponArray[$MainHandModel]["Name"])) {
+                        $MainHandb = $ModelbOrigin;
+                        do {
+                            $MainHandb--;
+                            if ($MainHandb < 0) {
+                                break;
+                            }
+                            $MainHandModel = "". $MainHanda ."-". $MainHandb ."-". $MainHandc ."-". $MainHandd ."";
+                            $guess = "\n|Main Hand Guess = yes";
+                            if ($MainHandb > $ModelbOrigin) {
+                                break;
+                            }
+                        } while (empty($weaponArray[$MainHandModel]["Name"]));
+                    }
+                    if ($MainHanda < 8999) {
+                        if ($MainHandb >= 0) {
+                            $MainHandModel = "". $MainHanda ."-". $MainHandb ."-". $MainHandc ."-". $MainHandd ."";
+                            $MainHand = "". $weaponArray[$MainHandModel]["Name"] ."". $guess ."";
+                        }
+                        if ($MainHandb < 0) {
+                            $MainHand = "Custom Main Hand";
+                        }
+                    }
                 }
-                if ($MainHandb < 0) {
-                  $MainHand = "Custom Main Hand";
+                if ($MainHanda > 8999) {
+                    $MainHand = "Custom Main Hand";
                 }
-              }
-            }
-              if ($MainHanda > 8999) {
-                $MainHand = "Custom Main Hand";
-              }
             }
 
-//OffHand
-
+            //OffHand
             $OffHandBase = str_replace(", ", "-", $EnpcBase['Model{OffHand}']);
-            $guess = "";
+            $guess = false;
             if ($OffHandBase == 0) {
-              $OffHand = "";
-              if ($NpcEquipCsv->at($EnpcBase['NpcEquip'])['Model{OffHand}'] != 0) {
-                $OffHandBase = str_replace(", ", "-", $NpcEquipCsv->at($EnpcBase['NpcEquip'])['Model{OffHand}']);
-                $OffHandDyeBase = $NpcEquipCsv->at($EnpcBase['NpcEquip'])['Dye{OffHand}'];
-              }
+                $OffHand = false;
+                if ($NpcEquipCsv->at($EnpcBase['NpcEquip'])['Model{OffHand}'] != 0) {
+                    $OffHandBase = str_replace(", ", "-", $NpcEquipCsv->at($EnpcBase['NpcEquip'])['Model{OffHand}']);
+                    $OffHandDyeBase = $NpcEquipCsv->at($EnpcBase['NpcEquip'])['Dye{OffHand}'];
+                }
             }
             if ($OffHandBase > 0) {
-              $OffHandmodmain = explode("-", $OffHandBase);
-              $OffHanda = $OffHandmodmain[0];
-              $OffHandb = $OffHandmodmain[1];
-              $OffHandc = $OffHandmodmain[2];
-              $OffHandd = $OffHandmodmain[3];
-              $OffHandModela = $OffHanda;
-              if ($OffHandModela < 8999) {
-              $ModelbOrigin = $OffHandb;
-              $OffHandModel = "". $OffHanda ."-". $OffHandb ."-". $OffHandc ."-". $OffHandd ."";
-              if (empty($weaponArray[$OffHandModel]["Name"])) {
-                do {
-                  $OffHandb++;
-                  $OffHandModel = "". $OffHanda ."-". $OffHandb ."-". $OffHandc ."-". $OffHandd ."";
-                  $guess = "\n|Off Hand Guess = yes";
-                  if ($OffHandb > 300) {
-                    break;
-                  }
-                } while (empty($weaponArray[$OffHandModel]["Name"]));
-              }
-              if (empty($weaponArray[$OffHandModel]["Name"])) {
-                $OffHandb = $ModelbOrigin;
-                do {
-                  $OffHandb--;
-                  if ($OffHandb < 0) {
-                      break;
-                  }
-                  $OffHandModel = "". $OffHanda ."-". $OffHandb ."-". $OffHandc ."-". $OffHandd ."";
-                  $guess = "\n|Off Hand Guess = yes";
-                  if ($OffHandb > $ModelbOrigin) {
-                      break;
-                  }
-                } while (empty($weaponArray[$OffHandModel]["Name"]));
-              }
-              if ($OffHanda < 8999) {
-                if ($OffHandb >= 0) {
-                  $OffHandModel = "". $OffHanda ."-". $OffHandb ."-". $OffHandc ."-". $OffHandd ."";
-                  $OffHand = "". $weaponArray[$OffHandModel]["Name"] ."". $guess ."";
+                $OffHandmodmain = explode("-", $OffHandBase);
+                $OffHanda = $OffHandmodmain[0];
+                $OffHandb = $OffHandmodmain[1];
+                $OffHandc = $OffHandmodmain[2];
+                $OffHandd = $OffHandmodmain[3];
+                $OffHandModela = $OffHanda;
+                if ($OffHandModela < 8999) {
+                    $ModelbOrigin = $OffHandb;
+                    $OffHandModel = "". $OffHanda ."-". $OffHandb ."-". $OffHandc ."-". $OffHandd ."";
+                    if (empty($weaponArray[$OffHandModel]["Name"])) {
+                        do {
+                            $OffHandb++;
+                            $OffHandModel = "". $OffHanda ."-". $OffHandb ."-". $OffHandc ."-". $OffHandd ."";
+                            $guess = "\n|Off Hand Guess = yes";
+                            if ($OffHandb > 300) {
+                                break;
+                            }
+                        } while (empty($weaponArray[$OffHandModel]["Name"]));
+                    }
+                    if (empty($weaponArray[$OffHandModel]["Name"])) {
+                        $OffHandb = $ModelbOrigin;
+                        do {
+                            $OffHandb--;
+                            if ($OffHandb < 0) {
+                                break;
+                            }
+                            $OffHandModel = "". $OffHanda ."-". $OffHandb ."-". $OffHandc ."-". $OffHandd ."";
+                            $guess = "\n|Off Hand Guess = yes";
+                            if ($OffHandb > $ModelbOrigin) {
+                                break;
+                            }
+                        } while (empty($weaponArray[$OffHandModel]["Name"]));
+                    }
+                    if ($OffHanda < 8999) {
+                        if ($OffHandb >= 0) {
+                            $OffHandModel = "". $OffHanda ."-". $OffHandb ."-". $OffHandc ."-". $OffHandd ."";
+                            $OffHand = "". $weaponArray[$OffHandModel]["Name"] ."". $guess ."";
+                        }
+                        if ($OffHandb < 0) {
+                            $OffHand = "Custom Off Hand";
+                        }
+                    }
                 }
-                if ($OffHandb < 0) {
-                  $OffHand = "Custom Off Hand";
+                if ($OffHanda > 8999) {
+                    $OffHand = "Custom Off Hand";
                 }
-              }
-            }
-              if ($OffHanda > 8999) {
-                $OffHand = "Custom Off Hand";
-              }
             }
 
-//Visor
-          	$Visor = $EnpcBase['Visor'];
-//Head
-          	$HeadCat = "34";
-            $guess = "";
-            $Head = "";
+            //Visor
+            $Visor = $EnpcBase['Visor'];
+
+            //Head
+            $HeadCat = "34";
+            $guess = false;
+            $Head = false;
             $Modela = null;
             $Modelb = null;
             $HeadBase = $EnpcBase['Model{Head}'];
 
             if ($HeadBase == 0) {
-              $Head = "";
-              if ($NpcEquipCsv->at($EnpcBase['NpcEquip'])['Model{Head}'] != 0) {
-                $HeadBase = $NpcEquipCsv->at($EnpcBase['NpcEquip'])['Model{Head}'];
-                $HeadDyeBase = $NpcEquipCsv->at($EnpcBase['NpcEquip'])['Dye{Head}'];
-              }
+                $Head = false;
+                if ($NpcEquipCsv->at($EnpcBase['NpcEquip'])['Model{Head}'] != 0) {
+                    $HeadBase = $NpcEquipCsv->at($EnpcBase['NpcEquip'])['Model{Head}'];
+                    $HeadDyeBase = $NpcEquipCsv->at($EnpcBase['NpcEquip'])['Dye{Head}'];
+                }
             }
             if ($HeadBase == 4294967295) {
-              $Head = "";
-              $HeadBase = 0;
+                $Head = false;
+                $HeadBase = 0;
             }
             //for test HeadBase outcome here is 2494967295
             if ($HeadBase > 0) {
-              $Modela = $HeadBase & 0xFFFF;
+                $Modela = $HeadBase & 0xFFFF;
                 if ($Modela < 8999) {
-                $Modelb = ($HeadBase >> 16) & 0xFFFF;
-                $Modelc = ($HeadBase >> 32) & 0xFFFF;
-                $Modeld = ($HeadBase >> 48) & 0xFFFF;
-                $ModelbOrigin = ($HeadBase >> 16) & 0xFFFF;
-                //$HeadModel = "".($HeadBase & 0xFFFF) ."-". (($HeadBase >> 16) & 0xFFFF). "-". (($HeadBase >> 32) & 0xFFFF) ."-". (($HeadBase >> 48) & 0xFFFF) ."";
-                $HeadModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
-                if (empty($itemArray[$HeadCat][$HeadModel]["Name"])) {
-                  do {
-                    $Modelb++;
+                    $Modelb = ($HeadBase >> 16) & 0xFFFF;
+                    $Modelc = ($HeadBase >> 32) & 0xFFFF;
+                    $Modeld = ($HeadBase >> 48) & 0xFFFF;
+                    $ModelbOrigin = ($HeadBase >> 16) & 0xFFFF;
+                    //$HeadModel = "".($HeadBase & 0xFFFF) ."-". (($HeadBase >> 16) & 0xFFFF). "-". (($HeadBase >> 32) & 0xFFFF) ."-". (($HeadBase >> 48) & 0xFFFF) ."";
                     $HeadModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
-                    $guess = "\n|Head Guess = yes";
-                    if ($Modelb > 300) {
-                      break;
+                    if (empty($itemArray[$HeadCat][$HeadModel]["Name"])) {
+                        do {
+                            $Modelb++;
+                            $HeadModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
+                            $guess = "\n|Head Guess = yes";
+                            if ($Modelb > 300) {
+                                break;
+                            }
+                        } while (empty($itemArray[$HeadCat][$HeadModel]["Name"]));
                     }
-                  } while (empty($itemArray[$HeadCat][$HeadModel]["Name"]));
+                    if (empty($itemArray[$HeadCat][$HeadModel]["Name"])) {
+                        $Modelb = $ModelbOrigin;
+                        do {
+                            $Modelb--;
+                            if ($Modelb < 0) {
+                                break;
+                            }
+                            $HeadModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
+                            $guess = "\n|Head Guess = yes";
+                            if ($Modelb > $ModelbOrigin) {
+                                break;
+                            }
+                        } while (empty($itemArray[$HeadCat][$HeadModel]["Name"]));
+                    }
+                    if ($Modela < 8999) {
+                        if ($Modelb >= 0) {
+                            $HeadModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
+                            $Head = "". $itemArray[$HeadCat][$HeadModel]["Name"] ."". $guess ."";
+                        }
+                        if ($Modelb < 0) {
+                            $Head = "Custom Head";
+                        }
+                    }
                 }
-                if (empty($itemArray[$HeadCat][$HeadModel]["Name"])) {
-                  $Modelb = $ModelbOrigin;
-                  do {
-                    $Modelb--;
-                    if ($Modelb < 0) {
-                        break;
-                    }
-                    $HeadModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
-                    $guess = "\n|Head Guess = yes";
-                    if ($Modelb > $ModelbOrigin) {
-                        break;
-                    }
-                  } while (empty($itemArray[$HeadCat][$HeadModel]["Name"]));
-                }
-                if ($Modela < 8999) {
-                  if ($Modelb >= 0) {
-                    $HeadModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
-                    $Head = "". $itemArray[$HeadCat][$HeadModel]["Name"] ."". $guess ."";
-                  }
-                  if ($Modelb < 0) {
+                if ($Modela > 8999) {
                     $Head = "Custom Head";
-                  }
                 }
-              }
-              if ($Modela > 8999) {
-                $Head = "Custom Head";
-              }
             }
             $HeadDye = $StainCsv->at($EnpcBase['Dye{Head}'])['Name'];
 
-//Body
-          	$BodyCat = "35";
-            $guess = "";
-            $Body = "";
+            //Body
+            $BodyCat = "35";
+            $guess = false;
+            $Body = false;
             $Modela = null;
             $Modelb = null;
             $BodyBase = $EnpcBase['Model{Body}'];
             if ($BodyBase == 0) {
-              $Body = "";
-              if ($NpcEquipCsv->at($EnpcBase['NpcEquip'])['Model{Body}'] != 0) {
-                $BodyBase = $NpcEquipCsv->at($EnpcBase['NpcEquip'])['Model{Body}'];
-                $BodyDyeBase = $NpcEquipCsv->at($EnpcBase['NpcEquip'])['Dye{Body}'];
-              }
+                $Body = false;
+                if ($NpcEquipCsv->at($EnpcBase['NpcEquip'])['Model{Body}'] != 0) {
+                    $BodyBase = $NpcEquipCsv->at($EnpcBase['NpcEquip'])['Model{Body}'];
+                    $BodyDyeBase = $NpcEquipCsv->at($EnpcBase['NpcEquip'])['Dye{Body}'];
+                }
             }
             if ($BodyBase == 4294967295) {
-              $Body = "";
-              $BodyBase = 0;
+                $Body = false;
+                $BodyBase = 0;
             }
             if ($BodyBase > 0) {
-              $Modela = $BodyBase & 0xFFFF;
-              if ($Modela < 8999) {
-              $Modelb = ($BodyBase >> 16) & 0xFFFF;
-              $Modelc = ($BodyBase >> 32) & 0xFFFF;
-              $Modeld = ($BodyBase >> 48) & 0xFFFF;
-              $ModelbOrigin = ($BodyBase >> 16) & 0xFFFF;
-              //$BodyModel = "".($BodyBase & 0xFFFF) ."-". (($BodyBase >> 16) & 0xFFFF). "-". (($BodyBase >> 32) & 0xFFFF) ."-". (($BodyBase >> 48) & 0xFFFF) ."";
-              $BodyModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
-              if (empty($itemArray[$BodyCat][$BodyModel]["Name"])) {
-                do {
-                  $Modelb++;
-                  $BodyModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
-                  $guess = "\n|Body Guess = yes";
-                  if ($Modelb > 300) {
-                    break;
-                  }
-                } while (empty($itemArray[$BodyCat][$BodyModel]["Name"]));
-              }
-              if (empty($itemArray[$BodyCat][$BodyModel]["Name"])) {
-                $Modelb = $ModelbOrigin;
-                do {
-                  $Modelb--;
-                  if ($Modelb < 0) {
-                      break;
-                  }
-                  $BodyModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
-                  $guess = "\n|Body Guess = yes";
-                  if ($Modelb > $ModelbOrigin) {
-                      break;
-                  }
-                } while (empty($itemArray[$BodyCat][$BodyModel]["Name"]));
-              }
-              if ($Modela < 8999) {
-                if ($Modelb >= 0) {
-                  $BodyModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
-                  $Body = "". $itemArray[$BodyCat][$BodyModel]["Name"] ."". $guess ."";
+                $Modela = $BodyBase & 0xFFFF;
+                if ($Modela < 8999) {
+                    $Modelb = ($BodyBase >> 16) & 0xFFFF;
+                    $Modelc = ($BodyBase >> 32) & 0xFFFF;
+                    $Modeld = ($BodyBase >> 48) & 0xFFFF;
+                    $ModelbOrigin = ($BodyBase >> 16) & 0xFFFF;
+                    //$BodyModel = "".($BodyBase & 0xFFFF) ."-". (($BodyBase >> 16) & 0xFFFF). "-". (($BodyBase >> 32) & 0xFFFF) ."-". (($BodyBase >> 48) & 0xFFFF) ."";
+                    $BodyModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
+                    if (empty($itemArray[$BodyCat][$BodyModel]["Name"])) {
+                        do {
+                            $Modelb++;
+                            $BodyModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
+                            $guess = "\n|Body Guess = yes";
+                            if ($Modelb > 300) {
+                                break;
+                            }
+                        } while (empty($itemArray[$BodyCat][$BodyModel]["Name"]));
+                    }
+                    if (empty($itemArray[$BodyCat][$BodyModel]["Name"])) {
+                        $Modelb = $ModelbOrigin;
+                        do {
+                            $Modelb--;
+                            if ($Modelb < 0) {
+                                break;
+                            }
+                            $BodyModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
+                            $guess = "\n|Body Guess = yes";
+                            if ($Modelb > $ModelbOrigin) {
+                                break;
+                            }
+                        } while (empty($itemArray[$BodyCat][$BodyModel]["Name"]));
+                    }
+                    if ($Modela < 8999) {
+                        if ($Modelb >= 0) {
+                            $BodyModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
+                            $Body = "". $itemArray[$BodyCat][$BodyModel]["Name"] ."". $guess ."";
+                        }
+                        if ($Modelb < 0) {
+                            $Body = "Custom Body";
+                        }
+                    }
                 }
-                if ($Modelb < 0) {
-                  $Body = "Custom Body";
+                if ($Modela > 8999) {
+                    $Body = "Custom Body";
                 }
-              }
-            }
-              if ($Modela > 8999) {
-                $Body = "Custom Body";
-              }
             }
             $BodyDye = $StainCsv->at($EnpcBase['Dye{Body}'])['Name'];
-//Hands
 
-          	$HandsCat = "37";
-            $guess = "";
-            $Hands = "";
+            //Hands
+            $HandsCat = "37";
+            $guess = false;
+            $Hands = false;
             $Modela = null;
             $Modelb = null;
             $HandsBase = $EnpcBase['Model{Hands}'];
             if ($HandsBase == 0) {
-              $Hands = "";
-              if ($NpcEquipCsv->at($EnpcBase['NpcEquip'])['Model{Hands}'] != 0) {
-                $HandsBase = $NpcEquipCsv->at($EnpcBase['NpcEquip'])['Model{Hands}'];
-                $HandsDyeBase = $NpcEquipCsv->at($EnpcBase['NpcEquip'])['Dye{Hands}'];
-              }
+                $Hands = false;
+                if ($NpcEquipCsv->at($EnpcBase['NpcEquip'])['Model{Hands}'] != 0) {
+                    $HandsBase = $NpcEquipCsv->at($EnpcBase['NpcEquip'])['Model{Hands}'];
+                    $HandsDyeBase = $NpcEquipCsv->at($EnpcBase['NpcEquip'])['Dye{Hands}'];
+                }
             }
             if ($HandsBase == 4294967295) {
-              $Hands = "";
-              $HandsBase = 0;
+                $Hands = false;
+                $HandsBase = 0;
             }
             if ($HandsBase > 0) {
-              $Modela = $HandsBase & 0xFFFF;
-              if ($Modela < 8999) {
-              $Modelb = ($HandsBase >> 16) & 0xFFFF;
-              $Modelc = ($HandsBase >> 32) & 0xFFFF;
-              $Modeld = ($HandsBase >> 48) & 0xFFFF;
-              $ModelbOrigin = ($HandsBase >> 16) & 0xFFFF;
-              //$HandsModel = "".($HandsBase & 0xFFFF) ."-". (($HandsBase >> 16) & 0xFFFF). "-". (($HandsBase >> 32) & 0xFFFF) ."-". (($HandsBase >> 48) & 0xFFFF) ."";
-              $HandsModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
-              if (empty($itemArray[$HandsCat][$HandsModel]["Name"])) {
-                do {
-                  $Modelb++;
-                  $HandsModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
-                  $guess = "\n|Hands Guess = yes";
-                  if ($Modelb > 300) {
-                    break;
-                  }
-                } while (empty($itemArray[$HandsCat][$HandsModel]["Name"]));
-              }
-              if (empty($itemArray[$HandsCat][$HandsModel]["Name"])) {
-                $Modelb = $ModelbOrigin;
-                do {
-                  $Modelb--;
-                  if ($Modelb < 0) {
-                      break;
-                  }
-                  $HandsModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
-                  $guess = "\n|Hands Guess = yes";
-                  if ($Modelb > $ModelbOrigin) {
-                      break;
-                  }
-                } while (empty($itemArray[$HandsCat][$HandsModel]["Name"]));
-              }
-              if ($Modela < 8999) {
-                if ($Modelb >= 0) {
-                  $HandsModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
-                  $Hands = "". $itemArray[$HandsCat][$HandsModel]["Name"] ."". $guess ."";
+                $Modela = $HandsBase & 0xFFFF;
+                if ($Modela < 8999) {
+                    $Modelb = ($HandsBase >> 16) & 0xFFFF;
+                    $Modelc = ($HandsBase >> 32) & 0xFFFF;
+                    $Modeld = ($HandsBase >> 48) & 0xFFFF;
+                    $ModelbOrigin = ($HandsBase >> 16) & 0xFFFF;
+                    //$HandsModel = "".($HandsBase & 0xFFFF) ."-". (($HandsBase >> 16) & 0xFFFF). "-". (($HandsBase >> 32) & 0xFFFF) ."-". (($HandsBase >> 48) & 0xFFFF) ."";
+                    $HandsModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
+                    if (empty($itemArray[$HandsCat][$HandsModel]["Name"])) {
+                        do {
+                            $Modelb++;
+                            $HandsModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
+                            $guess = "\n|Hands Guess = yes";
+                            if ($Modelb > 300) {
+                                break;
+                            }
+                        } while (empty($itemArray[$HandsCat][$HandsModel]["Name"]));
+                    }
+                    if (empty($itemArray[$HandsCat][$HandsModel]["Name"])) {
+                        $Modelb = $ModelbOrigin;
+                        do {
+                            $Modelb--;
+                            if ($Modelb < 0) {
+                                break;
+                            }
+                            $HandsModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
+                            $guess = "\n|Hands Guess = yes";
+                            if ($Modelb > $ModelbOrigin) {
+                                break;
+                            }
+                        } while (empty($itemArray[$HandsCat][$HandsModel]["Name"]));
+                    }
+                    if ($Modela < 8999) {
+                        if ($Modelb >= 0) {
+                            $HandsModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
+                            $Hands = "". $itemArray[$HandsCat][$HandsModel]["Name"] ."". $guess ."";
+                        }
+                        if ($Modelb < 0) {
+                            $Hands = "Custom Hands";
+                        }
+                    }
                 }
-                if ($Modelb < 0) {
-                  $Hands = "Custom Hands";
+                if ($Modela > 8999) {
+                    $Hands = "Custom Hands";
                 }
-              }
-            }
-              if ($Modela > 8999) {
-                $Hands = "Custom Hands";
-              }
-              if ($Modela == 9903) {
-                $Hands = "";
-              }
-              if ($Modela == 0) {
-                $Hands = "";
-              }
+                if ($Modela == 9903) {
+                    $Hands = false;
+                }
+                if ($Modela == 0) {
+                    $Hands = false;
+                }
             }
             $HandsDye = $StainCsv->at($EnpcBase['Dye{Hands}'])['Name'];
-//Legs
-          	$LegsCat = "36";
-            $guess = "";
-            $Legs = "";
+
+            //Legs
+            $LegsCat = "36";
+            $guess = false;
+            $Legs = false;
             $Modela = null;
             $Modelb = null;
             $LegsBase = $EnpcBase['Model{Legs}'];
             if ($LegsBase == 0) {
-              $Legs = "";
-              if ($NpcEquipCsv->at($EnpcBase['NpcEquip'])['Model{Legs}'] != 0) {
-                $LegsBase = $NpcEquipCsv->at($EnpcBase['NpcEquip'])['Model{Legs}'];
-                $LegsDyeBase = $NpcEquipCsv->at($EnpcBase['NpcEquip'])['Dye{Legs}'];
-              }
+                $Legs = false;
+                if ($NpcEquipCsv->at($EnpcBase['NpcEquip'])['Model{Legs}'] != 0) {
+                    $LegsBase = $NpcEquipCsv->at($EnpcBase['NpcEquip'])['Model{Legs}'];
+                    $LegsDyeBase = $NpcEquipCsv->at($EnpcBase['NpcEquip'])['Dye{Legs}'];
+                }
             }
             if ($LegsBase == 4294967295) {
-              $Legs = "";
-              $LegsBase = 0;
+                $Legs = false;
+                $LegsBase = 0;
             }
             if ($LegsBase  > 0) {
-              $Modela = $LegsBase & 0xFFFF;
-              if ($Modela < 8999) {
-              $Modelb = ($LegsBase >> 16) & 0xFFFF;
-              $Modelc = ($LegsBase >> 32) & 0xFFFF;
-              $Modeld = ($LegsBase >> 48) & 0xFFFF;
-              $ModelbOrigin = ($LegsBase >> 16) & 0xFFFF;
-              //$LegsModel = "".($LegsBase & 0xFFFF) ."-". (($LegsBase >> 16) & 0xFFFF). "-". (($LegsBase >> 32) & 0xFFFF) ."-". (($LegsBase >> 48) & 0xFFFF) ."";
-              $LegsModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
-              if (empty($itemArray[$LegsCat][$LegsModel]["Name"])) {
-                do {
-                  $Modelb++;
-                  $LegsModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
-                  $guess = "\n|Legs Guess = yes";
-                  if ($Modelb > 300) {
-                    break;
-                  }
-                } while (empty($itemArray[$LegsCat][$LegsModel]["Name"]));
-              }
-              if (empty($itemArray[$LegsCat][$LegsModel]["Name"])) {
-                $Modelb = $ModelbOrigin;
-                do {
-                  $Modelb--;
-                  if ($Modelb < 0) {
-                      break;
-                  }
-                  $LegsModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
-                  $guess = "\n|Legs Guess = yes";
-                  if ($Modelb > $ModelbOrigin) {
-                      break;
-                  }
-                } while (empty($itemArray[$LegsCat][$LegsModel]["Name"]));
-              }
-              if ($Modela < 8999) {
-                if ($Modelb >= 0) {
-                  $LegsModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
-                  $Legs = "". $itemArray[$LegsCat][$LegsModel]["Name"] ."". $guess ."";
+                $Modela = $LegsBase & 0xFFFF;
+                if ($Modela < 8999) {
+                    $Modelb = ($LegsBase >> 16) & 0xFFFF;
+                    $Modelc = ($LegsBase >> 32) & 0xFFFF;
+                    $Modeld = ($LegsBase >> 48) & 0xFFFF;
+                    $ModelbOrigin = ($LegsBase >> 16) & 0xFFFF;
+                    //$LegsModel = "".($LegsBase & 0xFFFF) ."-". (($LegsBase >> 16) & 0xFFFF). "-". (($LegsBase >> 32) & 0xFFFF) ."-". (($LegsBase >> 48) & 0xFFFF) ."";
+                    $LegsModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
+                    if (empty($itemArray[$LegsCat][$LegsModel]["Name"])) {
+                        do {
+                            $Modelb++;
+                            $LegsModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
+                            $guess = "\n|Legs Guess = yes";
+                            if ($Modelb > 300) {
+                                break;
+                            }
+                        } while (empty($itemArray[$LegsCat][$LegsModel]["Name"]));
+                    }
+                    if (empty($itemArray[$LegsCat][$LegsModel]["Name"])) {
+                        $Modelb = $ModelbOrigin;
+                        do {
+                            $Modelb--;
+                            if ($Modelb < 0) {
+                                break;
+                            }
+                            $LegsModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
+                            $guess = "\n|Legs Guess = yes";
+                            if ($Modelb > $ModelbOrigin) {
+                                break;
+                            }
+                        } while (empty($itemArray[$LegsCat][$LegsModel]["Name"]));
+                    }
+                    if ($Modela < 8999) {
+                        if ($Modelb >= 0) {
+                            $LegsModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
+                            $Legs = "". $itemArray[$LegsCat][$LegsModel]["Name"] ."". $guess ."";
+                        }
+                        if ($Modelb < 0) {
+                            $Legs = "Custom Legs";
+                        }
+                    }
                 }
-                if ($Modelb < 0) {
-                  $Legs = "Custom Legs";
+                if ($Modela > 8999) {
+                    $Legs = "Custom Legs";
                 }
-              }
-            }
-              if ($Modela > 8999) {
-                $Legs = "Custom Legs";
-              }
             }
             $LegsDye = $StainCsv->at($EnpcBase['Dye{Legs}'])['Name'];
-//Feet
-          	$FeetCat = "38";
-            $guess = "";
-            $Feet = "";
+
+            //Feet
+            $FeetCat = "38";
+            $guess = false;
+            $Feet = false;
             $Modela = null;
             $Modelb = null;
             $FeetBase = $EnpcBase['Model{Feet}'];
             if ($FeetBase == 0) {
-              $Feet = "";
-              if ($NpcEquipCsv->at($EnpcBase['NpcEquip'])['Model{Feet}'] != 0) {
-                $FeetBase = $NpcEquipCsv->at($EnpcBase['NpcEquip'])['Model{Feet}'];
-                $FeetDyeBase = $NpcEquipCsv->at($EnpcBase['NpcEquip'])['Dye{Feet}'];
-              }
+                $Feet = false;
+                if ($NpcEquipCsv->at($EnpcBase['NpcEquip'])['Model{Feet}'] != 0) {
+                    $FeetBase = $NpcEquipCsv->at($EnpcBase['NpcEquip'])['Model{Feet}'];
+                    $FeetDyeBase = $NpcEquipCsv->at($EnpcBase['NpcEquip'])['Dye{Feet}'];
+                }
             }
             if ($FeetBase == 4294967295) {
-              $Feet = "";
-              $FeetBase = 0;
+                $Feet = false;
+                $FeetBase = 0;
             }
             if ($FeetBase > 0) {
-              $Modela = $FeetBase & 0xFFFF;
-              if ($Modela < 8999) {
-              $Modelb = ($FeetBase >> 16) & 0xFFFF;
-              $Modelc = ($FeetBase >> 32) & 0xFFFF;
-              $Modeld = ($FeetBase >> 48) & 0xFFFF;
-              $ModelbOrigin = ($FeetBase >> 16) & 0xFFFF;
-              //$FeetModel = "".($FeetBase & 0xFFFF) ."-". (($FeetBase >> 16) & 0xFFFF). "-". (($FeetBase >> 32) & 0xFFFF) ."-". (($FeetBase >> 48) & 0xFFFF) ."";
-              $FeetModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
-              if (empty($itemArray[$FeetCat][$FeetModel]["Name"])) {
-                do {
-                  $Modelb++;
-                  $FeetModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
-                  $guess = "\n|Feet Guess = yes";
-                  if ($Modelb > 300) {
-                    break;
-                  }
-                } while (empty($itemArray[$FeetCat][$FeetModel]["Name"]));
-              }
-              if (empty($itemArray[$FeetCat][$FeetModel]["Name"])) {
-                $Modelb = $ModelbOrigin;
-                do {
-                  $Modelb--;
-                  if ($Modelb < 0) {
-                      break;
-                  }
-                  $FeetModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
-                  $guess = "\n|Feet Guess = yes";
-                  if ($Modelb > $ModelbOrigin) {
-                      break;
-                  }
-                } while (empty($itemArray[$FeetCat][$FeetModel]["Name"]));
-              }
-              if ($Modela < 8999) {
-                if ($Modelb >= 0) {
-                  $FeetModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
-                  $Feet = "". $itemArray[$FeetCat][$FeetModel]["Name"] ."". $guess ."";
+                $Modela = $FeetBase & 0xFFFF;
+                if ($Modela < 8999) {
+                    $Modelb = ($FeetBase >> 16) & 0xFFFF;
+                    $Modelc = ($FeetBase >> 32) & 0xFFFF;
+                    $Modeld = ($FeetBase >> 48) & 0xFFFF;
+                    $ModelbOrigin = ($FeetBase >> 16) & 0xFFFF;
+                    //$FeetModel = "".($FeetBase & 0xFFFF) ."-". (($FeetBase >> 16) & 0xFFFF). "-". (($FeetBase >> 32) & 0xFFFF) ."-". (($FeetBase >> 48) & 0xFFFF) ."";
+                    $FeetModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
+                    if (empty($itemArray[$FeetCat][$FeetModel]["Name"])) {
+                        do {
+                            $Modelb++;
+                            $FeetModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
+                            $guess = "\n|Feet Guess = yes";
+                            if ($Modelb > 300) {
+                                break;
+                            }
+                        } while (empty($itemArray[$FeetCat][$FeetModel]["Name"]));
+                    }
+                    if (empty($itemArray[$FeetCat][$FeetModel]["Name"])) {
+                        $Modelb = $ModelbOrigin;
+                        do {
+                            $Modelb--;
+                            if ($Modelb < 0) {
+                                break;
+                            }
+                            $FeetModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
+                            $guess = "\n|Feet Guess = yes";
+                            if ($Modelb > $ModelbOrigin) {
+                                break;
+                            }
+                        } while (empty($itemArray[$FeetCat][$FeetModel]["Name"]));
+                    }
+                    if ($Modela < 8999) {
+                        if ($Modelb >= 0) {
+                            $FeetModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
+                            $Feet = "". $itemArray[$FeetCat][$FeetModel]["Name"] ."". $guess ."";
+                        }
+                        if ($Modelb < 0) {
+                            $Feet = "Custom Feet";
+                        }
+                    }
                 }
-                if ($Modelb < 0) {
-                  $Feet = "Custom Feet";
+                if ($Modela > 8999) {
+                    $Feet = "Custom Feet";
                 }
-              }
-            }
-              if ($Modela > 8999) {
-                $Feet = "Custom Feet";
-              }
             }
             $FeetDye = $StainCsv->at($EnpcBase['Dye{Feet}'])['Name'];
 
 
-          $BodyOutput = "\n|Race = ". $Race ."\n|Gender = ". $Gender ."\n|Body Type = ". $BodyType ."\n|Height = ". $Height ."\n|Clan = ". $Tribe ."\n". $extraIcons ."\n|Hair Style = ". $hairStyleIcon ."\n|Skin Color = ". $skinColor ."\n|Hair Color = ". $hairColor ."\n|Hair Highlight Color = ". $hairHighlightColor ."\n|Facial Feature = ". $facialFeature ."". $facialFeatureExtra ."". $extraFeature ."". $bustAndMuscle ."\n|Eyebrows = ". $Eyebrows ."\n|Eye Shape = ". $eyeShape ."\n|Eye Size = ". $eyeSize ."\n|Eye Color = ". $eyeColor ."\n|Eye Heterochromia = ". $heterochromiaColor ."\n|Nose = ". $Nose ."\n|Jaw = ". $Jaw ."\n". $mouthData ."\n". $facePaintIcon ."\n";
+            $BodyOutput = "\n|Race = ". $Race ."\n|Gender = ". $Gender ."\n|Body Type = ". $BodyType ."\n|Height = ". $Height ."\n|Clan = ". $Tribe ."\n". $extraIcons ."\n|Hair Style = ". $hairStyleIcon ."\n|Skin Color = ". $skinColor ."\n|Hair Color = ". $hairColor ."\n|Hair Highlight Color = ". $hairHighlightColor ."\n|Facial Feature = ". $facialFeature ."". $facialFeatureExtra ."". $extraFeature ."". $bustAndMuscle ."\n|Eyebrows = ". $Eyebrows ."\n|Eye Shape = ". $eyeShape ."\n|Eye Size = ". $eyeSize ."\n|Eye Color = ". $eyeColor ."\n|Eye Heterochromia = ". $heterochromiaColor ."\n|Nose = ". $Nose ."\n|Jaw = ". $Jaw ."\n". $mouthData ."\n". $facePaintIcon ."\n";
 
-          $EquipmentOutput = "\n|Head = ". $Head ."\n|Head Dye = ". $HeadDye ."\n|Visor = ". $Visor ."\n|Body = ". $Body ."\n|Body Dye = ". $BodyDye ."\n|Hands = ". $Hands ."\n|Hands Dye = ". $HandsDye ."\n|Legs = ". $Legs ."\n|Legs Dye = ". $LegsDye ."\n|Feet = ". $Feet ."\n|Feet Dye = ". $FeetDye ."\n|Main Hand = ". $MainHand ."\n|Off Hand = ". $OffHand ."";
+            $EquipmentOutput = "\n|Head = ". $Head ."\n|Head Dye = ". $HeadDye ."\n|Visor = ". $Visor ."\n|Body = ". $Body ."\n|Body Dye = ". $BodyDye ."\n|Hands = ". $Hands ."\n|Hands Dye = ". $HandsDye ."\n|Legs = ". $Legs ."\n|Legs Dye = ". $LegsDye ."\n|Feet = ". $Feet ."\n|Feet Dye = ". $FeetDye ."\n|Main Hand = ". $MainHand ."\n|Off Hand = ". $OffHand ."";
 
             // Save some data
             $data = [
@@ -1233,12 +1230,12 @@ BaseFaceCalc > ". $BaseFaceCalc ."
             // format using Gamer Escape formatter and add to data array
             // need to look into using item-specific regex, if required.
             $this->data[] = GeFormatter::format(self::WIKI_FORMAT, $data);
-    }
+        }
 
         // save our data to the filename: GeRecipeWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save("GENPCEquipment.txt", 999999999);
+        $info = $this->save("GENPCEquipment - ". $patch .".txt", 999999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],
