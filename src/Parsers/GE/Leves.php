@@ -360,7 +360,7 @@ class Leves implements ParseInterface
 
                         $MobObjectiveList[0] = "\n|Objectives =\n*" . $ObjectiveText;
                         if ($BattleLeveCsv->at($leve['DataId'])["ToDoNumberInvolved[$i]"] > 0) {
-                            $MobObjectiveList[] = "**" . $MobsInvolved . ": 0/" . $BattleLeveCsv->at($leve['DataId'])["ToDoNumberInvolved[$i]"];
+                            $MobObjectiveList[] = "**" . $MobsInvolved . ": 0/" . $BattleLeveCsv->at($leve['DataId'])["ToDoNumberInvolved[$i]"] . "";
                         } elseif ($BattleLeveCsv->at($leve['DataId'])["ToDoNumberInvolved[$i]"] == 0) {
                             $MobObjectiveList[] = "**" . $EventItemCsv->at($BattleLeveCsv->at($leve['DataId'])["ItemsInvolved[$i]"])['Name'] . ": 0/" . $BattleLeveCsv->at($leve['DataId'])["ToDoParam[$i]"] . "";
                         }
