@@ -281,7 +281,7 @@ class Leves implements ParseInterface
                     $MoreTradein = false;
                 } elseif ($MoreTradeinRaw !== 0) {
                     $MoreTradeinMaths = ($MoreTradeinRaw + 1);
-                    $MoreTradein = "\n|TurnInRepeat = ". $MoreTradeinMaths ."";
+                    $MoreTradein = "\n|TurnInRepeat = ". $MoreTradeinMaths;
                 }
                 $NpcName = $ENpcResidentCsv->at($LevelCsv->at($leve['Level{Levemete}'])['Object'])['Singular'];
                 if ($CraftLeveItemQty > 1) {
@@ -298,6 +298,7 @@ class Leves implements ParseInterface
                         $BCItemsInvolved = false;
                         $BCItemQTY = false;
                         $BCItemDropRate = false;
+                        $ItemIF = false;
                         $ItemIFSingular = false;
 
                         $TargetNumber = ($TargetNumber + 1);
@@ -359,16 +360,16 @@ class Leves implements ParseInterface
 
                         $MobObjectiveList[0] = "\n|Objectives =\n*" . $ObjectiveText;
                         if ($BattleLeveCsv->at($leve['DataId'])["ToDoNumberInvolved[$i]"] > 0) {
-                            $MobObjectiveList[] = "**" . $MobsInvolved . ": 0/" . $BattleLeveCsv->at($leve['DataId'])["ToDoNumberInvolved[$i]"] . "";
+                            $MobObjectiveList[] = "**" . $MobsInvolved . ": 0/" . $BattleLeveCsv->at($leve['DataId'])["ToDoNumberInvolved[$i]"];
                         }
 
                         //$BattleObjective = "\n|Objectives = \n*" . $ObjectiveText;
 
                         //i have an issue here where i need to put $MobObjectiveList AFTER [0] but before the next line. if you have any ideas let me know
                         //  fixed
-                        //$InvolvementObjective[0] = "". $BattleObjective. "";
+                        //$InvolvementObjective[0] = $BattleObjective;
                         $InvolvementObjective[0] = "\n";
-                        $InvolvementObjective[] = "" . $BNpcName . "" . $BCLevel . "" . $BCItemsInvolved . "" . $BCItemQTY . "" . $BCItemDropRate . "" . $BCToDoNumber . "";
+                        $InvolvementObjective[] = "" . $BNpcName . "" . $BCLevel . "" . $BCItemsInvolved . "" . $BCItemQTY . "" . $BCItemDropRate . "" . $BCToDoNumber;
                     }
                 }
             }
@@ -412,12 +413,12 @@ class Leves implements ParseInterface
                             $FieldcraftObjective = "\n|Objectives = \n*$ObjectiveString\n**$Item: 0/$FieldLeveItemQty";
                         } else {
                             // otherwise, objective should be an evaluation leve so go ahead and display the whole thing
-                            $FieldcraftObjective = "\n|Objectives = " . $ObjectiveString . "";
+                            $FieldcraftObjective = "\n|Objectives = $ObjectiveString";
                         }
                     } elseif (empty($ObjectiveString)) {
                         $FieldcraftObjective = false;
                     } elseif (!empty($ObjectiveString2)) {
-                        $FieldcraftObjective = "\n|Objectives = ". $ObjectiveString ."\n". $ObjectiveString2 ."";
+                        $FieldcraftObjective = "\n|Objectives = ". $ObjectiveString ."\n". $ObjectiveString2;
                     }
                 }
 
@@ -497,7 +498,7 @@ class Leves implements ParseInterface
             $VFXOuter = "\n\n|Frame = ". sprintf("%06d", $LeveVfxCsv->at($leve['LeveVfx{Frame}'])['Icon']) .".png";
             $VFXInner = "\n|Image = ". sprintf("%06d", $LeveVfxCsv->at($leve['LeveVfx'])['Icon']) .".png";
             $VFXTown = "\n|Town  = ". sprintf("%06d", $leve['Icon{CityState}']) .".png";
-            $VFXImage = "". $VFXOuter ."". $VFXInner ."". $VFXTown ."";
+            $VFXImage = "". $VFXOuter ."". $VFXInner ."". $VFXTown;
 
             //header image
             $Header = $leve['Icon{Issuer}'];
@@ -588,10 +589,10 @@ class Leves implements ParseInterface
             $this->data[] = GeFormatter::format(self::WIKI_FORMAT, $data);
         }
 
-        // save our data to the filename: GeRecipeWiki.txt
+        // save our data to the filename: GeLeveWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save("GeLeveWiki.txt - ". $patch .".txt", 9999999);
+        $info = $this->save("GeLeveWiki - ". $patch .".txt", 9999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],
