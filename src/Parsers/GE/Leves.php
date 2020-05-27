@@ -90,7 +90,7 @@ class Leves implements ParseInterface
             }
             //fordebug
             //$db = $leve['DataId'];
-            //if ($id != 526) continue;
+            //if ($id != 754) continue;
             //fordebug
 
             //get the Patch and Issuing NPC from a separate file called LevemetePatch.csv which was custom made
@@ -404,11 +404,11 @@ class Leves implements ParseInterface
                     $ItemVowel = $ItemCsv->at($FieldLeveItem)['StartsWithVowel'];
                     $Item = $ItemCsv->at($FieldLeveItem)['Name'];
                     if ($FieldLeveItemQty > 1) {
-                        $FieldcraftObjective = "*Deliver [[$Item|$ItemPlural]] to {{NPCLink|$NpcName}}. 0/$FieldLeveItemQty";
+                        $FieldcraftObjective = "\n|Objectives =\n*Deliver [[$Item|$ItemPlural]] to {{NPCLink|$NpcName}}. 0/$FieldLeveItemQty";
                     } elseif ($ItemVowel == "0" && $FieldLeveItemQty == "1") {
-                        $FieldcraftObjective = "*Deliver a [[$Item|$ItemSingle]] to {{NPCLink|$NpcName}}. 0/$FieldLeveItemQty";
+                        $FieldcraftObjective = "\n|Objectives =\n*Deliver a [[$Item|$ItemSingle]] to {{NPCLink|$NpcName}}. 0/$FieldLeveItemQty";
                     } elseif ($ItemVowel == "1" && $FieldLeveItemQty == "1") {
-                        $FieldcraftObjective = "*Deliver an [[$Item|$ItemSingle]] to {{NPCLink|$NpcName}}. 0/$FieldLeveItemQty";
+                        $FieldcraftObjective = "\n|Objectives =\n*Deliver an [[$Item|$ItemSingle]] to {{NPCLink|$NpcName}}. 0/$FieldLeveItemQty";
                     }
                 } else {
                     // If the required item in GatheringLeve.csv is not empty
@@ -417,15 +417,17 @@ class Leves implements ParseInterface
                         $FieldLeveItemQty = $GatheringLeveCsv->at($leve['DataId'])['RequiredItemQty[0]'];
                         $Item = $EventItemCsv->at($FieldLeveItem)['Name'];
                     } else {
-                        // If the required item in GatheringLeve.csv IS empty, then look in this asinine spot for the required item name
-                        // 5/27/20 note: Briar in the Hole, Leve#689, has 4 items associated with it (Dried Mun-Tuy Bean, Giant Brambleweed Sap,
-                        // Mature Galago Mint, Shroud Iris). So need to change code to account for Leve->Route->GatheringPoint->GatheringPointBase->
-                        // Item1, 2, 3, 4. Possibly other leves do something similar, but can't be fucked to mess with it right now
-                        $ItemName1 = $EventItemCsv->at($GatheringItemCsv->at($GatheringPointBaseCsv->at($GatheringPointCsv->at($GatheringLeveRouteCsv->
-                        at($GatheringLeveCsv->at($leve['DataId'])['Route[0]'])['GatheringPoint[0]'])['GatheringPointBase'])["Item[0]"])['Item'])['Name'];
-                        $ItemName2 = $EventItemCsv->at($GatheringItemCsv->at($GatheringPointBaseCsv->at($GatheringPointCsv->at($GatheringLeveRouteCsv->
-                        at($GatheringLeveCsv->at($leve['DataId'])['Route[0]'])['GatheringPoint[0]'])['GatheringPointBase'])["Item[1]"])['Item'])['Name'];
-                        $Item = "$ItemName1, $ItemName2";
+                        $gatheringItemArray = [];
+                        foreach(range(0,3) as $routes) {
+                        	foreach(range(0,11) as $points) {
+                        		foreach(range(0,7) as $pointsItems) {
+                        			if (!empty($EventItemCsv->at($GatheringItemCsv->at($GatheringPointBaseCsv->at($GatheringPointCsv->at($GatheringLeveRouteCsv->at($GatheringLeveCsv->at($leve['DataId'])["Route[$routes]"])["GatheringPoint[$points]"])['GatheringPointBase'])["Item[$pointsItems]"])['Item'])['Name']))
+                        			$gatheringItemArray[] = $EventItemCsv->at($GatheringItemCsv->at($GatheringPointBaseCsv->at($GatheringPointCsv->at($GatheringLeveRouteCsv->at($GatheringLeveCsv->at($leve['DataId'])["Route[$routes]"])["GatheringPoint[$points]"])['GatheringPointBase'])["Item[$pointsItems]"])['Item'])['Name'];
+                        		}
+                        	}
+                        }
+                        $gatheringItems = implode(", ", array_unique($gatheringItemArray));
+                        $Item = $gatheringItems;
                     }
                     $ObjectiveString = $LeveStringCsv->at($GatheringLeveCsv->at($leve['DataId'])["Objective[0]"])["Objective"];
                     $ObjectiveString2 = $LeveStringCsv->at($GatheringLeveCsv->at($leve['DataId'])["Objective[1]"])["Objective"];
@@ -437,6 +439,7 @@ class Leves implements ParseInterface
                             // otherwise, objective should be an evaluation leve so go ahead and display the whole thing
                             $FieldcraftObjective = "\n|Objectives = $ObjectiveString";
                         }
+
                     } elseif (empty($ObjectiveString)) {
                         $FieldcraftObjective = false;
                     } elseif (!empty($ObjectiveString2)) {
