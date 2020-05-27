@@ -19,7 +19,7 @@ class Items implements ParseInterface
         | Name           = {name}
         | Subheading     = {subheading}{description}{slots}{advancedmelding}{stack}{requires}
         | Required Level = {level}
-        | Item Level     = {itemlevel}{untradable}{unique}{convertible}{sells}{dyeallowed}{crestallowed}{glamour}{desynthesis}{repair}{MarketProhib}{setbonus}{bonus}{physicaldamage}{magicdamage}{defense}{block}{itemaction}
+        | Item Level     = {itemlevel}{untradable}{unique}{extractable}{sells}{dyeallowed}{crestallowed}{glamour}{desynthesis}{repair}{MarketProhib}{setbonus}{bonus}{physicaldamage}{magicdamage}{defense}{block}{itemaction}
         }}{Bottom}";
 
     public function parse()
@@ -748,9 +748,9 @@ class Items implements ParseInterface
                 '{unique}' => ($item['IsUnique'] == "True")
                     ? "\n| Unique         = Yes"
                     : "",
-                '{convertible}' => ($item['MaterializeType'] > 0)
-                    ? "\n| Convertible    = Yes"
-                    : "\n| Convertible    = No",
+                '{extractable}' => ($item['MaterializeType'] > 0)
+                    ? "\n| Extractable    = Yes"
+                    : "\n| Extractable    = No",
                 '{sells}' => ($item['Price{Low}'] > 0)
                     ? "\n| Sells          = ". $item['Price{Low}'] ."\n| HQ             = ". $item['CanBeHq']
                     : "\n| Sells          = No\n| HQ             = ". $item['CanBeHq'],
