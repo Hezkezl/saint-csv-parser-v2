@@ -303,7 +303,7 @@ class Leves implements ParseInterface
             } elseif ($levetype == "Battlecraft") {
                 foreach(range(0,7) as $i) {
                 	//ToDo Items involved
-                	//at the moment im just overwriting 7 times over which is stupid, ideally i want to make an array and then implode it but array just isnt working for me today.
+                	//at the moment im just overwriting 7 times over which is stupid, ideally i want to make an array and then implode it but array just isn't working for me today.
                     if ($BattleLeveCsv->at($leve['DataId'])["Objective[0]"] == 2) {
                     	$objectiveItemTodoName = ucwords(strtolower($EventItemCsv->at($BattleLeveCsv->at($leve['DataId'])["ItemsInvolved[0]"])['Singular']));
                     	$objectiveItemTodoQty = $BattleLeveCsv->at($leve['DataId'])["ToDoParam[0][0]"];
@@ -418,6 +418,9 @@ class Leves implements ParseInterface
                         $Item = $EventItemCsv->at($FieldLeveItem)['Name'];
                     } else {
                         // If the required item in GatheringLeve.csv IS empty, then look in this asinine spot for the required item name
+                        // 5/27/20 note: Briar in the Hole, Leve#689, has 4 items associated with it (Dried Mun-Tuy Bean, Giant Brambleweed Sap,
+                        // Mature Galago Mint, Shroud Iris). So need to change code to account for Leve->Route->GatheringPoint->GatheringPointBase->
+                        // Item1, 2, 3, 4. Possibly other leves do something similar, but can't be fucked to mess with it right now
                         $ItemName1 = $EventItemCsv->at($GatheringItemCsv->at($GatheringPointBaseCsv->at($GatheringPointCsv->at($GatheringLeveRouteCsv->
                         at($GatheringLeveCsv->at($leve['DataId'])['Route[0]'])['GatheringPoint[0]'])['GatheringPointBase'])["Item[0]"])['Item'])['Name'];
                         $ItemName2 = $EventItemCsv->at($GatheringItemCsv->at($GatheringPointBaseCsv->at($GatheringPointCsv->at($GatheringLeveRouteCsv->
