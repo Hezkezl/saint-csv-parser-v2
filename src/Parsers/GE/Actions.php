@@ -24,7 +24,7 @@ class Actions implements ParseInterface
 
 |Acquired = {classjoblong}
 |Acquired Level = {level}
-|Affinity = {classjobshort} 		<!-- Comma separated -->
+|Affinity = {classjobshort}     <!-- Comma separated -->
 
 |Range = {range}
 |Radius = {radius}
@@ -39,19 +39,19 @@ class Actions implements ParseInterface
 
     public function parse()
     {
+      include (dirname(__DIR__) . '/Paths.php');
         // grab CSV files we want to use
-        $ActionCsv = $this->csv('Action');
-        $ActionCategoryCsv = $this->csv('ActionCategory');
-        $ActionTransientCsv = $this->csv('ActionTransient');
-        $ClassJobCsv = $this->csv('ClassJob');
-        $ClassJobCategoryCsv = $this->csv('ClassJobCategory');
+        $ActionCsv = $this->csv("$CurrentPatch/Action");
+        $ActionCategoryCsv = $this->csv("$CurrentPatch/ActionCategory");
+        $ActionTransientCsv = $this->csv("$CurrentPatch/ActionTransient");
+        $ClassJobCsv = $this->csv("$CurrentPatch/ClassJob");
+        $ClassJobCategoryCsv = $this->csv("$CurrentPatch/ClassJobCategory");
 
         $Range = false;
         $Recast = false;
         $CastTime = false;
         $npcif = false;
 
-        $patch = '5.21';
         // if I want to use pywikibot to create these pages, this should be true. Otherwise if I want to create pages
         // manually, set to false
         // $Bot = "false";
@@ -76,59 +76,59 @@ class Actions implements ParseInterface
 
             $Type = $ActionCategoryCsv->at($Action['ActionCategory'])['Name'];
             //add "NPC SKILL" if it's an npc so we can sort
-           	if ($Action['ClassJob'] == "-1") {
-           		$npcif = "|Player Allowed = False";
-           	} elseif ($Action['ClassJob'] !== "-1") {
-           		$npcif = "";
-           	}
+            if ($Action['ClassJob'] == "-1") {
+              $npcif = "|Player Allowed = False";
+            } elseif ($Action['ClassJob'] !== "-1") {
+              $npcif = "";
+            }
 
-           	$ClassJobLong = ucwords(strtolower($ClassJobCsv->at($Action['ClassJob'])['Name']));
-           	$ClassJobShort = str_replace(" ",",",$ClassJobCategoryCsv->at($Action['ClassJobCategory'])['Name']);
-           	$Level = $Action['ClassJobLevel'];
+            $ClassJobLong = ucwords(strtolower($ClassJobCsv->at($Action['ClassJob'])['Name']));
+            $ClassJobShort = str_replace(" ",",",$ClassJobCategoryCsv->at($Action['ClassJobCategory'])['Name']);
+            $Level = $Action['ClassJobLevel'];
 
-           	if ($Action['Range'] == "-1") {
-           		$Range = "3";
-           	} elseif ($Action['Range'] !== "-1") {
-           		$Range = $Action['Range'];
-           	}
-           	$Radius = $Action['EffectRange'];
+            if ($Action['Range'] == "-1") {
+              $Range = "3";
+            } elseif ($Action['Range'] !== "-1") {
+              $Range = $Action['Range'];
+            }
+            $Radius = $Action['EffectRange'];
 
-           	if ($Action['Cast<100ms>'] == "0") {
-           		$CastTime = "Instant";
-           	} elseif ($Action['Cast<100ms>'] !== "0") {
-           		$CastTimeRaw = $Action['Cast<100ms>'];
+            if ($Action['Cast<100ms>'] == "0") {
+              $CastTime = "Instant";
+            } elseif ($Action['Cast<100ms>'] !== "0") {
+              $CastTimeRaw = $Action['Cast<100ms>'];
                 $CastTimeMins = floor(($CastTimeRaw / 60) % 60);
                 $CastSeconds = $CastTimeRaw % 60;
                 $CastString = " ". $CastTimeMins ."m". $CastSeconds ."s";
                 $CastFormat1 = str_replace(" 0m", " ", $CastString);
                 $CastTime = str_replace("m0s", "m", $CastFormat1);
-           	}
+            }
 
-           	if ($Action['Recast<100ms>'] == "0") {
-           		$Recast = "Instant";
-           	} elseif ($Action['Recast<100ms>'] !== "0") {
-           		$ReCastTimeRaw = $Action['Recast<100ms>'];
+            if ($Action['Recast<100ms>'] == "0") {
+              $Recast = "Instant";
+            } elseif ($Action['Recast<100ms>'] !== "0") {
+              $ReCastTimeRaw = $Action['Recast<100ms>'];
                 $ReCastTimeMins = floor(($ReCastTimeRaw / 60) % 60);
                 $ReCastSeconds = $ReCastTimeRaw % 60;
                 $ReCastString = " ". $ReCastTimeMins ."m". $ReCastSeconds ."s";
                 $ReCastFormat1 = str_replace(" 0m", " ", $ReCastString);
                 $Recast = str_replace("m0s", "m", $ReCastFormat1);
                 //$Recast = $ReCastTimeRaw;
-           	}
+            }
 
-           	//$StatusGainedRaw = $Action['Status{GainSelf}'];
-           	//$Duration = $StatusCsv->at($DurationRaw)['']
-           	//$StatusGainedName = $
-           	$Description = $ActionTransientCsv->at($Action['id'])['Description'];
+            //$StatusGainedRaw = $Action['Status{GainSelf}'];
+            //$Duration = $StatusCsv->at($DurationRaw)['']
+            //$StatusGainedName = $
+            $Description = $ActionTransientCsv->at($Action['id'])['Description'];
 
-           	$Combo = $ActionCsv->at($Action['Action{Combo}'])['Name'];
+            $Combo = $ActionCsv->at($Action['Action{Combo}'])['Name'];
 
 
             // Save some data
             $data = [
                 //'{top}' => $Top,
                 //'{bottom}' => $Bottom,
-                '{patch}' => $patch,
+                '{patch}' => $Patch,
                 //'{name}' => $Name,
                 '{name}' => $Action['Name'],
                 '{type}' => $Type,
@@ -153,7 +153,7 @@ class Actions implements ParseInterface
         // save our data to the filename: GeRecipeWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save("GeActionsWiki - ". $patch .".txt", 999999999);
+        $info = $this->save("$CurrentPatchOutput/Actions - ". $Patch .".txt", 999999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],
