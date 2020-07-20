@@ -27,16 +27,15 @@ class TripleTriad implements ParseInterface
 }}{Bottom}";
     public function parse()
     {
-        $patch = '5.21';
         // if I want to use pywikibot to create these pages, this should be true. Otherwise if I want to create pages
         // manually, set to false
         $Bot = "true";
-
+        include (dirname(__DIR__) . '/Paths.php');
         // grab CSV files we want to use
-        $TripleTriadCardCsv = $this->csv('TripleTriadCard');
-        $TripleTriadCardResidentCsv = $this->csv('TripleTriadCardResident');
-        $TripleTriadCardRarityCsv = $this->csv('TripleTriadCardRarity');
-        $TripleTriadCardTypeCsv = $this->csv('TripleTriadCardType');
+        $TripleTriadCardCsv = $this->csv("$CurrentPatch/TripleTriadCard");
+        $TripleTriadCardResidentCsv = $this->csv("$CurrentPatch/TripleTriadCardResident");
+        $TripleTriadCardRarityCsv = $this->csv("$CurrentPatch/TripleTriadCardRarity");
+        $TripleTriadCardTypeCsv = $this->csv("$CurrentPatch/TripleTriadCardType");
 
         // (optional) start a progress bar
         $this->io->progressStart($TripleTriadCardCsv->total);
@@ -95,7 +94,7 @@ class TripleTriad implements ParseInterface
             $data = [
                 '{Top}' => $Top,
                 '{Name}' => $Name,
-                '{Patch}' => $patch,
+                '{Patch}' => $Patch,
                 '{Index}' => $TripleTriad['id'],
                 '{Rarity}' => $Rarity,
                 '{Family}' => ($TripleTriadCardResidentCsv->at($TripleTriad['id'])['TripleTriadCardType'] > 0)
@@ -118,7 +117,7 @@ class TripleTriad implements ParseInterface
         // save our data to the filename: GeTripleTriadWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save("GeTripleTriadWikiBot - ". $patch .".txt", 9999999);
+        $info = $this->save("$CurrentPatchOutput/GeTripleTriadWikiBot - ". $Patch .".txt", 9999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],
