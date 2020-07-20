@@ -17,17 +17,12 @@ setlocal
 SET /P AREYOUSURE=Would you like to run WinMerge on this? (Y/[N])?
 IF /I "%AREYOUSURE%" NEQ "Y" GOTO END
 
-rem location of WinMerge
-set c="PATH TO WINMERGE.EXE"
-
-set d="PATH TO PARSER OUTPUT FOLDER"
-rem example: E:\saint-csv-parser-v2-master\output
-cd $c%
+cd "PATH TO FOLDER CONTAINING WINMERGE.EXE"
 
 rem old -  new
 set /p "a=old patch number: "
 set /p "b=new patch number: "
-WinMergeU /r "%d%\%a%\" "%d%\%b%"
+WinMergeU /r "YOURPATH\saint-csv-parser-v2-master\output\%a%\" "YOURPATH\saint-csv-parser-v2-master\output\%b%"
 
 :END
 endlocal
