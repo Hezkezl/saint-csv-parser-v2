@@ -19,16 +19,14 @@ class Collectable implements ParseInterface
 
     public function parse()
     {
-
-        $patch = '5.21';
-
+        include (dirname(__DIR__) . '/Paths.php');
         // grab CSV files
-        $MasterpieceCsv = $this->csv('MasterpieceSupplyDuty');
-        $MultiplierCsv = $this->csv('MasterpieceSupplyMultiplier');
-        $ParamgrowCsv = $this->csv('ParamGrow');
-        $ItemCsv = $this->csv('Item');
-        $ClassJobCsv = $this->csv('ClassJob');
-        $CurrencyCsv = $this->csv('Currency');
+        $MasterpieceCsv = $this->csv("$CurrentPatch/MasterpieceSupplyDuty");
+        $MultiplierCsv = $this->csv("$CurrentPatch/MasterpieceSupplyMultiplier");
+        $ParamgrowCsv = $this->csv("$CurrentPatch/ParamGrow");
+        $ItemCsv = $this->csv("$CurrentPatch/Item");
+        $ClassJobCsv = $this->csv("$CurrentPatch/ClassJob");
+        $CurrencyCsv = $this->csv("$CurrentPatch/Currency");
 
         $this->io->progressStart($MasterpieceCsv->total);
 
@@ -90,7 +88,7 @@ class Collectable implements ParseInterface
         // save our data to the filename: GeCollectWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save("GeCollectWiki - ". $patch .".txt", 9999999);
+        $info = $this->save("$CurrentPatchOutput/GeCollectWiki - ". $Patch .".txt", 9999999);
 
         $this->io->table(
             ['Filename', 'Data Count', 'File Size'],
