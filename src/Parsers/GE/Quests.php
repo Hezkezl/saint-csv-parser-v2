@@ -59,31 +59,30 @@ class Quests implements ParseInterface
 
     public function parse()
     {
-        $patch = '5.21';
-
+        include (dirname(__DIR__) . '/Paths.php');
         //grab CSV files
-        $questCsv = $this->csv('Quest');
-        $ENpcResidentCsv = $this->csv('ENpcResident');
-        $ItemCsv = $this->csv('Item');
-        $EmoteCsv = $this->csv('Emote');
-        $JournalGenreCsv = $this->csv('JournalGenre');
-        $JournalCategoryCsv = $this->csv('JournalCategory');
-        $JournalSectionCsv = $this->csv('JournalSection');
-        $PlaceNameCsv = $this->csv('PlaceName');
-        $ClassJobCsv = $this->csv('ClassJob');
-        $ActionCsv = $this->csv('Action');
-        $OtherRewardCsv = $this->csv('QuestRewardOther');
-        $BeastReputationRankCsv = $this->csv('BeastReputationRank');
-        $BeastTribeCsv = $this->csv('BeastTribe');
-        $TraitCsv = $this->csv('Trait');
-        $EventIconTypeCsv = $this->csv('EventIconType');
-        $KeyItemCsv = $this->csv('EventItem');
+        $questCsv = $this->csv("$CurrentPatch/Quest");
+        $ENpcResidentCsv = $this->csv("$CurrentPatch/ENpcResident");
+        $ItemCsv = $this->csv("$CurrentPatch/Item");
+        $EmoteCsv = $this->csv("$CurrentPatch/Emote");
+        $JournalGenreCsv = $this->csv("$CurrentPatch/JournalGenre");
+        $JournalCategoryCsv = $this->csv("$CurrentPatch/JournalCategory");
+        $JournalSectionCsv = $this->csv("$CurrentPatch/JournalSection");
+        $PlaceNameCsv = $this->csv("$CurrentPatch/PlaceName");
+        $ClassJobCsv = $this->csv("$CurrentPatch/ClassJob");
+        $ActionCsv = $this->csv("$CurrentPatch/Action");
+        $OtherRewardCsv = $this->csv("$CurrentPatch/QuestRewardOther");
+        $BeastReputationRankCsv = $this->csv("$CurrentPatch/BeastReputationRank");
+        $BeastTribeCsv = $this->csv("$CurrentPatch/BeastTribe");
+        $TraitCsv = $this->csv("$CurrentPatch/Trait");
+        $EventIconTypeCsv = $this->csv("$CurrentPatch/EventIconType");
+        $KeyItemCsv = $this->csv("$CurrentPatch/EventItem");
         /* unused files
-        $InstanceContentCsv = $this->csv('InstanceContent');
-        $LevelCsv = $this->csv('Level');
-        $MapCsv = $this->csv('Map');
+        $InstanceContentCsv = $this->csv("$CurrentPatch/InstanceContent");
+        $LevelCsv = $this->csv("$CurrentPatch/Level");
+        $MapCsv = $this->csv("$CurrentPatch/Map");
         */
-        $paramGrowCsv = $this->csv('ParamGrow');
+        $paramGrowCsv = $this->csv("$CurrentPatch/ParamGrow");
 
         $this->io->progressStart($questCsv->total);
 
@@ -635,7 +634,7 @@ class Quests implements ParseInterface
             //---------------------------------------------------------------------------------
 
             $data = [
-                '{patch}' => $patch,
+                '{patch}' => $Patch,
                 '{id}' => $quest['id'],
                 '{name}' => $quest['Name'],
                 '{types}' => $types,
@@ -695,7 +694,7 @@ class Quests implements ParseInterface
         // save our data to the filename: GeQuestWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save("GeQuestWikiBot - ". $patch .".txt", 9999999);
+        $info = $this->save("$CurrentPatchOutput/GeQuestWikiBot - ". $Patch .".txt", 9999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],
