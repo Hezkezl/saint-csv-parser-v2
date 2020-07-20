@@ -34,19 +34,19 @@ class Achievement implements ParseInterface
 }}{Bottom}";
     public function parse()
     {
-        $patch = '5.21';
+      include (dirname(__DIR__) . '/Paths.php');
 
         // grab CSV files we want to use
-        $AchievementCsv = $this->csv('Achievement');
-        $ItemCsv = $this->csv('Item');
-        $TitleCsv = $this->csv('Title');
-        $ClassJobCsv = $this->csv('ClassJob');
-        $PlaceNameCsv = $this->csv('PlaceName');
-        $QuestCsv = $this->csv('Quest');
-        $MapCsv = $this->csv('Map');
-        $TerritoryTypeCsv = $this->csv('TerritoryType');
-        $AchievementCategoryCsv = $this->csv('AchievementCategory');
-        $AchievementKindCsv = $this->csv('AchievementKind');
+        $AchievementCsv = $this->csv("$CurrentPatch/Achievement");
+        $ItemCsv = $this->csv("$CurrentPatch/Item");
+        $TitleCsv = $this->csv("$CurrentPatch/Title");
+        $ClassJobCsv = $this->csv("$CurrentPatch/ClassJob");
+        $PlaceNameCsv = $this->csv("$CurrentPatch/PlaceName");
+        $QuestCsv = $this->csv("$CurrentPatch/Quest");
+        $MapCsv = $this->csv("$CurrentPatch/Map");
+        $TerritoryTypeCsv = $this->csv("$CurrentPatch/TerritoryType");
+        $AchievementCategoryCsv = $this->csv("$CurrentPatch/AchievementCategory");
+        $AchievementKindCsv = $this->csv("$CurrentPatch/AchievementKind");
 
 
         // (optional) start a progress bar
@@ -114,10 +114,10 @@ class Achievement implements ParseInterface
 
             // change the top and bottom code depending on if I want to bot the pages up or not. Places Patch on subpage
             if ($Bot == "true") {
-                $Top = "{{-start-}}\n'''$name/Patch'''\n$patch\n{{-stop-}}{{-start-}}\n'''$name'''\n";
+                $Top = "{{-start-}}\n'''$name/Patch'''\n$Patch\n{{-stop-}}{{-start-}}\n'''$name'''\n";
                 $Bottom = "{{-stop-}}";
             } else {
-                $Top = "http://ffxiv.gamerescape.com/wiki/$name\Patch?action=edit\n$patch\nhttp://ffxiv.gamerescape.com/wiki/$name?action=edit\n";
+                $Top = "http://ffxiv.gamerescape.com/wiki/$name\Patch?action=edit\n$Patch\nhttp://ffxiv.gamerescape.com/wiki/$name?action=edit\n";
                 $Bottom = "";
             };
 
@@ -125,7 +125,7 @@ class Achievement implements ParseInterface
             $data = [
                 '{Top}' => $Top,
                 '{index}' => $index,
-                '{patch}' => $patch,
+                '{patch}' => $Patch,
                 '{name}' => $name,
                 '{item}' => $item,
                 '{icon}' => $icon,
@@ -148,7 +148,7 @@ class Achievement implements ParseInterface
         $this->io->progressFinish();
         $this->io->text('Saving ...');
         //$info = $this->save('Achievement.txt', 20000);
-        $info = $this->save("GeAchievementWiki - ". $patch .".txt", 9999999);
+        $info = $this->save("$CurrentPatchOutput/GeAchievementWiki - ". $Patch .".txt", 9999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],
