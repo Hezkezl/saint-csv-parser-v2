@@ -27,17 +27,16 @@ class Mounts implements ParseInterface
 }}{Bottom}";
     public function parse()
     {
-        $patch = '5.21';
         // if I want to use pywikibot to create these pages, this should be true. Otherwise if I want to create pages
         // manually, set to false
         $Bot = "true";
-
+        include (dirname(__DIR__) . '/Paths.php');
         // grab CSV files we want to use
-        $MountCsv = $this->csv('Mount');
-        $MountActionCsv = $this->csv('MountAction');
-        $MountTransientCsv = $this->csv('MountTransient');
-        $ActionCsv = $this->csv('Action');
-        $BGMCsv = $this->csv('BGM');
+        $MountCsv = $this->csv("$CurrentPatch/Mount");
+        $MountActionCsv = $this->csv("$CurrentPatch/MountAction");
+        $MountTransientCsv = $this->csv("$CurrentPatch/MountTransient");
+        $ActionCsv = $this->csv("$CurrentPatch/Action");
+        $BGMCsv = $this->csv("$CurrentPatch/BGM");
 
         // (optional) start a progress bar
         $this->io->progressStart($MountCsv->total);
@@ -73,6 +72,7 @@ class Mounts implements ParseInterface
             $SmallIcon = $Mount["Icon"];
             $Icon2 = substr($SmallIcon, -3);
             $LargeIcon = str_pad($Icon2, "6", "068", STR_PAD_LEFT);
+            $LargeIcon2 = str_pad($Icon2, "6", "077", STR_PAD_LEFT);
 
             // ensure output directory exists
             $IconoutputDirectory = $this->getOutputFolder() . '/MountIcons';
@@ -83,6 +83,7 @@ class Mounts implements ParseInterface
 
             // build icon input folder paths
             $LargeIconPath = $this->getInputFolder() .'/icon/'. $this->iconize($LargeIcon);
+            $LargeIconPath2 = $this->getInputFolder() .'/icon/'. $this->iconize($LargeIcon2);
             $SmallIconPath = $this->getInputFolder() .'/icon/'. $this->iconize($Mount["Icon"]);
 
             // give correct file names to icons for output
@@ -92,14 +93,16 @@ class Mounts implements ParseInterface
             copy($SmallIconPath, $SmallIconFileName);
             if (file_exists($LargeIconPath)) {
                 copy($LargeIconPath, $LargeIconFileName);
+            } else {
+                copy($LargeIconPath2, $LargeIconFileName);
             };
 
             // change the top and bottom code depending on if I want to bot the pages up or not. Places Patch on subpage
             if ($Bot == "true") {
-                $Top = "{{-start-}}\n'''$Name (Mount)/Patch'''\n$patch\n{{-stop-}}{{-start-}}\n'''$Name (Mount)'''\n";
+                $Top = "{{-start-}}\n'''$Name (Mount)/Patch'''\n$Patch\n{{-stop-}}{{-start-}}\n'''$Name (Mount)'''\n";
                 $Bottom = "{{-stop-}}";
             } else {
-                $Top = "http://ffxiv.gamerescape.com/wiki/$Name (Mount)\Patch?action=edit\n$patch\nhttp://ffxiv.gamerescape.com/wiki/$Name (Mount)?action=edit\n";
+                $Top = "http://ffxiv.gamerescape.com/wiki/$Name (Mount)\Patch?action=edit\n$Patch\nhttp://ffxiv.gamerescape.com/wiki/$Name (Mount)?action=edit\n";
                 $Bottom = "";
             };
 
@@ -107,7 +110,7 @@ class Mounts implements ParseInterface
             $data = [
                 '{Top}' => $Top,
                 '{Name}' => $Name,
-                '{Patch}' => $patch,
+                '{Patch}' => $Patch,
                 '{Index}' => $Mount['id'],
                 '{Description}' => $Description,
                 '{Quote}' => $Quote,
@@ -126,7 +129,7 @@ class Mounts implements ParseInterface
         // save our data to the filename: GeMountWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save('GeMountWiki - '. $patch .'.txt', 999999);
+        $info = $this->save("$CurrentPatchOutput/GeMountWiki - ". $Patch .".txt", 999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],
