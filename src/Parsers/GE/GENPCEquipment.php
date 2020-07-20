@@ -22,19 +22,18 @@ class GENPCEquipment implements ParseInterface
 
     public function parse()
     {
+        include (dirname(__DIR__) . '/Paths.php');
         // grab CSV files we want to use
-        $ENpcBaseCsv = $this->csv('ENpcBase');
-        $ENpcResidentCsv = $this->csv('ENpcResident');
-        $TribeCsv = $this->csv('Tribe');
-        $RaceCsv = $this->csv('Race');
-        $StainCsv = $this->csv('Stain');
-        $CharaMakeCustomizeCsv = $this->csv('CharaMakeCustomize');
-        $CharaMakeTypeCsv = $this->csv('CharaMakeType');
-        $ItemCsv = $this->csv('Item');
-        $NpcEquipCsv = $this->csv('NpcEquip');
+        $ENpcBaseCsv = $this->csv("$CurrentPatch/ENpcBase");
+        $ENpcResidentCsv = $this->csv("$CurrentPatch/ENpcResident");
+        $TribeCsv = $this->csv("$CurrentPatch/Tribe");
+        $RaceCsv = $this->csv("$CurrentPatch/Race");
+        $StainCsv = $this->csv("$CurrentPatch/Stain");
+        $CharaMakeCustomizeCsv = $this->csv("$CurrentPatch/CharaMakeCustomize");
+        $CharaMakeTypeCsv = $this->csv("$CurrentPatch/CharaMakeType");
+        $ItemCsv = $this->csv("$CurrentPatch/Item");
+        $NpcEquipCsv = $this->csv("$CurrentPatch/NpcEquip");
 
-
-        $patch = '5.25';
 
         // (optional) start a progress bar
         $this->io->progressStart($ENpcBaseCsv->total);
@@ -86,7 +85,7 @@ class GENPCEquipment implements ParseInterface
             $Index = $EnpcBase['id'];
 
             $debug = false;
-            //if ($Index != 1009441) continue; // for debug
+            //if ($Index != 1009183) continue; // for debug
             //var_dump($Index);
 
 
@@ -1235,7 +1234,7 @@ BaseFaceCalc > ". $BaseFaceCalc ."
         // save our data to the filename: GeRecipeWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save("GENPCEquipment - ". $patch .".txt", 999999999);
+        $info = $this->save("$CurrentPatchOutput/GENPCEquipment - ". $Patch .".txt", 999999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],
