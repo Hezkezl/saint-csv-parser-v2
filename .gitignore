@@ -7,14 +7,10 @@ input/*
 .idea
 src/Parsers/Icons/imgs*
 src/Parsers/GE/icons*
-###> symfony/framework-bundle ###
 .env
 /public/bundles/
 /var/
-###< symfony/framework-bundle ###
 vendor/autoload.php
-symfony.lock
-symfony.lock
 vendor/*
 symfony.lock
 bin/*
