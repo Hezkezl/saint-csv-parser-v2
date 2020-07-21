@@ -44,19 +44,18 @@ class Minions implements ParseInterface
 {Bottom}";
     public function parse()
     {
-        $patch = '5.21';
         // if I want to use pywikibot to create these pages, this should be true. Otherwise if I want to create pages
         // manually, set to false
         $Bot = "true";
-
+        include (dirname(__DIR__) . '/Paths.php');
         // grab CSV files we want to use
-        $ItemCsv = $this->csv('Item');
-        $ItemActionCsv = $this->csv('ItemAction');
-        $CompanionCsv = $this->csv('Companion');
-        $CompanionMoveCsv = $this->csv('CompanionMove');
-        $CompanionTransientCsv = $this->csv('CompanionTransient');
-        $MinionRaceCsv = $this->csv('MinionRace');
-        $MinionSkillTypeCsv = $this->csv('MinionSkillType');
+        $ItemCsv = $this->csv("$CurrentPatch/Item");
+        $ItemActionCsv = $this->csv("$CurrentPatch/ItemAction");
+        $CompanionCsv = $this->csv("$CurrentPatch/Companion");
+        $CompanionMoveCsv = $this->csv("$CurrentPatch/CompanionMove");
+        $CompanionTransientCsv = $this->csv("$CurrentPatch/CompanionTransient");
+        $MinionRaceCsv = $this->csv("$CurrentPatch/MinionRace");
+        $MinionSkillTypeCsv = $this->csv("$CurrentPatch/MinionSkillType");
 
 
         //NOTES / PLAN
@@ -145,7 +144,7 @@ class Minions implements ParseInterface
 
             $Strengths = "". $gate ."". $eye ."". $shield ."". $arcana ."";
 
-            $SmallIcon = $Minion["Icon"];
+                        $SmallIcon = $Minion["Icon"];
             $Icon2 = substr($SmallIcon, -3);
             $LargeIcon = str_pad($Icon2, "6", "068", STR_PAD_LEFT);
 
@@ -171,10 +170,10 @@ class Minions implements ParseInterface
 
             // change the top and bottom code depending on if I want to bot the pages up or not. Places Patch on subpage
             if ($Bot == "true") {
-                $Top = "{{-start-}}\n'''$Name (Minion)/Patch'''\n$patch\n{{-stop-}}{{-start-}}\n'''$Name (Minion)'''\n";
+                $Top = "{{-start-}}\n'''$Name (Minion)/Patch'''\n$Patch\n{{-stop-}}{{-start-}}\n'''$Name (Minion)'''\n";
                 $Bottom = "{{-stop-}}";
             } else {
-                $Top = "http://ffxiv.gamerescape.com/wiki/$Name (Minion)\Patch?action=edit\n$patch\nhttp://ffxiv.gamerescape.com/wiki/$Name (Minion)?action=edit\n";
+                $Top = "http://ffxiv.gamerescape.com/wiki/$Name (Minion)\Patch?action=edit\n$Patch\nhttp://ffxiv.gamerescape.com/wiki/$Name (Minion)?action=edit\n";
                 $Bottom = "";
             };
 
@@ -182,7 +181,7 @@ class Minions implements ParseInterface
             $data = [
                 '{Top}' => $Top,
                 '{Name}' => $Name,
-                '{Patch}' => $patch,
+                '{Patch}' => $Patch,
                 '{Description}' => $Description,
                 '{Quote}' => $Quote,
                 '{Behaviour}' => $Behaviour,
@@ -211,7 +210,7 @@ class Minions implements ParseInterface
         // save our data to the filename: GeMountWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save('GeMinionWiki - '. $patch .'.txt', 999999);
+        $info = $this->save("$CurrentPatchOutput/GeMinionWiki - ". $Patch .".txt", 9999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],
@@ -245,4 +244,5 @@ class Minions implements ParseInterface
 
         return $icon;
     }
+}
 }
