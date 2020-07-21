@@ -69,6 +69,8 @@ class Leves implements ParseInterface
         $GatheringPointBaseCsv = $this->csv('GatheringPointBase');
         $GatheringItemCsv = $this->csv('GatheringItem');
         $LevemetePatchCsv = $this->csv('LevemetePatch');
+        $CompanyLeveCsv = $this->csv('CompanyLeve');
+        $CompanyLeveRuleCsv = $this->csv('CompanyLeveRule');
 
         // (optional) start a progress bar
         $this->io->progressStart($LeveCsv->total);
@@ -90,7 +92,7 @@ class Leves implements ParseInterface
             }
             //fordebug
             //$db = $leve['DataId'];
-            //if ($id != 754) continue;
+            if ($id != 858) continue;
             //fordebug
 
             //get the Patch and Issuing NPC from a separate file called LevemetePatch.csv which was custom made
@@ -491,6 +493,49 @@ class Leves implements ParseInterface
                 }
                 */
             }
+            ////Guild Leve Output
+            //if ($leve["JournalGenre"] == 200 || $leve["JournalGenre"] == 201 || $leve["JournalGenre"] == 202) {
+            //    $CompanyLeveLink = $leve["DataId"];
+            //    //report to ?
+//
+            //    //objectives
+            //    //switch for stringfix
+            //    $GCRuleParamInterger = $CompanyLeveCsv->at($CompanyLeveLink)['RuleParam'];
+            //    switch ($GCRuleParamInterger) {
+            //        case 1:
+            //            $GCRuleParam = "/poke";
+            //        break;
+            //        case 2:
+            //            $GCRuleParam = "/doubt";
+            //        break;
+            //    }
+            //    //im keeping this very simple and open incase we ever need to modify it.
+            //    if ($CompanyLeveCsv->at($CompanyLeveLink)['Rule'] == 1) {
+            //        $GCRuleObjective = $CompanyLeveCsv->at($CompanyLeveLink)['Rule']
+            //        $GCRuleBNpcName = ucwords($BNpcNameCsv->at($CompanyLeveCsv->at($CompanyLeveLink)['BNpcName[0]'])['Singular']);
+            //        $GCToDoParam01 = ucwords($BNpcNameCsv->at($CompanyLeveCsv->at($CompanyLeveLink)['ToDoParam[0][1]'])['Singular']);
+            //        $GCRuleHelp = "*Objective failed if all ". $GCToDoParam01 ." are lost.";
+            //        foreach(range(0,7) as $n) {
+            //            if (!empty($BNpcNameCsv->at($CompanyLeveCsv->at($CompanyLeveLink)["BNpcName[$n]"])['Singular'])){
+            //                $GCTargets = ucwords($BNpcNameCsv->at($CompanyLeveCsv->at($CompanyLeveLink)["BNpcName[$n]"])['Singular']);
+            //                $GCTargetsAmount = //?????????????????
+            //            }
+            //        }
+            //    }
+            //    if ($CompanyLeveCsv->at($CompanyLeveLink)['Rule'] == 3) {
+            //        $GCRuleEventItem = $EventItemCsv->at($CompanyLeveCsv->at($CompanyLeveLink)['ItemsInvolved[0]'])['Plural'];
+            //        $GCRuleObjective = "*Discover who is carrying the ". $GCRuleEventItem ." and slay the target.";
+            //        $GCRuleHelp = "*Slay enemies that respond to the ". $GCRuleParam ." emote and collect the ". $GCRuleEventItem .".";
+            //        $GCToDoParam00 = $CompanyLeveCsv->at($CompanyLeveLink)['ToDoParam[0][0]'];
+            //        $GCObjective = "*". $GCRuleBNpcName .": 0/". $GCToDoParam00 ."";
+            //    }
+//
+            //    $GCObjectivesString = "|Objectives=\n". $GCReportTo ."\n". $GCRuleObjective ."\n". $GCObjective ."\n". $GCRuleHelp ."";
+            //    //items involved
+            //    //npcs involved
+            //    //mobs involved
+//
+            //}
 
 
             //check to see if there's a "start" before moving to levemete
