@@ -16,7 +16,7 @@ class Sightseeing implements ParseInterface
     const WIKI_FORMAT = "{{-start-}}
 '''Sightseeing Log: {name}'''
 {{ARR Infobox Sightseeing Log
-| Patch = 5.0
+| Patch = {patch}
 | Expansion   = Shadowbringers
 | Name        = {name}
 | Location    = {name}
@@ -44,6 +44,8 @@ class Sightseeing implements ParseInterface
 }}{{-stop-}}";
     public function parse()
     {
+        include (dirname(__DIR__) . '/Paths.php');
+
         // grab CSV files we want to use
         $AdventureCsv = $this->csv('Adventure');
         $EmoteCsv = $this->csv('Emote');
@@ -61,7 +63,7 @@ class Sightseeing implements ParseInterface
             $number = ($id-2162687-204);
 
             // ensure output directory exists
-            $IconoutputDirectory = $this->getOutputFolder() .'/adventureicon';
+            $IconoutputDirectory = $this->getOutputFolder() ."/$CurrentPatchOutput/SightseeingLogIcons";
             if (!is_dir($IconoutputDirectory)) {
                 mkdir($IconoutputDirectory, 0777, true);
             }
@@ -79,6 +81,7 @@ class Sightseeing implements ParseInterface
 
             // Save some data
             $data = [
+                '{patch}' => $Patch,
                 '{name}' => $name,
                 '{emote}' => $emote,
                 '{impression}' => $item['Impression'],
@@ -97,32 +100,6 @@ class Sightseeing implements ParseInterface
 
         // save
         $this->io->text('Saving data ...');
-        $this->save('SightseeingLog.txt');
-    }
-    /**
-     * Converts SE icon "number" into a proper path
-     */
-    private function iconize($number, $hq = false)
-    {
-        $number = intval($number);
-        $extended = (strlen($number) >= 6);
-
-        if ($number == 0) {
-            return null;
-        }
-
-        // create icon filename
-        $icon = $extended ? str_pad($number, 5, "0", STR_PAD_LEFT) : '0' . str_pad($number, 5, "0", STR_PAD_LEFT);
-
-        // create icon path
-        $path = [];
-        $path[] = $extended ? $icon[0] . $icon[1] . $icon[2] .'000' : '0'. $icon[1] . $icon[2] .'000';
-
-        $path[] = $icon;
-
-        // combine
-        $icon = implode('/', $path) .'.png';
-
-        return $icon;
+        $this->save("$CurrentPatchOutput/SightseeingLogs.txt");
     }
 }

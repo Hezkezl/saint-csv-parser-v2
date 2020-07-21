@@ -37,16 +37,16 @@ class Achievement implements ParseInterface
       include (dirname(__DIR__) . '/Paths.php');
 
         // grab CSV files we want to use
-        $AchievementCsv = $this->csv("$CurrentPatch/Achievement");
-        $ItemCsv = $this->csv("$CurrentPatch/Item");
-        $TitleCsv = $this->csv("$CurrentPatch/Title");
-        $ClassJobCsv = $this->csv("$CurrentPatch/ClassJob");
-        $PlaceNameCsv = $this->csv("$CurrentPatch/PlaceName");
-        $QuestCsv = $this->csv("$CurrentPatch/Quest");
-        $MapCsv = $this->csv("$CurrentPatch/Map");
-        $TerritoryTypeCsv = $this->csv("$CurrentPatch/TerritoryType");
-        $AchievementCategoryCsv = $this->csv("$CurrentPatch/AchievementCategory");
-        $AchievementKindCsv = $this->csv("$CurrentPatch/AchievementKind");
+        $AchievementCsv = $this->csv("Achievement");
+        $ItemCsv = $this->csv("Item");
+        $TitleCsv = $this->csv("Title");
+        $ClassJobCsv = $this->csv("ClassJob");
+        $PlaceNameCsv = $this->csv("PlaceName");
+        $QuestCsv = $this->csv("Quest");
+        $MapCsv = $this->csv("Map");
+        $TerritoryTypeCsv = $this->csv("TerritoryType");
+        $AchievementCategoryCsv = $this->csv("AchievementCategory");
+        $AchievementKindCsv = $this->csv("AchievementKind");
 
 
         // (optional) start a progress bar
@@ -148,7 +148,7 @@ class Achievement implements ParseInterface
         $this->io->progressFinish();
         $this->io->text('Saving ...');
         //$info = $this->save('Achievement.txt', 20000);
-        $info = $this->save("$CurrentPatchOutput/GeAchievementWiki - ". $Patch .".txt", 9999999);
+        $info = $this->save("$CurrentPatchOutput/Achievements - ". $Patch .".txt", 9999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],

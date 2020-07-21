@@ -23,16 +23,17 @@ class GENPCEquipment implements ParseInterface
     public function parse()
     {
         include (dirname(__DIR__) . '/Paths.php');
+
         // grab CSV files we want to use
-        $ENpcBaseCsv = $this->csv("$CurrentPatch/ENpcBase");
-        $ENpcResidentCsv = $this->csv("$CurrentPatch/ENpcResident");
-        $TribeCsv = $this->csv("$CurrentPatch/Tribe");
-        $RaceCsv = $this->csv("$CurrentPatch/Race");
-        $StainCsv = $this->csv("$CurrentPatch/Stain");
-        $CharaMakeCustomizeCsv = $this->csv("$CurrentPatch/CharaMakeCustomize");
-        $CharaMakeTypeCsv = $this->csv("$CurrentPatch/CharaMakeType");
-        $ItemCsv = $this->csv("$CurrentPatch/Item");
-        $NpcEquipCsv = $this->csv("$CurrentPatch/NpcEquip");
+        $ENpcBaseCsv = $this->csv("ENpcBase");
+        $ENpcResidentCsv = $this->csv("ENpcResident");
+        $TribeCsv = $this->csv("Tribe");
+        $RaceCsv = $this->csv("Race");
+        $StainCsv = $this->csv("Stain");
+        $CharaMakeCustomizeCsv = $this->csv("CharaMakeCustomize");
+        $CharaMakeTypeCsv = $this->csv("CharaMakeType");
+        $ItemCsv = $this->csv("Item");
+        $NpcEquipCsv = $this->csv("NpcEquip");
 
 
         // (optional) start a progress bar
@@ -1234,7 +1235,7 @@ BaseFaceCalc > ". $BaseFaceCalc ."
         // save our data to the filename: GeRecipeWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save("$CurrentPatchOutput/GENPCEquipment - ". $Patch .".txt", 999999999);
+        $info = $this->save("$CurrentPatchOutput/NPCEquipment - ". $Patch .".txt", 999999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],

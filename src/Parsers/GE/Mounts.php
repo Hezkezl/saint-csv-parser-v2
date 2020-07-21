@@ -31,12 +31,13 @@ class Mounts implements ParseInterface
         // manually, set to false
         $Bot = "true";
         include (dirname(__DIR__) . '/Paths.php');
+
         // grab CSV files we want to use
-        $MountCsv = $this->csv("$CurrentPatch/Mount");
-        $MountActionCsv = $this->csv("$CurrentPatch/MountAction");
-        $MountTransientCsv = $this->csv("$CurrentPatch/MountTransient");
-        $ActionCsv = $this->csv("$CurrentPatch/Action");
-        $BGMCsv = $this->csv("$CurrentPatch/BGM");
+        $MountCsv = $this->csv("Mount");
+        $MountActionCsv = $this->csv("MountAction");
+        $MountTransientCsv = $this->csv("MountTransient");
+        $ActionCsv = $this->csv("Action");
+        $BGMCsv = $this->csv("BGM");
 
         // (optional) start a progress bar
         $this->io->progressStart($MountCsv->total);
@@ -53,7 +54,7 @@ class Mounts implements ParseInterface
             // code starts here
             $Name = ucwords(strtolower(str_replace(" & ", " and ", $Mount['Singular']))); // replace the & character with 'and' in names
             $Description = strip_tags($MountTransientCsv->at($Mount['id'])['Description{Enhanced}']); // strip tags from description
-            $Description = str_replace("\n", "", $Description); // delete any line breaks in description
+            $Description = str_replace("\n", " ", $Description); // delete any line breaks in description
             $Quote = str_replace("\n", "<br>", ($MountTransientCsv->at($Mount['id'])['Tooltip'])); // replace line breaks in quote
 
             // Using the value at MountAction inside Mount.csv, match that up with the column "Action[0]" in the file
@@ -75,7 +76,7 @@ class Mounts implements ParseInterface
             $LargeIcon2 = str_pad($Icon2, "6", "077", STR_PAD_LEFT);
 
             // ensure output directory exists
-            $IconoutputDirectory = $this->getOutputFolder() . '/MountIcons';
+            $IconoutputDirectory = $this->getOutputFolder() . "/$CurrentPatchOutput/MountIcons";
             // if it doesn't exist, make it
             if (!is_dir($IconoutputDirectory)) {
                 mkdir($IconoutputDirectory, 0777, true);
@@ -129,38 +130,11 @@ class Mounts implements ParseInterface
         // save our data to the filename: GeMountWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save("$CurrentPatchOutput/GeMountWiki - ". $Patch .".txt", 999999);
+        $info = $this->save("$CurrentPatchOutput/Mounts - ". $Patch .".txt", 999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],
             $info
         );
-    }
-
-    /**
-     * Converts SE icon "number" into a proper path
-     */
-    private function iconize($number, $hq = false)
-    {
-        $number = intval($number);
-        $extended = (strlen($number) >= 6);
-
-        if ($number == 0) {
-            return null;
-        }
-
-        // create icon filename
-        $icon = $extended ? str_pad($number, 5, "0", STR_PAD_LEFT) : '0' . str_pad($number, 5, "0", STR_PAD_LEFT);
-
-        // create icon path
-        $path = [];
-        $path[] = $extended ? $icon[0] . $icon[1] . $icon[2] .'000' : '0'. $icon[1] . $icon[2] .'000';
-
-        $path[] = $icon;
-
-        // combine
-        $icon = implode('/', $path) .'.png';
-
-        return $icon;
     }
 }

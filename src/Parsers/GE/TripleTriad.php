@@ -32,10 +32,10 @@ class TripleTriad implements ParseInterface
         $Bot = "true";
         include (dirname(__DIR__) . '/Paths.php');
         // grab CSV files we want to use
-        $TripleTriadCardCsv = $this->csv("$CurrentPatch/TripleTriadCard");
-        $TripleTriadCardResidentCsv = $this->csv("$CurrentPatch/TripleTriadCardResident");
-        $TripleTriadCardRarityCsv = $this->csv("$CurrentPatch/TripleTriadCardRarity");
-        $TripleTriadCardTypeCsv = $this->csv("$CurrentPatch/TripleTriadCardType");
+        $TripleTriadCardCsv = $this->csv("TripleTriadCard");
+        $TripleTriadCardResidentCsv = $this->csv("TripleTriadCardResident");
+        $TripleTriadCardRarityCsv = $this->csv("TripleTriadCardRarity");
+        $TripleTriadCardTypeCsv = $this->csv("TripleTriadCardType");
 
         // (optional) start a progress bar
         $this->io->progressStart($TripleTriadCardCsv->total);
@@ -74,7 +74,7 @@ class TripleTriad implements ParseInterface
             $LargeIcon = (82100 + $TripleTriad['id']);
             $SmallIcon = (82500 + $TripleTriad['id']);
             // ensure output directory exists
-            $TriadIconoutputDirectory = $this->getOutputFolder() . '/TripleTriadIcons';
+            $TriadIconoutputDirectory = $this->getOutputFolder() . "/$CurrentPatchOutput/TripleTriadIcons";
             // if it doesn't exist, make it
             if (!is_dir($TriadIconoutputDirectory)) {
                 mkdir($TriadIconoutputDirectory, 0777, true);
@@ -117,38 +117,11 @@ class TripleTriad implements ParseInterface
         // save our data to the filename: GeTripleTriadWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save("$CurrentPatchOutput/GeTripleTriadWikiBot - ". $Patch .".txt", 9999999);
+        $info = $this->save("$CurrentPatchOutput/TripleTriad - ". $Patch .".txt", 9999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],
             $info
         );
-    }
-
-    /**
-     * Converts SE icon "number" into a proper path
-     */
-    private function iconize($number, $hq = false)
-    {
-        $number = intval($number);
-        $extended = (strlen($number) >= 6);
-
-        if ($number == 0) {
-            return null;
-        }
-
-        // create icon filename
-        $icon = $extended ? str_pad($number, 5, "0", STR_PAD_LEFT) : '0' . str_pad($number, 5, "0", STR_PAD_LEFT);
-
-        // create icon path
-        $path = [];
-        $path[] = $extended ? $icon[0] . $icon[1] . $icon[2] .'000' : '0'. $icon[1] . $icon[2] .'000';
-
-        $path[] = $icon;
-
-        // combine
-        $icon = implode('/', $path) .'.png';
-
-        return $icon;
     }
 }

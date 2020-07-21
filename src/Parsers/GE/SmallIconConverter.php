@@ -17,8 +17,10 @@ class SmallIconConverter implements ParseInterface
 
     public function parse()
     {
+        include (dirname(__DIR__) . '/Paths.php');
+
         // ensure output directory exists
-        $outputDirectory = $this->getOutputFolder() . '/40pxitemicons';
+        $outputDirectory = $this->getOutputFolder() . "/$CurrentPatchOutput/40pxitemicons";
         if (!is_dir($outputDirectory)) {
             mkdir($outputDirectory, 0777, true);
         }
@@ -74,36 +76,5 @@ class SmallIconConverter implements ParseInterface
             //    copy($itemIconHq, $iconFileNameHq);
             //}
         }
-    }
-
-    /**
-     * Converts SE icon "number" into a proper path
-     */
-    private function iconize($number, $hq = false)
-    {
-        $number = intval($number);
-        $extended = (strlen($number) >= 6);
-
-        if ($number == 0) {
-            return null;
-        }
-
-        // create icon filename
-        $icon = $extended ? str_pad($number, 5, "0", STR_PAD_LEFT) : '0' . str_pad($number, 5, "0", STR_PAD_LEFT);
-
-        // create icon path
-        $path = [];
-        $path[] = $extended ? $icon[0] . $icon[1] . $icon[2] .'000' : '0'. $icon[1] . $icon[2] .'000';
-
-        if ($hq) {
-            $path[] = 'hq';
-        }
-
-        $path[] = $icon;
-
-        // combine
-        $icon = implode('/', $path) .'.png';
-
-        return $icon;
     }
 }

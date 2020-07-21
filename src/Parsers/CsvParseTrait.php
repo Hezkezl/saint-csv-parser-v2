@@ -20,46 +20,26 @@ trait CsvParseTrait
     public $ex;
 
     /**
-     * Initialize environment
-     */
-    public function init()
-    {
-        //
-        // Check for ex.json file
-        //
-
-        $cacheDirectory = $this->projectDirectory . getenv('CACHE_DIRECTORY');
-        $exJsonFilename = "$cacheDirectory/ex.json";
-
-        if (!file_exists($exJsonFilename)) {
-            $this->io->text('ex.json file does not exist, downloading from github ...');
-
-            $ex = file_get_contents(getenv('GITHUB_EX_JSON'));
-            if (!$ex) {
-                $this->io->text('<error>Failed to download ex.json from: '. getenv('GITHUB_EX_JSON'));die;
-            }
-
-            file_put_contents($exJsonFilename, $ex);
-            $this->ex = json_decode($ex);
-            $this->io->text('✓ Download complete');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Query CSV file from github
+     * Query CSV file from SaintC extraction folder
      */
     public function csv($content): ParseWrapper
     {
         if (isset($this->internal[$content])) {
             return $this->internal[$content];
         }
-        
-        $cache = $this->projectDirectory . getenv('CACHE_DIRECTORY');
+
+        // $cache = $this->projectDirectory . getenv('CACHE_DIRECTORY');
+
+        //get the current patch long ID
+        $MainPath = "C:\Program Files (x86)\SquareEnix\FINAL FANTASY XIV - A Realm Reborn";
+        $PatchID = file_get_contents("". $MainPath ."\game\\ffxivgame.ver");
+        $cache = "F:\Rogue\SaintCoinach.Cmd/$PatchID/rawexd";
+
+        //$cache = $this->projectDirectory . getenv('CACHE_DIRECTORY');
         $filename = "{$cache}/{$content}.csv";
 
-        // check cache and download if it does not exist
+        // check cache and download if it does not exist. Ignoring now since Icarus rewrite in July 2020
+        /*
         if (!file_exists($filename)) {
             $this->io->text("Downloading: '{$content}.csv' for the first time ...");
 
@@ -74,7 +54,7 @@ trait CsvParseTrait
             if (!$githubFiledata) {
                 $this->io->text('<error>Could not download file from github: '. $githubFilename);die;
             }
-            
+
             $pi = pathinfo($filename);
             if (!is_dir($pi['dirname'])) {
                 mkdir($pi['dirname'], 0777, true);
@@ -83,13 +63,14 @@ trait CsvParseTrait
             file_put_contents($filename, $githubFiledata);
             $this->io->text('✓ Download complete');
         }
+        */
 
         // grab wrapper
         $parser = new ParseWrapper($content, $filename);
         file_put_contents($filename.'.columns', json_encode($parser->columns, JSON_PRETTY_PRINT));
         file_put_contents($filename.'.offsets', json_encode($parser->offsets, JSON_PRETTY_PRINT));
         file_put_contents($filename.'.data', json_encode($parser->data, JSON_PRETTY_PRINT));
-        
+
         $this->internal[$content] = $parser;
 
         return $parser;
@@ -109,7 +90,8 @@ trait CsvParseTrait
      */
     public function getInputFolder()
     {
-        return $this->projectDirectory . getenv('INPUT_DIRECTORY');
+        $PatchID = file_get_contents("C:\Program Files (x86)\SquareEnix\FINAL FANTASY XIV - A Realm Reborn\game\\ffxivgame.ver");
+        return "F:\Rogue\SaintCoinach.Cmd/$PatchID/ui";
     }
 
     /**
@@ -144,7 +126,7 @@ trait CsvParseTrait
         $info = [];
         foreach ($dataset as $chunkCount => $data) {
             // build folder and filename
-            $saveto = "{$folder}/chunk{$chunkCount}_{$filename}";
+            $saveto = "{$folder}/{$filename}";
 
             // save chunked data
             file_put_contents($saveto, implode("\n", $data));
@@ -156,5 +138,32 @@ trait CsvParseTrait
         }
 
         return $info;
+    }
+
+    /**
+     * Converts SE icon "number" into a proper path
+     */
+    private function iconize($number, $hq = false)
+    {
+        $number = intval($number);
+        $extended = (strlen($number) >= 6);
+
+        if ($number == 0) {
+            return null;
+        }
+
+        // create icon filename
+        $icon = $extended ? str_pad($number, 5, "0", STR_PAD_LEFT) : '0' . str_pad($number, 5, "0", STR_PAD_LEFT);
+
+        // create icon path
+        $path = [];
+        $path[] = $extended ? $icon[0] . $icon[1] . $icon[2] .'000' : '0'. $icon[1] . $icon[2] .'000';
+
+        $path[] = $icon;
+
+        // combine
+        $icon = implode('/', $path) .'.png';
+
+        return $icon;
     }
 }

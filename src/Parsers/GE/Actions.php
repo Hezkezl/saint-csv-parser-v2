@@ -41,11 +41,11 @@ class Actions implements ParseInterface
     {
       include (dirname(__DIR__) . '/Paths.php');
         // grab CSV files we want to use
-        $ActionCsv = $this->csv("$CurrentPatch/Action");
-        $ActionCategoryCsv = $this->csv("$CurrentPatch/ActionCategory");
-        $ActionTransientCsv = $this->csv("$CurrentPatch/ActionTransient");
-        $ClassJobCsv = $this->csv("$CurrentPatch/ClassJob");
-        $ClassJobCategoryCsv = $this->csv("$CurrentPatch/ClassJobCategory");
+        $ActionCsv = $this->csv("Action");
+        $ActionCategoryCsv = $this->csv("ActionCategory");
+        $ActionTransientCsv = $this->csv("ActionTransient");
+        $ClassJobCsv = $this->csv("ClassJob");
+        $ClassJobCategoryCsv = $this->csv("ClassJobCategory");
 
         $Range = false;
         $Recast = false;

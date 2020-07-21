@@ -25,7 +25,7 @@ class KeyItems implements ParseInterface
 
     public function parse()
     {
-        $patch = '5.21';
+        include (dirname(__DIR__) . '/Paths.php');
 
         // grab CSV files we want to use
         $EventItemCsv = $this->csv('EventItem');
@@ -54,7 +54,7 @@ class KeyItems implements ParseInterface
                 $icon = "\n|Icon = 0". $iconstart ."000/0". ($eventitem['Icon']) .".png";
 
                 // ensure output directory exists
-                $EventIconoutputDirectory = $this->getOutputFolder() . '/eventicon';
+                $EventIconoutputDirectory = $this->getOutputFolder() . "/$CurrentPatchOutput/KeyItemIcons";
                 if (!is_dir($EventIconoutputDirectory)) {
                     mkdir($EventIconoutputDirectory, 0777, true);
                 }
@@ -92,7 +92,7 @@ class KeyItems implements ParseInterface
 
             // Save some data
             $data = [
-                '{patch}' => $patch,
+                '{patch}' => $Patch,
                 '{name}' => $eventitem['Name'],
                 '{description}' => $EventItemHelpCsv->at($eventitem['id'])['Description'],
                 '{stack}' => $eventitem['StackSize'],
@@ -109,39 +109,11 @@ class KeyItems implements ParseInterface
         // save our data to the filename: GeEventItemWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save('GeEventItemWiki - '. $patch .'.txt', 999999);
+        $info = $this->save("$CurrentPatchOutput/KeyItems - ". $Patch .".txt", 999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],
             $info
         );
     }
-
-    /**
-     * Converts SE icon "number" into a proper path
-     */
-    private function iconize($number, $hq = false)
-    {
-        $number = intval($number);
-        $extended = (strlen($number) >= 6);
-
-        if ($number == 0) {
-            return null;
-        }
-
-        // create icon filename
-        $icon = $extended ? str_pad($number, 5, "0", STR_PAD_LEFT) : '0' . str_pad($number, 5, "0", STR_PAD_LEFT);
-
-        // create icon path
-        $path = [];
-        $path[] = $extended ? $icon[0] . $icon[1] . $icon[2] .'000' : '0'. $icon[1] . $icon[2] .'000';
-
-        $path[] = $icon;
-
-        // combine
-        $icon = implode('/', $path) .'.png';
-
-        return $icon;
-    }
-
 }

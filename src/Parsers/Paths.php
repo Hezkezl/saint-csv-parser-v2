@@ -24,13 +24,6 @@ $Patch = "5.25";
         $info = $this->save("$CurrentShortPatchOutput/GeLeveWiki - ". $patch .".txt", 9999999);
 */
 
-
-
-
-
-
-
-
 //get the current patch long ID
 $PatchID = file_get_contents("". $MainPath ."\game\\ffxivgame.ver");
 $CurrentPatch = "$PatchID/rawexd";

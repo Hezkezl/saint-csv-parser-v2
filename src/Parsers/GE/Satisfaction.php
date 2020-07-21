@@ -48,12 +48,12 @@ class Satisfaction implements ParseInterface
         include (dirname(__DIR__) . '/Paths.php');
 
         // grab CSV files
-        $SatisfactionNpcCsv = $this->csv("$CurrentPatch/SatisfactionNpc");
-        $SatisfactionSupplyCsv = $this->csv("$CurrentPatch/SatisfactionSupply");
-        $ENpcResidentCsv = $this->csv("$CurrentPatch/ENpcResident");
-        $SatisfactionSupplyRewardCsv = $this->csv("$CurrentPatch/SatisfactionSupplyReward");
-        $ItemCsv = $this->csv("$CurrentPatch/Item");
-        $CurrencyCsv = $this->csv("$CurrentPatch/Currency");
+        $SatisfactionNpcCsv = $this->csv("SatisfactionNpc");
+        $SatisfactionSupplyCsv = $this->csv("SatisfactionSupply");
+        $ENpcResidentCsv = $this->csv("ENpcResident");
+        $SatisfactionSupplyRewardCsv = $this->csv("SatisfactionSupplyReward");
+        $ItemCsv = $this->csv("Item");
+        $CurrencyCsv = $this->csv("Currency");
 
         $this->io->progressStart($SatisfactionSupplyCsv->total);
 
@@ -147,7 +147,7 @@ class Satisfaction implements ParseInterface
         // save our data to the filename: GeSatisfactionWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save("$CurrentPatchOutput/GeSatisfactionWiki - ". $Patch .".txt", 999999);
+        $info = $this->save("$CurrentPatchOutput/SatisfactionNPC - ". $Patch .".txt", 999999);
 
         $this->io->table(
             ['Filename', 'Data Count', 'File Size'],

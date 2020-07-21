@@ -20,3 +20,4 @@ symfony.lock
 bin/*
 composer*
 old *
+PatchDayBatch.bat

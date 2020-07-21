@@ -26,13 +26,14 @@ class RaceAbility implements ParseInterface
 
     public function parse()
     {
+        include (dirname(__DIR__) . '/Paths.php');
+
         // grab CSV files we want to use
         $ChocoboRaceAbilityCsv = $this->csv('ChocoboRaceAbility');
         $ChocoboRaceAbilityTypeCsv = $this->csv('ChocoboRaceAbilityType');
 
         // (optional) start a progress bar
         $this->io->progressStart($ChocoboRaceAbilityCsv->total);
-        $patch = "2.51";
 
         // loop through data
         foreach ($ChocoboRaceAbilityCsv->data as $id => $ability) {
@@ -68,7 +69,7 @@ class RaceAbility implements ParseInterface
             if (!empty($ability['Icon'])) {
 
                 // ensure output directory exists
-                $EventIconoutputDirectory = $this->getOutputFolder() . '/chocoboabilityicon';
+                $EventIconoutputDirectory = $this->getOutputFolder() . "/$CurrentPatchOutput/ChocoboAbilityIcons";
                 if (!is_dir($EventIconoutputDirectory)) {
                     mkdir($EventIconoutputDirectory, 0777, true);
                 }
@@ -92,7 +93,7 @@ class RaceAbility implements ParseInterface
 
             $data = [
                 '{index}' => $ability['id'],
-                '{patch}' => $patch,
+                '{patch}' => $Patch,
                 '{name}' => $ability['Name'],
                 '{type}' => $type,
                 '{description}' => $description,
@@ -106,38 +107,11 @@ class RaceAbility implements ParseInterface
         // save our data to the filename: GeEventItemWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save('GeAbilityInfoWiki - '. $patch .'.txt', 999999);
+        $info = $this->save("$CurrentPatchOutput/ChocoboRaceAbilities - ". $Patch .".txt", 999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],
             $info
         );
-    }
-
-    /**
-     * Converts SE icon "number" into a proper path
-     */
-    private function iconize($number)
-    {
-        $number = intval($number);
-        $extended = (strlen($number) >= 6);
-
-        if ($number == 0) {
-            return null;
-        }
-
-        // create icon filename
-        $icon = $extended ? str_pad($number, 5, "0", STR_PAD_LEFT) : '0' . str_pad($number, 5, "0", STR_PAD_LEFT);
-
-        // create icon path
-        $path = [];
-        $path[] = $extended ? $icon[0] . $icon[1] . $icon[2] .'000' : '0'. $icon[1] . $icon[2] .'000';
-
-        $path[] = $icon;
-
-        // combine
-        $icon = implode('/', $path) .'.png';
-
-        return $icon;
     }
 }

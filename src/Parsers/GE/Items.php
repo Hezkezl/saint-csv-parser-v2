@@ -31,24 +31,24 @@ class Items implements ParseInterface
         $Bot = "true";
 
         // grab CSV files we want to use
-        $ItemCsv = $this->csv("$CurrentPatch/Item");
-        $TripleTriadCardCsv = $this->csv("$CurrentPatch/TripleTriadCard");
-        $CompanionCsv = $this->csv("$CurrentPatch/Companion");
-        $OrchestrionCsv = $this->csv("$CurrentPatch/Orchestrion");
-        $GatheringSubCategoryCsv = $this->csv("$CurrentPatch/GatheringSubCategory");
-        $MountCsv = $this->csv("$CurrentPatch/Mount");
-        $SecretRecipeBookCsv = $this->csv("$CurrentPatch/SecretRecipeBook");
-        $ItemActionCsv = $this->csv("$CurrentPatch/ItemAction");
-        $ItemFoodCsv = $this->csv("$CurrentPatch/ItemFood");
-        $StatusCsv = $this->csv("$CurrentPatch/Status");
-        //$ItemSearchCategoryCsv = $this->csv("$CurrentPatch/ItemSearchCategory");
-        $BaseParamCsv = $this->csv("$CurrentPatch/BaseParam");
-        $ItemSeriesCsv = $this->csv("$CurrentPatch/ItemSeries");
-        $ItemUiCategoryCsv = $this->csv("$CurrentPatch/ItemUICategory");
-        $ClassJobCategoryCsv = $this->csv("$CurrentPatch/ClassJobCategory");
-        $ClassJobCsv = $this->csv("$CurrentPatch/ClassJob");
-        $SalvageCsv = $this->csv("$CurrentPatch/Salvage");
-        $BuddyEquipCsv = $this->csv("$CurrentPatch/BuddyEquip");
+        $ItemCsv = $this->csv("Item");
+        $TripleTriadCardCsv = $this->csv("TripleTriadCard");
+        $CompanionCsv = $this->csv("Companion");
+        $OrchestrionCsv = $this->csv("Orchestrion");
+        $GatheringSubCategoryCsv = $this->csv("GatheringSubCategory");
+        $MountCsv = $this->csv("Mount");
+        $SecretRecipeBookCsv = $this->csv("SecretRecipeBook");
+        $ItemActionCsv = $this->csv("ItemAction");
+        $ItemFoodCsv = $this->csv("ItemFood");
+        $StatusCsv = $this->csv("Status");
+        //$ItemSearchCategoryCsv = $this->csv("ItemSearchCategory");
+        $BaseParamCsv = $this->csv("BaseParam");
+        $ItemSeriesCsv = $this->csv("ItemSeries");
+        $ItemUiCategoryCsv = $this->csv("ItemUICategory");
+        $ClassJobCategoryCsv = $this->csv("ClassJobCategory");
+        $ClassJobCsv = $this->csv("ClassJob");
+        $SalvageCsv = $this->csv("Salvage");
+        $BuddyEquipCsv = $this->csv("BuddyEquip");
 
         // (optional) start a progress bar
         $this->io->progressStart($ItemCsv->total);
@@ -782,7 +782,7 @@ class Items implements ParseInterface
         // save our data to the filename: GeItemWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save("$CurrentPatchOutput/GeItemWiki - ". $Patch .".txt", 999999);
+        $info = $this->save("$CurrentPatchOutput/Items - ". $Patch .".txt", 999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],

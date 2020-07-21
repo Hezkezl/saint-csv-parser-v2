@@ -60,29 +60,30 @@ class Quests implements ParseInterface
     public function parse()
     {
         include (dirname(__DIR__) . '/Paths.php');
+
         //grab CSV files
-        $questCsv = $this->csv("$CurrentPatch/Quest");
-        $ENpcResidentCsv = $this->csv("$CurrentPatch/ENpcResident");
-        $ItemCsv = $this->csv("$CurrentPatch/Item");
-        $EmoteCsv = $this->csv("$CurrentPatch/Emote");
-        $JournalGenreCsv = $this->csv("$CurrentPatch/JournalGenre");
-        $JournalCategoryCsv = $this->csv("$CurrentPatch/JournalCategory");
-        $JournalSectionCsv = $this->csv("$CurrentPatch/JournalSection");
-        $PlaceNameCsv = $this->csv("$CurrentPatch/PlaceName");
-        $ClassJobCsv = $this->csv("$CurrentPatch/ClassJob");
-        $ActionCsv = $this->csv("$CurrentPatch/Action");
-        $OtherRewardCsv = $this->csv("$CurrentPatch/QuestRewardOther");
-        $BeastReputationRankCsv = $this->csv("$CurrentPatch/BeastReputationRank");
-        $BeastTribeCsv = $this->csv("$CurrentPatch/BeastTribe");
-        $TraitCsv = $this->csv("$CurrentPatch/Trait");
-        $EventIconTypeCsv = $this->csv("$CurrentPatch/EventIconType");
-        $KeyItemCsv = $this->csv("$CurrentPatch/EventItem");
+        $questCsv = $this->csv("Quest");
+        $ENpcResidentCsv = $this->csv("ENpcResident");
+        $ItemCsv = $this->csv("Item");
+        $EmoteCsv = $this->csv("Emote");
+        $JournalGenreCsv = $this->csv("JournalGenre");
+        $JournalCategoryCsv = $this->csv("JournalCategory");
+        $JournalSectionCsv = $this->csv("JournalSection");
+        $PlaceNameCsv = $this->csv("PlaceName");
+        $ClassJobCsv = $this->csv("ClassJob");
+        $ActionCsv = $this->csv("Action");
+        $OtherRewardCsv = $this->csv("QuestRewardOther");
+        $BeastReputationRankCsv = $this->csv("BeastReputationRank");
+        $BeastTribeCsv = $this->csv("BeastTribe");
+        $TraitCsv = $this->csv("Trait");
+        $EventIconTypeCsv = $this->csv("EventIconType");
+        $KeyItemCsv = $this->csv("EventItem");
         /* unused files
-        $InstanceContentCsv = $this->csv("$CurrentPatch/InstanceContent");
-        $LevelCsv = $this->csv("$CurrentPatch/Level");
-        $MapCsv = $this->csv("$CurrentPatch/Map");
+        $InstanceContentCsv = $this->csv("InstanceContent");
+        $LevelCsv = $this->csv("Level");
+        $MapCsv = $this->csv("Map");
         */
-        $paramGrowCsv = $this->csv("$CurrentPatch/ParamGrow");
+        $paramGrowCsv = $this->csv("ParamGrow");
 
         $this->io->progressStart($questCsv->total);
 
@@ -605,9 +606,9 @@ class Quests implements ParseInterface
                 //the beginning of the code and put */ after the code for easier commenting, as compared to
                 //putting // in front of every line. ie:  */ commented out code here <line breaks etc/everything too> /*
                 if (!empty($quest['Icon'])) {
-                    if (!file_exists($this->getOutputFolder() . "/questheadericons/{$quest['Icon']}.png")) {
+                    if (!file_exists($this->getOutputFolder() . "/$CurrentPatchOutput/QuestHeaderIcons/{$quest['Icon']}.png")) {
                         // ensure output directory exists
-                        $QuestIconOutputDirectory = $this->getOutputFolder() . '/questheadericons';
+                        $QuestIconOutputDirectory = $this->getOutputFolder() . "/$CurrentPatchOutput/questheadericons";
                         if (!is_dir($QuestIconOutputDirectory)) {
                             mkdir($QuestIconOutputDirectory, 0777, true);
                         }
@@ -694,7 +695,7 @@ class Quests implements ParseInterface
         // save our data to the filename: GeQuestWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save("$CurrentPatchOutput/GeQuestWikiBot - ". $Patch .".txt", 9999999);
+        $info = $this->save("$CurrentPatchOutput/Quests - ". $Patch .".txt", 9999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],
@@ -820,32 +821,5 @@ class Quests implements ParseInterface
         }
 
         return $data;
-    }
-
-    /**
-     * Converts SE icon "number" into a proper path
-     */
-    private function iconize($number)
-    {
-        $number = intval($number);
-        $extended = (strlen($number) >= 6);
-
-        if ($number == 0) {
-            return null;
-        }
-
-        // create icon filename
-        $icon = $extended ? str_pad($number, 5, "0", STR_PAD_LEFT) : '0' . str_pad($number, 5, "0", STR_PAD_LEFT);
-
-        // create icon path
-        $path = [];
-        $path[] = $extended ? $icon[0] . $icon[1] . $icon[2] .'000' : '0'. $icon[1] . $icon[2] .'000';
-
-        $path[] = $icon;
-
-        // combine
-        $icon = implode('/', $path) .'.png';
-
-        return $icon;
     }
 }

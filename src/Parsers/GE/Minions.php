@@ -48,15 +48,15 @@ class Minions implements ParseInterface
         // manually, set to false
         $Bot = "true";
         include (dirname(__DIR__) . '/Paths.php');
-        // grab CSV files we want to use
-        $ItemCsv = $this->csv("$CurrentPatch/Item");
-        $ItemActionCsv = $this->csv("$CurrentPatch/ItemAction");
-        $CompanionCsv = $this->csv("$CurrentPatch/Companion");
-        $CompanionMoveCsv = $this->csv("$CurrentPatch/CompanionMove");
-        $CompanionTransientCsv = $this->csv("$CurrentPatch/CompanionTransient");
-        $MinionRaceCsv = $this->csv("$CurrentPatch/MinionRace");
-        $MinionSkillTypeCsv = $this->csv("$CurrentPatch/MinionSkillType");
 
+        // grab CSV files we want to use
+        $ItemCsv = $this->csv("Item");
+        $ItemActionCsv = $this->csv("ItemAction");
+        $CompanionCsv = $this->csv("Companion");
+        $CompanionMoveCsv = $this->csv("CompanionMove");
+        $CompanionTransientCsv = $this->csv("CompanionTransient");
+        $MinionRaceCsv = $this->csv("MinionRace");
+        $MinionSkillTypeCsv = $this->csv("MinionSkillType");
 
         //NOTES / PLAN
         //Cycle through Item.csv and continue; on anything other than ItemUICategory = Minion,
@@ -149,7 +149,7 @@ class Minions implements ParseInterface
             $LargeIcon = str_pad($Icon2, "6", "068", STR_PAD_LEFT);
 
             // ensure output directory exists
-            $IconoutputDirectory = $this->getOutputFolder() . '/MinionIcons';
+            $IconoutputDirectory = $this->getOutputFolder() . "/$CurrentPatchOutput/MinionIcons";
             // if it doesn't exist, make it
             if (!is_dir($IconoutputDirectory)) {
                 mkdir($IconoutputDirectory, 0777, true);
@@ -210,39 +210,11 @@ class Minions implements ParseInterface
         // save our data to the filename: GeMountWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save("$CurrentPatchOutput/GeMinionWiki - ". $Patch .".txt", 9999999);
+        $info = $this->save("$CurrentPatchOutput/Minions - ". $Patch .".txt", 9999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],
             $info
         );
     }
-
-    /**
-     * Converts SE icon "number" into a proper path
-     */
-    private function iconize($number, $hq = false)
-    {
-        $number = intval($number);
-        $extended = (strlen($number) >= 6);
-
-        if ($number == 0) {
-            return null;
-        }
-
-        // create icon filename
-        $icon = $extended ? str_pad($number, 5, "0", STR_PAD_LEFT) : '0' . str_pad($number, 5, "0", STR_PAD_LEFT);
-
-        // create icon path
-        $path = [];
-        $path[] = $extended ? $icon[0] . $icon[1] . $icon[2] .'000' : '0'. $icon[1] . $icon[2] .'000';
-
-        $path[] = $icon;
-
-        // combine
-        $icon = implode('/', $path) .'.png';
-
-        return $icon;
-    }
-}
 }

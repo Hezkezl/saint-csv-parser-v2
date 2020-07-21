@@ -44,6 +44,8 @@ class Leves implements ParseInterface
 
     public function parse()
     {
+        include (dirname(__DIR__) . '/Paths.php');
+
         // grab CSV files we want to use
         $LeveCsv = $this->csv('Leve');
         $LeveVfxCsv = $this->csv('LeveVfx');
@@ -69,13 +71,11 @@ class Leves implements ParseInterface
         $GatheringPointBaseCsv = $this->csv('GatheringPointBase');
         $GatheringItemCsv = $this->csv('GatheringItem');
         $LevemetePatchCsv = $this->csv('LevemetePatch');
-        $CompanyLeveCsv = $this->csv('CompanyLeve');
-        $CompanyLeveRuleCsv = $this->csv('CompanyLeveRule');
+        //$CompanyLeveCsv = $this->csv('CompanyLeve');
+        //$CompanyLeveRuleCsv = $this->csv('CompanyLeveRule');
 
         // (optional) start a progress bar
         $this->io->progressStart($LeveCsv->total);
-
-        $patch = '5.21';
 
         // if I want to use pywikibot to create these pages, this should be true. Otherwise if I want to create pages
         // manually, set to false
@@ -90,9 +90,10 @@ class Leves implements ParseInterface
             if ((empty($Name)) || (preg_match("/[\x{30A0}-\x{30FF}\x{3040}-\x{309F}\x{4E00}-\x{9FBF}]+/u", $Name))) {
                 continue;
             }
+
             //fordebug
             //$db = $leve['DataId'];
-            if ($id != 858) continue;
+            //if ($id != 858) continue;
             //fordebug
 
             //get the Patch and Issuing NPC from a separate file called LevemetePatch.csv which was custom made
@@ -229,8 +230,7 @@ class Leves implements ParseInterface
             $objectiveItemTodo = false;
             $ObjectiveTask = false;
 
-
-            $debugleveid = $leve['DataId'];
+            //$debugleveid = $leve['DataId'];
 
             // Levequest Reward List. Need a double foreach here.
             foreach(range(0,7) as $i) {
@@ -665,40 +665,11 @@ class Leves implements ParseInterface
         // save our data to the filename: GeLeveWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save("GeLeveWiki - ". $patch .".txt", 9999999);
+        $info = $this->save("$CurrentPatchOutput/Leves - ". $Patch .".txt", 9999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],
             $info
         );
     }
-
-    /**
-     * Converts SE icon "number" into a proper path
-     */
-    /* delete this line and the other * below to uncomment this out
-    private function iconize($number)
-    {
-        $number = intval($number);
-        $extended = (strlen($number) >= 6);
-
-        if ($number == 0) {
-            return null;
-        }
-
-        // create icon filename
-        $icon = $extended ? str_pad($number, 5, "0", STR_PAD_LEFT) : '0' . str_pad($number, 5, "0", STR_PAD_LEFT);
-
-        // create icon path
-        $path = [];
-        $path[] = $extended ? $icon[0] . $icon[1] . $icon[2] .'000' : '0'. $icon[1] . $icon[2] .'000';
-
-        $path[] = $icon;
-
-        // combine
-        $icon = implode('/', $path) .'.png';
-
-        return $icon;
-    }
-    */
 }

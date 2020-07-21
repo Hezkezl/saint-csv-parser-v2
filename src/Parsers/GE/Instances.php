@@ -33,7 +33,7 @@ class Instances implements ParseInterface
     public function parse()
     {
 
-        $patch = '5.21';
+        include (dirname(__DIR__) . '/Paths.php');
 
         // grab CSV files we want to use
         $ContentFinderConditionCsv = $this->csv('ContentFinderCondition');
@@ -287,7 +287,7 @@ class Instances implements ParseInterface
         // save our data to the filename: GeRecipeWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save("GeInstancesWikiBot - ". $patch .".txt", 9999999);
+        $info = $this->save("$CurrentPatchOutput/Instances - ". $Patch .".txt", 9999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],
