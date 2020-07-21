@@ -21,13 +21,12 @@ class SpecialShop implements ParseInterface
 
     public function parse()
     {
-        $patch = '5.21';
-
-        $SpecialShopCsv = $this->csv('SpecialShop');
-        $ItemCsv = $this->csv('Item');
-        $QuestCsv = $this->csv('Quest');
-        $AchievementCsv = $this->csv('Achievement');
-        $DefaultTalkCsv = $this->csv('DefaultTalk');
+        include (dirname(__DIR__) . '/Paths.php');
+        $SpecialShopCsv = $this->csv("$CurrentPatch/SpecialShop");
+        $ItemCsv = $this->csv("$CurrentPatch/Item");
+        $QuestCsv = $this->csv("$CurrentPatch/Quest");
+        $AchievementCsv = $this->csv("$CurrentPatch/Achievement");
+        $DefaultTalkCsv = $this->csv("$CurrentPatch/DefaultTalk");
 
         // console writer
         $console = new ConsoleOutput();
@@ -215,6 +214,6 @@ class SpecialShop implements ParseInterface
 
         // save
         $console->writeln(" Saving... ");
-        $info = $this->save('GeSpecialShopWiki - '. $patch .'.txt', 999999);
+        $info = $this->save("$CurrentPatchOutput/GeSpecialShopWiki - ". $Patch .".txt", 999999);
     }
 }
