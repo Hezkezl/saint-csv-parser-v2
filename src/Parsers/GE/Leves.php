@@ -97,8 +97,12 @@ class Leves implements ParseInterface
             //fordebug
 
             //get the Patch and Issuing NPC from a separate file called LevemetePatch.csv which was custom made
-            $Patch = $LevemetePatchCsv->at($leve['Name'])['Patch'];
+            $PatchFile = $LevemetePatchCsv->at($leve['Name'])['Patch'];
             $Npc = $LevemetePatchCsv->at($leve['Name'])['Levemete'];
+
+            //Test to see wtf is going on with patch numbers
+            //echo "Patch = $PatchFile -- $Npc -- $Patch\n";
+            //Seems to work fine, idk.
 
             // change the top and bottom code depending on if I want to bot the pages up or not
             if ($Bot == "true") {
@@ -620,7 +624,7 @@ class Leves implements ParseInterface
             // Save some data
             $data = [
                 '{Top}' => $Top,
-                '{patch}' => $Patch,
+                '{patch}' => $PatchFile,
                 '{index}' => $leve['id'],
                 '{name}' => $leve['Name'],
                 '{level}' => $leve['ClassJobLevel'],
