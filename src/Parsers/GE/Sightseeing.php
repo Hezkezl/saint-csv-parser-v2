@@ -6,7 +6,7 @@ use App\Parsers\CsvParseTrait;
 use App\Parsers\ParseInterface;
 
 /**
- * php bin/console app:parse:csv GE:FishParameter
+ * php bin/console app:parse:csv GE:Sightseeing
  */
 class Sightseeing implements ParseInterface
 {
@@ -100,6 +100,6 @@ class Sightseeing implements ParseInterface
 
         // save
         $this->io->text('Saving data ...');
-        $this->save("$CurrentPatchOutput/SightseeingLogs.txt");
+        $this->save("$CurrentPatchOutput/SightseeingLogs - ". $Patch .".txt");
     }
 }
