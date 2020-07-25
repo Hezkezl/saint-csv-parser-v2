@@ -40,6 +40,8 @@ class GENPCEquipment implements ParseInterface
         $this->io->progressStart($ENpcBaseCsv->total);
 
         $Bot = true;
+        $OutputNeedsFix = false;
+        $NeedsFixArray = [];
 
         //color generator
         $CMPfile= "cache/human.cmp";
@@ -86,7 +88,8 @@ class GENPCEquipment implements ParseInterface
             $Index = $EnpcBase['id'];
 
             $debug = false;
-            //if ($Index != 1009183) continue; // for debug
+            $needsFix = "FALSE";
+            //if ($Index != 1020124) continue; // for debug
             //var_dump($Index);
 
 
@@ -921,6 +924,23 @@ BaseFaceCalc > ". $BaseFaceCalc ."
                     if ($Modela < 8999) {
                         if ($Modelb >= 0) {
                             $HeadModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
+                            $canWearBool = "";
+                            $ItemRestriction = $itemArray[$HeadCat][$HeadModel]["EquipRestriction"];
+                            switch ($ItemRestriction) {
+                                case 0:
+                                    $canWearBool = "";
+                                break;
+                                case 1:
+                                    $canWearBool = ($isMale == "true") ? "" : "\n|Needs Verification = yes";
+                                break;
+                                case 2:
+                                    $canWearBool = ($isMale == "true") ? "\n|Needs Verification = yes" : "";
+                                break;
+                                
+                                default:
+                                    $canWearBool = "";
+                                break;
+                            }
                             $Head = "". $itemArray[$HeadCat][$HeadModel]["Name"] ."". $guess ."";
                         }
                         if ($Modelb < 0) {
@@ -988,7 +1008,35 @@ BaseFaceCalc > ". $BaseFaceCalc ."
                     if ($Modela < 8999) {
                         if ($Modelb >= 0) {
                             $BodyModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
-                            $Body = "". $itemArray[$BodyCat][$BodyModel]["Name"] ."". $guess ."";
+                            $canWearBool = "";
+                            $ItemRestriction = $itemArray[$BodyCat][$BodyModel]["EquipRestriction"];
+                            switch ($ItemRestriction) {
+                                case 1:
+                                    $canWearBool = "";
+                                break;
+                                case 2:
+                                    $canWearBool = ($isMale == "true") ? "" : "\n|Needs Verification = yes";
+                                    $needsFix = ($isMale == "true") ? "" : "TRUE";
+                                break;
+                                case 3:
+                                    $canWearBool = ($isMale == "true") ? "\n|Needs Verification = yes" : "";
+                                    $needsFix = ($isMale == "true") ? "TRUE" : "";
+                                break;
+                                
+                                default:
+                                    $canWearBool = "";
+                                break;
+                            }
+                            $BodyName = $itemArray[$BodyCat][$BodyModel]["Name"];
+                            if ($needsFix == "TRUE") {
+                                if ($itemArray[$BodyCat][$BodyModel]["Name"] == "Hempen Camise") {
+                                    $BodyName = "Hempen Undershirt";
+                                    $NeedsFixArray[] = "http://ffxiv.gamerescape.com/wiki/$Name/Appearance?action=edit\n$BodyName\n";
+                                } elseif ($itemArray[$BodyCat][$BodyModel]["Name"] != "Hempen Camise") {
+                                    $NeedsFixArray[] = "http://ffxiv.gamerescape.com/wiki/$Name/Appearance?action=edit\n$BodyName\n";
+                                }
+                            }
+                            $Body = "". $BodyName ."". $guess ."". $canWearBool ."";
                         }
                         if ($Modelb < 0) {
                             $Body = "Custom Body";
@@ -1055,7 +1103,29 @@ BaseFaceCalc > ". $BaseFaceCalc ."
                     if ($Modela < 8999) {
                         if ($Modelb >= 0) {
                             $HandsModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
-                            $Hands = "". $itemArray[$HandsCat][$HandsModel]["Name"] ."". $guess ."";
+                            $canWearBool = "";
+                            $ItemRestriction = $itemArray[$HandsCat][$HandsModel]["EquipRestriction"];
+                            switch ($ItemRestriction) {
+                                case 1:
+                                    $canWearBool = "";
+                                break;
+                                case 2:
+                                    $canWearBool = ($isMale == "true") ? "" : "\n|Needs Verification = yes";
+                                    $needsFix = ($isMale == "true") ? "" : "TRUE";
+                                break;
+                                case 3:
+                                    $canWearBool = ($isMale == "true") ? "\n|Needs Verification = yes" : "";
+                                    $needsFix = ($isMale == "true") ? "TRUE" : "";
+                                break;
+                                
+                                default:
+                                    $canWearBool = "";
+                                break;
+                            }
+                            if ($needsFix == "TRUE") {
+                                $NeedsFixArray[] = "http://ffxiv.gamerescape.com/wiki/$Name/Appearance?action=edit\n". $itemArray[$HandsCat][$HandsModel]["Name"] ."\n";
+                            }
+                            $Hands = "". $itemArray[$HandsCat][$HandsModel]["Name"] ."". $guess ."". $canWearBool ."";
                         }
                         if ($Modelb < 0) {
                             $Hands = "Custom Hands";
@@ -1128,7 +1198,38 @@ BaseFaceCalc > ". $BaseFaceCalc ."
                     if ($Modela < 8999) {
                         if ($Modelb >= 0) {
                             $LegsModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
-                            $Legs = "". $itemArray[$LegsCat][$LegsModel]["Name"] ."". $guess ."";
+                            $canWearBool = "";
+                            $ItemRestriction = $itemArray[$LegsCat][$LegsModel]["EquipRestriction"];
+                            switch ($ItemRestriction) {
+                                case 1:
+                                    $canWearBool = "";
+                                break;
+                                case 2:
+                                    $canWearBool = ($isMale == "true") ? "" : "\n|Needs Verification = yes";
+                                    $needsFix = ($isMale == "true") ? "" : "TRUE";
+                                break;
+                                case 3:
+                                    $canWearBool = ($isMale == "true") ? "\n|Needs Verification = yes" : "";
+                                    $needsFix = ($isMale == "true") ? "TRUE" : "";
+                                break;
+                                
+                                default:
+                                    $canWearBool = "";
+                                break;
+                            }
+                            $LegsName = $itemArray[$LegsCat][$LegsModel]["Name"];
+                            if ($needsFix == "TRUE") {
+                                if ($itemArray[$LegsCat][$LegsModel]["Name"] == "Red Summer Tanga") {
+                                    $LegsName = "Red Summer Trunks";
+                                    $NeedsFixArray[] = "http://ffxiv.gamerescape.com/wiki/$Name/Appearance?action=edit\n$LegsName\n";
+                                } elseif ($itemArray[$LegsCat][$LegsModel]["Name"] == "Hempen Pantalettes") {
+                                    $LegsName = "Hempen Underpants";
+                                    $NeedsFixArray[] = "http://ffxiv.gamerescape.com/wiki/$Name/Appearance?action=edit\n$LegsName\n";
+                                } else {
+                                    $NeedsFixArray[] = "http://ffxiv.gamerescape.com/wiki/$Name/Appearance?action=edit\n$LegsName\n";
+                                }
+                            }
+                            $Legs = "". $LegsName ."". $guess ."". $canWearBool ."";
                         }
                         if ($Modelb < 0) {
                             $Legs = "Custom Legs";
@@ -1195,7 +1296,29 @@ BaseFaceCalc > ". $BaseFaceCalc ."
                     if ($Modela < 8999) {
                         if ($Modelb >= 0) {
                             $FeetModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
-                            $Feet = "". $itemArray[$FeetCat][$FeetModel]["Name"] ."". $guess ."";
+                            $canWearBool = "";
+                            $ItemRestriction = $itemArray[$FeetCat][$FeetModel]["EquipRestriction"];
+                            switch ($ItemRestriction) {
+                                case 1:
+                                    $canWearBool = "";
+                                break;
+                                case 2:
+                                    $canWearBool = ($isMale == "true") ? "" : "\n|Needs Verification = yes";
+                                    $needsFix = ($isMale == "true") ? "" : "TRUE";
+                                break;
+                                case 3:
+                                    $canWearBool = ($isMale == "true") ? "\n|Needs Verification = yes" : "";
+                                    $needsFix = ($isMale == "true") ? "TRUE" : "";
+                                break;
+                                
+                                default:
+                                    $canWearBool = "";
+                                break;
+                            }
+                            $Feet = "". $itemArray[$FeetCat][$FeetModel]["Name"] ."". $guess ."". $canWearBool ."";
+                        }
+                        if ($needsFix == "TRUE") {
+                            $NeedsFixArray[] = "http://ffxiv.gamerescape.com/wiki/$Name/Appearance?action=edit\n". $itemArray[$FeetCat][$FeetModel]["Name"] ."\n";
                         }
                         if ($Modelb < 0) {
                             $Feet = "Custom Feet";
@@ -1232,6 +1355,14 @@ BaseFaceCalc > ". $BaseFaceCalc ."
             $this->data[] = GeFormatter::format(self::WIKI_FORMAT, $data);
         }
 
+        $NeedsFixArray = implode("\n", array_unique($NeedsFixArray));
+
+
+        if ($OutputNeedsFix == true) {
+            $outputfilename = fopen("output/NPCEquipmentfix.txt", 'w');
+            fwrite($outputfilename, $NeedsFixArray);
+            fclose($outputfilename);
+        }
         // save our data to the filename: GeRecipeWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
@@ -1243,3 +1374,7 @@ BaseFaceCalc > ". $BaseFaceCalc ."
         );
     }
 }
+
+/* 
+25 July 2020 - Added a check for incorrect items (turn need fix to true for output)
+*/
