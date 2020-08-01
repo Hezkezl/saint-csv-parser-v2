@@ -26,7 +26,7 @@ class Recipes implements ParseInterface
 |Difficulty          = {difficulty}
 |Quality             = {quality}{maxquality}{requiredcrafts}{requiredcontrol}
 |Quick Synthesis     = {quicksynth}{quicksynthcrafts}{quicksynthcontrol}{status}{equipment}{ingredient1}{ingredient2}
-{ingredients}
+{ingredients}{Special}
 }}{{-stop-}}";
 
     public function parse()
@@ -39,9 +39,39 @@ class Recipes implements ParseInterface
         $RecipeLevelCsv = $this->csv('RecipeLevelTable');
         $RecipeSecretCsv = $this->csv('SecretRecipeBook');
         $StatusCsv = $this->csv('Status');
+        $QuestClassJobSupplyCsv = $this->csv('QuestClassJobSupply');
+        $QuestCsv = $this->csv('Quest');
+        $BeastTribeCsv = $this->csv('BeastTribe');
+        $ENpcResidentCsv = $this->csv('ENpcResident');
+        $HugeCraftworksNpcCsv = $this->csv('HugeCraftworksNpc');
 
         // (optional) start a progress bar
         $this->io->progressStart($RecipeCsv->total);
+
+        //make arrays for QuestClassJobSupply and Quest to re-order index
+        $SupplyItemArray = [];
+
+        foreach ($QuestClassJobSupplyCsv->data as $id => $SupplyItemData) {
+            $ItemIDSupply = $SupplyItemData['Item'];
+            $SupplyItemArray[$ItemIDSupply] = $SupplyItemData;
+            // example = var_dump($SupplyItemArray["22720"]["id"]);
+        }
+
+        $QuestArray = [];
+
+        foreach ($QuestCsv->data as $id => $QuestData) {
+            $QuestIDSupply = $QuestData['QuestClassJobSupply'];
+            $QuestArray[$QuestIDSupply] = $QuestData;
+            // example = var_dump($QuestArray["25"]["id"]);
+        }
+
+        $CrystariumArray = [];
+
+        foreach ($HugeCraftworksNpcCsv->data as $id => $HugeCraftworksNpcData) {
+            foreach(range(0,3) as $a) {
+                $CrystariumArray[] = $HugeCraftworksNpcData["ItemRequested[$a]"];
+            };
+        }
 
         // loop through data
         foreach ($RecipeCsv->data as $id => $recipe) {
@@ -50,6 +80,46 @@ class Recipes implements ParseInterface
             // skip ones without a name
             if (empty($recipe['Item{Result}'])) {
                 continue;
+            }
+            //sort through arrays to find if it's limited to a beast tribe etc
+
+            $ResultItemID = $recipe['Item{Result}'];
+            $SpecialString = "";
+            if (!empty($SupplyItemArray["$ResultItemID"]["id"])) {  
+                $LinkToSupplyItemSheet = $SupplyItemArray["$ResultItemID"]["id"];
+                $HandInNpc = ucwords($ENpcResidentCsv->at($SupplyItemArray["$ResultItemID"]["ENpcResident"])['Singular']);
+                //split "25.0" into "25" and "0" so we can link in quest array
+                $keyExplode = explode(".", $LinkToSupplyItemSheet);
+                //only pick the first in array (25 for example)
+                $keyID = $keyExplode[0];
+                $QuestID = $QuestArray["$keyID"]["id"];
+                $QuestName = preg_replace('/[^\x00-\x7F]+/', '',$QuestArray["$keyID"]["Name"]);
+                $BeastTribe = $BeastTribeCsv->at($QuestArray["$keyID"]["BeastTribe"])['Name'];
+                $SpecialString = "\n|Special Recipe           = ". $BeastTribe ."\n|Special Recipe Quest     = ". $QuestName ."\n|Special Recipe HandInNPC = ". $HandInNpc ."";
+            }
+
+            //is it Crystarium Item?
+            if (in_array($ResultItemID, $CrystariumArray)) {
+                $SpecialString = "\n|Special Recipe           = Crystarium";
+            }
+
+            //use description for |special Recipe
+            if (empty($SpecialString)) {
+                $ItemDescription = $ItemCsv->at($ResultItemID)['Description'];
+                if (strpos($ItemDescription, '※Only for use in ') !== false) {
+                    switch (true) {
+                        case (strpos($ItemDescription, 'moogle')) !== false:
+                            $SpecialString = "\n|Special Recipe           = Moogle";
+                        break;
+                        case (strpos($ItemDescription, 'Ixal')) !== false:
+                            $SpecialString = "\n|Special Recipe           = Ixal";
+                        break;
+                        
+                        default:
+                            $SpecialString = "\n|Special Recipe           = FIX IN PHP";
+                        break;
+                    }
+                }
             }
 
             $skill = [
@@ -102,6 +172,7 @@ class Recipes implements ParseInterface
                 '{ingredient1}' => "\n|Ingredient 1        = ". $ItemCsv->at($recipe['Item{Ingredient}[8]'])['Name'] ."\n|Ingredient 1 Amount = ". $recipe['Amount{Ingredient}[8]'],
                 '{ingredient2}' => ($recipe['Item{Ingredient}[9]'] > 0) ? "\n|Ingredient 2        = ". $ItemCsv->at($recipe['Item{Ingredient}[9]'])['Name'] ."\n|Ingredient 2 Amount = ". $recipe['Amount{Ingredient}[9]'] : "",
                 '{ingredients}' => $Ingredients,
+                '{Special}' => $SpecialString,
             ];
 
             // format using Gamer Escape formatter and add to data array
@@ -120,3 +191,7 @@ class Recipes implements ParseInterface
         );
     }
 }
+
+/*
+1st Aug 2020 - Added checks and data for "Special Recipe" (used in beast tribes etc)
+*/
