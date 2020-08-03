@@ -44,6 +44,7 @@ class Recipes implements ParseInterface
         $BeastTribeCsv = $this->csv('BeastTribe');
         $ENpcResidentCsv = $this->csv('ENpcResident');
         $HugeCraftworksNpcCsv = $this->csv('HugeCraftworksNpc');
+        $SatisfactionSupplyCsv = $this->csv('SatisfactionSupply');
 
         // (optional) start a progress bar
         $this->io->progressStart($RecipeCsv->total);
@@ -55,6 +56,12 @@ class Recipes implements ParseInterface
             $ItemIDSupply = $SupplyItemData['Item'];
             $SupplyItemArray[$ItemIDSupply] = $SupplyItemData;
             // example = var_dump($SupplyItemArray["22720"]["id"]);
+        }
+
+        $SatisfactionItemArray = [];
+
+        foreach ($SatisfactionSupplyCsv->data as $id => $SatisfactionItemData) {
+            $SatisfactionItemArray[] = $SatisfactionItemData['Item'];
         }
 
         $QuestArray = [];
@@ -95,12 +102,16 @@ class Recipes implements ParseInterface
                 $QuestID = $QuestArray["$keyID"]["id"];
                 $QuestName = preg_replace('/[^\x00-\x7F]+/', '',$QuestArray["$keyID"]["Name"]);
                 $BeastTribe = $BeastTribeCsv->at($QuestArray["$keyID"]["BeastTribe"])['Name'];
-                $SpecialString = "\n|Special Recipe           = ". $BeastTribe ."\n|Special Recipe Quest     = ". $QuestName ."\n|Special Recipe HandInNPC = ". $HandInNpc ."";
+                $SpecialString = "\n|Special Recipe           = ". $BeastTribe ." Quest\n|Special Recipe Quest     = ". $QuestName ."\n|Special Recipe HandInNPC = ". $HandInNpc ."";
             }
 
             //is it Crystarium Item?
             if (in_array($ResultItemID, $CrystariumArray)) {
-                $SpecialString = "\n|Special Recipe           = Crystarium";
+                $SpecialString = "\n|Special Recipe           = Crystarium Deliveries";
+            }
+            //is it for Collectable?
+            if (in_array($ResultItemID, $SatisfactionItemArray)) {
+                $SpecialString = "\n|Special Recipe           = Custom Delivery";
             }
 
             //use description for |special Recipe
@@ -109,10 +120,10 @@ class Recipes implements ParseInterface
                 if (strpos($ItemDescription, '※Only for use in ') !== false) {
                     switch (true) {
                         case (strpos($ItemDescription, 'moogle')) !== false:
-                            $SpecialString = "\n|Special Recipe           = Moogle";
+                            $SpecialString = "\n|Special Recipe           = Moogle Quest";
                         break;
                         case (strpos($ItemDescription, 'Ixal')) !== false:
-                            $SpecialString = "\n|Special Recipe           = Ixal";
+                            $SpecialString = "\n|Special Recipe           = Ixal Quest";
                         break;
                         
                         default:
@@ -194,4 +205,5 @@ class Recipes implements ParseInterface
 
 /*
 1st Aug 2020 - Added checks and data for "Special Recipe" (used in beast tribes etc)
+3rd Aug 2020 - Added checks for collectable
 */
