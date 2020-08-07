@@ -25,8 +25,8 @@ class Recipes implements ParseInterface
 |Durability          = {durability}
 |Difficulty          = {difficulty}
 |Quality             = {quality}{maxquality}{requiredcrafts}{requiredcontrol}
-|Quick Synthesis     = {quicksynth}{quicksynthcrafts}{quicksynthcontrol}{status}{equipment}{ingredient1}{ingredient2}
-{ingredients}{Special}
+|Quick Synthesis     = {quicksynth}{quicksynthcrafts}{quicksynthcontrol}{status}{equipment}{Special}{ingredient1}{ingredient2}
+{ingredients}
 }}{{-stop-}}";
 
     public function parse()
@@ -55,7 +55,7 @@ class Recipes implements ParseInterface
         foreach ($QuestClassJobSupplyCsv->data as $id => $SupplyItemData) {
             $ItemIDSupply = $SupplyItemData['Item'];
             $SupplyItemArray[$ItemIDSupply] = $SupplyItemData;
-            // example = var_dump($SupplyItemArray["22720"]["id"]);
+            // example = var_dump($SupplyItemArray['22720']['id']);
         }
 
         $SatisfactionItemArray = [];
@@ -69,7 +69,7 @@ class Recipes implements ParseInterface
         foreach ($QuestCsv->data as $id => $QuestData) {
             $QuestIDSupply = $QuestData['QuestClassJobSupply'];
             $QuestArray[$QuestIDSupply] = $QuestData;
-            // example = var_dump($QuestArray["25"]["id"]);
+            // example = var_dump($QuestArray['25']['id']);
         }
 
         $CrystariumArray = [];
@@ -88,46 +88,46 @@ class Recipes implements ParseInterface
             if (empty($recipe['Item{Result}'])) {
                 continue;
             }
-            //sort through arrays to find if it's limited to a beast tribe etc
 
+            //sort through arrays to find if it's limited to a beast tribe etc
             $ResultItemID = $recipe['Item{Result}'];
-            $SpecialString = "";
-            if (!empty($SupplyItemArray["$ResultItemID"]["id"])) {  
-                $LinkToSupplyItemSheet = $SupplyItemArray["$ResultItemID"]["id"];
-                $HandInNpc = ucwords($ENpcResidentCsv->at($SupplyItemArray["$ResultItemID"]["ENpcResident"])['Singular']);
+            $SpecialString = false;
+            if (!empty($SupplyItemArray["$ResultItemID"]['id'])) {
+                $LinkToSupplyItemSheet = $SupplyItemArray["$ResultItemID"]['id'];
+                $HandInNpc = ucwords($ENpcResidentCsv->at($SupplyItemArray["$ResultItemID"]['ENpcResident'])['Singular']);
                 //split "25.0" into "25" and "0" so we can link in quest array
                 $keyExplode = explode(".", $LinkToSupplyItemSheet);
                 //only pick the first in array (25 for example)
                 $keyID = $keyExplode[0];
-                $QuestID = $QuestArray["$keyID"]["id"];
-                $QuestName = preg_replace('/[^\x00-\x7F]+/', '',$QuestArray["$keyID"]["Name"]);
-                $BeastTribe = $BeastTribeCsv->at($QuestArray["$keyID"]["BeastTribe"])['Name'];
-                $SpecialString = "\n|Special Recipe           = ". $BeastTribe ." Quest\n|Special Recipe Quest     = ". $QuestName ."\n|Special Recipe HandInNPC = ". $HandInNpc ."";
+                //$QuestID = $QuestArray["$keyID"]['id'];
+                $BeastTribe = $BeastTribeCsv->at($QuestArray["$keyID"]['BeastTribe'])['Name'];
+                $SpecialString = "\n|Special Recipe      = $BeastTribe Quest\n|Recipe Quest        = ". $QuestArray["$keyID"]['Name'] ."\n|Recipe HandInNPC    = $HandInNpc";
             }
 
             //is it Crystarium Item?
             if (in_array($ResultItemID, $CrystariumArray)) {
-                $SpecialString = "\n|Special Recipe           = Crystarium Deliveries";
-            }
-            //is it for Collectable?
-            if (in_array($ResultItemID, $SatisfactionItemArray)) {
-                $SpecialString = "\n|Special Recipe           = Custom Delivery";
+                $SpecialString = "\n|Special Recipe      = Crystarium Deliveries";
             }
 
-            //use description for |special Recipe
+            //is it for Collectable?
+            if (in_array($ResultItemID, $SatisfactionItemArray)) {
+                $SpecialString = "\n|Special Recipe      = Custom Delivery";
+            }
+
+            //use description for |Special Recipe
             if (empty($SpecialString)) {
                 $ItemDescription = $ItemCsv->at($ResultItemID)['Description'];
                 if (strpos($ItemDescription, '※Only for use in ') !== false) {
                     switch (true) {
                         case (strpos($ItemDescription, 'moogle')) !== false:
-                            $SpecialString = "\n|Special Recipe           = Moogle Quest";
+                            $SpecialString = "\n|Special Recipe      = Moogle Quest";
                         break;
                         case (strpos($ItemDescription, 'Ixal')) !== false:
-                            $SpecialString = "\n|Special Recipe           = Ixal Quest";
+                            $SpecialString = "\n|Special Recipe      = Ixal Quest";
                         break;
                         
                         default:
-                            $SpecialString = "\n|Special Recipe           = FIX IN PHP";
+                            $SpecialString = "\n|Special Recipe      = NEED TO FIX";
                         break;
                     }
                 }

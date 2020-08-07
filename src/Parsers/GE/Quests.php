@@ -104,20 +104,24 @@ class Quests implements ParseInterface
             //if the quest name has one of the special symbols then output if its sync or lock
             $QuestName = $quest['Name'];
             $SpecialChar = "";
-            $skip = TRUE;
+            //commenting out $skip. if the "continue" part underneath isn't used, then no need to set it every time
+            //$skip = TRUE;
             if (strpos($QuestName, " ") !== false) {
                 $SpecialChar = "\n|Quest Sync = True";
-                $QuestName = str_replace(" ", "", $QuestName);
+                //below str_replace is unneeded because GeFormatter fixes this for us
+                //$QuestName = str_replace(" ", "", $QuestName);
                 $replacestring[] = "". $QuestName ."\n}}". $SpecialChar ."\n}}";
-                $skip = FALSE;
+                //$skip = FALSE;
             }
             if (strpos($QuestName, " ") !== false) {
                 $SpecialChar = "\n|Job Lock = True";
-                $QuestName = str_replace(" ", "", $QuestName);
+                //below str_replace is unneeded because GeFormatter fixes this for us
+                //$QuestName = str_replace(" ", "", $QuestName);
                 $replacestring[] = "". $QuestName ."\n}}". $SpecialChar ."\n}}";
-                $skip = FALSE;
+                //$skip = FALSE;
             }
             //if ($skip == TRUE) continue;
+
             //Grab the correct EventIconType which should then show the correct Icon for a quest
             //(the 'Blue Icon' that appears above an NPC's head, instead of the minimap icon)
             $EventIconType = $EventIconTypeCsv->at($quest['EventIconType'])['NpcIcon{Available}'];
