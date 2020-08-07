@@ -26,7 +26,7 @@ class Quests implements ParseInterface
         |Quest Number = {number}
 
         |Required Quests ={prevquestspace1}{prevquest2}{prevquest3}
-        |Unlocks Quests =
+        |Unlocks Quests ={Locks}
 
         |Objectives =
 {objectives}
@@ -88,6 +88,7 @@ class Quests implements ParseInterface
         $this->io->progressStart($questCsv->total);
 
         //loop through quest data
+        $replacestring = [];
         foreach($questCsv->data as $id => $quest) {
             //---------------------------------------------------------
             $this->io->progressAdvance();
@@ -96,11 +97,27 @@ class Quests implements ParseInterface
             if (empty($quest['Name']) || $quest['Name'] === "Testdfghjkl;") {
                 continue;
             }
-
             //---------------------------------------------------------------------------------
             //Actual code definition begins below!
             //---------------------------------------------------------------------------------
 
+            //if the quest name has one of the special symbols then output if its sync or lock
+            $QuestName = $quest['Name'];
+            $SpecialChar = "";
+            $skip = TRUE;
+            if (strpos($QuestName, " ") !== false) {
+                $SpecialChar = "\n|Quest Sync = True";
+                $QuestName = str_replace(" ", "", $QuestName);
+                $replacestring[] = "". $QuestName ."\n}}". $SpecialChar ."\n}}";
+                $skip = FALSE;
+            }
+            if (strpos($QuestName, " ") !== false) {
+                $SpecialChar = "\n|Job Lock = True";
+                $QuestName = str_replace(" ", "", $QuestName);
+                $replacestring[] = "". $QuestName ."\n}}". $SpecialChar ."\n}}";
+                $skip = FALSE;
+            }
+            //if ($skip == TRUE) continue;
             //Grab the correct EventIconType which should then show the correct Icon for a quest
             //(the 'Blue Icon' that appears above an NPC's head, instead of the minimap icon)
             $EventIconType = $EventIconTypeCsv->at($quest['EventIconType'])['NpcIcon{Available}'];
@@ -679,6 +696,7 @@ class Quests implements ParseInterface
                 '{npcs}' => "\n\n|NPCs Involved = $NpcsInvolved",
                 '{npcloc}' => $npcloc,
                 '{npclocend}' => $npclocend,
+                '{Locks}' => $SpecialChar,
                 /* unused / old code
                  '{instancecontent1}' => $InstanceContent1 ? "\n|Dungeon Requirement = ". $InstanceContent1 : "",
                 '{instancecontent2}' => $InstanceContent2 ? ", ". $InstanceContent2 : "",
@@ -691,7 +709,10 @@ class Quests implements ParseInterface
             // format using Gamer Escape formatter and add to data array
             $this->data[] = GeFormatter::format(self::WIKI_FORMAT, $data);
         }
-
+        //$replacestring = implode("\n\n", $replacestring);
+        //$JSONAPI_File = fopen("output/questreplace.txt", 'w');
+        //fwrite($JSONAPI_File, $replacestring);
+        //fclose($JSONAPI_File);
         // save our data to the filename: GeQuestWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
