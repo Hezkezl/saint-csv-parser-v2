@@ -245,9 +245,9 @@ class Quests implements ParseInterface
                 80101 => "\n|Event = Moonfire Faire (2020)",
                 80102 => "\n|Event = Lightning Strikes (2020)",
                 80103 => "\n|Event = All Saints' Wake (2020)",
-                80104 => "\n|Event = Breaking Brick Mountains (2019)",
+                80104 => "\n|Event = Breaking Brick Mountains (2020)",
                 80105 => "\n|Event = The Maiden's Rhapsody (2019)",
-                80106 => "\n|Event = Starlight Celebration (2019)",
+                80106 => "\n|Event = Starlight Celebration (2020)",
                 80107 => "\n|Event = Heavensturn (2014)",
                 80108 => "\n|Event = Valentione's Day (2020)",
                 80109 => "\n|Event = Little Ladies' Day (2020)",
@@ -256,7 +256,7 @@ class Quests implements ParseInterface
                 80113 => "\n|Event = The Rising (2020)",
                 80115 => "\n|Event = Heavensturn (2016)",
                 80116 => "\n|Event = The Make It Rain Campaign (2020)",
-                80117 => "\n|Event = Yo-kai Watch (2019)",
+                80117 => "\n|Event = Yo-kai Watch (2020)",
                 80118 => "\n|Event = Heavensturn (2017)",
                 80119 => "\n|Event = Heavensturn (2018)",
                 80120 => "\n|Event = Heavensturn (2019)",
@@ -265,33 +265,6 @@ class Quests implements ParseInterface
                 80123 => "\n|Event = A Nocturne for Heroes",
             ];
 
-            //If Small Image (Quest Header Image) is greater than 0 (not blank), then display in html comment
-            //with "Quest Name Image.png" as default location for the filename to be saved.
-            $smallimage = false;
-            if ($quest['Icon'] > 0) {
-                $smallimage = "\n\n|Header Image = ". $quest['Icon'] .".png";
-            }
-
-            //If Beast Tribe Faction is defined, show it. Otherwise don't.
-            $faction = false;
-            if ($quest['BeastTribe']) {
-                $faction = "\n|Faction = ". ucwords(strtolower($BeastTribeCsv->at($quest['BeastTribe'])['Name']));
-            }
-
-            //If "Beast Tribe Reputation Required" equals "None", don't display. Otherwise show it.
-            //Used for Beast quests that have a specific Reputation required to receive Quest.
-            $reputation = false;
-            if ($BeastReputationRankCsv->at($quest['BeastReputationRank'])['Name'] === "None") {
-            } else {
-                $reputation = "\n|Required Reputation = ". $BeastReputationRankCsv->at($quest['BeastReputationRank'])['Name'];
-            }
-
-            //If Beast Tribe Currency is received, show it.
-            $relations = false;
-            if ($quest['ReputationReward'] > 0) {
-                $relations = "\n|Relations = ". $quest['ReputationReward'];
-            }
-
             $instanceunlock = false;
             /* If you unlock a Dungeon during this quest, show the Name.
             commenting out because of the Patch 5.2 change to InstanceContent and the removal of 'Name'
@@ -299,26 +272,6 @@ class Quests implements ParseInterface
                 $instanceunlock = "\n|Misc Reward = [[". $InstanceContentCsv->at($quest['InstanceContent{Unlock}'])['Name'] ."]] unlocked.";
             }
             */
-
-            //Display Grand Company Seal Reward if it's more than zero.
-            $sealsreward = false;
-            if ($quest['GCSeals'] > 0) {
-                $sealsreward = "\n|SealsReward = ". $quest['GCSeals'];
-            }
-
-            //don't display Required Class if equal to "adventurer". Otherwise, show its proper/capitalized Name.
-            $requiredclass = false;
-            if ($ClassJobCsv->at($quest['ClassJob{Required}'])['Name{English}'] === "Adventurer") {
-            } else {
-                $requiredclass = "\n|Required Class = ". $ClassJobCsv->at($quest['ClassJob{Required}'])['Name{English}'];
-            }
-
-            //Show GilReward if more than zero. Otherwise, blank it.
-            if ($quest['GilReward'] > 0) {
-                $gilreward = "\n|GilReward = ". $quest['GilReward'];
-            } else {
-                $gilreward = "\n|GilReward =";
-            }
 
             //Need to add the ClassJobLevel[0] value to the LevelOffset value to get the actual level of the quest
             $QuestLevel = ($quest['ClassJobLevel[0]'] + $quest['QuestLevelOffset']);
@@ -385,12 +338,23 @@ class Quests implements ParseInterface
                 $types = "\n|Section = $JournalSectionName\n|Type = $JournalCategoryName\n|Subtype = $JournalGenreName";
             }
 
-            //Show Repeatable as 'Yes' for instantly repeatable quests, or 'Daily' for dailies, or none
+            //Show Repeatable as 'Yes' for instantly repeatable quests, 'Daily' for dailies, 'Weekly', or 'wtf' for unknown
             $repeatable = false;
-            if (($quest['IsRepeatable'] === "True") && ($quest['RepeatIntervalType'] == 1)) {
-                $repeatable = "\n|Repeatable = Daily";
-            } elseif (($quest['IsRepeatable'] === "True") && ($quest['RepeatIntervalType'] == 0)) {
-                $repeatable = "\n|Repeatable = Yes";
+            if ($quest['IsRepeatable'] === "True") {
+                switch ($quest['RepeatIntervalType']) {
+                    case 0:
+                        $repeatable = "\n|Repeatable = Yes";
+                        break;
+                    case 1:
+                        $repeatable = "\n|Repeatable = Daily";
+                        break;
+                    case 2:
+                        $repeatable = "\n|Repeatable = Weekly";
+                        break;
+                    default:
+                        $repeatable = "UNKNOWN PLEASE FIX";
+                        break;
+                }
             }
 
             /*Show the Previous Quest(s) correct Name by looking them up. Also replace any commas in the name with &#44;
@@ -626,6 +590,7 @@ class Quests implements ParseInterface
                 //quest header image copying code. Should probably comment this out most of the time with /* before
                 //the beginning of the code and put */ after the code for easier commenting, as compared to
                 //putting // in front of every line. ie:  */ commented out code here <line breaks etc/everything too> /*
+                /*
                 if (!empty($quest['Icon'])) {
                     if (!file_exists($this->getOutputFolder() . "/$CurrentPatchOutput/QuestHeaderIcons/{$quest['Icon']}.png")) {
                         // ensure output directory exists
@@ -651,6 +616,7 @@ class Quests implements ParseInterface
                         copy($questIcon, $questiconFileName);
                     }
                 }
+                */
             }
 
             //---------------------------------------------------------------------------------
@@ -662,12 +628,12 @@ class Quests implements ParseInterface
                 '{types}' => $types,
                 '{questicontype}' => $EventIconType,
                 '{eventicon}' => $quest['Icon{Special}'] ? $eventicon[$quest['Icon{Special}']] : '',
-                '{smallimage}' => $smallimage,
+                '{smallimage}' => ($quest['Icon'] > 0) ? "\n\n|Header Image = ". $quest['Icon'] .".png" : "",
                 '{level}' => $QuestLevel,
-                '{reputationrank}' => $reputation,
+                '{reputationrank}' => ($quest['BeastReputationRank'] > 0) ? "\n|Required Reputation = ". $BeastReputationRankCsv->at($quest['BeastReputationRank'])['Name'] : "",
                 '{repeatable}' => $repeatable,
-                '{faction}' => $faction,
-                '{requiredclass}' => $requiredclass,
+                '{faction}' => ($quest['BeastTribe']) ? "\n|Faction = ". ucwords(strtolower($BeastTribeCsv->at($quest['BeastTribe'])['Name'])) : "",
+                '{requiredclass}' => ($quest['ClassJob{Required}'] > 0) ? "\n|Required Class = ". $ClassJobCsv->at($quest['ClassJob{Required}'])['Name{English}'] : "",
                 '{number}' => $quest['id'],
                 '{prevquestspace1}' => $prevquestspace1 ? " ". $prevquestspace1 : "",
                 '{prevquest1}' => $prevquest1 ? $prevquest1 : "",
@@ -676,10 +642,10 @@ class Quests implements ParseInterface
                 '{prev2}' => (!empty($prevquest2)) ? "|prev2=$prevquest2" : "",
                 '{prev3}' => (!empty($prevquest3)) ? "|prev3=$prevquest3" : "",
                 '{expreward}' => $QuestEXP ? "\n\n|EXPReward = $QuestEXP" : "\n\n|EXPReward = ",
-                '{gilreward}' => $gilreward,
-                '{sealsreward}' => $sealsreward,
+                '{gilreward}' => ($quest['GilReward'] > 0) ? "\n|GilReward = ". $quest['GilReward'] : "\n|GilReward =",
+                '{sealsreward}' => ($quest['GCSeals'] > 0) ? "\n|SealsReward = ". $quest['GCSeals'] : "",
                 '{tomestones}' => $quest['TomestoneCount{Reward}'] ? $tomestoneList[$quest['Tomestone{Reward}']] . $quest['TomestoneCount{Reward}'] : '',
-                '{relations}' => $relations,
+                '{relations}' => ($quest['ReputationReward'] > 0) ? "\n|Relations = ". $quest['ReputationReward'] : "",
                 '{instanceunlock}' => $instanceunlock,
                 '{questrewards}' => $questRewards,
                 '{catalystrewards}' => $catalystRewards,
