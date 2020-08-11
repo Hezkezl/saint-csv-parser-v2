@@ -135,6 +135,7 @@ class Recipes implements ParseInterface
                     }
                 }
             }
+            if (strpos($ItemDescription, 'dwarf') == false) continue;
 
             $skill = [
                 0 => 'Carpenter',
