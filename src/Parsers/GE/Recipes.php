@@ -125,7 +125,10 @@ class Recipes implements ParseInterface
                         case (strpos($ItemDescription, 'Ixal')) !== false:
                             $SpecialString = "\n|Special Recipe      = Ixal Quest";
                         break;
-                        
+                        case (strpos($ItemDescription, 'dwarf')) !== false:
+                            $SpecialString = "\n|Special Recipe      = Dwarf Quest";
+                        break;
+
                         default:
                             $SpecialString = "\n|Special Recipe      = NEED TO FIX";
                         break;
@@ -206,4 +209,5 @@ class Recipes implements ParseInterface
 /*
 1st Aug 2020 - Added checks and data for "Special Recipe" (used in beast tribes etc)
 3rd Aug 2020 - Added checks for collectable
+11th Aug 2020 - Added checks for Dwarf Beast Tribe
 */
