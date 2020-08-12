@@ -16,7 +16,6 @@ class SpecialShop implements ParseInterface
 
     // the wiki output format / template we shall use
     const WIKI_FORMAT = "{name}
-{quest}{deny}{accept}
 {item}";
 
     public function parse()
@@ -32,7 +31,6 @@ class SpecialShop implements ParseInterface
         // console writer
         $console = new ConsoleOutput();
 
-
         // download our CSV files
         $console->writeln(" Loading CSVs");
         $console->writeln(" Processing SpecialShop");
@@ -44,13 +42,20 @@ class SpecialShop implements ParseInterface
         foreach($SpecialShopCsv->data as $id => $SpecialShop) {
             $id = $SpecialShop['id'];
             $name = $SpecialShop['Name'];
+            /*
+
+            $QuestUnlock = false;
+            $DenyMessage = false;
+            $AcceptMessage = false;
+
             $QuestUnlock = $QuestCsv->at($SpecialShop['Quest{Unlock}'])['Name'];
-            //if the quest is a 0 (not unlocked via quest) then don't output.
+            if the quest is a 0 (not unlocked via quest) then don't output.
             if (empty($QuestUnlock)) {
                     $QuestUnlock = "";
                 } elseif (!empty($QuestUnlock)) {
                     $QuestUnlock = "\n| Quest = ". $QuestUnlock ."";
             }
+
             $DenyMessage = $DefaultTalkCsv->at($SpecialShop['NotCompleteText'])['Text[0]'];
                 if (!empty($DenyMessage)) {
                     $DenyMessage0 = str_replace("0","",$DefaultTalkCsv->at($SpecialShop['NotCompleteText'])['Text[0]']);
@@ -60,6 +65,7 @@ class SpecialShop implements ParseInterface
                 } elseif (empty($DenyMessage)) {
                     $DenyMessage = "";
                 }
+
             $AcceptMessage = $DefaultTalkCsv->at($SpecialShop['CompleteText'])['Text[0]'];
                 if (!empty($AcceptMessage)) {
                     $AcceptMessage0 = str_replace("0","",$DefaultTalkCsv->at($SpecialShop['CompleteText'])['Text[0]']);
@@ -69,6 +75,7 @@ class SpecialShop implements ParseInterface
                 } elseif (empty($AcceptMessage)) {
                     $AcceptMessage = "";
                 }
+            */
 
             //loop though every Item Receive column
             $item =[];
@@ -204,9 +211,9 @@ class SpecialShop implements ParseInterface
                 '{id}'  => $id,
                 '{name}'  => (!empty($name)) ? "| $name =" : "",
                 '{item}'  => $item,
-                '{quest}'  => $QuestUnlock,
+                /*'{quest}'  => $QuestUnlock,
                 '{deny}' => $DenyMessage,
-                '{accept}' => $AcceptMessage,
+                '{accept}' => $AcceptMessage,*/
 
             ]);
             $this->data[] = $data;
