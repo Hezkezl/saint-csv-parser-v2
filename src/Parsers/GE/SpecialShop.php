@@ -26,7 +26,7 @@ class SpecialShop implements ParseInterface
         $ItemCsv = $this->csv("Item");
         $QuestCsv = $this->csv("Quest");
         $AchievementCsv = $this->csv("Achievement");
-        $DefaultTalkCsv = $this->csv("DefaultTalk");
+        //$DefaultTalkCsv = $this->csv("DefaultTalk");
 
         // console writer
         $console = new ConsoleOutput();
