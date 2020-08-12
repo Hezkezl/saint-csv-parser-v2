@@ -105,8 +105,9 @@ class Quests implements ParseInterface
 
             //Grab the correct EventIconType which should then show the correct Icon for a quest
             //(the 'Blue Icon' that appears above an NPC's head, instead of the minimap icon)
-            $EventIconType = $EventIconTypeCsv->at($quest['EventIconType'])['NpcIcon{Available}']
-                ? (($quest['IsRepeatable']) == "False" ? 1 : 2) : 0;
+            $EventIconType = $EventIconTypeCsv->at($quest['EventIconType'])['NpcIcon{Available}'];
+            $EventIconType += $EventIconType ? (($quest['IsRepeatable']) == "False" ? 1 : 2) : 0;
+            //$EventIconType = $EventIconTypeCsv->at($quest['EventIconType'])['NpcIcon{Available}'] ? (($quest['IsRepeatable']) == "False" ? 1 : 2) : 0;
 
             //change Rewarded Tomestone Number to Correct Wiki Parameter/Name
             $tomestoneList = [
