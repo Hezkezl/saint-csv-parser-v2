@@ -44,7 +44,6 @@ class GeFormatter
         //below string replacement is for adding "an" before Armorer, Alchemist, Archer, Arcanist, Astrologian, or "a" before the other Job names (due to the vowel at the beginning of the name. Silly English language...)
         $format = str_replace("<If(Equal(PlayerParameter(68),10))>an <Sheet(ClassJob,PlayerParameter(68),0)/><Else/><If(Equal(PlayerParameter(68),14))>an <Sheet(ClassJob,PlayerParameter(68),0)/><Else/><If(Equal(PlayerParameter(68),5))>an <Sheet(ClassJob,PlayerParameter(68),0)/><Else/><If(Equal(PlayerParameter(68),26))>an <Sheet(ClassJob,PlayerParameter(68),0)/><Else/><If(Equal(PlayerParameter(68),33))>an <Sheet(ClassJob,PlayerParameter(68),0)/><Else/>a <Sheet(ClassJob,PlayerParameter(68),0)/></If></If></If></If></If>","{{Loremtextconditional|an Armorer|or 'an Alchemist/Archer/Arcanist/Astrologian', or 'a JobName' (depending on your current job)}}", $format);
         $format = preg_replace("/\\<UIForeground\\>[^<]+\\<\\/UIForeground\\>|\\<UIGlow\\>[^<]+\\<\\/UIGlow\\>|\\<\d+\\>[^<]+\\<\\/\d+\\>|\\<\d+\\>[^<]+\\<\\/\d+\\>| Quest Sync\n/",null, $format);
-        $format = preg_replace("/\\|Description = Quest Sync\n/", null, $format);
         //regex to add a % to the end of [[EXP Bonus]] gear
         $format = preg_replace("/(\\[\\[EXP Bonus\\]\\] \\+\d+)/", "$1%", $format);
         $format = str_replace("= False\n", "= No\n", $format);
