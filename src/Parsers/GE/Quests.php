@@ -30,7 +30,8 @@ class Quests implements ParseInterface
         |Objectives =
 {objectives}
 
-        |Description = {description}{expreward}{gilreward}{sealsreward}{tomestones}{relations}{instanceunlock}{questrewards}{catalystrewards}{guaranteeditem7}{guaranteeditem8}{guaranteeditem9}{guaranteeditem11}{questoptionrewards}{trait}
+        |Description = {description}{expreward}{gilreward}{sealsreward}
+{tomestones}{relations}{instanceunlock}{questrewards}{catalystrewards}{guaranteeditem7}{guaranteeditem8}{guaranteeditem9}{guaranteeditem11}{questoptionrewards}{trait}
         |Issuing NPC = {questgiver}
         |NPC Location ={npcs}
         |Mobs Involved ={items}
@@ -534,11 +535,12 @@ class Quests implements ParseInterface
                 //quest header image copying code. Should probably comment this out most of the time with /* before
                 //the beginning of the code and put */ after the code for easier commenting, as compared to
                 //putting // in front of every line. ie:  */ commented out code here <line breaks etc/everything too> /*
+
                 /*
                 if (!empty($quest['Icon'])) {
                     if (!file_exists($this->getOutputFolder() ."/$CurrentPatchOutput/QuestHeaderIcons/{$quest['Icon']}.png")) {
                         // ensure output directory exists
-                        $QuestIconOutputDirectory = $this->getOutputFolder() ."/$CurrentPatchOutput/questheadericons";
+                        $QuestIconOutputDirectory = $this->getOutputFolder() ."/$CurrentPatchOutput/QuestHeaderIcons";
                         if (!is_dir($QuestIconOutputDirectory)) {
                             mkdir($QuestIconOutputDirectory, 0777, true);
                         }
