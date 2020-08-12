@@ -450,7 +450,6 @@ class Quests implements ParseInterface
                 }
 
                 //do the $quest['Name']/NPCs page for each quest
-                $npclocend = false;
                 $npcloc = [];
                 $ItemsInvolved = [];
                 $KeyItemsInvolved = [];
