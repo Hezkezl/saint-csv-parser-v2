@@ -18,7 +18,7 @@ class GeFormatter
         $format = str_ireplace('        }}','}}', $format);
         $format = str_ireplace('        {{','{{', $format);
         //null replacement regex (find something, replace with nothing)
-        $format = preg_replace("/(.*)dammy(.*)\n|(.*)★未使用(.*)削除予定★(.*)\n|{{Loremquote\\|Todo\d\d+\\|link=y\\|(.*)\n|\s*|\s*|<UIForeground>F201FC<\/UIForeground><UIGlow>\w+<\/UIGlow> Quest Sync<UIGlow>\d+<\/UIGlow><UIForeground>\d+</UIForeground>\n/", null, $format);
+        $format = preg_replace("/(.*)dammy(.*)\n|(.*)★未使用(.*)削除予定★(.*)\n|{{Loremquote\\|Todo\d\d+\\|link=y\\|(.*)\n|\s*|\s*|<UIForeground>\w+<\\/UIForeground><UIGlow>\w+<\\/UIGlow> Quest Sync<UIGlow>\d+<\\/UIGlow><UIForeground>\d+<\\/UIForeground>\n/", null, $format);
         $format = preg_replace("/(QuestReward.*)\n\n(?!\\|Issuing NPC)/", "$1\n", $format);
         $format = preg_replace("/(QuestReward.*)\n(\\|Issuing NPC.*)/", "$1\n\n$2", $format);
         $format = preg_replace("/<Emphasis>|<\\/Emphasis>/", "''", $format);
