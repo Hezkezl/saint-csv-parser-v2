@@ -20,32 +20,23 @@ class Quests implements ParseInterface
         |Index = {id}
         |Name = {name}{types}{repeatable}{faction}{eventicon}{reputationrank}
         |Icontype = {questicontype}.png{smallimage}
-        |Level = {level}
-{requiredclass}
-        |Required Affiliation =
-        |Quest Number = {number}
+        |Level = {level}{requiredclass}
 
-        |Required Quests ={prevquestspace1}{prevquest2}{prevquest3}
-        |Unlocks Quests ={Locks}
+        |Required Affiliation =
+        |Quest Number = {id}
+
+        |Required Quests ={prevquestspace1}{prevquest2}{prevquest3}{Locks}
 
         |Objectives =
 {objectives}
 
-        |Description = {description}{expreward}{gilreward}{sealsreward}
-{tomestones}{relations}{instanceunlock}{questrewards}{catalystrewards}{guaranteeditem7}{guaranteeditem8}{guaranteeditem9}{guaranteeditem11}{questoptionrewards}{trait}
+        |Description = {description}{expreward}{gilreward}{sealsreward}{tomestones}{relations}{instanceunlock}{questrewards}{catalystrewards}{guaranteeditem7}{guaranteeditem8}{guaranteeditem9}{guaranteeditem11}{questoptionrewards}{trait}
         |Issuing NPC = {questgiver}
         |NPC Location ={npcs}
         |Mobs Involved ={items}
 
         |Journal =
 {journal}
-
-        |Strategy =
-        |Walkthrough =
-        |Dialogue =
-        |Etymology =
-        |Images =
-        |Notes =
         }}
 {{-stop-}}{{-start-}}
 '''Loremonger:{name}'''
@@ -114,14 +105,14 @@ class Quests implements ParseInterface
 
             //Grab the correct EventIconType which should then show the correct Icon for a quest
             //(the 'Blue Icon' that appears above an NPC's head, instead of the minimap icon)
-            $EventIconType = $EventIconTypeCsv->at($quest['EventIconType'])['NpcIcon{Available}'];
-            $EventIconType += $EventIconType ? (($quest['IsRepeatable']) == "False" ? 1 : 2) : 0;
+            $EventIconType = $EventIconTypeCsv->at($quest['EventIconType'])['NpcIcon{Available}']
+                ? (($quest['IsRepeatable']) == "False" ? 1 : 2) : 0;
 
             //change Rewarded Tomestone Number to Correct Wiki Parameter/Name
             $tomestoneList = [
-                1 => '|ARRTomestone = ',
-                2 => '|TomestoneLow = ',
-                3 => '|TomestoneHigh = ',
+                1 => "\n|ARRTomestone = ",
+                2 => "\n|TomestoneLow = ",
+                3 => "\n|TomestoneHigh = ",
             ];
 
             //Loop through guaranteed QuestRewards and display the Item Name
@@ -585,8 +576,7 @@ class Quests implements ParseInterface
                 '{reputationrank}' => ($quest['BeastReputationRank'] > 0) ? "\n|Required Reputation = ". $BeastReputationRankCsv->at($quest['BeastReputationRank'])['Name'] : "",
                 '{repeatable}' => $repeatable,
                 '{faction}' => ($quest['BeastTribe']) ? "\n|Faction = ". ucwords(strtolower($BeastTribeCsv->at($quest['BeastTribe'])['Name'])) : "",
-                '{requiredclass}' => ($quest['ClassJob{Required}'] > 0) ? "\n|Required Class = ". $ClassJobCsv->at($quest['ClassJob{Required}'])['Name{English}'] : "",
-                '{number}' => $quest['id'],
+                '{requiredclass}' => ($quest['ClassJob{Required}'] > 0) ? "\n\n|Required Class = ". $ClassJobCsv->at($quest['ClassJob{Required}'])['Name{English}'] : "",
                 '{prevquestspace1}' => $prevquestspace1 ? " ". $prevquestspace1 : "",
                 '{prevquest1}' => $prevquest1 ? $prevquest1 : "",
                 '{prevquest2}' => $prevquest2 ? ", ". $prevquest2 : "",
