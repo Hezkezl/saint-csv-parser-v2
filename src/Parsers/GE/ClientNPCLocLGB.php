@@ -26,10 +26,19 @@ class ClientNPCLocLGB implements ParseInterface
         $PlaceNameCsv = $this->csv('PlaceName');
         $EnpcResidentCsv = $this->csv('EnpcResident');
         $ENpcBaseCsv = $this->csv('ENpcBase');
+        $QuestCsv = $this->csv('Quest');
 
 
         $zone = 133;
         $this->io->progressStart($TerritoryTypeCsv->total);
+
+        $NPCIssuerArray = [];
+
+        foreach ($QuestCsv->data as $id => $QuestData) {
+            $QuestIssuer = $QuestData['Issuer{Start}'];
+            $NPCIssuerArray[$QuestIssuer][] = $QuestData;
+            // example = var_dump($SupplyItemArray['22720']['id']);
+        }
 
         foreach ($TerritoryTypeCsv->data as $id => $teri) {
         $this->io->progressAdvance();
@@ -140,6 +149,14 @@ class ClientNPCLocLGB implements ParseInterface
                     } elseif ($MapCsv->at($teri["Map"])["PlaceName"] > 0) {
                     $sub = "";
                     }
+                    
+                $IssuerArray = [];
+                foreach(range(0,20) as $i) {
+                    if (empty($NPCIssuerArray["$BaseId"]["$i"]['Name'])) continue;
+                    $IssuerArray[0] = "\n| Issuer =";
+                    $IssuerArray[] = " ". $NPCIssuerArray["$BaseId"]["$i"]['Name'] .",";
+                }
+                $NpcIssues = implode("", $IssuerArray);
 
                     $MapCode = substr($NpcMapCodeName, 0, 4);
 
@@ -153,7 +170,7 @@ class ClientNPCLocLGB implements ParseInterface
                     //string for csv
                     //$string = "". $InstanceID .",". $x .",". $y .",". $AssetType .",". $BaseId .",". $Name .",";
                     //string for wikioutput
-                    $string = "{{-start-}}\n'''". $NpcName ."/Map/". $BaseId ."'''\n{{NPCMap\n| base = ". $MapCode ." - ". $NpcPlaceName ."". $sub .".png\n| float_link = ". $NpcName ."\n| float_caption = ". $NpcName ." (x:". $X .", y:". $Y .")\n| x = ". $PixX ."\n| y = ". $PixY ."\n| zone = ". $NpcPlaceName ."\n| level_id = ". $InstanceID ."\n| npc_id = ". $BaseId ."\n}}\n{{-stop-}}";
+                    $string = "{{-start-}}\n'''". $NpcName ."/Map/". $BaseId ."'''\n{{NPCMap\n| base = ". $MapCode ." - ". $NpcPlaceName ."". $sub .".png\n| float_link = ". $NpcName ."\n| float_caption = ". $NpcName ." (x:". $X .", y:". $Y .")\n| x = ". $PixX ."\n| y = ". $PixY ."\n| zone = ". $NpcPlaceName ."\n| level_id = ". $InstanceID ."\n| npc_id = ". $BaseId ."". $NpcIssues ."\n}}{{-stop-}}";
 
                     $output[] = $string;
 
@@ -184,4 +201,5 @@ class ClientNPCLocLGB implements ParseInterface
 
 /*
 27th July 2020 - Adujusted to work with bot
+13th Aug 2020 - Added |Issuer = variable for npcs which issue quests
 */
