@@ -15,6 +15,21 @@ class Download implements ParseInterface
 
     public function parse()
     {
+        include (dirname(__DIR__) . '/Paths.php');
+        $ItemCsv = $this->csv('Item');
+        $ItemArray = [];
+        foreach ($ItemCsv->data as $id => $ItemData) {
+            $JSONItemName = $ItemData['Name'];
+            $JSONItemId = $id;
+            $ItemArray[] = array(
+                'id' => $JSONItemId,
+                'name_en' => $JSONItemName,
+            );
+        }
+        $JSONOUTPUT = json_encode($ItemArray, JSON_PRETTY_PRINT);
+        $JSONOUTPUT_File = fopen("src\Parsers\Icons\IconData.json", 'w');
+        fwrite($JSONOUTPUT_File, $JSONOUTPUT);
+        fclose($JSONOUTPUT_File);
         $dom = new Dom;
         $list = json_decode(file_get_contents(__DIR__ .'/IconData.json'));
         $baseUrl  = 'https://na.finalfantasyxiv.com/lodestone/playguide/db/item/?patch=&db_search_category=item&category2=&q={ITEM_NAME}';
