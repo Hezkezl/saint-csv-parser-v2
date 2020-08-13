@@ -26,7 +26,7 @@ class ClientNPCLocLevel implements ParseInterface
           | y = {pixY}
           | zone = {map}
           | level_id = {id}
-          | npc_id = {objectid}
+          | npc_id = {objectid}{NpcIssues}
         }}
         {{-stop-}}";
 
@@ -40,6 +40,7 @@ class ClientNPCLocLevel implements ParseInterface
         $ENpcBaseCsv = $this->csv('ENpcBase');
         $TerritoryTypeCsv = $this->csv('TerritoryType');
         $PlaceNameCsv = $this->csv('PlaceName');
+        $QuestCsv = $this->csv('Quest');
 
         // console writer
         $console = new ConsoleOutput();
@@ -54,6 +55,15 @@ class ClientNPCLocLevel implements ParseInterface
         // switch to a section so we can overwrite
         $console = $console->section();
 
+        $NPCIssuerArray = [];
+
+        foreach ($QuestCsv->data as $id => $QuestData) {
+            $QuestIssuer = $QuestData['Issuer{Start}'];
+            $NPCIssuerArray[$QuestIssuer][] = $QuestData;
+            // example = var_dump($SupplyItemArray['22720']['id']);
+        }
+
+        
         // loop through our sequences
         foreach($levelcsv->data as $id => $level) {
             $id = $level['id'];
@@ -63,6 +73,13 @@ class ClientNPCLocLevel implements ParseInterface
             if ($level["Type"] = 8) {
                 $name = ucwords(strtolower($residentcsv->at($level["Object"])['Singular']));
                 $objectid = $level["Object"];
+                $IssuerArray = [];
+                foreach(range(0,20) as $i) {
+                    if (empty($NPCIssuerArray["$objectid"]["$i"]['Name'])) continue;
+                    $IssuerArray[0] = "\n  | Issuer =";
+                    $IssuerArray[] = " ". $NPCIssuerArray["$objectid"]["$i"]['Name'] .",";
+                }
+                $NpcIssues = implode("", $IssuerArray);
                 //Array of names that should not be capitalized
             $IncorrectNames = array(" De ", " Bas ", " Mal ", " Van ", " Cen ", " Sas ", " Tol ", " Zos ", " Yae ", " The ", " Of The ", " Of ",
             "A-ruhn-senna", "A-towa-cant", "Bea-chorr", "Bie-zumm", "Bosta-bea", "Bosta-loe", "Chai-nuzz", "Chei-ladd", "Chora-kai", "Chora-lue",
@@ -146,6 +163,7 @@ class ClientNPCLocLevel implements ParseInterface
                 '{objectid}' => $objectid,
                 '{map}' => $NpcPlaceName,
                 '{sub}' => $sub,
+                '{NpcIssues}' => $NpcIssues,
                 '{mapcode}' => $code,
             ]);
 
@@ -163,4 +181,5 @@ class ClientNPCLocLevel implements ParseInterface
 
 /*
 27th July 2020 - Adujusted to work with bot
+13th Aug 2020 - Added |Issuer = variable for npcs which issue quests
 */
