@@ -4,184 +4,182 @@ namespace App\Parsers\GE;
 
 use App\Parsers\CsvParseTrait;
 use App\Parsers\ParseInterface;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
 /**
- * php bin/console app:parse:csv GE:ClientNPCLocLGB
+ * php bin/console app:parse:csv GE:ClientNPCLocLevel
  */
-class ClientNPCLocLGB implements ParseInterface
+class ClientNPCLocLevel implements ParseInterface
 {
     use CsvParseTrait;
 
+
     // the wiki output format / template we shall use
-    const WIKI_FORMAT ='{output}
-     ';
+    const WIKI_FORMAT = "
+        {{-start-}}
+        '''{name}/Map/{objectid}'''
+        {{NPCMap
+          | base = {mapcode} - {map}{sub}.png
+          | float_link = {name}
+          | float_caption = {name} (x:{x2}, y:{y2})
+          | x = {pixX}
+          | y = {pixY}
+          | zone = {map}
+          | level_id = {id}
+          | npc_id = {objectid}{NpcIssues}
+        }}
+        {{-stop-}}";
+
     public function parse()
     {
         include (dirname(__DIR__) . '/Paths.php');
 
-        // grab CSV files we want to use
-        $MapCsv = $this->csv('Map');
-        $TerritoryTypeCsv = $this->csv('TerritoryType');
-        $fatecsv = $this->csv('Fate');
-        $PlaceNameCsv = $this->csv('PlaceName');
-        $EnpcResidentCsv = $this->csv('EnpcResident');
+        $levelcsv = $this->csv('Level');
+        $mapcsv = $this->csv('Map');
+        $residentcsv = $this->csv('ENpcResident');
         $ENpcBaseCsv = $this->csv('ENpcBase');
+        $TerritoryTypeCsv = $this->csv('TerritoryType');
+        $PlaceNameCsv = $this->csv('PlaceName');
+        $QuestCsv = $this->csv('Quest');
+
+        // console writer
+        $console = new ConsoleOutput();
 
 
-        $zone = 133;
-        $this->io->progressStart($TerritoryTypeCsv->total);
+        // download our CSV files
+        $console->writeln(" Loading CSVs");
 
-        foreach ($TerritoryTypeCsv->data as $id => $teri) {
-        $this->io->progressAdvance();
-        $index = $teri['id'];
-        //if ($index != $zone) continue;//comment this out for run all in teri
-        $code = $teri['Name'];
-        if (empty($code)) continue;
-        //if ($code = "n4t2") continue; // skipping eulmore because of floors
-        foreach(range(0,2) as $range) {
-            if ($range == 0) {
-                $url = "cache/$PatchID/lgb/". $code ."_planlive.lgb.json";
-                //var_dump($url);
-            } elseif ($range == 1) {
-                $url = "cache/$PatchID/lgb/". $code ."_planevent.lgb.json";
-            } elseif ($range == 2) {
-                $url = "cache/$PatchID/lgb/". $code ."_planmap.lgb.json";
-            }
-            if (!file_exists($url)) continue;
-        //$url = 'cache/lgb/'. $code .'_planevent.lgb.json'; // path to your JSON file
-        $jdata = file_get_contents($url);
-        $decodeJdata = json_decode($jdata);
-            foreach ($decodeJdata as $lgb) {
-                $LayerID = $lgb->LayerID;
-                $Name = $lgb->strName;
-                $InstanceObjects = $lgb->InstanceObjects;
-                $AssetType = "";
 
-                foreach($InstanceObjects as $Object) {
-                    $AssetType = $Object->AssetType;
-                    $InstanceID = "";
-                    if (!empty($Object->InstanceID)) {
-                        $InstanceID = $Object->InstanceID;
-                    }
-                    $BaseId = "";
-                    $x = "";
-                    $y = "";
-                    if ($AssetType == 8) {
-                        $BaseId = "". $Object->Object->ParentData->ParentData->BaseId ."";
-                        $x = $Object->Transform->Translation->x;
-                        $y = $Object->Transform->Translation->z;
-                    } elseif ($AssetType == 45) {
-                        $BaseId = "". $Object->Object->ParentData->BaseId ."";
-                        $x = $Object->Transform->Translation->x;
-                        $y = $Object->Transform->Translation->z;
-                    } elseif ($AssetType == 6) {
-                        $x = $Object->Transform->Translation->x;
-                        $y = $Object->Transform->Translation->z;
-                    }
-                    if ($AssetType !== 8) continue;
+        $console->writeln(" Processing Level at ENpc Location data");
 
-                    //Array of names that should not be capitalized
+        // switch to a section so we can overwrite
+        $console = $console->section();
+
+        $NPCIssuerArray = [];
+
+        foreach ($QuestCsv->data as $id => $QuestData) {
+            $QuestIssuer = $QuestData['Issuer{Start}'];
+            $NPCIssuerArray[$QuestIssuer][] = $QuestData;
+            // example = var_dump($SupplyItemArray['22720']['id']);
+        }
+
+        
+        // loop through our sequences
+        foreach($levelcsv->data as $id => $level) {
+            $id = $level['id'];
+
+
+
+            if ($level["Type"] = 8) {
+                $name = ucwords(strtolower($residentcsv->at($level["Object"])['Singular']));
+                $objectid = $level["Object"];
+                $IssuerArray = [];
+                foreach(range(0,20) as $i) {
+                    if (empty($NPCIssuerArray["$objectid"]["$i"]['Name'])) continue;
+                    $IssuerArray[0] = "\n  | Issuer =";
+                    $IssuerArray[] = " ". $NPCIssuerArray["$objectid"]["$i"]['Name'] .",";
+                }
+                $NpcIssues = implode("", $IssuerArray);
+                //Array of names that should not be capitalized
             $IncorrectNames = array(" De ", " Bas ", " Mal ", " Van ", " Cen ", " Sas ", " Tol ", " Zos ", " Yae ", " The ", " Of The ", " Of ",
-                "A-ruhn-senna", "A-towa-cant", "Bea-chorr", "Bie-zumm", "Bosta-bea", "Bosta-loe", "Chai-nuzz", "Chei-ladd", "Chora-kai", "Chora-lue",
-                "Chue-zumm", "Dulia-chai", "E-sumi-yan", "E-una-kotor", "Fae-hann", "Hangi-rua", "Hanji-fae", "Kai-shirr", "Kan-e-senna", "Kee-bostt",
-                "Kee-satt", "Lewto-sai", "Lue-reeq", "Mao-ladd", "Mei-tatch", "Moa-mosch", "Mosha-moa", "Moshei-lea", "Nunsi-lue", "O-app-pesi", "Qeshi-rae",
-                "Rae-qesh", "Rae-satt", "Raya-o-senna", "Renda-sue", "Riqi-mao", "Roi-tatch", "Rua-hann", "Sai-lewq", "Sai-qesh", "Sasha-rae", "Shai-satt",
-                "Shai-tistt", "Shee-tatch", "Shira-kee", "Shue-hann", "Sue-lewq", "Tao-tistt", "Tatcha-mei", "Tatcha-roi", "Tio-reeq", "Tista-bie", "Tui-shirr",
-                "Vroi-reeq", "Zao-mosc", "Zia-bostt", "Zoi-chorr", "Zumie-moa", "Zumie-shai");
-            $correctnames = array(" de ", " bas ", " mal ", " van ", " cen ", " sas ", " tol ", " zos ", " yae ", " the ", " of the ", " of ",
-                "A-Ruhn-Senna", "A-Towa-Cant", "Bea-Chorr", "Bie-Zumm", "Bosta-Bea", "Bosta-Loe", "Chai-Nuzz", "Chei-Ladd", "Chora-Kai", "Chora-Lue",
-                "Chue-Zumm", "Dulia-Chai", "E-Sumi-Yan", "E-Una-Kotor", "Fae-Hann", "Hangi-Rua", "Hanji-Fae", "Kai-Shirr", "Kan-E-Senna", "Kee-Bostt",
-                "Kee-Satt", "Lewto-Sai", "Lue-Reeq", "Mao-Ladd", "Mei-Tatch", "Moa-Mosch", "Mosha-Moa", "Moshei-Lea", "Nunsi-Lue", "O-App-Pesi", "Qeshi-Rae",
-                "Rae-Qesh", "Rae-Satt", "Raya-O-Senna", "Renda-Sue", "Riqi-Mao", "Roi-Tatch", "Rua-Hann", "Sai-Lewq", "Sai-Qesh", "Sasha-Rae", "Shai-Satt",
-                "Shai-Tistt", "Shee-Tatch", "Shira-Kee", "Shue-Hann", "Sue-Lewq", "Tao-Tistt", "Tatcha-Mei", "Tatcha-Roi", "Tio-Reeq", "Tista-Bie", "Tui-Shirr",
-                "Vroi-Reeq", "Zao-Mosc", "Zia-Bostt", "Zoi-Chorr", "Zumie-Moa", "Zumie-Shai");
+            "A-ruhn-senna", "A-towa-cant", "Bea-chorr", "Bie-zumm", "Bosta-bea", "Bosta-loe", "Chai-nuzz", "Chei-ladd", "Chora-kai", "Chora-lue",
+            "Chue-zumm", "Dulia-chai", "E-sumi-yan", "E-una-kotor", "Fae-hann", "Hangi-rua", "Hanji-fae", "Kai-shirr", "Kan-e-senna", "Kee-bostt",
+            "Kee-satt", "Lewto-sai", "Lue-reeq", "Mao-ladd", "Mei-tatch", "Moa-mosch", "Mosha-moa", "Moshei-lea", "Nunsi-lue", "O-app-pesi", "Qeshi-rae",
+            "Rae-qesh", "Rae-satt", "Raya-o-senna", "Renda-sue", "Riqi-mao", "Roi-tatch", "Rua-hann", "Sai-lewq", "Sai-qesh", "Sasha-rae", "Shai-satt",
+            "Shai-tistt", "Shee-tatch", "Shira-kee", "Shue-hann", "Sue-lewq", "Tao-tistt", "Tatcha-mei", "Tatcha-roi", "Tio-reeq", "Tista-bie", "Tui-shirr",
+            "Vroi-reeq", "Zao-mosc", "Zia-bostt", "Zoi-chorr", "Zumie-moa", "Zumie-shai");
+        $correctnames = array(" de ", " bas ", " mal ", " van ", " cen ", " sas ", " tol ", " zos ", " yae ", " the ", " of the ", " of ",
+            "A-Ruhn-Senna", "A-Towa-Cant", "Bea-Chorr", "Bie-Zumm", "Bosta-Bea", "Bosta-Loe", "Chai-Nuzz", "Chei-Ladd", "Chora-Kai", "Chora-Lue",
+            "Chue-Zumm", "Dulia-Chai", "E-Sumi-Yan", "E-Una-Kotor", "Fae-Hann", "Hangi-Rua", "Hanji-Fae", "Kai-Shirr", "Kan-E-Senna", "Kee-Bostt",
+            "Kee-Satt", "Lewto-Sai", "Lue-Reeq", "Mao-Ladd", "Mei-Tatch", "Moa-Mosch", "Mosha-Moa", "Moshei-Lea", "Nunsi-Lue", "O-App-Pesi", "Qeshi-Rae",
+            "Rae-Qesh", "Rae-Satt", "Raya-O-Senna", "Renda-Sue", "Riqi-Mao", "Roi-Tatch", "Rua-Hann", "Sai-Lewq", "Sai-Qesh", "Sasha-Rae", "Shai-Satt",
+            "Shai-Tistt", "Shee-Tatch", "Shira-Kee", "Shue-Hann", "Sue-Lewq", "Tao-Tistt", "Tatcha-Mei", "Tatcha-Roi", "Tio-Reeq", "Tista-Bie", "Tui-Shirr",
+            "Vroi-Reeq", "Zao-Mosc", "Zia-Bostt", "Zoi-Chorr", "Zumie-Moa", "Zumie-Shai");
 
-                    $NpcMiqoCheck = $ENpcBaseCsv->at($BaseId)['Race']; //see if miqote
-                    $NpcName = ucwords(strtolower($EnpcResidentCsv->at($BaseId)['Singular']));
-                    //this explodes miqote's names into 2 words, capitalizes them and then puts it back together with a hyphen
-                    if ($NpcMiqoCheck == 4) {
-                        $NpcName = ucwords(strtolower($EnpcResidentCsv->at($BaseId)['Singular']));
-                        $NpcName = implode('-', array_map('ucfirst', explode('-', $NpcName)));
-                    }
-                    $NpcName = str_replace($IncorrectNames, $correctnames, $NpcName);
-                    if (empty($NpcName)) continue;
+                $NpcMiqoCheck = $ENpcBaseCsv->at($objectid)['Race']; //see if miqote
+                //this explodes miqote's names into 2 words, capitalizes them and then puts it back together with a hyphen
+                if ($NpcMiqoCheck == 4) {
+                    $name = ucwords(strtolower($residentcsv->at($objectid)['Singular']));
+                    $name = implode('-', array_map('ucfirst', explode('-', $name)));
+                }
+                if (empty($name)) {
+                    continue;
+                }
 
+                $NpcLevelX = $level["X"];
+                $NpcLevelY = $level["Y"];
+                $NpcLevelZ = $level["Z"];
+                $NpcLevelMap = $level["Map"];
 
-                    $scale = $MapCsv->at($teri["Map"])['SizeFactor'];
-                    $c = $scale / 100.0;
+                $scale = $mapcsv->at($level["Map"])['SizeFactor'];
+                //$offsetx = $mapcsv["Offset{X}"];
+                $c = $scale / 100.0;
 
-                    $offsetx = $MapCsv->at($teri["Map"])['Offset{X}'];
-                    $offsetValueX = ($x + $offsetx) * $c;
-                    $X = round(((41.0 / $c) * (($offsetValueX + 1024.0) / 2048.0) +1), 1);
-                    $PixX = round(((($X - 1) * 50 * $c) /3.9 + 2), 2);
+                $offsetx = $mapcsv->at($level["Map"])['Offset{X}'];
+                    $offsetValueX = ($NpcLevelX + $offsetx) * $c;
+                    $NpcLevelX2 = round(((41.0 / $c) * (($offsetValueX + 1024.0) / 2048.0) +1), 1);
+                    $NpcPixelX = round(((($NpcLevelX2 - 1) * 50 * $c) /3.9 + 5), 2);
 
-                    $offsetz = $MapCsv->at($teri["Map"])['Offset{Y}'];
-                    $offsetValueZ = ($y + $offsetz) * $c;
-                    $Y = round(((41.0 / $c) * (($offsetValueZ + 1024.0) / 2048.0) +1), 1);
-                    $PixY = round(((($Y - 1) * 50 * $c) /3.9 + 5), 2);
+                $offsetz = $mapcsv->at($level["Map"])['Offset{Y}'];
+                    $offsetValueZ = ($NpcLevelZ + $offsetz) * $c;
+                    $NpcLevelZ2 = round(((41.0 / $c) * (($offsetValueZ + 1024.0) / 2048.0) +1), 1);
+                    $NpcPixelZ = round(((($NpcLevelZ2 - 1) * 50 * $c) /3.9 + 5), 2);
                     //$npcpixelY2 = $NpcPixelZ /3.9
 
-                    $NpcMap1 = $MapCsv->at($teri["Map"])['PlaceName'];
-                        $NpcPlaceName = str_replace("''Prima Vista''", "Prima Vista", $PlaceNameCsv->at($NpcMap1)['Name']);
+            $NpcMap1 = $mapcsv->at($level["Map"])['PlaceName'];
+                $NpcPlaceName = $PlaceNameCsv->at($NpcMap1)['Name'];
 
-                    if ($code == "z3e2") {
-                         $NpcPlaceName = "The Prima Vista Tiring Room";
-                    }
+            $NpcMapCodeName = $mapcsv->at($level["Map"])['Id'];
 
-                    $NpcMapCodeName = $MapCsv->at($teri["Map"])['Id'];
-
-                    $NpcMap2 = $MapCsv->at($teri["Map"])['PlaceName{Sub}'];
-                        $NpcPlaceNameSub = $PlaceNameCsv->at($NpcMap2)['Name'];
-                    $NpcNameSubString = "Merchant & Mender (". $NpcPlaceName .")";
-                    $NpcName = str_replace("Merchant & Mender", $NpcNameSubString, $NpcName);
-
-                    if ($MapCsv->at($teri["Map"])["PlaceName{Sub}"] > 0) {
-                    $sub = " - ".$PlaceNameCsv->at($MapCsv->at($teri["Map"])["PlaceName{Sub}"])['Name']."";
-                    } elseif ($MapCsv->at($teri["Map"])["PlaceName"] > 0) {
-                    $sub = "";
-                    }
-
-                    $MapCode = substr($NpcMapCodeName, 0, 4);
-
-                    //for debugging:
-                    //var_dump($lgb);
-                    //$fileoutput = print_r(array($lgb, true));
-                    //file_put_contents('file.txt', $fileoutput);
-
-                    //start of section
-                    $output =[];
-                    //string for csv
-                    //$string = "". $InstanceID .",". $x .",". $y .",". $AssetType .",". $BaseId .",". $Name .",";
-                    //string for wikioutput
-                    $string = "{{-start-}}\n'''". $NpcName ."/Map/". $BaseId ."'''\n{{NPCMap\n| base = ". $MapCode ." - ". $NpcPlaceName ."". $sub .".png\n| float_link = ". $NpcName ."\n| float_caption = ". $NpcName ." (x:". $X .", y:". $Y .")\n| x = ". $PixX ."\n| y = ". $PixY ."\n| zone = ". $NpcPlaceName ."\n| level_id = ". $InstanceID ."\n| npc_id = ". $BaseId ."\n}}\n{{-stop-}}";
-
-                    $output[] = $string;
+            $NpcMap2 = $mapcsv->at($level["Map"])['PlaceName{Sub}'];
+                $NpcPlaceNameSub = $PlaceNameCsv->at($NpcMap2)['Name'];
+            }
 
 
+            if ($mapcsv->at($level["Map"])["PlaceName{Sub}"] > 0) {
+            $sub = " - ".$PlaceNameCsv->at($mapcsv->at($level["Map"])["PlaceName{Sub}"])['Name']."";
+            } elseif ($mapcsv->at($level["Map"])["PlaceName"] > 0) {
+            $sub = "";
+            }
+            $code = substr($NpcMapCodeName, 0, 4);
+            if ($code == "z3e2") {
+                $NpcPlaceName = "The Prima Vista Tiring Room";
+           }
 
-                    // Save some data
-                    $data = [
-                        '{output}' => "\n\n$string",
-                    ];
-                    // format using Gamer Escape formatter and add to data array
-                    // need to look into using item-specific regex, if required.
-                    $this->data[] = GeFormatter::format(self::WIKI_FORMAT, $data);
-                }
-                }
-            };
+            // build our data array using the GE Formatter
+            $data = GeFormatter::format(self::WIKI_FORMAT, [
+                '{x}'  => $NpcLevelX,
+                '{id}' => $id,
+                '{y}'    => $NpcLevelY,
+                '{m}' => $NpcLevelMap,
+                '{scale}' => $scale,
+                '{x2}'  => $NpcLevelX2,
+                '{y2}'  => $NpcLevelZ2,
+                '{pixX}' => $NpcPixelX,
+                '{pixY}' => $NpcPixelZ,
+                //'{y3}'  => $NpcLevelY3,
+                '{name}' => $name,
+                '{npcname}' => $name,
+                '{objectid}' => $objectid,
+                '{map}' => $NpcPlaceName,
+                '{sub}' => $sub,
+                '{NpcIssues}' => $NpcIssues,
+                '{mapcode}' => $code,
+            ]);
+
+            $this->data[] = $data;
+
+            $console->overwrite(" > Completed Sequence: {$id} --> }");
         }
-        // save our data to the filename: LGB_NPC.txt
-        $this->io->progressFinish();
-        $this->io->text('Saving ...');
-        $info = $this->save("$CurrentPatchOutput/ClientNPCLocationsLGB - ". $Patch .".txt", 9999999);
 
-        $this->io->table(
-            [ 'Filename', 'Data Count', 'File Size' ],
-            $info
-        );
+        // save
+        $console->writeln(" Saving... ");
+        $this->save("$CurrentPatchOutput/ClientNPCLocationsLevel - ". $Patch .".txt", 999999);
     }
 }
 
+
 /*
 27th July 2020 - Adujusted to work with bot
+13th Aug 2020 - Added |Issuer = variable for npcs which issue quests
 */
