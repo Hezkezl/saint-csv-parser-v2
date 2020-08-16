@@ -47,7 +47,6 @@ class Items implements ParseInterface
         $ItemUiCategoryCsv = $this->csv("ItemUICategory");
         $ClassJobCategoryCsv = $this->csv("ClassJobCategory");
         $ClassJobCsv = $this->csv("ClassJob");
-        $SalvageCsv = $this->csv("Salvage");
         $BuddyEquipCsv = $this->csv("BuddyEquip");
 
         // (optional) start a progress bar
@@ -61,36 +60,27 @@ class Items implements ParseInterface
             if (empty($item['Name'])) {
                 continue;
             }
-            //if (($item['ClassJob{Repair}'] == 0) || ($SalvageCsv->at($item['Salvage'])['OptimalSkill'] == 0)) {continue;}
 
             // remove Emphasis, comma, and wiki italic '' code in names
             $Name = preg_replace("/<Emphasis>|<\/Emphasis>|,|''/", "", $item['Name']);
             //$Name = str_replace("&", "and", $Name);
 
-            // check if item can be Desynthesized
-            $Desynth = false;
-            $DesynthText = false;
+            // add Desynth template and subpage if item is eligible
             $DesynthTop = false;
-            if (($SalvageCsv->at($item['Salvage'])['OptimalSkill'] > 1) && ($item['ItemUICategory'] == 47 || $item['ClassJob{Repair}'] > 0)) {
-                $Desynth = "Yes";
+            if (!empty($item['Desynth'])) {
+                $DesynthText = "{{ARR Infobox Desynth\n|Item            = ". $item['Name'] ."\n|Primary Skill   = ".
+                    ucwords(strtolower($ClassJobCsv->at($item['ClassJob{Repair}'])['Name'])) ."\n|Result 1        = \n".""
+                    ."|Result 1 Amount = \n|Result 2        = \n|Result 2 Amount = \n|Result 3        = \n".""
+                    ."|Result 3 Amount = \n|Result 4        = \n|Result 4 Amount = \n|Result 5        = \n".""
+                    ."|Result 5 Amount = \n|Result 6        = \n|Result 6 Amount = \n}}";
+                if ($Bot == "true") {
+                    $DesynthTop = "{{-start-}}\n'''$Name/Desynth'''\n$DesynthText{{-stop-}}";
+                } else {
+                    $DesynthTop = "http://ffxiv.gamerescape.com/wiki/$Name/Desynth\n$DesynthText";
+                }
             };
 
-            // add Desynth template and page if item can be Desynthesized
-            if ($Desynth == "Yes") {
-                $DesynthText = "{{ARR Infobox Desynth\n|Item            = " . $item['Name'] . "\n|Primary Skill   = " .
-                    ucwords(strtolower($ClassJobCsv->at($item['ClassJob{Repair}'])['Name'])) . "\n|Result 1        = \n" . ""
-                    . "|Result 1 Amount = \n|Result 2        = \n|Result 2 Amount = \n|Result 3        = \n" . ""
-                    . "|Result 3 Amount = \n|Result 4        = \n|Result 4 Amount = \n|Result 5        = \n" . ""
-                    . "|Result 5 Amount = \n|Result 6        = \n|Result 6 Amount = \n}}";
-            };
-
-            if (($Bot == "true") && ($Desynth == "Yes")) {
-                $DesynthTop = "{{-start-}}\n'''$Name/Desynth'''\n$DesynthText{{-stop-}}";
-            } elseif (($Bot != "true") && ($Desynth == "Yes")) {
-                $DesynthTop = "http://ffxiv.gamerescape.com/wiki/$Name/Desynth\n$DesynthText";
-            }
-
-            // change the top and bottom code depending on if I want to bot the pages up or not
+            // change the top and bottom code of item output depending on if I want to bot the pages up or not
             if ($Bot == "true") {
                 $Top = "{{-start-}}\n'''$Name/Patch'''\n$Patch\n<noinclude>[[Category:Patch Subpages]]</noinclude>\n{{-stop-}}{{-start-}}\n'''$Name'''\n";
                 //$Top = "{{-start-}}\n'''$Name'''\n";
@@ -105,7 +95,7 @@ class Items implements ParseInterface
 
             // if multiple Required Classes separate with commas, otherwise 3 capital letters. If no classes, null
             $RequiredClasses = ($item['ClassJobCategory'] > 0)
-                ? "\n| Requires       = " . preg_replace("/([A-Z]{3})\s/", "$1, ", ($ClassJobCategoryCsv->at($item['ClassJobCategory'])['Name']))
+                ? "\n| Requires       = ". preg_replace("/([A-Z]{3})\s/", "$1, ", ($ClassJobCategoryCsv->at($item['ClassJobCategory'])['Name']))
                 : false;
 
             // change Fits/Gender to wiki-specific parameters
@@ -113,7 +103,7 @@ class Items implements ParseInterface
             if ($item['Description'] == "Fits: Game Masters") {
                 $Description = "\n| FitsGM         = Game Masters";
             } elseif (!empty($item['Description'])) {
-                $Description = "\n| Description    = " . $item['Description'];
+                $Description = "\n| Description    = ". $item['Description'];
             }
             if (!empty($item['EquipRestriction'])) {
                 switch ($item['EquipRestriction']) {
@@ -177,30 +167,47 @@ class Items implements ParseInterface
                 case 33; case 39; case 40; case 41; case 42; case 43; case 44; case 45; case 46; case 47;
                 case 48; case 49; case 50; case 51; case 52; case 53; case 54; case 55; case 56; case 58;
                 case 59; case 60; case 61; case 62; case 63; case 64; case 71; case 73; case 74; case 75;
-                case 81; case 82; case 83; case 85; case 86; case 94; case 95; case 99; case 100;
+                case 81; case 82; case 83; case 85; case 86; case 94; case 95; case 99; case 100; case NULL:
                     break;
                 case 11; case 34; case 35;
                     $Crest = "\n| Crest Allowed  = ". $item['IsCrestWorthy'];
                     $Dye = "\n| Dye Allowed    = ". $item['IsDyeable'];
-                    break;
-                case NULL:
                     break;
                 default:
                     $Dye = "\n| Dye Allowed    = ". $item['IsDyeable'];
                     break;
             }
 
-            // display Repair Class if it is NOT equal to "adventurer" or if Item is NOT Seafood, Furniture, Miscellany
+            // If Repair Class is NOT equal to "adventurer" or if Item is NOT in the right UICategory to be equipped
+            // also display Materia Extractable status for the same items
             $Repair = false;
-            if ($item['ClassJob{Repair}'] == 0 || $item['ItemUICategory'] == 47 || $item['ItemUICategory'] == 65
+            if ($item['ClassJob{Repair}'] == 0 || $item['ItemUICategory'] == 33 || $item['ItemUICategory'] == 44
+                || $item['ItemUICategory'] == 45 || $item['ItemUICategory'] == 46 || $item['ItemUICategory'] == 47
+                || $item['ItemUICategory'] == 48 || $item['ItemUICategory'] == 49 || $item['ItemUICategory'] == 50
+                || $item['ItemUICategory'] == 51 || $item['ItemUICategory'] == 52 || $item['ItemUICategory'] == 53
+                || $item['ItemUICategory'] == 54 || $item['ItemUICategory'] == 55 || $item['ItemUICategory'] == 56
+                || $item['ItemUICategory'] == 57 || $item['ItemUICategory'] == 58 || $item['ItemUICategory'] == 59
+                || $item['ItemUICategory'] == 60 || $item['ItemUICategory'] == 61 || $item['ItemUICategory'] == 62
+                || $item['ItemUICategory'] == 63 || $item['ItemUICategory'] == 64 || $item['ItemUICategory'] == 65
                 || $item['ItemUICategory'] == 66 || $item['ItemUICategory'] == 67 || $item['ItemUICategory'] == 68
                 || $item['ItemUICategory'] == 69 || $item['ItemUICategory'] == 70 || $item['ItemUICategory'] == 71
                 || $item['ItemUICategory'] == 72 || $item['ItemUICategory'] == 73 || $item['ItemUICategory'] == 74
                 || $item['ItemUICategory'] == 75 || $item['ItemUICategory'] == 76 || $item['ItemUICategory'] == 77
                 || $item['ItemUICategory'] == 78 || $item['ItemUICategory'] == 79 || $item['ItemUICategory'] == 80
-                || $item['ItemUICategory'] == 64 || $item['ItemUICategory'] == 57 || $item['ItemUICategory'] == 61) {
+                || $item['ItemUICategory'] == 81 || $item['ItemUICategory'] == 82 || $item['ItemUICategory'] == 83
+                || $item['ItemUICategory'] == 85 || $item['ItemUICategory'] == 86 || $item['ItemUICategory'] == 90
+                || $item['ItemUICategory'] == 91 || $item['ItemUICategory'] == 92 || $item['ItemUICategory'] == 93
+                || $item['ItemUICategory'] == 94 || $item['ItemUICategory'] == 95 || $item['ItemUICategory'] == 100
+                || $item['ItemUICategory'] == 101 || $item['ItemUICategory'] == 102 || $item['ItemUICategory'] == 103
+                || $item['ItemUICategory'] == 104) {
+                $Extractable = false;
             } else {
                 $Repair = "\n| Repair Class   = ". ucwords(strtolower($ClassJobCsv->at($item['ClassJob{Repair}'])['Name']));
+                if ($item['MaterializeType'] > 0) {
+                    $Extractable = "\n| Extractable    = Yes";
+                } else {
+                    $Extractable = "\n| Extractable    = No";
+                }
             }
 
             // display Damage. Also display HQ if item is HQ.
@@ -213,7 +220,7 @@ class Items implements ParseInterface
                 $MagicDamageHQ = $item['BaseParamValue{Special}[1]'] + $item['Damage{Mag}'];
                 $AutoattackHQ = (floor((($item["Delay<ms>"]/1000)/3)*$PhysicalDamageHQ*100)/100);
                 $Autoattack = (floor((($item["Delay<ms>"]/1000)/3)*$item['Damage{Phys}']*100)/100);
-                $PhysicalDamage = "\n\n| Physical Damage    = " . $item['Damage{Phys}'] . "\n| Physical Damage HQ = " . $PhysicalDamageHQ;
+                $PhysicalDamage = "\n\n| Physical Damage    = ". $item['Damage{Phys}'] ."\n| Physical Damage HQ = ". $PhysicalDamageHQ;
                 $MagicDamage = "\n| Magic Damage    = ". $item['Damage{Mag}'] ."\n| Magic Damage HQ = ". $MagicDamageHQ;
                 $MagicDamage .= "\n| Delay          = ". $Delay;
                 $MagicDamage .= "\n| Auto-attack    = ". $Autoattack ."\n| Auto-attack HQ = ". $AutoattackHQ;
@@ -241,7 +248,7 @@ class Items implements ParseInterface
             // ring, necklace, earring, or bracelets. Also Display Defense/MagDef HQ if item is HQ
             $Defense = false;
             if ((($item['ItemUICategory'] == 40 || $item['ItemUICategory'] == 41
-                        || $item['ItemUICategory'] == 42 || $item['ItemUICategory'] == 43)
+                    || $item['ItemUICategory'] == 42 || $item['ItemUICategory'] == 43)
                     || $item['Defense{Phys}'] > 0 || $item['Defense{Mag}'] > 0)
                 && $item['CanBeHq'] == "True") {
                 $DefenseHQ = ($item['Defense{Phys}'] + $item['BaseParamValue{Special}[0]']);
@@ -283,7 +290,7 @@ class Items implements ParseInterface
                     break;
                 case 6: // Mog Station Gear
                     $SetBonus[0] = "\n\n| SetBonus Set_Bonus_(Capped):=\n:[[". $ItemSeriesCsv->at($item['ItemSeries'])['Name'] ."]]";
-                    $SetBonus[1] = ":Active Under Lv. ". $item['ItemSpecialBonus{Param}'];
+                    $SetBonus[1] = ":Active Under Lv.". $item['ItemSpecialBonus{Param}'];
                     foreach(range(0,5) as $i) {
                         if(!empty($item["BaseParam{Special}[$i]"])) {
                             $ParamName = $BaseParamCsv->at($item["BaseParam{Special}[$i]"])['Name'];
@@ -320,7 +327,7 @@ class Items implements ParseInterface
                     if ((!empty($item["BaseParam[$i]"])) && (!empty($item["BaseParamValue[$i]"]))) {
                         $BonusStatName = str_replace(" ", "_", $BaseParamCsv->at($item["BaseParam[$i]"])['Name']);
                         $BonusStat[0] = "\n";
-                        $BonusStat[] = "| Bonus " . $BonusStatName . " = +" . $item["BaseParamValue[$i]"];
+                        $BonusStat[] = "| Bonus ". $BonusStatName ." = +". $item["BaseParamValue[$i]"];
                         // create a different loop from the foreach above that goes from 0 to 5. For each one of those numbers
                         // (which will be the number in the BaseParamSpecial[X] column) match up the "foreach" loop number
                         // with the "for" loop number and print the stats. Complicated asfuck but should fix SE's retardedness with
@@ -344,7 +351,7 @@ class Items implements ParseInterface
                     if (!empty($item["BaseParam[$i]"])) {
                         $BonusStatName = str_replace(" ", "_", $BaseParamCsv->at($item["BaseParam[$i]"])['Name']);
                         $BonusStat[0] ="\n";
-                        $BonusStat[] = "| Bonus " . $BonusStatName . " = +" . $item["BaseParamValue[$i]"];
+                        $BonusStat[] = "| Bonus ". $BonusStatName ." = +". $item["BaseParamValue[$i]"];
                     }
                 }
             }
@@ -393,12 +400,12 @@ class Items implements ParseInterface
                     //$ItemActionEffectHQRaw = $ItemActionCsv->at($ItemActionNumber)["Data{HQ}[0]"];
                     //if ($ItemActionEffectHQRaw !== 0) {
                     //    $ItemActionEffectHQ = $StatusCsv->at($ItemActionEffectHQRaw)["Name"];
-                    //    $HQString = "\n". $stringtype1HQ ."" . $ItemActionEffectHQ . "". $stringtype2 ."";
+                    //    $HQString = "\n". $stringtype1HQ ."". $ItemActionEffectHQ ."". $stringtype2 ."";
                     //} elseif ($ItemActionEffectHQRaw == 0) {
                     //    $ItemActionEffectHQ = false;
                     //    $HQString = false;
                     //}
-                    $outputstring = "\n". $stringtype1 ."" . $ItemActionEffect . "". $stringtype2 ."";
+                    $outputstring = "\n". $stringtype1 ."". $ItemActionEffect ."". $stringtype2 ."";
 
                 }
                 //end of Remove Status code
@@ -414,7 +421,7 @@ class Items implements ParseInterface
                     $stringtype1 = "| Grantsnewitem = ";
                     //end text for string
                     $stringtype2 = false;
-                    $outputstring = "\n". $stringtype1 ."" . $ItemActionEffect . "". $stringtype2 ."";
+                    $outputstring = "\n". $stringtype1 ."". $ItemActionEffect ."". $stringtype2 ."";
 
                 }
                 //end of Barding code
@@ -438,10 +445,10 @@ class Items implements ParseInterface
                             break;
                         default:
                             $ItemActionEffectHQ = $ItemActionEffectHQRaw;
-                            $HQString = "\n| Consumable Restores_GP HQ = " . $ItemActionEffectHQ;
+                            $HQString = "\n| Consumable Restores_GP HQ = ". $ItemActionEffectHQ;
                             break;
                     }
-                    $outputstring = "\n". $stringtype1 ."" . $ItemActionEffect . "". $stringtype2 ."". $HQString ."";
+                    $outputstring = "\n". $stringtype1 ."". $ItemActionEffect ."". $stringtype2 ."". $HQString ."";
                 }
                 //end of Restore GP code
 
@@ -456,7 +463,7 @@ class Items implements ParseInterface
                     $stringtype1 = "| Grantsnewitem = ";
                     //end text for string
                     $stringtype2 = "_(Mount)";
-                    $outputstring = "\n". $stringtype1 ."" . $ItemActionEffect . "". $stringtype2 ."";
+                    $outputstring = "\n". $stringtype1 ."". $ItemActionEffect ."". $stringtype2 ."";
 
                 }
                 //end of Whistle to Mount code
@@ -472,7 +479,7 @@ class Items implements ParseInterface
                     $stringtype1 = "| Grants = ";
                     //end text for string
                     $stringtype2 = "_Recipe";
-                    $outputstring = "\n". $stringtype1 ."" . $ItemActionEffect . "". $stringtype2 ."";
+                    $outputstring = "\n". $stringtype1 ."". $ItemActionEffect ."". $stringtype2 ."";
 
                 }
                 //end of Master Recipes code
@@ -488,7 +495,7 @@ class Items implements ParseInterface
                 //    $stringtype1 = "| Text = ";
                 //    //end text for string
                 //    $stringtype2 = false;
-                //    $outputstring = "\n". $stringtype1 ."" . $ItemActionEffect . "". $stringtype2 ."";
+                //    $outputstring = "\n". $stringtype1 ."". $ItemActionEffect ."". $stringtype2 ."";
                 //}
                 //end of Emotes etc code
 
@@ -505,7 +512,7 @@ class Items implements ParseInterface
                     $stringtype1 = "| Grants = ";
                     //end text for string
                     $stringtype2 = "_(Triple_Triad_Card)";
-                    $outputstring = "\n". $stringtype1 ."" . $ItemActionEffect . "". $stringtype2 ."";
+                    $outputstring = "\n". $stringtype1 ."". $ItemActionEffect ."". $stringtype2 ."";
 
                 }
                 //end of TripleTriad Card code
@@ -521,7 +528,7 @@ class Items implements ParseInterface
                     $stringtype1 = "| Consumable Grants_MGP = ";
                     //end text for string
                     $stringtype2 = false;
-                    $outputstring = "\n". $stringtype1 ."" . $ItemActionEffectRaw . "". $stringtype2 ."";
+                    $outputstring = "\n". $stringtype1 ."". $ItemActionEffectRaw ."". $stringtype2 ."";
 
                 }
                 //end of MGP code
@@ -537,7 +544,7 @@ class Items implements ParseInterface
                     $stringtype1 = "| Grants = ";
                     //end text for string
                     $stringtype2 = " Book";
-                    $outputstring = "\n". $stringtype1 ."" . $ItemActionEffect . "". $stringtype2 ."";
+                    $outputstring = "\n". $stringtype1 ."". $ItemActionEffect ."". $stringtype2 ."";
 
                 }
                 //end of Tome of Folklore code
@@ -553,7 +560,7 @@ class Items implements ParseInterface
                     $stringtype1 = "| Grants = ";
                     //end text for string
                     $stringtype2 = "_Orchestrion_Roll";
-                    $outputstring = "\n". $stringtype1 ."" . $ItemActionEffect . "". $stringtype2 ."";
+                    $outputstring = "\n". $stringtype1 ."". $ItemActionEffect ."". $stringtype2 ."";
                 }
                 //end of Orchestrion Rolls code
 
@@ -569,14 +576,14 @@ class Items implements ParseInterface
                     $ItemActionSeconds = $ItemActionCsv->at($ItemActionNumber)["Data[2]"];
                     //$ItemActionEffect = $ItemFoodCsv->at($ItemActionEffectRaw)["EXPBonus%"];
                     //if (empty($ItemActionEffect)) continue;
-                    //String for duration
 
+                    //String for duration
                     $DurationMinutes = floor(($ItemActionSeconds / 60) % 60);
                     $DurationSeconds = $ItemActionSeconds % 60;
-                    $DurationString = " " . $DurationMinutes . "m" . $DurationSeconds . "s";
+                    $DurationString = " ". $DurationMinutes ."m". $DurationSeconds ."s";
                     $DurationFormat1 = str_replace(" 0m", " ", $DurationString);
                     $DurationFormat = str_replace("m0s", "m", $DurationFormat1);
-                    $Duration = ($DurationFormat == 30) ? "\n| Duration =$DurationFormat/60m" : "\n\n| Duration =$DurationFormat";
+                    $Duration = ($DurationFormat == 30) ? "\n| Duration =$DurationFormat/60m" : "\n| Duration =$DurationFormat";
 
                     //exp
                     $EXPBonus = $ItemFoodCsv->at($ItemActionEffectRaw)["EXPBonus%"];
@@ -589,18 +596,18 @@ class Items implements ParseInterface
 
                     $RecastMinutes = floor(($RecastNQ / 60) % 60);
                     $RecastSeconds = $RecastNQ % 60;
-                    $RecastString = " " . $RecastMinutes . "m" . $RecastSeconds . "s";
+                    $RecastString = " ". $RecastMinutes ."m". $RecastSeconds ."s";
                     $RecastFormatNQ1 = str_replace(" 0m", " ", $RecastString);
                     $RecastFormatNQ = str_replace("m0s", "m", $RecastFormatNQ1);
 
                     $RecastMinutesHQ = floor(($RecastHQ / 60) % 60);
                     $RecastSecondsHQ = $RecastHQ % 60;
-                    $RecastStringHQ = " " . $RecastMinutesHQ . "m" . $RecastSecondsHQ . "s";
+                    $RecastStringHQ = " ". $RecastMinutesHQ ."m". $RecastSecondsHQ ."s";
                     $RecastFormatHQ1 = str_replace(" 0m", " ", $RecastStringHQ);
                     $RecastFormatHQ = str_replace("m0s", "m", $RecastFormatHQ1);
 
                     if ($ItemActionType == 846) {
-                        $Recast = "\n| Recast = " . $RecastFormatNQ . "\n| Recast HQ = " . $RecastFormatHQ . "";
+                        $Recast = "\n| Recast = ". $RecastFormatNQ ."\n| Recast HQ = ". $RecastFormatHQ ."";
                     } elseif (($ItemActionType == 844) || ($ItemActionType == 845)) {
                         $Recast = false;
                     }
@@ -614,29 +621,29 @@ class Items implements ParseInterface
                             //switch to percentage if true and flat if false
                             $Relative = ($ItemFoodCsv->at($ItemActionEffectRaw)["IsRelative[$k]"] == "True") ? "%" : false;
 
-                            $BaseStatFmt = "| Consumable " . $BaseStat . " = ";
-                            $BaseStatHQFmt = "| Consumable " . $BaseStat . " HQ = ";
+                            $BaseStatFmt = "| Consumable ". $BaseStat ." = ";
+                            $BaseStatHQFmt = "| Consumable ". $BaseStat ." HQ = ";
 
                             $BaseMax = $ItemFoodCsv->at($ItemActionEffectRaw)["Max[$k]"];
                             $BaseValue = $ItemFoodCsv->at($ItemActionEffectRaw)["Value[$k]"];
                             $BaseValueHQ = $ItemFoodCsv->at($ItemActionEffectRaw)["Value{HQ}[$k]"];
                             $BaseMaxHQ = $ItemFoodCsv->at($ItemActionEffectRaw)["Max{HQ}[$k]"];
 
-                            $BaseValueFmt = "" . $BaseStatFmt . "+" . $BaseValue . "" . $Relative . "\n";
-                            $BaseValueHQFmt = "" . $BaseStatHQFmt . "+" . $BaseValueHQ . "" . $Relative . "\n";
+                            $BaseValueFmt = "". $BaseStatFmt ."+". $BaseValue ."". $Relative ."\n";
+                            $BaseValueHQFmt = "". $BaseStatHQFmt ."+". $BaseValueHQ ."". $Relative ."\n";
 
                             // don't display Cap if it's going to be +0
-                            $BaseStatCapFmt = ($BaseMax > 0) ? "| Consumable " . $BaseStat . " Cap = " : false;
-                            $BaseStatHQCapFmt = ($BaseMax > 0) ? "| Consumable " . $BaseStat . " Cap HQ = " : false;
-                            $BaseMaxFmt = ($BaseMax > 0) ? "" .  $BaseStatCapFmt . "+" . $BaseMax . "\n" : false;
-                            $BaseMaxHQFmt = ($BaseMax > 0) ? "" . $BaseStatHQCapFmt . "+" . $BaseMaxHQ . "\n" : false;
+                            $BaseStatCapFmt = ($BaseMax > 0) ? "| Consumable ". $BaseStat ." Cap = " : false;
+                            $BaseStatHQCapFmt = ($BaseMax > 0) ? "| Consumable ". $BaseStat ." Cap HQ = " : false;
+                            $BaseMaxFmt = ($BaseMax > 0) ? "".  $BaseStatCapFmt ."+". $BaseMax ."\n" : false;
+                            $BaseMaxHQFmt = ($BaseMax > 0) ? "". $BaseStatHQCapFmt ."+". $BaseMaxHQ ."\n" : false;
 
-                            ${"outputstring$k"} = "\n" . $BaseValueFmt . "" . $BaseMaxFmt . "" . $BaseValueHQFmt . "" . $BaseMaxHQFmt . "";
+                            ${"outputstring$k"} = "\n". $BaseValueFmt ."". $BaseMaxFmt ."". $BaseValueHQFmt ."". $BaseMaxHQFmt ."";
                         }
                         //End of base parameters
 
                         //end text for string
-                        $outputstring = "\n" . $Duration . "" . $Recast . "" . $outputstring0 . "" . $outputstring1 . "" . $outputstring2 . "" . $EXPBonusFmt . "" . $ItemActionEffectStatusFmt . "";
+                        $outputstring = "\n". $Duration ."". $Recast ."". $outputstring0 ."". $outputstring1 ."". $outputstring2 ."". $EXPBonusFmt ."". $ItemActionEffectStatusFmt ."";
                     }
                     //end of Battle Food/gathering food/attribute potions code
                 }
@@ -669,7 +676,7 @@ class Items implements ParseInterface
                         $BaseValueHQFmt = "". $ItemActionEffectHQRawString ."+". $ItemActionEffectHQRaw ."%\n";
                         $BaseValueHQCapFmt = "". $ItemActionEffectCapHQRawString ."+". $ItemActionEffectCapHQRaw ."\n";
 
-                $outputstring0 = "\n". $BaseValueFmt ."". $BaseValueCapFmt ."" . $BaseValueHQFmt . "". $BaseValueHQCapFmt ."";
+                $outputstring0 = "\n". $BaseValueFmt ."". $BaseValueCapFmt ."". $BaseValueHQFmt ."". $BaseValueHQCapFmt ."";
 
                 //Recast
                 $RecastNQ = $item['Cooldown<s>'];
@@ -692,7 +699,7 @@ class Items implements ParseInterface
 
                 if (empty($ItemActionEffectRaw)) continue;
                 //start text for string
-                $outputstring = "\n" . $Recast . "". $outputstring0 ."";
+                $outputstring = "\n". $Recast ."". $outputstring0 ."";
                 }
                 //end of HP/MP Potions code
 
@@ -702,7 +709,7 @@ class Items implements ParseInterface
                     $ItemActionEffectRaw = $ItemActionCsv->at($ItemActionNumber)["Data[0]"];
                     $ItemActionEffect = ucwords(strtolower($CompanionCsv->at($ItemActionEffectRaw)["Singular"]));
                     if (empty($ItemActionEffect)) continue;
-                    $outputstring = "\n| Grants = " . $ItemActionEffect . "_(Minion)";
+                    $outputstring = "\n| Grants = ". $ItemActionEffect ."_(Minion)";
                 }
                 //end of Minions code
                 //end of ItemAction code
@@ -748,9 +755,7 @@ class Items implements ParseInterface
                 '{unique}' => ($item['IsUnique'] == "True")
                     ? "\n| Unique         = Yes"
                     : "",
-                '{extractable}' => ($item['MaterializeType'] > 0)
-                    ? "\n| Extractable    = Yes"
-                    : "\n| Extractable    = No",
+                '{extractable}' => $Extractable,
                 '{sells}' => ($item['Price{Low}'] > 0)
                     ? "\n| Sells          = ". $item['Price{Low}'] ."\n| HQ             = ". $item['CanBeHq']
                     : "\n| Sells          = No\n| HQ             = ". $item['CanBeHq'],
@@ -759,7 +764,7 @@ class Items implements ParseInterface
                 '{glamour}' => ($item['IsGlamourous'] == "True")
                     ? "\n| Projectable    = Yes"
                     : "",
-                '{desynthesis}' => ($Desynth == "Yes")
+                '{desynthesis}' => (!empty($item['Desynth']))
                     ? "\n| Desynthesizable= Yes\n| Desynth Level  = ". $item['Level{Item}']
                     : "\n| Desynthesizable= No",
                 '{repair}' => $Repair,
