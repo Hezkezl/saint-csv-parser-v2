@@ -42,7 +42,7 @@ class Mounts implements ParseInterface
         $BGMCsv = $this->csv("BGM");
 
         // (optional) start a progress bar
-        $this->io->progressStart($MountCsv->total);
+        $this->io->progressStart($ItemCsv->total);
 
         foreach ($ItemCsv->data as $id => $Item) {
             $this->io->progressAdvance();
@@ -56,7 +56,66 @@ class Mounts implements ParseInterface
             //set up the base mount we want to the sheet
             $Mount = $MountCsv->at($MountID);
 
-            $Name = ucwords(strtolower(str_replace(" & ", " and ", $MountName))); // replace the & character with 'and' in names
+            // change the name of the mount based off of the required item (for better capitalization on a few mounts)
+            $MountItemRemove = array(" Bell", " Bugle", " Clarion", " Conch", " Core", " Crystal", " Dizi", " Fife", " Flute",
+                " Gear", " Horn", " Identification Key", " Ignition Key", " Master Key", " Neurolink Key", " Medal", " Key",
+                " Pendant (Left)", " Pendant (Right)", " Pipe", " Prism", " Resonator", " Seeds", " Seed", " Title", " Trumpet",
+                " Warhorn", " Whistle");
+            switch ($MountName) {
+                case "company chocobo":
+                    $Name = "Company Chocobo";
+                    break;
+                case "ahriman":
+                    $Name = "Ahriman";
+                    break;
+                case "cavalry drake":
+                    $Name = "Cavalry Drake";
+                    break;
+                case "magitek armor":
+                    $Name = "Magitek Armor";
+                    break;
+                case "gilded magitek armor":
+                    $Name = "Gilded Magitek Armor";
+                    break;
+                case "cavalry elbst":
+                    $Name = "Cavalry Elbst";
+                    break;
+                case "war panther":
+                    $Name = "War Panther";
+                    break;
+                case "Gloria-class airship":
+                    $Name = "Gloria-class Airship";
+                    break;
+                case "original fat chocobo":
+                    $Name = "Original Fat Chocobo";
+                    break;
+                case "black pegasus":
+                    $Name = "Black Pegasus";
+                    break;
+                case "broken heart (right)":
+                    $Name = "Broken Heart (Right)";
+                    break;
+                case "broken heart (left)":
+                    $Name = "Broken Heart (Left)";
+                    break;
+                case "Indigo whale":
+                    $Name = "Indigo Whale";
+                    break;
+                case "kamuy of the Nine Tails":
+                    $Name = "Kamuy of the Nine Tails";
+                    break;
+                case "Circus ahriman":
+                    $Name = "Circus Ahriman";
+                    break;
+                case "Great Vessel of Ronka":
+                    $Name = "Great Vessel of Ronka";
+                    break;
+                default:
+                    $Name = str_replace($MountItemRemove, null, $RequiredItemName);
+                    break;
+            }
+
+            // clean up Description and Quote
             $Description = strip_tags($MountTransientCsv->at($Mount['id'])['Description{Enhanced}']); // strip tags from description
             $Description = str_replace(array("\n\r", "\r", "\n", "\t", "\0", "\x0b"), " ", $Description); // replace line breaks with a space in Description
             $Description = preg_replace("/  +/", " ", $Description); // replace two spaces in Description with single space
