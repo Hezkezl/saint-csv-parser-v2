@@ -88,7 +88,7 @@ class Minions implements ParseInterface
             $Description = str_replace(array("\n\r", "\r", "\n", "\t", "\0", "\x0b"), " ", $Description); // replace line breaks with a space in Description
             $Description = preg_replace("/\s\s+/", " ", $Description); // replace any space that's more than two spaces with a single space in Description
             $Quote = str_replace(array("\n\r", "\r", "\n", "\t", "\0", "\x0b"), " ", ($CompanionTransientCsv->at($MinionID)['Tooltip'])); // replace line breaks with a space in Quote
-            $Quote = preg_replace("/\s\s+\-\s*/", "<br>- ", $Quote); // add line break before Quote giver's name
+            $Quote = preg_replace("/\s\s+\-\s*(.*)/", "<br>- [[$1]]", $Quote); // add line break before Quote giver's name and place name in [[Wiki Brackets]]
             $Quote = preg_replace("/\s\s+/", " ", $Quote); // replace any space that's more than two spaces with a single space in Quote
 
             //behaviour

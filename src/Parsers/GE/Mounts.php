@@ -17,9 +17,9 @@ class Mounts implements ParseInterface
 | Index = {Index}
 | Name = {Name} (Mount)
 | Description = {Description}
-| Acquisition = 
+| Acquisition =
 | Quote = {Quote}{Airborne}
-| Required Item = {Action}
+| Required Item = {RequiredItem}{Action}
 | Notes =
 | Lore =
 | Etymology ={Flying}
@@ -33,6 +33,8 @@ class Mounts implements ParseInterface
         include (dirname(__DIR__) . '/Paths.php');
 
         // grab CSV files we want to use
+        $ItemCsv = $this->csv("Item");
+        $ItemActionCsv = $this->csv("ItemAction");
         $MountCsv = $this->csv("Mount");
         $MountActionCsv = $this->csv("MountAction");
         $MountTransientCsv = $this->csv("MountTransient");
@@ -42,20 +44,25 @@ class Mounts implements ParseInterface
         // (optional) start a progress bar
         $this->io->progressStart($MountCsv->total);
 
-        // loop through data
-        foreach ($MountCsv->data as $id => $Mount) {
+        foreach ($ItemCsv->data as $id => $Item) {
             $this->io->progressAdvance();
 
-            // skip ones without a name
-            if (empty($Mount['Singular']) || empty($Mount['Icon'])) {
-                continue;
-            }
+            if ($ItemActionCsv->at($Item['ItemAction'])['Type'] !== "1322") continue;
 
             // code starts here
-            $Name = ucwords(strtolower(str_replace(" & ", " and ", $Mount['Singular']))); // replace the & character with 'and' in names
+            $RequiredItemName = $Item['Name'];
+            $MountID = $ItemActionCsv->at($Item['ItemAction'])['Data[0]'];
+            $MountName = $MountCsv->at($MountID)['Singular'];
+            //set up the base mount we want to the sheet
+            $Mount = $MountCsv->at($MountID);
+
+            $Name = ucwords(strtolower(str_replace(" & ", " and ", $MountName))); // replace the & character with 'and' in names
             $Description = strip_tags($MountTransientCsv->at($Mount['id'])['Description{Enhanced}']); // strip tags from description
-            $Description = str_replace("\n", " ", $Description); // delete any line breaks in description
-            $Quote = str_replace("\n", "<br>", ($MountTransientCsv->at($Mount['id'])['Tooltip'])); // replace line breaks in quote
+            $Description = str_replace(array("\n\r", "\r", "\n", "\t", "\0", "\x0b"), " ", $Description); // replace line breaks with a space in Description
+            $Description = preg_replace("/  +/", " ", $Description); // replace two spaces in Description with single space
+            $Quote = str_replace(array("\n\r", "\r", "\n", "\t", "\0", "\x0b"), " ", ($MountTransientCsv->at($Mount['id'])['Tooltip'])); // replace line breaks with a space in Quote
+            $Quote = preg_replace("/  +/", " ", $Quote); // replace two or more spaces in Quote with a single space
+            $Quote = preg_replace("/ \- (.*)/", "<br>- [[$1]]", $Quote); // add line break before Quote giver's name and place name in [[Wiki Brackets]]
 
             // Using the value at MountAction inside Mount.csv, match that up with the column "Action[0]" in the file
             // MountAction.csv, and take THAT value and match it with the "Name" column from Action.csv
@@ -115,10 +122,11 @@ class Mounts implements ParseInterface
                 '{Index}' => $Mount['id'],
                 '{Description}' => $Description,
                 '{Quote}' => $Quote,
-                '{Airborne}' => ($Mount['IsAirborne'] == "False") ? "\n| Movement = Airborne" : "\n| Movement = Terrestrial",
+                '{Airborne}' => ($Mount['IsAirborne'] == "True") ? "\n| Movement = Airborne" : "\n| Movement = Terrestrial",
+                '{RequiredItem}' => $RequiredItemName,
                 '{Action}' => $Action,
                 '{Flying}' => ($Mount['IsFlying'] > 0) ? "\n| Flying = Yes" : "\n| Flying = No",
-                '{Music}' => str_replace("music/ffxiv/", "", $BGMCsv->at($Mount['RideBGM'])['File']),
+                '{Music}' => str_replace("music/ffxiv/", null, $BGMCsv->at($Mount['RideBGM'])['File']),
                 '{Bottom}' => $Bottom,
             ];
 
