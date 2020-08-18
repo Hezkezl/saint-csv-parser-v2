@@ -32,11 +32,11 @@ class Minions implements ParseInterface
 | SPD = {speed}
 | Cost = {cost}
 | Auto-attack = {autoattack}
-| Strengths = {strengths}
+| Strengths ={strengths}
 
 | Special Action = {spaction}
 | Special Action Description = {spactiondescription}
-| Special Action Duration = 
+| Special Action Duration ={duration}
 | Special Action Type = {spactiontype}
 | Special Action Points = {spactionpoints}
 | Special Action Area = {spactionarea} <!-- 0, 30, 120, 360 -->
@@ -84,9 +84,12 @@ class Minions implements ParseInterface
             //set up the base minion we want to the sheet
             $Minion = $CompanionCsv->at($MinionID);
             $Name = ucwords(strtolower(str_replace(" & ", " and ", $MinionName))); // replace the & character with 'and' in names
-            $Description = strip_tags($CompanionTransientCsv->at($MinionID)['Description{Enhanced}']); // strip tags from description
-            $Description = str_replace(array("\n\r", "\r", "\n", "\t", "\0", "\x0b"), ' ', $Description); // delete any line breaks in description
-            $Quote = str_replace(array("\n\r", "\r", "\n", "\t", "\0", "\x0b"), '<br>', ($CompanionTransientCsv->at($MinionID)['Tooltip'])); // replace line breaks in quote
+            $Description = strip_tags($CompanionTransientCsv->at($MinionID)['Description{Enhanced}']); // strip tags from Description
+            $Description = str_replace(array("\n\r", "\r", "\n", "\t", "\0", "\x0b"), " ", $Description); // replace line breaks with a space in Description
+            $Description = preg_replace("/\s\s+/", " ", $Description); // replace any space that's more than two spaces with a single space in Description
+            $Quote = str_replace(array("\n\r", "\r", "\n", "\t", "\0", "\x0b"), " ", ($CompanionTransientCsv->at($MinionID)['Tooltip'])); // replace line breaks with a space in Quote
+            $Quote = preg_replace("/\s\s+\-\s*/", "<br>- ", $Quote); // add line break before Quote giver's name
+            $Quote = preg_replace("/\s\s+/", " ", $Quote); // replace any space that's more than two spaces with a single space in Quote
 
             //behaviour
             $Behaviour = $CompanionMoveCsv->at($Minion['Behavior'])['Name'];
@@ -107,6 +110,16 @@ class Minions implements ParseInterface
             $SPAction = $MinionTransient['SpecialAction{Name}'];
             //SP Description
             $SPActionDescription = $MinionTransient['SpecialAction{Description}'];
+            $SPActionDescription = preg_replace("/\n.*Duration:<UIGlow>\d+<\/UIGlow><UIForeground>\d+<\/UIForeground>.*\n?/",
+                null, $SPActionDescription);
+
+            //Duration removal from Description and add to the | Special Action Duration parameter
+            $DurationRemoval = str_replace("<UIForeground>F201F8</UIForeground><UIGlow>F201F9</UIGlow>Duration:<UIGlow>01</UIGlow><UIForeground>01</UIForeground> " ,
+                null, $MinionTransient['SpecialAction{Description}']);
+            $DurationRemoval = preg_replace("/[A-Za-z<]+.*/", null, $DurationRemoval);
+            $DurationRemoval = preg_replace("/\n\s*/", null, $DurationRemoval);
+            $Duration = preg_replace("/(\d+)/", " $1s", $DurationRemoval);
+
             //SP Angle
             $SPActionArea = $Minion['Skill{Angle}'];
             //SP Cost
@@ -116,35 +129,29 @@ class Minions implements ParseInterface
 
             if ($MinionTransient['HasAreaAttack'] == "True") {
                 $AutoAttack = "AoE";
-            } elseif ($MinionTransient['HasAreaAttack'] == "False") {
+            } else {
                 $AutoAttack = "Single-target";
             }
 
-            //strengths
+            //List of Strengths. Turned into an array so we can implode with comma to eliminate trailing commas
+            $Strengths = [];
             if ($MinionTransient['Strength{Gate}'] == "True") {
-                $gate = "Gate, ";
-            } elseif ($MinionTransient['Strength{Gate}'] == "False") {
-                $gate = "";
+                $Strengths[0] = " Gate";
             }
             if ($MinionTransient['Strength{Eye}'] == "True") {
-                $eye = "Eye, ";
-            } elseif ($MinionTransient['Strength{Eye}'] == "False") {
-                $eye = "";
+                $Strengths[1] = " Eye";
             }
             if ($MinionTransient['Strength{Shield}'] == "True") {
-                $shield = "Shield, ";
-            } elseif ($MinionTransient['Strength{Shield}'] == "False") {
-                $shield = "";
+                $Strengths[2] = " Shield";
             }
             if ($MinionTransient['Strength{Arcana}'] == "True") {
-                $arcana = "Arcana, ";
-            } elseif ($MinionTransient['Strength{Arcana}'] == "False") {
-                $arcana = "";
+                $Strengths[3] = " Arcana";
             }
 
-            $Strengths = "". $gate ."". $eye ."". $shield ."". $arcana ."";
+            $Strengths = implode(",", $Strengths);
 
-                        $SmallIcon = $Minion["Icon"];
+            // beginning of Icon copying code
+            $SmallIcon = $Minion["Icon"];
             $Icon2 = substr($SmallIcon, -3);
             $LargeIcon = str_pad($Icon2, "6", "068", STR_PAD_LEFT);
 
@@ -196,6 +203,7 @@ class Minions implements ParseInterface
                 '{spactionarea}' => $SPActionArea,
                 '{spactionpoints}' => $SPActionPoints,
                 '{spactiondescription}' => $SPActionDescription,
+                '{duration}' => $Duration,
                 '{spactiontype}' => $SPActionType,
                 '{spaction}' => $SPAction,
                 '{item}' => $ItemName,
