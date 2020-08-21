@@ -79,11 +79,15 @@ class Items implements ParseInterface
             if ($item['Desynth'] != 0) {
                 //var_dump($DesynthItemBase);
                 foreach(range(0,10) as $a) {
-                    if (empty($DesynthArray["$id"][$a])) continue;
-                    $DesynthItem = $DesynthArray["$id"][$a];
-                    $DesynthArrayItem = $ItemCsv->at($DesynthItem)['Name'];
                     $b = $a + 1;
-                    $DesynthItemArray[] = "|Result $b        = ". $DesynthArrayItem ."\n|Result $b Amount = ";
+                    if (empty($DesynthArray["$id"][$a])) {
+                        $DesynthItemArray[] = "|Result $b        = \n|Result $b Amount = ";
+                    }
+                    if (!empty($DesynthArray["$id"][$a])) {
+                        $DesynthItem = $DesynthArray["$id"][$a];
+                        $DesynthArrayItem = $ItemCsv->at($DesynthItem)['Name'];
+                        $DesynthItemArray[] = "|Result $b        = ". $DesynthArrayItem ."\n|Result $b Amount = ";
+                    }
                 }
                 $DesynthArrayOutput = implode("\n", $DesynthItemArray);
                 $DesynthText = "{{ARR Infobox Desynth\n|Item            = ". $item['Name'] ."\n|Primary Skill   = ".
