@@ -52,9 +52,17 @@ class Items implements ParseInterface
         // (optional) start a progress bar
         $this->io->progressStart($ItemCsv->total);
 
+        
+        $url = "cache/desynth.json";
+        $jdata = file_get_contents($url);
+        $DesynthArray = json_decode($jdata,true);
+
         // loop through data
         foreach ($ItemCsv->data as $id => $item) {
             $this->io->progressAdvance();
+            
+        
+        
 
             // skip ones without a name
             if (empty($item['Name'])) {
@@ -67,12 +75,19 @@ class Items implements ParseInterface
 
             // add Desynth template and subpage if item is eligible
             $DesynthTop = false;
-            if (!empty($item['Desynth'])) {
+            $DesynthItemArray = [];
+            if ($item['Desynth'] != 0) {
+                //var_dump($DesynthItemBase);
+                foreach(range(0,10) as $a) {
+                    if (empty($DesynthArray["$id"][$a])) continue;
+                    $DesynthItem = $DesynthArray["$id"][$a];
+                    $DesynthArrayItem = $ItemCsv->at($DesynthItem)['Name'];
+                    $b = $a + 1;
+                    $DesynthItemArray[] = "|Result $b        = ". $DesynthArrayItem ."\n|Result $b Amount = ";
+                }
+                $DesynthArrayOutput = implode("\n", $DesynthItemArray);
                 $DesynthText = "{{ARR Infobox Desynth\n|Item            = ". $item['Name'] ."\n|Primary Skill   = ".
-                    ucwords(strtolower($ClassJobCsv->at($item['ClassJob{Repair}'])['Name'])) ."\n|Result 1        = \n".""
-                    ."|Result 1 Amount = \n|Result 2        = \n|Result 2 Amount = \n|Result 3        = \n".""
-                    ."|Result 3 Amount = \n|Result 4        = \n|Result 4 Amount = \n|Result 5        = \n".""
-                    ."|Result 5 Amount = \n|Result 6        = \n|Result 6 Amount = \n}}";
+                    ucwords(strtolower($ClassJobCsv->at($item['ClassJob{Repair}'])['Name'])) ."\n". $DesynthArrayOutput ."\n}}";
                 if ($Bot == "true") {
                     $DesynthTop = "{{-start-}}\n'''$Name/Desynth'''\n$DesynthText{{-stop-}}";
                 } else {
