@@ -41,28 +41,22 @@ class Items implements ParseInterface
         $ItemActionCsv = $this->csv("ItemAction");
         $ItemFoodCsv = $this->csv("ItemFood");
         $StatusCsv = $this->csv("Status");
-        //$ItemSearchCategoryCsv = $this->csv("ItemSearchCategory");
         $BaseParamCsv = $this->csv("BaseParam");
         $ItemSeriesCsv = $this->csv("ItemSeries");
         $ItemUiCategoryCsv = $this->csv("ItemUICategory");
         $ClassJobCategoryCsv = $this->csv("ClassJobCategory");
         $ClassJobCsv = $this->csv("ClassJob");
         $BuddyEquipCsv = $this->csv("BuddyEquip");
-
-        // (optional) start a progress bar
-        $this->io->progressStart($ItemCsv->total);
-
-        
         $url = "cache/desynth.json";
         $jdata = file_get_contents($url);
         $DesynthArray = json_decode($jdata,true);
 
+        // (optional) start a progress bar
+        $this->io->progressStart($ItemCsv->total);
+
         // loop through data
         foreach ($ItemCsv->data as $id => $item) {
             $this->io->progressAdvance();
-            
-        
-        
 
             // skip ones without a name
             if (empty($item['Name'])) {
@@ -78,12 +72,13 @@ class Items implements ParseInterface
             $DesynthItemArray = [];
             if ($item['Desynth'] != 0) {
                 //var_dump($DesynthItemBase);
-                foreach(range(0,10) as $a) {
+                foreach(range(0,13) as $a) {
                     $b = $a + 1;
                     if (empty($DesynthArray["$id"][$a])) {
-                        $DesynthItemArray[] = "|Result $b        = \n|Result $b Amount = ";
-                    }
-                    if (!empty($DesynthArray["$id"][$a])) {
+                        if ($b <= 6) {
+                            $DesynthItemArray[] = "|Result $b        = \n|Result $b Amount = ";
+                        }
+                    } else {
                         $DesynthItem = $DesynthArray["$id"][$a];
                         $DesynthArrayItem = $ItemCsv->at($DesynthItem)['Name'];
                         $DesynthItemArray[] = "|Result $b        = ". $DesynthArrayItem ."\n|Result $b Amount = ";
@@ -309,7 +304,7 @@ class Items implements ParseInterface
                     break;
                 case 6: // Mog Station Gear
                     $SetBonus[0] = "\n\n| SetBonus Set_Bonus_(Capped):=\n:[[". $ItemSeriesCsv->at($item['ItemSeries'])['Name'] ."]]";
-                    $SetBonus[1] = ":Active Under Lv.". $item['ItemSpecialBonus{Param}'];
+                    $SetBonus[1] = ":Active Under Lv. ". $item['ItemSpecialBonus{Param}'];
                     foreach(range(0,5) as $i) {
                         if(!empty($item["BaseParam{Special}[$i]"])) {
                             $ParamName = $BaseParamCsv->at($item["BaseParam{Special}[$i]"])['Name'];
