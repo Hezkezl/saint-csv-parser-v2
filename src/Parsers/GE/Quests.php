@@ -64,6 +64,7 @@ class Quests implements ParseInterface
         $PlaceNameCsv = $this->csv("PlaceName");
         $ClassJobCsv = $this->csv("ClassJob");
         $ActionCsv = $this->csv("Action");
+        $GeneralActionCsv = $this->csv("GeneralAction");
         $OtherRewardCsv = $this->csv("QuestRewardOther");
         $BeastReputationRankCsv = $this->csv("BeastReputationRank");
         $BeastTribeCsv = $this->csv("BeastTribe");
@@ -195,13 +196,13 @@ class Quests implements ParseInterface
                 $guaranteedreward8 = "\n|QuestReward ". $RewardNumber ." = ". $ActionCsv->at($quest['Action{Reward}'])['Name'];
             }
 
-            //If General Action is rewarded, display Action Name from Action.csv (different from above)
+            //If General Action is rewarded, display Name from GeneralAction
             $guaranteedreward9 = [];
             foreach (range(0, 1) as $i) {
                 if ($quest["GeneralAction{Reward}[{$i}]"] > 0) {
                     $RewardNumber = ($RewardNumber + 1);
                     $guaranteedreward9[] = "\n|QuestReward ". $RewardNumber ." = ".
-                        $ActionCsv->at($quest["GeneralAction{Reward}[{$i}]"])['Name'];
+                        $GeneralActionCsv->at($quest["GeneralAction{Reward}[{$i}]"])['Name'];
                 }
             }
 
