@@ -83,7 +83,7 @@ class Minions implements ParseInterface
             $MinionTransient = $CompanionTransientCsv->at($MinionID);
             //set up the base minion we want to the sheet
             $Minion = $CompanionCsv->at($MinionID);
-            $Name = ucwords(strtolower(str_replace(" & ", " and ", $MinionName))); // replace the & character with 'and' in names
+            $Name = "".ucwords(strtolower(str_replace(" & ", " and ", $MinionName)))." (Minion)"; // replace the & character with 'and' in names
             $Description = strip_tags($CompanionTransientCsv->at($MinionID)['Description{Enhanced}']); // strip tags from Description
             $Description = str_replace(array("\n\r", "\r", "\n", "\t", "\0", "\x0b"), " ", $Description); // replace line breaks with a space in Description
             $Description = preg_replace("/\s\s+/", " ", $Description); // replace any space that's more than two spaces with a single space in Description
@@ -167,8 +167,8 @@ class Minions implements ParseInterface
             $SmallIconPath = $this->getInputFolder() .'/icon/'. $this->iconize($Minion["Icon"]);
 
             // give correct file names to icons for output
-            $LargeIconFileName = "{$IconoutputDirectory}/$Name (Minion) Patch.png";
-            $SmallIconFileName = "{$IconoutputDirectory}/$Name (Minion) Icon.png";
+            $LargeIconFileName = "{$IconoutputDirectory}/$Name Patch.png";
+            $SmallIconFileName = "{$IconoutputDirectory}/$Name Icon.png";
             // actually copy the icons
             copy($SmallIconPath, $SmallIconFileName);
             if (file_exists($LargeIconPath)) {
@@ -177,10 +177,10 @@ class Minions implements ParseInterface
 
             // change the top and bottom code depending on if I want to bot the pages up or not. Places Patch on subpage
             if ($Bot == "true") {
-                $Top = "{{-start-}}\n'''$Name (Minion)/Patch'''\n$Patch\n{{-stop-}}{{-start-}}\n'''$Name (Minion)'''\n";
+                $Top = "{{-start-}}\n'''$Name/Patch'''\n$Patch\n{{-stop-}}{{-start-}}\n'''$Name'''\n";
                 $Bottom = "{{-stop-}}";
             } else {
-                $Top = "http://ffxiv.gamerescape.com/wiki/$Name (Minion)\Patch?action=edit\n$Patch\nhttp://ffxiv.gamerescape.com/wiki/$Name (Minion)?action=edit\n";
+                $Top = "http://ffxiv.gamerescape.com/wiki/$Name\Patch?action=edit\n$Patch\nhttp://ffxiv.gamerescape.com/wiki/$Name?action=edit\n";
                 $Bottom = "";
             };
 

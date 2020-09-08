@@ -15,7 +15,7 @@ class Mounts implements ParseInterface
     // the wiki output format / template we shall use
     const WIKI_FORMAT = "{Top}{{ARR Infobox Mount
 | Index = {Index}
-| Name = {Name} (Mount)
+| Name = {Name}
 | Description = {Description}
 | Acquisition =
 | Quote = {Quote}{Airborne}
@@ -63,55 +63,55 @@ class Mounts implements ParseInterface
                 " Warhorn", " Whistle");
             switch ($MountName) {
                 case "company chocobo":
-                    $Name = "Company Chocobo";
+                    $Name = "Company Chocobo (Mount)";
                     break;
                 case "ahriman":
-                    $Name = "Ahriman";
+                    $Name = "Ahriman (Mount)";
                     break;
                 case "cavalry drake":
-                    $Name = "Cavalry Drake";
+                    $Name = "Cavalry Drake (Mount)";
                     break;
                 case "magitek armor":
-                    $Name = "Magitek Armor";
+                    $Name = "Magitek Armor (Mount)";
                     break;
                 case "gilded magitek armor":
-                    $Name = "Gilded Magitek Armor";
+                    $Name = "Gilded Magitek Armor (Mount)";
                     break;
                 case "cavalry elbst":
-                    $Name = "Cavalry Elbst";
+                    $Name = "Cavalry Elbst (Mount)";
                     break;
                 case "war panther":
-                    $Name = "War Panther";
+                    $Name = "War Panther (Mount)";
                     break;
                 case "Gloria-class airship":
-                    $Name = "Gloria-class Airship";
+                    $Name = "Gloria-class Airship (Mount)";
                     break;
                 case "original fat chocobo":
-                    $Name = "Original Fat Chocobo";
+                    $Name = "Original Fat Chocobo (Mount)";
                     break;
                 case "black pegasus":
-                    $Name = "Black Pegasus";
+                    $Name = "Black Pegasus (Mount)";
                     break;
                 case "broken heart (right)":
-                    $Name = "Broken Heart (Right)";
+                    $Name = "Broken Heart (Right) (Mount)";
                     break;
                 case "broken heart (left)":
-                    $Name = "Broken Heart (Left)";
+                    $Name = "Broken Heart (Left) (Mount)";
                     break;
                 case "Indigo whale":
-                    $Name = "Indigo Whale";
+                    $Name = "Indigo Whale (Mount)";
                     break;
                 case "kamuy of the Nine Tails":
-                    $Name = "Kamuy of the Nine Tails";
+                    $Name = "Kamuy of the Nine Tails (Mount)";
                     break;
                 case "Circus ahriman":
-                    $Name = "Circus Ahriman";
+                    $Name = "Circus Ahriman (Mount)";
                     break;
                 case "Great Vessel of Ronka":
-                    $Name = "Great Vessel of Ronka";
+                    $Name = "Great Vessel of Ronka (Mount)";
                     break;
                 default:
-                    $Name = str_replace($MountItemRemove, null, $RequiredItemName);
+                    $Name = "". str_replace($MountItemRemove, null, $RequiredItemName) ." (Mount)";
                     break;
             }
 
@@ -154,8 +154,8 @@ class Mounts implements ParseInterface
             $SmallIconPath = $this->getInputFolder() .'/icon/'. $this->iconize($Mount["Icon"]);
 
             // give correct file names to icons for output
-            $LargeIconFileName = "{$IconoutputDirectory}/$Name (Mount) Patch.png";
-            $SmallIconFileName = "{$IconoutputDirectory}/$Name (Mount) Icon.png";
+            $LargeIconFileName = "{$IconoutputDirectory}/$Name Patch.png";
+            $SmallIconFileName = "{$IconoutputDirectory}/$Name Icon.png";
             // actually copy the icons
             copy($SmallIconPath, $SmallIconFileName);
             if (file_exists($LargeIconPath)) {
@@ -166,10 +166,10 @@ class Mounts implements ParseInterface
 
             // change the top and bottom code depending on if I want to bot the pages up or not. Places Patch on subpage
             if ($Bot == "true") {
-                $Top = "{{-start-}}\n'''$Name (Mount)/Patch'''\n$Patch\n{{-stop-}}{{-start-}}\n'''$Name (Mount)'''\n";
+                $Top = "{{-start-}}\n'''$Name/Patch'''\n$Patch\n{{-stop-}}{{-start-}}\n'''$Name'''\n";
                 $Bottom = "{{-stop-}}";
             } else {
-                $Top = "http://ffxiv.gamerescape.com/wiki/$Name (Mount)\Patch?action=edit\n$Patch\nhttp://ffxiv.gamerescape.com/wiki/$Name (Mount)?action=edit\n";
+                $Top = "http://ffxiv.gamerescape.com/wiki/$Name\Patch?action=edit\n$Patch\nhttp://ffxiv.gamerescape.com/wiki/$Name?action=edit\n";
                 $Bottom = "";
             };
 
