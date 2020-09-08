@@ -9,10 +9,10 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 /**
  * php bin/console app:parse:csv GE:SpecialShop
  */
+
 class SpecialShop implements ParseInterface
 {
     use CsvParseTrait;
-
 
     // the wiki output format / template we shall use
     const WIKI_FORMAT = "{name}
@@ -21,7 +21,7 @@ class SpecialShop implements ParseInterface
     public function parse()
     {
         include (dirname(__DIR__) . '/Paths.php');
-
+        // grab CSV files
         $SpecialShopCsv = $this->csv("SpecialShop");
         $ItemCsv = $this->csv("Item");
         $QuestCsv = $this->csv("Quest");
