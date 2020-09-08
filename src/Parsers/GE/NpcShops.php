@@ -29,7 +29,6 @@ class NpcShops implements ParseInterface
         $PreHandlerCsv = $this->csv("PreHandler");
         $ItemCsv = $this->csv("Item");
 
-
         // (optional) start a progress bar
         $this->io->progressStart($ENpcBaseCsv->total);
 
@@ -43,6 +42,7 @@ class NpcShops implements ParseInterface
             $TopicSelectArray = [];
             $ENpcShopsArray = [];
             $ShopOutputData = "";
+
             //if ($id != 1001965) continue;
             foreach(range(0,31) as $i) {
                 if ($ENpcBase["ENpcData[$i]"] == 0) continue;
@@ -51,6 +51,7 @@ class NpcShops implements ParseInterface
                         $TopicSelectName = "";
                         $TopicSelectName = $TopicSelectCsv->at($ENpcBase["ENpcData[$i]"])["Name"];
                         $TopicSelectArray = [];
+
                         foreach(range(0,9) as $a) {
                             $DataLink = $ENpcBase["ENpcData[$i]"];
                             if ($DataLink == 0) continue;
@@ -197,7 +198,6 @@ class NpcShops implements ParseInterface
         // save our data to the filename: GeMountWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        //$info = $this->save('Achievement.txt', 20000);
         $info = $this->save("$CurrentPatchOutput/NpcShops - ". $Patch .".txt", 9999999);
 
         $this->io->table(
