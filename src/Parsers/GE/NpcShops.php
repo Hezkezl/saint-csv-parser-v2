@@ -28,6 +28,8 @@ class NpcShops implements ParseInterface
         $SpecialShopCsv = $this->csv("SpecialShop");
         $PreHandlerCsv = $this->csv("PreHandler");
         $ItemCsv = $this->csv("Item");
+        $FccShopCsv = $this->csv("FccShop");
+        $LotteryExchangeShopCsv = $this->csv("LotteryExchangeShop");
 
         // (optional) start a progress bar
         $this->io->progressStart($ENpcBaseCsv->total);
@@ -47,6 +49,11 @@ class NpcShops implements ParseInterface
             foreach(range(0,31) as $i) {
                 if ($ENpcBase["ENpcData[$i]"] == 0) continue;
                 if(!empty($ENpcBase["ENpcData[$i]"])) {
+                    /**
+                     * 3538944 - > 3539050 goes prehandler
+                     * 3407872 -> 3407879 goes LotteryExchangeShop
+                     * 2752512 -> 2752515 FccShop
+                     */
                     if ($ENpcBase["ENpcData[$i]"] >= 3276800 && $ENpcBase["ENpcData[$i]"] < 3279999) { //TOPIC SELECT
                         $TopicSelectName = "";
                         $TopicSelectName = $TopicSelectCsv->at($ENpcBase["ENpcData[$i]"])["Name"];
@@ -56,7 +63,6 @@ class NpcShops implements ParseInterface
                             $DataLink = $ENpcBase["ENpcData[$i]"];
                             if ($DataLink == 0) continue;
                             $ShopLink = $TopicSelectCsv->at($DataLink)["Shop[$a]"];
-                            //var_dump($ShopLink);
                             if ($ShopLink == 0) continue;
 
                             if ($ShopLink >= 262000 && $ShopLink < 264000) { // links to GilShop
@@ -73,21 +79,6 @@ class NpcShops implements ParseInterface
                                 $GilShopItemArrayOutput = implode("\n", $GilShopItemArray);
                                 $ShopOutput = "|". $ShopName ." =\n". $GilShopItemArrayOutput ."\n";
                             }
-
-                            //this is broke
-                            if ($ShopLink > 720890 && $ShopLink < 722000) { // links to CustomTalk
-                                $CustomTalkArray = [];
-                                foreach(range(0,29) as $b) {
-                                    $ShopInstruction = $CustomTalkCsv->at($ShopLink)["Script{Instruction}[$b]"];
-                                    //if (empty($ShopInstruction)) continue;
-                                    //if (!strstr($ShopInstruction, 'SHOP')) continue;
-                                    $ShopArgument = $CustomTalkCsv->at($ShopLink)["Script{Arg}[$b]"];
-                                    $CustomTalkArray[] = $ShopArgument;
-                                }
-                                $ShopOutput = implode("\n", $CustomTalkArray);
-                                $ShopOutput = "CustomTalk -> ". $ShopName ."";
-                            }
-                            //this is broke
 
                             if ($ShopLink >= 3538900 && $ShopLink < 3540000) { // links to PreHandler
                                 $ShopID = $PreHandlerCsv->at($ShopLink)["Target"];
@@ -176,6 +167,131 @@ class NpcShops implements ParseInterface
                         $TopicSelectOutputOld = implode("\n", $TopicSelectArray);
                         $ShopOutputData = "\n". $TopicSelectName ."= TOPIC SELECT \n{{Tabsells\n". $TopicSelectOutputOld ."}}\n\n|-|";
                     } // end of TOPIC SELECT
+                    if ($ENpcBase["ENpcData[$i]"] >= 2752500 && $ENpcBase["ENpcData[$i]"] < 2753000) { //FC SHOP
+                        $FCShopName = "";
+                        $FCShopName = $FccShopCsv->at($ENpcBase["ENpcData[$i]"])["Name"];
+                        $FCShopArray = [];
+                        foreach(range(0,9) as $b) {
+                            $Item = $ItemCsv->at($FccShopCsv->at($ENpcBase["ENpcData[$i]"])["Item[$b]"])['Name'];
+                            if (empty($Item)) continue;
+                            $CreditsCost = $FccShopCsv->at($ENpcBase["ENpcData[$i]"])["Cost[$b]"];
+                            $RankRequired = $FccShopCsv->at($ENpcBase["ENpcData[$i]"])["FCRank{Required}[$b]"];
+                            $FCShopArray[] = "{{Sells|Item1=".$Item ."|Count1=".$CreditsCost ."|Required=FC Rank ". $RankRequired ."}}";
+                        }
+                        $ItemOutput = implode("\n", $FCShopArray);
+                        $ShopOutputData = "\n". $FCShopName ."= FC Shop \n{{Tabsells\n". $ItemOutput ."}}\n\n|-|";
+                    } // end of FC SHOP
+                    if ($ENpcBase["ENpcData[$i]"] >= 3407800 && $ENpcBase["ENpcData[$i]"] < 3409999) { //LOTTERYEXCHANGESHOP
+                        $LEShopName = "";
+                        $LEShopArray = [];
+                        foreach(range(0,15) as $b) {
+                            $Item = $ItemCsv->at($LotteryExchangeShopCsv->at($ENpcBase["ENpcData[$i]"])["ItemAccepted[$b]"])['Name'];
+                            if (empty($Item)) continue;
+                            $Cost = $LotteryExchangeShopCsv->at($ENpcBase["ENpcData[$i]"])["AmountAccepted[$b]"];
+                            $LEShopArray[] = "{{Sells|Item1=".$Item ."|Count1=".$Cost ."}}";
+                        }
+                        $ItemOutput = implode("\n", $LEShopArray);
+                        $ShopOutputData = "\n". $LEShopName ."= Lottery Exchange Shop \n{{Tabsells\n". $ItemOutput ."}}\n\n|-|";
+                    } // end of LOTTERYEXCHANGESHOP
+                    if ($ENpcBase["ENpcData[$i]"] >= 1769000 && $ENpcBase["ENpcData[$i]"] < 1779999) { //SPECIALSHOP
+                        $ShopID = $ENpcBase["ENpcData[$i]"];
+                        $ShopName = $SpecialShopCsv->at($ShopID)["Name"];
+
+                        $SpecialShopItemArray = [];
+                            foreach(range(0,59) as $b) {
+                            if (empty($ItemCsv->at($SpecialShopCsv->at($ShopID)["Item{Receive}[$b][0]"])["Name"])) continue;
+                            $Item1Name = $ItemCsv->at($SpecialShopCsv->at($ShopID)["Item{Receive}[$b][0]"])["Name"];
+                            $Item1Count = $SpecialShopCsv->at($ShopID)["Count{Receive}[$b][0]"];
+                            $Item1HQ = $SpecialShopCsv->at($ShopID)["HQ{Receive}[$b][0]"];
+                            $Item1Cost = $ItemCsv->at($SpecialShopCsv->at($ShopID)["Item{Cost}[$b][0]"])["Name"];
+                            $Item1CostCount = $SpecialShopCsv->at($ShopID)["Count{Cost}[$b][0]"];
+                            $Item1CostHQ = $SpecialShopCsv->at($ShopID)["HQ{Cost}[$b][0]"];
+                            $ItemFor = "{{Trades|". $Item1Name ."|Quantity=". $Item1Count ."";
+                            $ItemTrade = "|Item1=". $Item1Cost ."|Count1=". $Item1CostCount ."}}";
+                            if (!empty($ItemCsv->at($SpecialShopCsv->at($ShopID)["Item{Receive}[$b][1]"])["Name"])) {   
+                                $Item2Name = $ItemCsv->at($SpecialShopCsv->at($ShopID)["Item{Receive}[$b][1]"])["Name"];
+                                $Item2Count = $SpecialShopCsv->at($ShopID)["Count{Receive}[$b][1]"];
+                                $Item2HQ = $SpecialShopCsv->at($ShopID)["HQ{Receive}[$b][1]"];
+                                $ItemFor = "{{Trades|". $Item1Name ."|Quantity=". $Item1Count ."|". $Item2Name ."|Quantity=". $Item2Count ."";
+                                }
+                            if (!empty($ItemCsv->at($SpecialShopCsv->at($ShopID)["Item{Cost}[$b][1]"])["Name"])) { 
+                                $Item2Cost = $ItemCsv->at($SpecialShopCsv->at($ShopID)["Item{Cost}[$b][1]"])["Name"];
+                                $Item2CostCount = $SpecialShopCsv->at($ShopID)["Count{Cost}[$b][1]"];
+                                $Item2CostHQ = $SpecialShopCsv->at($ShopID)["HQ{Cost}[$b][1]"];
+                                $ItemTrade = "|Item1=". $Item1Cost ."|Count1=". $Item1CostCount ."|Item2=". $Item2Cost ."|Count2=". $Item2CostCount ."}}";
+                            }
+                            $SpecialShopItemArray[] = "". $ItemFor ." ". $ItemTrade ."";
+                        }
+                        $SpecialShopItemOutput = implode("\n", $SpecialShopItemArray);
+                        $ShopOutput = "\n|". $ShopName ."\n". $SpecialShopItemOutput ."";
+                        $ShopOutputData = "\n". $ShopName ."= Special Shop \n{{Tabsells\n". $ShopOutput ."}}\n\n|-|";
+                    } // end of SPECIALSHOP
+                    if ($ENpcBase["ENpcData[$i]"] >= 3538900 && $ENpcBase["ENpcData[$i]"] < 3540000) { //PREHANDLER
+                        $ShopID = $PreHandlerCsv->at($ENpcBase["ENpcData[$i]"])["Target"];
+                        if ($ShopID > 262100 && $ShopID < 269999) {
+                            $ShopName = $GilShopCsv->at($ShopID)["Name"];
+                            $ShopNameItems = $ItemCsv->at($GilShopItemCsv->at($ShopID)["Item"])["Name"];
+                            $GilShopItemArray = [];
+                            foreach(range(0,50) as $b) {
+                                $GilShopSubArray = "". $ShopID . "." . $b ."";
+                                if (empty($ItemCsv->at($GilShopItemCsv->at($GilShopSubArray)["Item"])["Name"])) continue;
+                                $GilShopSellsItem = $ItemCsv->at($GilShopItemCsv->at($GilShopSubArray)["Item"])["Name"];
+                                $GilShopSellsItemCost = $ItemCsv->at($GilShopItemCsv->at($GilShopSubArray)["Item"])["Price{Mid}"];
+                                $GilShopItemArray[] = "{{Sells|".$GilShopSellsItem ."|".$GilShopSellsItemCost ."}}";
+                            }
+                            $GilShopItemArrayOutput = implode("\n", $GilShopItemArray);
+                            $ShopOutput = "|". $ShopName ." =\n{{Tabsells". $GilShopItemArrayOutput ."";
+                            $ShopOutputData = "\n". $ShopName ."= Prehandler \n{{Tabsells\n". $ShopOutput ."}}\n\n|-|";
+                        }
+                        if ($ShopID >= 1769000 && $ShopID < 1779999) {
+                            $ShopName = $SpecialShopCsv->at($ShopID)["Name"];
+
+                            $SpecialShopItemArray = [];
+                                foreach(range(0,59) as $b) {
+                                if (empty($ItemCsv->at($SpecialShopCsv->at($ShopID)["Item{Receive}[$b][0]"])["Name"])) continue;
+                                $Item1Name = $ItemCsv->at($SpecialShopCsv->at($ShopID)["Item{Receive}[$b][0]"])["Name"];
+                                $Item1Count = $SpecialShopCsv->at($ShopID)["Count{Receive}[$b][0]"];
+                                $Item1HQ = $SpecialShopCsv->at($ShopID)["HQ{Receive}[$b][0]"];
+                                $Item1Cost = $ItemCsv->at($SpecialShopCsv->at($ShopID)["Item{Cost}[$b][0]"])["Name"];
+                                $Item1CostCount = $SpecialShopCsv->at($ShopID)["Count{Cost}[$b][0]"];
+                                $Item1CostHQ = $SpecialShopCsv->at($ShopID)["HQ{Cost}[$b][0]"];
+                                $ItemFor = "{{Trades|". $Item1Name ."|Quantity=". $Item1Count ."";
+                                $ItemTrade = "|Item1=". $Item1Cost ."|Count1=". $Item1CostCount ."}}";
+                                if (!empty($ItemCsv->at($SpecialShopCsv->at($ShopID)["Item{Receive}[$b][1]"])["Name"])) {   
+                                    $Item2Name = $ItemCsv->at($SpecialShopCsv->at($ShopID)["Item{Receive}[$b][1]"])["Name"];
+                                    $Item2Count = $SpecialShopCsv->at($ShopID)["Count{Receive}[$b][1]"];
+                                    $Item2HQ = $SpecialShopCsv->at($ShopID)["HQ{Receive}[$b][1]"];
+                                    $ItemFor = "{{Trades|". $Item1Name ."|Quantity=". $Item1Count ."|". $Item2Name ."|Quantity=". $Item2Count ."";
+                                    }
+                                if (!empty($ItemCsv->at($SpecialShopCsv->at($ShopID)["Item{Cost}[$b][1]"])["Name"])) { 
+                                    $Item2Cost = $ItemCsv->at($SpecialShopCsv->at($ShopID)["Item{Cost}[$b][1]"])["Name"];
+                                    $Item2CostCount = $SpecialShopCsv->at($ShopID)["Count{Cost}[$b][1]"];
+                                    $Item2CostHQ = $SpecialShopCsv->at($ShopID)["HQ{Cost}[$b][1]"];
+                                    $ItemTrade = "|Item1=". $Item1Cost ."|Count1=". $Item1CostCount ."|Item2=". $Item2Cost ."|Count2=". $Item2CostCount ."}}";
+                                }
+                                $SpecialShopItemArray[] = "". $ItemFor ." ". $ItemTrade ."";
+                            }
+                            $SpecialShopItemOutput = implode("\n", $SpecialShopItemArray);
+                            $ShopOutput = "\n|". $ShopName ."\n". $SpecialShopItemOutput ."";
+                            $ShopOutputData = "\n". $ShopName ."= Prehandler \n{{Tabsells\n". $ShopOutput ."}}\n\n|-|";
+                        }
+                    } // end of PREHANDLER
+                    if ($ENpcBase["ENpcData[$i]"] >= 262000 && $ENpcBase["ENpcData[$i]"] < 264000) { //GILSHOP
+                        $ShopLink = $ENpcBase["ENpcData[$i]"];
+                        $ShopName = $GilShopCsv->at($ShopLink)["Name"];
+                        $ShopNameItems = $ItemCsv->at($GilShopItemCsv->at($ShopLink)["Item"])["Name"];
+                        $GilShopItemArray = [];
+                        foreach(range(0,50) as $b) {
+                            $GilShopSubArray = "". $ShopLink . "." . $b ."";
+                            if (empty($ItemCsv->at($GilShopItemCsv->at($GilShopSubArray)["Item"])["Name"])) continue;
+                            $GilShopSellsItem = $ItemCsv->at($GilShopItemCsv->at($GilShopSubArray)["Item"])["Name"];
+                            $GilShopSellsItemCost = $ItemCsv->at($GilShopItemCsv->at($GilShopSubArray)["Item"])["Price{Mid}"];
+                            $GilShopItemArray[] = "{{Sells|".$GilShopSellsItem ."|".$GilShopSellsItemCost ."}}";
+                        }
+                        $GilShopItemArrayOutput = implode("\n", $GilShopItemArray);
+                        $ShopOutput = "|". $ShopName ." =\n". $GilShopItemArrayOutput ."\n";
+                        $ShopOutputData = "\n". $ShopName ."= Gilshop \n{{Tabsells\n". $ShopOutput ."}}\n\n|-|";
+                    } // end of GILSHOP
 
                 }
                 $ENpcShopsArray[] = $ShopOutputData;
