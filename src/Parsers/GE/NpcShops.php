@@ -161,9 +161,7 @@ class NpcShops implements ParseInterface
                                         }
                                     if (!empty($ItemCsv->at($SpecialShopCsv->at($ShopLink)["Item{Cost}[$b][1]"])["Name"])) { 
                                         $Item2Cost = $ItemCsv->at($SpecialShopCsv->at($ShopLink)["Item{Cost}[$b][1]"])["Name"];
-                                        //needs fix, only shows 0
-                                        $Item2CostCount = $SpecialShopCsv->at($ShopID)["Count{Cost}[$b][1]"];
-                                        //needs fix, only shows 0 ^^^^^^
+                                        $Item2CostCount = $SpecialShopCsv->at($ShopLink)["Count{Cost}[$b][1]"];
                                         $Item2CostHQ = $SpecialShopCsv->at($ShopLink)["HQ{Cost}[$b][1]"];
                                         $ItemTrade = "|Item1=". $Item1Cost ."|Count1=". $Item1CostCount ."|Item2=". $Item2Cost ."|Count2=". $Item2CostCount ."}}";
                                     }
