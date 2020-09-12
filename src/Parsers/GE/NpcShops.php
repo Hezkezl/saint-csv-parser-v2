@@ -220,7 +220,7 @@ class NpcShops implements ParseInterface
                                 $Item2CostHQ = $SpecialShopCsv->at($ShopID)["HQ{Cost}[$b][1]"];
                                 $ItemTrade = "|Item1=". $Item1Cost ."|Count1=". $Item1CostCount ."|Item2=". $Item2Cost ."|Count2=". $Item2CostCount ."}}";
                             }
-                            $SpecialShopItemArray[] = "". $ItemFor ." ". $ItemTrade ."";
+                            $SpecialShopItemArray[] = "". $ItemFor ."". $ItemTrade ."";
                         }
                         $SpecialShopItemOutput = implode("\n", $SpecialShopItemArray);
                         $ShopOutput = "\n|". $ShopName ."\n". $SpecialShopItemOutput ."";
