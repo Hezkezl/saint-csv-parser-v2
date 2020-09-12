@@ -21,6 +21,7 @@ class SpecialShop implements ParseInterface
     public function parse()
     {
         include (dirname(__DIR__) . '/Paths.php');
+
         // grab CSV files
         $SpecialShopCsv = $this->csv("SpecialShop");
         $ItemCsv = $this->csv("Item");
@@ -149,10 +150,31 @@ class SpecialShop implements ParseInterface
                     $SecondCollectabilityFmt = " at a Collectability Rating of ". $SecondCollectability ."+";
                 }
 
-                //if there is no 2nd reward then just output nothing so it doesn't clog up the output
-                if (empty($SecondItemCostType)) {
+                //item cost 2
+                $ThirdItemCostType = $ItemCsv->at($SpecialShop["Item{Cost}[$i][2]"])["Name"];
+                $ThirdItemCostAmount = $SpecialShop["Count{Cost}[$i][2]"];
+                //is the item only HQ trade in ? if not output nothing for no and "HQ" if yes
+                $ThirdItemCostTypeHQ = $SpecialShop["HQ{Cost}[$i][2]"];
+                if ($ThirdItemCostTypeHQ = "False") {
+                    $ThirdItemCostTypeHQFmt = "";
+                } elseif ($ThirdItemCostTypeHQ = "True") {
+                    $ThirdItemCostTypeHQFmt = "HQ ";
+                }
+
+                //does it need a collectablity rating amount?
+                $ThirdCollectability = $SpecialShop["CollectabilityRating{Cost}[$i][2]"];
+                if ($ThirdCollectability = "False") {
+                    $ThirdCollectabilityFmt = "";
+                } elseif ($ThirdCollectability = "True") {
+                    $ThirdCollectabilityFmt = " at a Collectability Rating of ". $ThirdCollectability ."+";
+                }
+
+                //if there is no 2nd and 3rd reward then just output nothing so it doesn't clog up the output
+                if (!empty($ThirdItemCostType)) {
+                    $SecondItemCostFmt = "|Item1=". $ItemCostType ."|Count1=". $ItemCostAmount ."|Item2=". $SecondItemCostType ."|Count2=". $SecondItemCostAmount ."|Item3=". $ThirdItemCostType ."|Count3=". $ThirdItemCostAmount ."";
+                } elseif (empty($SecondItemCostType)) {
                     $SecondItemCostFmt = "|Item1=". $ItemCostType ."|Count1=". $ItemCostAmount ."";
-                } else {
+                } elseif (!empty($SecondItemCostType)) {
                     $SecondItemCostFmt = "|Item1=". $ItemCostType ."|Count1=". $ItemCostAmount ."|Item2=". $SecondItemCostType ."|Count2=". $SecondItemCostAmount ."";
                 }
 
