@@ -62,13 +62,39 @@ class Items implements ParseInterface
             // skip ones without a name
             if (empty($item['Name'])) continue;
 
+            // grab item ui category for this item
+            $itemUiCategory = $ItemUiCategoryCsv->at($item['ItemUICategory']);
+
             // remove Emphasis, comma, and wiki italic '' code in names
-            $Name = preg_replace("/<Emphasis>|<\/Emphasis>|,|''/", "", $item['Name']);
+            $BadCharacterSearch = array("–", "—", "<Emphasis>", "</Emphasis>", "''");
+            $BadCharacterReplace = array("-", "-", "", "", "");
+            $Name = str_replace($BadCharacterSearch, $BadCharacterReplace, $item['Name']);
             //$Name = str_replace("&", "and", $Name);
 
-            // add Desynth template and subpage if item is eligible
+            // Remove En-dash and Em-dash from Subheading name
+            $Subheading = str_replace($BadCharacterSearch, $BadCharacterReplace, $itemUiCategory['Name']);
+
+            // stupid Switch for changing HQ for materia to "Yes" or "No" instead of "True" or "False"
+            switch($item['CanBeHq']) {
+                case "True";
+                    $HQ = "Yes";
+                    break;
+                case "False"; default:
+                    $HQ = "No";
+                    break;
+            }
+
+            // add Desynth template and subpage if item is eligible. Do not show Desynth status on materia pages
             $DesynthTop = false;
             $DesynthItemArray = [];
+            if (!empty($item['Desynth'])) {
+                $Desynth = "\n| Desynthesizable= Yes\n| Desynth Level  = " . $item['Level{Item}'];
+            } elseif ($item['ItemUICategory'] == 58) {
+                $Desynth = false;
+            } else {
+                $Desynth = "\n| Desynthesizable= No";
+            }
+
             if ($item['Desynth'] != 0) {
                 //var_dump($DesynthItemBase);
                 foreach(range(0,13) as $a) {
@@ -102,16 +128,6 @@ class Items implements ParseInterface
                 $Top = "http://ffxiv.gamerescape.com/wiki/$Name?action=edit\n";
                 $Bottom = $DesynthTop;
             };
-            if (!empty($item['Desynth'])) {
-                $Desynth = "\n| Desynthesizable= Yes\n| Desynth Level  = " . $item['Level{Item}'];
-            } elseif ($item['ItemUICategory'] == 58) {
-                $Desynth = false;
-            } else {
-                $Desynth = "\n| Desynthesizable= No";
-            }
-
-            // grab item ui category for this item
-            $itemUiCategory = $ItemUiCategoryCsv->at($item['ItemUICategory']);
 
             // if multiple "Required Class", then add comma to separate. Default is 3 capital letters.
             $RequiredClasses = false;
@@ -372,8 +388,8 @@ class Items implements ParseInterface
                         $BonusStat[] = "| Bonus ". $BonusStatName ." = +". $item["BaseParamValue[$i]"];
                     }
                 }
-            }  // Materia stats
-            if ($item['ItemUICategory'] == 58) {
+            }
+            if ($item['ItemUICategory'] == 58) {// Materia stats
                 foreach ($MateriaCsv->data as $key => $materia) {
                     foreach (range(0, 9) as $i) {
                         if ($item['id'] == $materia["Item[$i]"] && $materia["Value[$i]"] > 0) {
@@ -392,11 +408,6 @@ class Items implements ParseInterface
                 $MarketProhib[0] = "\n| Market Prohibited = Yes";
             }
             $MarketProhib = implode("\n", $MarketProhib);
-
-            // Remove En-dash and Em-dash from Subheading name
-            $SubHeadingReplaceSearch = array("–", "—");
-            $SubHeadingReplaceText = array("-", "-");
-            $Subheading = str_replace($SubHeadingReplaceSearch, $SubHeadingReplaceText, $itemUiCategory['Name']);
 
             // Item Action
             $ItemAction = [];
@@ -786,8 +797,8 @@ class Items implements ParseInterface
                     : "",
                 '{extractable}' => $Extractable,
                 '{sells}' => ($item['Price{Low}'] > 0)
-                    ? "\n| Sells          = ". $item['Price{Low}'] ."\n| HQ             = ". $item['CanBeHq']
-                    : "\n| Sells          = No\n| HQ             = ". $item['CanBeHq'],
+                    ? "\n| Sells          = ". $item['Price{Low}'] ."\n| HQ             = ". $HQ
+                    : "\n| Sells          = No\n| HQ             = ". $HQ,
                 '{dyeallowed}' => $Dye,
                 '{crestallowed}' => $Crest,
                 '{glamour}' => ($item['IsGlamourous'] == "True")
