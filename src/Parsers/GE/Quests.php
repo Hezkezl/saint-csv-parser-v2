@@ -42,7 +42,7 @@ class Quests implements ParseInterface
 {{-stop-}}{{-start-}}
 '''Loremonger:{name}'''
 <noinclude>{{Lorempageturn|prev={prevquest1}{prev2}{prev3}|next=}}{{Loremquestheader|{name}|Mined=X|Summary=}}</noinclude>
-{{LoremLoc|Location=Hydaelyn}}<!-- Replace 'Hydaelyn' here with proper location where first dialogue is said -->
+{{LoremLoc|Location={location}}}<!-- Replace 'Hydaelyn' here with proper location where first dialogue is said -->
 {dialogue}{battletalk}{{-stop-}}
 {{-start-}}
 '''{name}/NPCs'''
@@ -73,9 +73,9 @@ class Quests implements ParseInterface
         $KeyItemCsv = $this->csv("EventItem");
         /* unused files
         $InstanceContentCsv = $this->csv("InstanceContent");
+        */
         $LevelCsv = $this->csv("Level");
         $MapCsv = $this->csv("Map");
-        */
         $paramGrowCsv = $this->csv("ParamGrow");
 
         $this->io->progressStart($questCsv->total);
@@ -373,6 +373,7 @@ class Quests implements ParseInterface
             $questgiver = str_replace($IncorrectNames, $correctnames, ucwords(strtolower($ENpcResidentCsv->at($quest['Issuer{Start}'])['Singular'])));
 
             //Start Quest Objectives / Journal Entry / Dialogue code
+            //Declare variables as false so php program stops giving warnings that they weren't defined
             $description = false;
             $objectives = [];
             $dialogue = [];
@@ -380,6 +381,9 @@ class Quests implements ParseInterface
             $prejournal = [];
             $battletalk = [];
             $system = [];
+            $ItemsInvolved = false;
+            $NpcsInvolved = false;
+            $npcloc = false;
 
             /*If the Quest ID (NOT the same as id) is not empty, get the first three letters of the string after the
                underscore (_) in its full name, and store it as $folder. ie: "BanNam305_03107" would be: $folder = 031 */
@@ -448,23 +452,10 @@ class Quests implements ParseInterface
                 $ItemsInvolved = [];
                 $KeyItemsInvolved = [];
                 $NpcsInvolved = [];
-                /*
-                $questscripts = [];
-                $NpcLevelX = false;
-                $NpcLevelZ = false;
-                $NpcLevelMap = false;
-                $scale = false;
-                $NpcPlaceName = false;
-                $NpcLocation = false;
-                */
 
                 //Look up the Quest Scripts looking through the columns "Script{Instruction}[0-49]"
                 foreach (range(0, 49) as $i) {
                     if (!empty($quest["Script{Instruction}[$i]"])) {
-                        //Show "|Quest Script =" along with a full list of the Quest instructions and Arguments.
-                        //$string = "|Quest Script = ". $quest["Script{Instruction}[$i]"] ." = ". $quest["Script{Arg}[$i]"];
-                        //$questscripts[] = $string;
-
                         //Look up the Required Items (RITEM[0-5]) using the Name value from ItemCsv
                         foreach (range(0, 5) as $key) {
                             if ($quest["Script{Instruction}[$i]"] == "RITEM{$key}") {
@@ -495,7 +486,6 @@ class Quests implements ParseInterface
                     }
                 }
 
-                //$questscripts = implode("\n", $questscripts);
                 $ItemsInvolved = implode(", ", $ItemsInvolved);
                 $KeyItemsInvolved = implode(", ", $KeyItemsInvolved);
 
@@ -566,6 +556,13 @@ class Quests implements ParseInterface
                 */
             }
 
+            //Define Quest Giver location for Loremonger
+            if (!empty($MapCsv->at($LevelCsv->at($quest['Issuer{Location}'])['Map'])['PlaceName{Sub}'])) {
+                $Location = $PlaceNameCsv->at($MapCsv->at($LevelCsv->at($quest['Issuer{Location}'])['Map'])['PlaceName{Sub}'])['Name'];
+            } else {
+                $Location = $PlaceNameCsv->at($MapCsv->at($LevelCsv->at($quest['Issuer{Location}'])['Map'])['PlaceName'])['Name'];
+            }
+
             //---------------------------------------------------------------------------------
 
             $data = [
@@ -622,6 +619,7 @@ class Quests implements ParseInterface
                 '{script}' => $questscripts,
                 '{npclocation}' => $NpcLocation,
                 */
+                '{location}' => $Location,
             ];
 
             // format using Gamer Escape formatter and add to data array
