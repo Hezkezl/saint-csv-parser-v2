@@ -24,7 +24,7 @@ class Weather implements ParseInterface
 
         // (optional) start a progress bar
         $this->io->progressStart($WeatherCsv->total);
-
+        $weatherNames = [];
         // loop through data
         foreach ($WeatherCsv->data as $id => $Weather) {
             // skip blank icons
@@ -35,8 +35,9 @@ class Weather implements ParseInterface
             $Icon = $Weather['Icon'];
             $Name = $Weather['Name'];
             $Description = $Weather['Description'];
-
+            if (in_array($Name, $weatherNames)) continue;
             // icon copying code
+            $weatherNames[] = $Name;
             if (!empty($Weather['Icon'])) {
                 if (!file_exists($this->getOutputFolder() ."/$CurrentPatchOutput/WeatherIcons/{$Name} icon.png")) {
                     // ensure output directory exists
