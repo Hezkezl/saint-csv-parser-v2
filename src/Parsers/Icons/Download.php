@@ -27,11 +27,12 @@ class Download implements ParseInterface
             );
         }
         $JSONOUTPUT = json_encode($ItemArray, JSON_PRETTY_PRINT);
-        $JSONOUTPUT_File = fopen("src\Parsers\Icons\IconData.json", 'w');
+        $JSONOUTPUT_File = fopen("src\Parsers\Icons\ItemData.json", 'w');
         fwrite($JSONOUTPUT_File, $JSONOUTPUT);
         fclose($JSONOUTPUT_File);
+        /*
         $dom = new Dom;
-        $list = json_decode(file_get_contents(__DIR__ .'/IconData.json'));
+        $list = json_decode(file_get_contents(__DIR__ .'/ItemData.json'));
         $baseUrl  = 'https://na.finalfantasyxiv.com/lodestone/playguide/db/item/?patch=&db_search_category=item&category2=&q={ITEM_NAME}';
         $total = count($list);
 
@@ -53,9 +54,9 @@ class Download implements ParseInterface
 
             // find results
             $this->io->text('Looping through rows');
-
-
+            /*
             /** @var Dom\HtmlNode $row */
+            /*
             foreach ($rows as $row) {
                 $name = trim($row->innerHtml());
                 $link = 'https://na.finalfantasyxiv.com/'. $row->getAttribute('href');
@@ -89,5 +90,6 @@ class Download implements ParseInterface
                 }
             }
         }
+        */
     }
 }

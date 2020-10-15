@@ -152,10 +152,10 @@ class Collectable implements ParseInterface
                     $HWDBaseCollect = $item["BaseCollectable{Rating}[$i]"];
                     $HWDBaseScrip = $HWDCrafterSupplyRewardCsv->at($item["BaseCollectable{Reward}[$i]"])["ScriptReward{Amount}"];
                     $HWDBaseEXP = $HWDCrafterSupplyRewardCsv->at($item["BaseCollectable{Reward}[$i]"])["ExpReward"];
-                    $HWDBonus1Collect = $item["MidBaseCollectable{Rating}[$i]"];
+                    $HWDBonus1Collect = $item["MidCollectable{Rating}[$i]"];
                     $HWDBonus1Scrip = $HWDCrafterSupplyRewardCsv->at($item["MidCollectable{Reward}[$i]"])["ScriptReward{Amount}"];
                     $HWDBonus1EXP = $HWDCrafterSupplyRewardCsv->at($item["MidCollectable{Reward}[$i]"])["ExpReward"];
-                    $HWDBonus2Collect = $item["HighBaseCollectable{Rating}[$i]"];
+                    $HWDBonus2Collect = $item["HighCollectable{Rating}[$i]"];
                     $HWDBonus2Scrip = $HWDCrafterSupplyRewardCsv->at($item["HighCollectable{Reward}[$i]"])["ScriptReward{Amount}"];
                     $HWDBonus2EXP = $HWDCrafterSupplyRewardCsv->at($item["HighCollectable{Reward}[$i]"])["ExpReward"];
                     $HWDstring = "{{-start-}}\n'''". $HWDName ."/Collectable'''\n{{ARR Infobox Collectable\n";
