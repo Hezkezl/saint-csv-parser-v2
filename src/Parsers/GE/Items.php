@@ -19,7 +19,7 @@ class Items implements ParseInterface
         | Name           = {name}
         | Subheading     = {subheading}{description}{slots}{advancedmelding}{stack}{requires}
         | Required Level = {level}
-        | Item Level     = {itemlevel}{untradable}{unique}{extractable}{sells}{dyeallowed}{crestallowed}{glamour}{desynthesis}{repair}{MarketProhib}{setbonus}{bonus}{physicaldamage}{magicdamage}{defense}{block}{itemaction}
+        | Item Level     = {itemlevel}{untradable}{unique}{extractable}{sells}{dyeallowed}{crestallowed}{glamour}{desynthesis}{repair}{MarketProhib}{setbonus}{bonus}{damage}{defense}{block}{itemaction}
         }}{Bottom}";
 
     public function parse()
@@ -88,7 +88,7 @@ class Items implements ParseInterface
             $DesynthTop = false;
             $DesynthItemArray = [];
             if (!empty($item['Desynth'])) {
-                $Desynth = "\n| Desynthesizable= Yes\n| Desynth Level  = " . $item['Level{Item}'];
+                $Desynth = "\n| Desynthesizable= Yes\n| Desynth Level  = ". $item['Level{Item}'];
             } elseif ($item['ItemUICategory'] == 58) {
                 $Desynth = false;
             } else {
@@ -106,12 +106,13 @@ class Items implements ParseInterface
                     } else {
                         $DesynthItem = $DesynthArray["$id"][$a];
                         $DesynthArrayItem = $ItemCsv->at($DesynthItem)['Name'];
-                        $DesynthItemArray[] = "|Result $b        = ". $DesynthArrayItem ."\n|Result $b Amount = ";
+                        $DesynthItemArray[] = "|Result $b        = $DesynthArrayItem\n|Result $b Amount = ";
                     }
                 }
+
                 $DesynthArrayOutput = implode("\n", $DesynthItemArray);
-                $DesynthText = "{{ARR Infobox Desynth\n|Item            = ". $item['Name'] ."\n|Primary Skill   = ".
-                    ucwords(strtolower($ClassJobCsv->at($item['ClassJob{Repair}'])['Name'])) ."\n". $DesynthArrayOutput ."\n}}";
+                $DesynthText = "{{ARR Infobox Desynth\n|Item            = $Name\n|Primary Skill   = ".
+                    ucwords(strtolower($ClassJobCsv->at($item['ClassJob{Repair}'])['Name'])) ."\n$DesynthArrayOutput\n}}";
                 if ($Bot == "true") {
                     $DesynthTop = "{{-start-}}\n'''$Name/Desynth'''\n$DesynthText{{-stop-}}";
                 } else {
@@ -138,7 +139,7 @@ class Items implements ParseInterface
 
             // change Fits/Gender to wiki-specific parameters
             $Description = false;
-            if ($item['Description'] == "Fits: Game Masters") {
+            if ($item['Description'] == 'Fits: Game Masters') {
                 $Description = "\n| FitsGM         = Game Masters";
             } elseif (!empty($item['Description'])) {
                 $Description = "\n| Description    = ". $item['Description'];
@@ -250,36 +251,37 @@ class Items implements ParseInterface
 
             // display Damage. Also display HQ if item is HQ.
             // Double line break needed to separate this out from Repair
-            $PhysicalDamage = false;
-            $MagicDamage = false;
+            $Damage = false;
             if (($item['Damage{Phys}'] > 0 || $item['Damage{Mag}'] > 0) && $item['CanBeHq'] == "True") {
                 $Delay = round(($item["Delay<ms>"]/1000),2,PHP_ROUND_HALF_UP);
                 $PhysicalDamageHQ = $item['BaseParamValue{Special}[0]'] + $item['Damage{Phys}'];
                 $MagicDamageHQ = $item['BaseParamValue{Special}[1]'] + $item['Damage{Mag}'];
                 $AutoattackHQ = (floor((($item["Delay<ms>"]/1000)/3)*$PhysicalDamageHQ*100)/100);
                 $Autoattack = (floor((($item["Delay<ms>"]/1000)/3)*$item['Damage{Phys}']*100)/100);
-                $PhysicalDamage = "\n\n| Physical Damage    = ". $item['Damage{Phys}'] ."\n| Physical Damage HQ = ". $PhysicalDamageHQ;
-                $MagicDamage = "\n| Magic Damage    = ". $item['Damage{Mag}'] ."\n| Magic Damage HQ = ". $MagicDamageHQ;
-                $MagicDamage .= "\n| Delay          = ". $Delay;
-                $MagicDamage .= "\n| Auto-attack    = ". $Autoattack ."\n| Auto-attack HQ = ". $AutoattackHQ;
+                $Damage = "\n\n| Physical Damage    = ". $item['Damage{Phys}'] ."\n| Physical Damage HQ = $PhysicalDamageHQ";
+                $Damage .= "\n| Magic Damage    = ". $item['Damage{Mag}'] ."\n| Magic Damage HQ = $MagicDamageHQ";
+                $Damage .= "\n| Delay          = $Delay\n| Auto-attack    = $Autoattack\n| Auto-attack HQ = $AutoattackHQ";
             }   elseif (($item['Damage{Phys}'] > 0 || $item['Damage{Mag}'] > 0) && $item['CanBeHq'] == "False") {
                 $Delay = round(($item["Delay<ms>"]/1000),2,PHP_ROUND_HALF_UP);
                 $Autoattack = (floor((($item["Delay<ms>"]/1000)/3)*$item['Damage{Phys}']*100)/100);
-                $PhysicalDamage = "\n\n| Physical Damage = ". $item['Damage{Phys}'];
-                $MagicDamage = "\n| Magic Damage    = ". $item['Damage{Mag}'];
-                $MagicDamage .= "\n| Delay       = ". $Delay ."\n| Auto-attack = ". $Autoattack;
+                $Damage = "\n\n| Physical Damage = ". $item['Damage{Phys}'];
+                $Damage .= "\n| Magic Damage    = ". $item['Damage{Mag}'];
+                $Damage .= "\n| Delay       = $Delay\n| Auto-attack = $Autoattack";
             }
 
             // display Block/BlockRate and Block HQ/BlockRate HQ stats
             $Block = false;
-            if (($item['Block'] > 0 || $item['BlockRate'] > 0) && $item['CanBeHq'] == "True") {
-                $BlockStrengthHQ = $item['BaseParamValue{Special}[1]'] + $item['Block'];
-                $BlockRateHQ = $item['BaseParamValue{Special}[0]'] + $item['BlockRate'];
-                $Block = "\n\n| Block Strength    = ". $item['BlockRate'] ."\n| Block Strength HQ = ". $BlockStrengthHQ;
-                $Block .= "\n| Block Rate      = ". $item['BlockRate'] ."\n| Block Rate HQ   = ". $BlockRateHQ;
-            } elseif (($item['Block'] > 0 || $item['BlockRate'] > 0) && $item['CanBeHq'] == "False") {
-                $Block = "\n\n| Block Strength = ". $item['Block'];
-                $Block .= "\n| Block Rate     = ". $item['BlockRate'];
+            if ($item['Block'] > 0 || $item['BlockRate'] > 0) {
+                $BlockStrength = $item['Block'];
+                $BlockRate = $item['BlockRate'];
+                if ($item['CanBeHq'] == "True") {
+                    $BlockStrengthHQ = $item['BaseParamValue{Special}[1]'] + $item['Block'];
+                    $BlockRateHQ = $item['BaseParamValue{Special}[0]'] + $item['BlockRate'];
+                    $Block = "\n\n| Block Strength    = $BlockStrength\n| Block Strength HQ = $BlockStrengthHQ\n| Block Rate      = $BlockRate\n| Block Rate HQ   = $BlockRateHQ";
+                } else {
+                    $Block = "\n\n| Block Strength = $BlockStrength";
+                    $Block .= "\n| Block Rate     = $BlockRate";
+                }
             }
 
             // display Defense (and Magic Defense) if Def/MagDef is greater than 0, or if subheading is
@@ -287,18 +289,19 @@ class Items implements ParseInterface
             $Defense = false;
             if (($item['ItemUICategory'] == 40 || $item['ItemUICategory'] == 41
                     || $item['ItemUICategory'] == 42 || $item['ItemUICategory'] == 43)
-                    || $item['Defense{Phys}'] > 0 || $item['Defense{Mag}'] > 0)
+                    || $item['Defense{Phys}'] > 0 || $item['Defense{Mag}'] > 0) {
+                $PhysDefense = $item['Defense{Phys}'];
+                $MagicDefense = $item['Defense{Mag}'];
                 if ($item['CanBeHq'] == "True") {
-                $DefenseHQ = ($item['Defense{Phys}'] + $item['BaseParamValue{Special}[0]']);
-                $MagicDefenseHQ = ($item['Defense{Mag}'] + $item['BaseParamValue{Special}[1]']);
-                $Defense = "\n\n| Defense    = ". $item['Defense{Phys}'] ."\n| Defense HQ = ". $DefenseHQ;
-                $Defense .= "\n| Magic Defense    = ". $item['Defense{Mag}'] ."\n| Magic Defense HQ = ". $MagicDefenseHQ;
-            } else {
-                $Defense = "\n\n| Defense       = ". $item['Defense{Phys}'];
-                $Defense .= "\n| Magic Defense = ". $item['Defense{Mag}'];
+                    $DefenseHQ = ($PhysDefense + $item['BaseParamValue{Special}[0]']);
+                    $MagicDefenseHQ = ($MagicDefense + $item['BaseParamValue{Special}[1]']);
+                    $Defense = "\n\n| Defense    = $PhysDefense\n| Defense HQ = $DefenseHQ\n| Magic Defense    = $MagicDefense\n| Magic Defense HQ = $MagicDefenseHQ";
+                } else {
+                    $Defense = "\n\n| Defense       = $PhysDefense\n| Magic Defense = $MagicDefense";
+                }
             }
 
-            // switch code for GC gear, Sanction gear, Mog Station Gear, and Eureka Gear
+            // switch code for GC gear, Sanction gear, Mog Station gear, Eureka gear, and Bozja gear
             $SetBonus = [];
             switch ($item['ItemSpecialBonus']) {
                 case 2: // GC Gear
@@ -345,57 +348,72 @@ class Items implements ParseInterface
                         }
                     }
                     foreach (range(0,5) as $i) {
-                    if (!empty($item["BaseParam{Special}[$i]"])) {
-                        $BonusStatValue = ($item["BaseParamValue{Special}[$i]"] > 0) ? "+" : false;
-                        $ParamName = str_replace(" ", "_", $BaseParamCsv->at($item["BaseParam{Special}[$i]"])['Name']);
-                        $SetBonus[0] = "\n";
-                        $SetBonus[] = "| Eureka $ParamName = $BonusStatValue". $item["BaseParamValue{Special}[$i]"];
+                        if (!empty($item["BaseParam{Special}[$i]"])) {
+                            $ParamName = str_replace(" ", "_", $BaseParamCsv->at($item["BaseParam{Special}[$i]"])['Name']);
+                            $SetBonus[0] = "\n";
+                            $SetBonus[] = "| Eureka $ParamName = +". str_replace("-", null, $item["BaseParamValue{Special}[$i]"]);
+                        }
                     }
+                    break;
+
+                case 8: // Bozja gear
+                        foreach (range(0,5) as $i) {
+                            if (!empty($item["BaseParam{Special}[$i]"])) {
+                                $ParamName = str_replace(" ", "_", $BaseParamCsv->at($item["BaseParam{Special}[$i]"])['Name']);
+                                $SetBonus[0] = "\n";
+                                $SetBonus[] = "| Bozja $ParamName = +" . str_replace("-", null, $item["BaseParamValue{Special}[$i]"]);
+                            }
+                        }
+                    break;
+
+                    default:
+                        unset($ItemSeries);
+                        unset($BaseParamSpecial);
+                        break;
                 }
-                    break;
-                default:
-                    break;
-            }
 
             $SetBonus = implode("\n", $SetBonus);
 
             // Bonus Stat Code for normal items
             $BonusStat = [];
-            if (($item['CanBeHq'] == "True") && ($item['ItemSpecialBonus'] != 7)) {
-                foreach (range(0, 5) as $i) {
-                    if ((!empty($item["BaseParam[$i]"])) && (!empty($item["BaseParamValue[$i]"]))) {
-                        $BonusStatName = str_replace(" ", "_", $BaseParamCsv->at($item["BaseParam[$i]"])['Name']);
-                        $BonusStat[0] = "\n";
-                        $BonusStat[] = "| Bonus ". $BonusStatName ." = +". $item["BaseParamValue[$i]"];
-                        // create a different loop from the foreach above that goes from 0 to 5. For each one of those numbers
-                        // (which will be the number in the BaseParamSpecial[X] column) match up the "foreach" loop number
-                        // with the "for" loop number and print the stats. Complicated asfuck but should fix SE's retardedness with
-                        // making BaseParam columns not matching up with +2 of foreach in the BaseParamValue{Special} column.
-                        // Not perfect, still doesn't post stats that have 0 NQ and +1 or more HQ. But should fix the missing
-                        // HQ stats for the final stat, usually Vitality, on HQ crafted accessories and other items.
-                        for ($x = 0; $x <= 5; $x++) {
-                            if ($item["BaseParam[$i]"] == $item["BaseParam{Special}[$x]"]) {
-                                $BonusStat[] = '| Bonus ' . $BonusStatName . ' HQ = +' . ($item["BaseParamValue[$i]"] + $item["BaseParamValue{Special}[$x]"]);
+            if ($item['ItemSpecialBonus'] != 7) {
+                if ($item['CanBeHq'] == "True") {
+                    foreach (range(0, 5) as $i) {
+                        if ((!empty($item["BaseParam[$i]"])) && (!empty($item["BaseParamValue[$i]"]))) {
+                            $BonusStatName = str_replace(" ", "_", $BaseParamCsv->at($item["BaseParam[$i]"])['Name']);
+                            $BonusStat[0] = "\n";
+                            $BonusStat[] = "| Bonus $BonusStatName = +" . $item["BaseParamValue[$i]"];
+                            // create a different loop from the foreach above that goes from 0 to 5. For each one of those numbers
+                            // (which will be the number in the BaseParamSpecial[X] column) match up the "foreach" loop number
+                            // with the "for" loop number and print the stats. Complicated asfuck but should fix SE's retardedness with
+                            // making BaseParam columns not matching up with +2 of foreach in the BaseParamValue{Special} column.
+                            // Not perfect, still doesn't post stats that have 0 NQ and +1 or more HQ. But should fix the missing
+                            // HQ stats for the final stat, usually Vitality, on HQ crafted accessories and other items.
+                            for ($x = 0; $x <= 5; $x++) {
+                                if ($item["BaseParam[$i]"] == $item["BaseParam{Special}[$x]"]) {
+                                    $BonusStat[] = '| Bonus ' . $BonusStatName . ' HQ = +' . ($item["BaseParamValue[$i]"] + $item["BaseParamValue{Special}[$x]"]);
+                                }
                             }
                         }
                     }
-                }
-            } elseif (($item['CanBeHq'] == "False") && ($item['ItemSpecialBonus'] != 7)) {
-                foreach (range(0, 5) as $i) {
-                    if (!empty($item["BaseParam[$i]"])) {
-                        $BonusStatName = str_replace(" ", "_", $BaseParamCsv->at($item["BaseParam[$i]"])['Name']);
-                        $BonusStat[0] ="\n";
-                        $BonusStat[] = "| Bonus ". $BonusStatName ." = +". $item["BaseParamValue[$i]"];
+                } else {
+                    foreach (range(0, 5) as $i) {
+                        if (!empty($item["BaseParam[$i]"])) {
+                            $BonusStatName = str_replace(" ", "_", $BaseParamCsv->at($item["BaseParam[$i]"])['Name']);
+                            $BonusStat[0] = "\n";
+                            $BonusStat[] = "| Bonus $BonusStatName = +" . $item["BaseParamValue[$i]"];
+                        }
                     }
                 }
             }
+
             if ($item['ItemUICategory'] == 58) {// Materia stats
                 foreach ($MateriaCsv->data as $key => $materia) {
                     foreach (range(0, 9) as $i) {
                         if ($item['id'] == $materia["Item[$i]"] && $materia["Value[$i]"] > 0) {
                             $BonusStatName = str_replace(" ", "_", $BaseParamCsv->at($materia["BaseParam"])['Name']);
                             $BonusStat[0] = "\n";
-                            $BonusStat[] = "|Bonus ". $BonusStatName ." = +". $materia["Value[$i]"];
+                            $BonusStat[] = "|Bonus $BonusStatName = +". $materia["Value[$i]"];
                         }
                     }
                 }
@@ -403,11 +421,10 @@ class Items implements ParseInterface
             $BonusStat = implode("\n",$BonusStat);
 
             // Market Prohibited
-            $MarketProhib = [];
+            $MarketProhib = false;
             if ($item['ItemSearchCategory'] == 0) {
-                $MarketProhib[0] = "\n| Market Prohibited = Yes";
+                $MarketProhib = "\n| Market Prohibited = Yes";
             }
-            $MarketProhib = implode("\n", $MarketProhib);
 
             // Item Action
             $ItemAction = [];
@@ -761,7 +778,6 @@ class Items implements ParseInterface
                 $ItemAction1[0] ="\n";
                 $ItemAction[] = $outputstring;
             }
-
             $ItemAction = implode("\n",$ItemAction);
 
             // Save some data
@@ -806,8 +822,7 @@ class Items implements ParseInterface
                     : "",
                 '{desynthesis}' => $Desynth,
                 '{repair}' => $Repair,
-                '{physicaldamage}' => $PhysicalDamage,
-                '{magicdamage}' => $MagicDamage,
+                '{damage}' => $Damage,
                 '{block}' => $Block,
                 '{defense}' => $Defense,
                 '{setbonus}' => $SetBonus,
