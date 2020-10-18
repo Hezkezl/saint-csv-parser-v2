@@ -780,6 +780,37 @@ class Items implements ParseInterface
             }
             $ItemAction = implode("\n",$ItemAction);
 
+            // Icon copying. Uncomment this section if you want icon copying to run while Item parsing is happening.
+            /*
+            if ($item['Icon']) {
+                $itemIcon = $this->getInputFolder() .'/icon/'. $this->iconize($item['Icon']);
+                //$itemIconHq = $this->getInputFolder() .'/icon/'. $this->iconize($item['Icon'], true);
+                if (!file_exists($itemIcon)) {
+                    continue;
+                }
+
+                // ensure output directory exists
+                $outputDirectory = $this->getOutputFolder() . "/$CurrentPatchOutput/40pxitemicons";
+                if (!is_dir($outputDirectory)) {
+                    mkdir($outputDirectory, 0777, true);
+                }
+
+                $iconFileName = "{$outputDirectory}/". str_replace(" ", "_", str_replace("/", "-", $item['Name'])) ."_Icon.png";
+                //$iconFileNameHq = "{$outputDirectory}/". str_replace(" ", "_", str_replace("/", "-", $item['Name'])) ."_HQ_Icon.png";
+
+                copy($itemIcon, $iconFileName);
+                // if hq exists, copy that
+                //if (file_exists($itemIconHq)) {
+                //    //console output
+                //    $this->io->text(
+                //        sprintf(
+                //            '- copy <info>%s</info> to <info>%s</info>', $itemIconHq, $itemIconHq
+                //        )
+                //    );
+                //    copy($itemIconHq, $iconFileNameHq);
+            }
+            */
+
             // Save some data
             $data = [
                 '{Top}' => $Top,
