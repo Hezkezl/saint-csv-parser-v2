@@ -781,7 +781,7 @@ class Items implements ParseInterface
             $ItemAction = implode("\n",$ItemAction);
 
             // Icon copying. Uncomment this section if you want icon copying to run while Item parsing is happening.
-            /*
+
             if ($item['Icon']) {
                 $itemIcon = $this->getInputFolder() .'/icon/'. $this->iconize($item['Icon']);
                 //$itemIconHq = $this->getInputFolder() .'/icon/'. $this->iconize($item['Icon'], true);
@@ -809,7 +809,6 @@ class Items implements ParseInterface
                 //    );
                 //    copy($itemIconHq, $iconFileNameHq);
             }
-            */
 
             // Save some data
             $data = [

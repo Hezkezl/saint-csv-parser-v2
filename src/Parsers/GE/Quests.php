@@ -42,7 +42,7 @@ class Quests implements ParseInterface
 {{-stop-}}{{-start-}}
 '''Loremonger:{name}'''
 <noinclude>{{Lorempageturn|prev={prevquest1}{prev2}{prev3}|next=}}{{Loremquestheader|{name}|Mined=X|Summary=}}</noinclude>
-{{LoremLoc|Location={location}}}<!-- Replace 'Hydaelyn' here with proper location where first dialogue is said -->
+{{LoremLoc|Location={location}}}
 {dialogue}{battletalk}{{-stop-}}
 {{-start-}}
 '''{name}/NPCs'''
@@ -51,7 +51,7 @@ class Quests implements ParseInterface
 
     public function parse()
     {
-        include (dirname(__DIR__) . '/Paths.php');
+        include (dirname(__DIR__) .'/Paths.php');
 
         //grab CSV files
         $questCsv = $this->csv("Quest");
@@ -420,25 +420,25 @@ class Quests implements ParseInterface
 
                     //add objective
                     if ($textgroup->type == 'todo' && strlen($text) > 1) {
-                        $objectives[] = '*' . $text;
+                        $objectives[] = '*'. $text;
                     }
 
                     //add dialogue
                     if ($textgroup->type == 'dialogue' && strlen($text) > 1) {
                         //example: NPC says: Blah blah blah
-                        $dialogue[] = '{{Loremquote|' . $textgroup->npc . '|link=y|' . $text . '}}';
+                        $dialogue[] = '{{Loremquote|'. $textgroup->npc .'|link=y|'. $text .'}}';
                     }
 
                     //add journal
                     if ($textgroup->type == 'journal' && strlen($text) > 1) {
-                        //$journal[] = '*' .$text;
-                        $prejournal[] = '*' . $text;
+                        //$journal[] = '*'.$text;
+                        $prejournal[] = '*'. $text;
                     }
 
                     //add battletalk
                     if ($textgroup->type == 'battle_talk' && strlen($text) > 1) {
                         $battletalk[0] = "\n\n=== Battle Dialogue ===";
-                        $battletalk[] = '{{Loremquote|' . $textgroup->npc . '|link=y|' . $text . '}}';
+                        $battletalk[] = '{{Loremquote|'. $textgroup->npc .'|link=y|'. $text .'}}';
                     }
 
                     //add system messages

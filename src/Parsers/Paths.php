@@ -4,7 +4,7 @@
 $MainPath = "C:\Program Files (x86)\SquareEnix\FINAL FANTASY XIV - A Realm Reborn";
 //Change to current patch number
 //$Patch should now be global
-$Patch = "5.25";
+$Patch = "5.4";
 
 /**
  To Use:

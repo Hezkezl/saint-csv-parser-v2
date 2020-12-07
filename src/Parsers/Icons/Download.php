@@ -19,6 +19,8 @@ class Download implements ParseInterface
         $ItemCsv = $this->csv('Item');
         $ItemArray = [];
         foreach ($ItemCsv->data as $id => $ItemData) {
+            //skip if empty name or if the item id will return something before the first actual item you can search for
+            if ((empty($ItemData['Name'])) || ($ItemData['id'] < 1601)) continue;
             $JSONItemName = $ItemData['Name'];
             $JSONItemId = $id;
             $ItemArray[] = array(
