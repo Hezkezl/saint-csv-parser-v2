@@ -247,6 +247,8 @@ class Quests implements ParseInterface
                 80121 => "\n|Event = Monster Hunter World",
                 80122 => "\n|Event = Heavensturn (2020)",
                 80123 => "\n|Event = A Nocturne for Heroes",
+                80124 => "\n|Event = Heavensturn (2020)",
+                80126 => "\n|Event = UNKNOWN VALENTIONE'S DAY ALTERNATIVE"
             ];
 
             $instanceunlock = false;
@@ -527,7 +529,7 @@ class Quests implements ParseInterface
                 //the beginning of the code and put */ after the code for easier commenting, as compared to
                 //putting // in front of every line. ie:  */ commented out code here <line breaks etc/everything too> /*
 
-                /*
+
                 if (!empty($quest['Icon'])) {
                     if (!file_exists($this->getOutputFolder() ."/$CurrentPatchOutput/QuestHeaderIcons/{$quest['Icon']}.png")) {
                         // ensure output directory exists
@@ -553,7 +555,7 @@ class Quests implements ParseInterface
                         copy($questIcon, $questiconFileName);
                     }
                 }
-                */
+
             }
 
             //Define Quest Giver location for Loremonger
