@@ -25,7 +25,7 @@ class FishParameter implements ParseInterface
 |Bait =
 |Fishing Log Description = {description}
 |AquariumType =
-|AquariumSize =
+|AquariumSize ={folklore}
 }}{{-stop-}}";
 
     public function parse()
@@ -38,6 +38,7 @@ class FishParameter implements ParseInterface
         $TerritoryTypeCsv = $this->csv('TerritoryType');
         $PlaceNameCsv = $this->csv('PlaceName');
         $GatheringItemLevelConvertTableCsv = $this->csv('GatheringItemLevelConvertTable');
+        $GatheringSubCategoryCsv = $this->csv('GatheringSubCategory');
 
         // (optional) start a progress bar
         $this->io->progressStart($FishParameterCsv->total);
@@ -87,6 +88,11 @@ class FishParameter implements ParseInterface
             $Star = str_repeat("{{Star}}", $GatheringItemLevelConvertTableCsv->at($fish['GatheringItemLevel'])['Stars']);
             $LevelStar = "$Level $Star";
 
+            $Folklore = false;
+            if (!empty($fish['GatheringSubCategory'])) {
+                $Folklore = $ItemCsv->at($GatheringSubCategoryCsv->at($fish['GatheringSubCategory'])['Item'])['Name'];
+            }
+
             // Fishing Drawing Icon copying
             $IconNumber = $ItemCsv->at($fish['Item'])['Icon'];
             $Drawing = substr($IconNumber, -4);
@@ -116,6 +122,7 @@ class FishParameter implements ParseInterface
                 '{level}' => ($GatheringItemLevelConvertTableCsv->at($fish['GatheringItemLevel'])['Stars'] > 0) ? $LevelStar : $Level,
                 '{type}' => $Fishtype[$fish['FishingRecordType']],
                 '{description}' => $fish['Text'],
+                '{folklore}' => $Folklore ? "\n|Folklore = $Folklore" : "",
             ];
 
             // format using Gamer Escape formatter and add to data array
