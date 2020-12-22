@@ -19,7 +19,7 @@ class Sightseeing implements ParseInterface
 | Patch = {patch}{expansion}
 | Name        = {name}
 | Location    = {name}
-| Coordinates = {{Information Needed}}
+| Coordinates = X{x}-Y{y}
 | Vista Record Number = {number}
 | Impression = \"{impression}\"
 
@@ -48,6 +48,8 @@ class Sightseeing implements ParseInterface
         // grab CSV files we want to use
         $AdventureCsv = $this->csv('Adventure');
         $EmoteCsv = $this->csv('Emote');
+        $MapCsv = $this->csv('Map');
+        $LevelCsv = $this->csv('Level');
 
         // (optional) start a progress bar
         $this->io->progressStart($AdventureCsv->total);
@@ -86,6 +88,22 @@ class Sightseeing implements ParseInterface
             // Vista Image name (used in icon copying section as well as in template above)
             $Vista = "Sightseeing Log - {$expansionshort}{$number}-Complete.png";
 
+            //get x and y 
+
+            
+            $x = $LevelCsv->at($item['Level'])['X'];
+            $y = $LevelCsv->at($item['Level'])['Z'];
+            $mapLink = $LevelCsv->at($item['Level'])['Map'];
+            $scale = $MapCsv->at($mapLink)['SizeFactor'];
+            $c = $scale / 100.0;
+            $offsetx = $MapCsv->at($mapLink)['Offset{X}'];
+            $offsetValueX = ($x + $offsetx) * $c;
+            $LocX = ((41.0 / $c) * (($offsetValueX + 1024.0) / 2048.0) +1);
+            $offsety = $MapCsv->at($mapLink)['Offset{Y}'];
+            $offsetValueY = ($y + $offsety) * $c;
+            $LocY = ((41.0 / $c) * (($offsetValueY + 1024.0) / 2048.0) +1);
+
+
             // icon copying code
             // ensure output directory exists
             $smallIconOutputDirectory = $this->getOutputFolder() ."/$CurrentPatchOutput/SightseeingLogIcons/small";
@@ -106,7 +124,7 @@ class Sightseeing implements ParseInterface
             // copy the input icon to the output filenames
             copy($smallIcon, $smalliconFileName);
             copy($largeIcon, $largeiconFileName);
-
+            
             // Save some data
             $data = [
                 '{patch}' => $Patch,
@@ -118,6 +136,9 @@ class Sightseeing implements ParseInterface
                 '{number}' => $number,
                 '{time}' => ($item['MinTime'] > 0) ? " {$item['MinTime']}-{$item['MaxTime']}" : '',
                 '{vista}' => $Vista,
+                '{x}' => round($LocX, 1),
+                '{y}' => round($LocY, 1)
+
             ];
 
             // format using Gamer Escape formatter and add to data array
@@ -130,6 +151,6 @@ class Sightseeing implements ParseInterface
 
         // save
         $this->io->text('Saving data ...');
-        $this->save("$CurrentPatchOutput/SightseeingLogs - ". $Patch .".txt");
+        $this->save("$CurrentPatchOutput/SightseeingLogs - ". $Patch .".txt", 999999);
     }
 }
