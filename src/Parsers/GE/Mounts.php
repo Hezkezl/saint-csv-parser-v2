@@ -118,9 +118,9 @@ class Mounts implements ParseInterface
             // clean up Description and Quote
             $Description = strip_tags($MountTransientCsv->at($Mount['id'])['Description{Enhanced}']); // strip tags from description
             $Description = str_replace(array("\n\r", "\r", "\n", "\t", "\0", "\x0b"), " ", $Description); // replace line breaks with a space in Description
-            $Description = preg_replace("/  +/", " ", $Description); // replace two spaces in Description with single space
+            $Description = preg_replace("/\s\s+/", " ", $Description); // replace two spaces in Description with single space
             $Quote = str_replace(array("\n\r", "\r", "\n", "\t", "\0", "\x0b"), " ", ($MountTransientCsv->at($Mount['id'])['Tooltip'])); // replace line breaks with a space in Quote
-            $Quote = preg_replace("/  +/", " ", $Quote); // replace two or more spaces in Quote with a single space
+            $Quote = preg_replace("/\s\s+/", " ", $Quote); // replace two or more spaces in Quote with a single space
             $Quote = preg_replace("/ \- (.*)/", "<br>- [[$1]]", $Quote); // add line break before Quote giver's name and place name in [[Wiki Brackets]]
 
             // Using the value at MountAction inside Mount.csv, match that up with the column "Action[0]" in the file
