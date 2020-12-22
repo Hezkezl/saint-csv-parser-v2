@@ -21,11 +21,11 @@ class Sightseeing implements ParseInterface
 | Location    = {name}
 | Coordinates = X{x}-Y{y}
 | Vista Record Number = {number}
-| Impression = \"{impression}\"
+| Impression = {impression}
 
 | Description = {description}
 | Walkthrough =
-| Weather  =
+| Weather =
 | Emote = {emote}
 | Time ={time}
 | Miscellaneous Requirement =
@@ -39,7 +39,7 @@ class Sightseeing implements ParseInterface
 | Vista Image = {vista}
 | Vista Image Description =
 
-| Icon = {name} Image.png
+| Icon = {name} SS Icon.png
 }}{{-stop-}}";
     public function parse()
     {
@@ -88,9 +88,7 @@ class Sightseeing implements ParseInterface
             // Vista Image name (used in icon copying section as well as in template above)
             $Vista = "Sightseeing Log - {$expansionshort}{$number}-Complete.png";
 
-            //get x and y 
-
-            
+            //get x and y
             $x = $LevelCsv->at($item['Level'])['X'];
             $y = $LevelCsv->at($item['Level'])['Z'];
             $mapLink = $LevelCsv->at($item['Level'])['Map'];
@@ -103,6 +101,11 @@ class Sightseeing implements ParseInterface
             $offsetValueY = ($y + $offsety) * $c;
             $LocY = ((41.0 / $c) * (($offsetValueY + 1024.0) / 2048.0) +1);
 
+            // Time code
+            $MinTimeRaw = str_pad($item['MinTime'], 4, 0, STR_PAD_LEFT);
+            $MaxTimeRaw = str_pad($item['MaxTime'], 4, 0, STR_PAD_LEFT);
+            $MinTime = substr_replace($MinTimeRaw, ":", -2, -2);
+            $MaxTime = substr_replace($MaxTimeRaw, ":", -2, -2);
 
             // icon copying code
             // ensure output directory exists
@@ -124,7 +127,7 @@ class Sightseeing implements ParseInterface
             // copy the input icon to the output filenames
             copy($smallIcon, $smalliconFileName);
             copy($largeIcon, $largeiconFileName);
-            
+
             // Save some data
             $data = [
                 '{patch}' => $Patch,
@@ -134,11 +137,10 @@ class Sightseeing implements ParseInterface
                 '{impression}' => $item['Impression'],
                 '{description}' => $item['Description'],
                 '{number}' => $number,
-                '{time}' => ($item['MinTime'] > 0) ? " {$item['MinTime']}-{$item['MaxTime']}" : '',
+                '{time}' => ($item['MinTime'] > 0) ? " $MinTime ~ $MaxTime" : '',
                 '{vista}' => $Vista,
                 '{x}' => round($LocX, 1),
                 '{y}' => round($LocY, 1)
-
             ];
 
             // format using Gamer Escape formatter and add to data array
