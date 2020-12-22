@@ -102,19 +102,19 @@ class Instances implements ParseInterface
             $Roulettes = false;
 
             $LevelingRoulette = str_replace("True","Leveling, ",$Content['LevelingRoulette']);
-            $Level5060Roulette = str_replace("True","Level 50/60, ",$Content['Level50/60Roulette']);
+            $Level506070Roulette = str_replace("True","Level 50/60/70, ",$Content['Level50/60/70Roulette']);
             $MSQRoulette = str_replace("True","Main Story Quest, ",$Content['MSQRoulette']);
             $GuildHestRoulette = str_replace("True","GuildHest, ",$Content['GuildHestRoulette']);
             $TrialRoulette = str_replace("True","Trials, ",$Content['TrialRoulette']);
             $DailyFrontlineChallenge = str_replace("True","Frontline, ",$Content['DailyFrontlineChallenge']);
-            $Level70Roulette = str_replace("True","Level 70, ",$Content['Level70Roulette']);
+            //$Level70Roulette = str_replace("True","Level 70, ",$Content['Level70Roulette']);
             $MentorRoulette = str_replace("True","Mentor, ",$Content['MentorRoulette']);
             $AllianceRoulette = str_replace("True","Alliance Raids, ",$Content['AllianceRoulette']);
             $NormalRaidRoulette = str_replace("True","Normal Raids, ",$Content['NormalRaidRoulette']);
 
-            $RoulettesRaw = "". $LevelingRoulette ."". $Level5060Roulette ."". $MSQRoulette ."". $GuildHestRoulette
-                ."". $TrialRoulette ."". $DailyFrontlineChallenge ."". $Level70Roulette ."". $MentorRoulette
-                ."". $AllianceRoulette ."". $NormalRaidRoulette ."";
+            $RoulettesRaw = "". $LevelingRoulette ."". $Level506070Roulette ."". $MSQRoulette ."". $GuildHestRoulette
+                ."". $TrialRoulette ."". $DailyFrontlineChallenge ."". $MentorRoulette ."". $AllianceRoulette
+                ."". $NormalRaidRoulette ."";
             $RoulettesReplace = str_replace("False",null,$RoulettesRaw);
             $RoulettesReplace = preg_replace("/, $/", null, $RoulettesReplace);
             if (!empty($RoulettesReplace)) {

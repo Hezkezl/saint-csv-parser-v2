@@ -26,7 +26,6 @@ class Collectable implements ParseInterface
         $ParamgrowCsv = $this->csv("ParamGrow");
         $ItemCsv = $this->csv("Item");
         $ClassJobCsv = $this->csv("ClassJob");
-        $CurrencyCsv = $this->csv("Currency");
         $HWDCrafterSupplyCsv = $this->csv("HWDCrafterSupply");
         $HWDCrafterSupplyRewardCsv = $this->csv("HWDCrafterSupplyReward");
         $HWDCraftersupplyTermCsv = $this->csv("HWDCrafterSupplyTerm");
@@ -47,8 +46,25 @@ class Collectable implements ParseInterface
 
             foreach (range(0, 7) as $i) {
                 $Class = $ClassJobCsv->at($item['ClassJob'])['Name{English}'];
-                $CurrencyID = $CurrencyCsv->at($item['Reward{Currency}'])['Item'];
-                $Currency = $ItemCsv->at($CurrencyID)['Name'];
+                //$CurrencyID = $CurrencyCsv->at($item['Reward{Currency}'])['Item'];
+                //$Currency = $ItemCsv->at($CurrencyID)['Name'];
+                switch ($item['Reward{Currency}']) {
+                    case 2:
+                        $Currency = "Yellow Crafters' Scrip";
+                        break;
+                    case 4:
+                        $Currency = "Yellow Gatherers' Scrip";
+                        break;
+                    case 6:
+                        $Currency = "White Crafters' Scrip";
+                        break;
+                    case 7:
+                        $Currency = "White Gatherers' Scrip";
+                        break;
+                    default:
+                        $Currency = false;
+                        break;
+                }
                 if ($item["RequiredItem[$i]"] > 0) {
                     $Name = $ItemCsv->at($item["RequiredItem[$i]"])['Name'];
                     $BonusMultiplier = $MultiplierCsv->at($item["BonusMultiplier[$i]"]);

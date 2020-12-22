@@ -53,7 +53,6 @@ class Satisfaction implements ParseInterface
         $ENpcResidentCsv = $this->csv("ENpcResident");
         $SatisfactionSupplyRewardCsv = $this->csv("SatisfactionSupplyReward");
         $ItemCsv = $this->csv("Item");
-        $CurrencyCsv = $this->csv("Currency");
 
         $this->io->progressStart($SatisfactionSupplyCsv->total);
 
@@ -109,9 +108,45 @@ class Satisfaction implements ParseInterface
                 $whitelow = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Quantity{Low}[1]"];
                 $whitemid = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Quantity{Mid}[1]"];
                 $whitehigh = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Quantity{High}[1]"];
-                $yellowtype = $ItemCsv->at($CurrencyCsv->at($SatisfactionSupplyRewardCsv->at($item["Reward"])["Reward{Currency}[0]"])["Item"])["Name"];
-                $whitetype = $ItemCsv->at($CurrencyCsv->at($SatisfactionSupplyRewardCsv->at($item["Reward"])["Reward{Currency}[1]"])["Item"])["Name"];
+                $yellowtypenumber = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Reward{Currency}[0]"];
+                $whitetypenumber = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Reward{Currency}[1]"];
+
+                switch ($yellowtypenumber) {
+                    case 2:
+                        $yellowtype = "Yellow Crafters' Scrip";
+                        break;
+                    case 4:
+                        $yellowtype = "Yellow Gatherers' Scrip";
+                        break;
+                    case 6:
+                        $yellowtype = "White Crafters' Scrip";
+                        break;
+                    case 7:
+                        $yellowtype = "White Gatherers' Scrip";
+                        break;
+                    default:
+                        $yellowtype = false;
+                        break;
                 }
+                switch ($whitetypenumber) {
+                    case 2:
+                        $whitetype = "Yellow Crafters' Scrip";
+                        break;
+                    case 4:
+                        $whitetype = "Yellow Gatherers' Scrip";
+                        break;
+                    case 6:
+                        $whitetype = "White Crafters' Scrip";
+                        break;
+                    case 7:
+                        $whitetype = "White Gatherers' Scrip";
+                        break;
+                    default:
+                        $whitetype = false;
+                        break;
+                }
+
+            }
 
             //---------------------------------------------------------------------------------
 

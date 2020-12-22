@@ -541,15 +541,7 @@ class Quests implements ParseInterface
                         // build icon input folder paths
                         $questIcon = $this->getInputFolder() .'/icon/'. $this->iconize($quest['Icon']);
 
-                        // if icon doesn't exist (not in the input folder icon list), then skip
-                        //if (!file_exists($questIcon)) continue;
-
                         $questiconFileName = "{$QuestIconOutputDirectory}/{$quest['Icon']}.png";
-
-                        // inform console what item we're copying
-                        //$this->io->text("Ability: <comment>{$quest['Name']}</comment>");
-                        //$this->io->text(
-                        //sprintf('- copy <info>%s</info> to <info>%s</info>', $questIcon, $questiconFileName));
 
                         // copy the input icon to the output filename
                         copy($questIcon, $questiconFileName);
