@@ -130,6 +130,6 @@ class Sightseeing implements ParseInterface
 
         // save
         $this->io->text('Saving data ...');
-        $this->save("$CurrentPatchOutput/SightseeingLogs - ". $Patch .".txt");
+        $this->save("$CurrentPatchOutput/SightseeingLogs - ". $Patch .".txt", 999999);
     }
 }
