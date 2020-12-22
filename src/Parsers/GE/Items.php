@@ -142,7 +142,8 @@ class Items implements ParseInterface
             if ($item['Description'] == 'Fits: Game Masters') {
                 $Description = "\n| FitsGM         = Game Masters";
             } elseif (!empty($item['Description'])) {
-                $Description = "\n| Description    = ". $item['Description'];
+                $Description = "\n| Description    = ". preg_replace("/\s\s+/", " ",
+                        str_replace(array("\r\n", "\r", "\n"), "<br>", $item['Description']));
             }
             if (!empty($item['EquipRestriction'])) {
                 switch ($item['EquipRestriction']) {
