@@ -131,7 +131,7 @@ class Collectable implements ParseInterface
             $HWDClass = false;
             $id = $item['id'];
 
-            foreach (range(0, 16) as $i) {
+            foreach (range(0, 22) as $i) {
                 if ($item["Item{TradeIn}[$i]"] > 0) {
                     switch($item['id']) {
                     case 0; case NULL; default;
