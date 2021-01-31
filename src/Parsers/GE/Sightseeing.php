@@ -6,7 +6,7 @@ use App\Parsers\CsvParseTrait;
 use App\Parsers\ParseInterface;
 
 /**
- * php bin/console app:parse:csv GE:FishParameter
+ * php bin/console app:parse:csv GE:Sightseeing
  */
 class Sightseeing implements ParseInterface
 {
@@ -16,17 +16,16 @@ class Sightseeing implements ParseInterface
     const WIKI_FORMAT = "{{-start-}}
 '''Sightseeing Log: {name}'''
 {{ARR Infobox Sightseeing Log
-| Patch = 5.0
-| Expansion   = Shadowbringers
+| Patch = {patch}{expansion}
 | Name        = {name}
 | Location    = {name}
-| Coordinates = {{Information Needed}}
-| Vista Record Number = 0{number}
-| Impression = \"{impression}\"
+| Coordinates = X{x}-Y{y}
+| Vista Record Number = {number}
+| Impression = {impression}
 
 | Description = {description}
 | Walkthrough =
-| Weather  =
+| Weather =
 | Emote = {emote}
 | Time ={time}
 | Miscellaneous Requirement =
@@ -37,16 +36,20 @@ class Sightseeing implements ParseInterface
 | Screenshot =
 | Screenshot Description =
 
-| Vista Image = Sightseeing Log - SHB0{number}-Complete.png
+| Vista Image = {vista}
 | Vista Image Description =
 
-| Icon = {name} Image.png
+| Icon = {name} SS Icon.png
 }}{{-stop-}}";
     public function parse()
     {
+        include (dirname(__DIR__) . '/Paths.php');
+
         // grab CSV files we want to use
         $AdventureCsv = $this->csv('Adventure');
         $EmoteCsv = $this->csv('Emote');
+        $MapCsv = $this->csv('Map');
+        $LevelCsv = $this->csv('Level');
 
         // (optional) start a progress bar
         $this->io->progressStart($AdventureCsv->total);
@@ -55,36 +58,89 @@ class Sightseeing implements ParseInterface
         foreach ($AdventureCsv->data as $id => $item) {
             $this->io->progressAdvance();
 
-            $name2 = str_replace("<Emphasis>", "", $item['Name']);
-            $name = str_replace("</Emphasis>", "", $name2);
+            $name = preg_replace("/\<Emphasis>|<\/Emphasis>/", null, $item['Name']);
             $emote = $EmoteCsv->at($item['Emote'])['Name'];
-            $number = ($id-2162687-204);
 
+            // SS log number code. Needs these calculations to properly show 001, 002, 015, etc
+            // $expansionshort is used to show the abbreviation of the expansion name (HW, SB, SHB) for the image name
+            $expansion = false;
+            $expansionshort = false;
+            if ($id <= 2162767) {
+                $number1 = $id-2162687;
+            } elseif (($id >= 2162768) && ($id <= 2162829)) {
+                $number1 = $id-2162767;
+                $expansion = "\n| Expansion   = Heavensward";
+                $expansionshort = "HW";
+            } elseif (($id >= 2162830) && $id <= 2162891) {
+                $number1 = $id-2162829;
+                $expansion = "\n| Expansion   = Stormblood";
+                $expansionshort = "SB";
+            } elseif (($id >= 2162892) && $id <= 2162936) {
+                $number1 = $id-2162891;
+                $expansion = "\n| Expansion   = Shadowbringers";
+                $expansionshort = "SHB";
+            } else {
+                $number1 = "\n| Expansion   = ERROR: INVALID SIGHTSEEING LOG NUMBER";
+            }
+            // ensure there are always leading 0s. Two if single digit, one if double digit
+            $number = str_pad($number1, 3, "0", STR_PAD_LEFT);
+
+            // Vista Image name (used in icon copying section as well as in template above)
+            $Vista = "Sightseeing Log - {$expansionshort}{$number}-Complete.png";
+
+            //get x and y
+            $x = $LevelCsv->at($item['Level'])['X'];
+            $y = $LevelCsv->at($item['Level'])['Z'];
+            $mapLink = $LevelCsv->at($item['Level'])['Map'];
+            $scale = $MapCsv->at($mapLink)['SizeFactor'];
+            $c = $scale / 100.0;
+            $offsetx = $MapCsv->at($mapLink)['Offset{X}'];
+            $offsetValueX = ($x + $offsetx) * $c;
+            $LocX = ((41.0 / $c) * (($offsetValueX + 1024.0) / 2048.0) +1);
+            $offsety = $MapCsv->at($mapLink)['Offset{Y}'];
+            $offsetValueY = ($y + $offsety) * $c;
+            $LocY = ((41.0 / $c) * (($offsetValueY + 1024.0) / 2048.0) +1);
+
+            // Time code
+            $MinTimeRaw = str_pad($item['MinTime'], 4, 0, STR_PAD_LEFT);
+            $MaxTimeRaw = str_pad($item['MaxTime'], 4, 0, STR_PAD_LEFT);
+            $MinTime = substr_replace($MinTimeRaw, ":", -2, -2);
+            $MaxTime = substr_replace($MaxTimeRaw, ":", -2, -2);
+
+            // icon copying code
             // ensure output directory exists
-            $IconoutputDirectory = $this->getOutputFolder() .'/adventureicon';
-            if (!is_dir($IconoutputDirectory)) {
-                mkdir($IconoutputDirectory, 0777, true);
+            $smallIconOutputDirectory = $this->getOutputFolder() ."/$CurrentPatchOutput/SightseeingLogIcons/small";
+            $largeIconOutputDirectory = $this->getOutputFolder() ."/$CurrentPatchOutput/SightseeingLogIcons/large";
+            if (!is_dir($smallIconOutputDirectory)) {
+                mkdir($smallIconOutputDirectory, 0777, true);
+            }
+            if (!is_dir($largeIconOutputDirectory)) {
+                mkdir($largeIconOutputDirectory, 0777, true);
             }
 
             // build icon input folder paths
-            $itemIconsmall = $this->getInputFolder() .'/icon/'. $this->iconize($item['Icon{List}']);
-            $itemIconlarge = $this->getInputFolder() .'/icon/'. $this->iconize($item['Icon{Discovered}']);
+            $smallIcon = $this->getInputFolder() .'/icon/'. $this->iconize($item['Icon{List}']);
+            $largeIcon = $this->getInputFolder() .'/icon/'. $this->iconize($item['Icon{Discovered}']);
+            $smalliconFileName = "{$smallIconOutputDirectory}/{$name} SS Icon.png";
+            $largeiconFileName = "{$largeIconOutputDirectory}/{$Vista}";
 
-            $iconFileName = "$IconoutputDirectory/small/{$name} Image.png";
-            $iconFileNameLarge = "$IconoutputDirectory/large/Sightseeing Log - SHB0{$number}-Complete.png";
-
-            // copy the input icon to the output filename
-            copy($itemIconsmall, $iconFileName);
-            copy($itemIconlarge, $iconFileNameLarge);
+            // copy the input icon to the output filenames
+            copy($smallIcon, $smalliconFileName);
+            copy($largeIcon, $largeiconFileName);
 
             // Save some data
             $data = [
+                '{patch}' => $Patch,
                 '{name}' => $name,
+                '{expansion}' => $expansion,
                 '{emote}' => $emote,
-                '{impression}' => $item['Impression'],
-                '{description}' => $item['Description'],
+                '{impression}' => str_replace(array("\r\n", "\r", "\n"), "<br>", $item['Impression']),
+                '{description}' => str_replace(array("\r\n", "\r", "\n"), "<br>", $item['Description']),
                 '{number}' => $number,
-                '{time}' => ($item['MinTime'] > 0) ? " {$item['MinTime']}-{$item['MaxTime']}" : '',
+                '{time}' => ($item['MinTime'] > 0) ? " $MinTime ~ $MaxTime" : '',
+                '{vista}' => $Vista,
+                '{x}' => round($LocX, 1),
+                '{y}' => round($LocY, 1)
             ];
 
             // format using Gamer Escape formatter and add to data array
@@ -97,32 +153,6 @@ class Sightseeing implements ParseInterface
 
         // save
         $this->io->text('Saving data ...');
-        $this->save('SightseeingLog.txt');
-    }
-    /**
-     * Converts SE icon "number" into a proper path
-     */
-    private function iconize($number, $hq = false)
-    {
-        $number = intval($number);
-        $extended = (strlen($number) >= 6);
-
-        if ($number == 0) {
-            return null;
-        }
-
-        // create icon filename
-        $icon = $extended ? str_pad($number, 5, "0", STR_PAD_LEFT) : '0' . str_pad($number, 5, "0", STR_PAD_LEFT);
-
-        // create icon path
-        $path = [];
-        $path[] = $extended ? $icon[0] . $icon[1] . $icon[2] .'000' : '0'. $icon[1] . $icon[2] .'000';
-
-        $path[] = $icon;
-
-        // combine
-        $icon = implode('/', $path) .'.png';
-
-        return $icon;
+        $this->save("$CurrentPatchOutput/SightseeingLogs - ". $Patch .".txt", 999999);
     }
 }

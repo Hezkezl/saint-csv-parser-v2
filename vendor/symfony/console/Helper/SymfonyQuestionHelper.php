@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Console\Helper;
 
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Console\Formatter\OutputFormatter;
 
 /**
  * Symfony Style Guide compliant question helper.
@@ -58,7 +58,7 @@ class SymfonyQuestionHelper extends QuestionHelper
 
             case $question instanceof ChoiceQuestion:
                 $choices = $question->getChoices();
-                $text = sprintf(' <info>%s</info> [<comment>%s</comment>]:', $text, OutputFormatter::escape($choices[$default]));
+                $text = sprintf(' <info>%s</info> [<comment>%s</comment>]:', $text, OutputFormatter::escape(isset($choices[$default]) ? $choices[$default] : $default));
 
                 break;
 
@@ -68,15 +68,15 @@ class SymfonyQuestionHelper extends QuestionHelper
 
         $output->writeln($text);
 
-        if ($question instanceof ChoiceQuestion) {
-            $width = max(array_map('strlen', array_keys($question->getChoices())));
+        $prompt = ' > ';
 
-            foreach ($question->getChoices() as $key => $value) {
-                $output->writeln(sprintf("  [<comment>%-${width}s</comment>] %s", $key, $value));
-            }
+        if ($question instanceof ChoiceQuestion) {
+            $output->writeln($this->formatChoiceQuestionChoices($question, 'comment'));
+
+            $prompt = $question->getPrompt();
         }
 
-        $output->write(' > ');
+        $output->write($prompt);
     }
 
     /**

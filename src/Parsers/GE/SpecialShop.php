@@ -9,28 +9,28 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 /**
  * php bin/console app:parse:csv GE:SpecialShop
  */
+
 class SpecialShop implements ParseInterface
 {
     use CsvParseTrait;
 
-
     // the wiki output format / template we shall use
     const WIKI_FORMAT = "{name}
-{quest}{deny}{accept}
 {item}";
 
     public function parse()
     {
+        include (dirname(__DIR__) . '/Paths.php');
 
-        $SpecialShopCsv = $this->csv('SpecialShop');
-        $ItemCsv = $this->csv('Item');
-        $QuestCsv = $this->csv('Quest');
-        $AchievementCsv = $this->csv('Achievement');
-        $DefaultTalkCsv = $this->csv('DefaultTalk');
+        // grab CSV files
+        $SpecialShopCsv = $this->csv("SpecialShop");
+        $ItemCsv = $this->csv("Item");
+        $QuestCsv = $this->csv("Quest");
+        $AchievementCsv = $this->csv("Achievement");
+        //$DefaultTalkCsv = $this->csv("DefaultTalk");
 
         // console writer
         $console = new ConsoleOutput();
-
 
         // download our CSV files
         $console->writeln(" Loading CSVs");
@@ -43,13 +43,20 @@ class SpecialShop implements ParseInterface
         foreach($SpecialShopCsv->data as $id => $SpecialShop) {
             $id = $SpecialShop['id'];
             $name = $SpecialShop['Name'];
+            /*
+
+            $QuestUnlock = false;
+            $DenyMessage = false;
+            $AcceptMessage = false;
+
             $QuestUnlock = $QuestCsv->at($SpecialShop['Quest{Unlock}'])['Name'];
-            //if the quest is a 0 (not unlocked via quest) then don't output.
+            if the quest is a 0 (not unlocked via quest) then don't output.
             if (empty($QuestUnlock)) {
                     $QuestUnlock = "";
                 } elseif (!empty($QuestUnlock)) {
                     $QuestUnlock = "\n| Quest = ". $QuestUnlock ."";
             }
+
             $DenyMessage = $DefaultTalkCsv->at($SpecialShop['NotCompleteText'])['Text[0]'];
                 if (!empty($DenyMessage)) {
                     $DenyMessage0 = str_replace("0","",$DefaultTalkCsv->at($SpecialShop['NotCompleteText'])['Text[0]']);
@@ -59,6 +66,7 @@ class SpecialShop implements ParseInterface
                 } elseif (empty($DenyMessage)) {
                     $DenyMessage = "";
                 }
+
             $AcceptMessage = $DefaultTalkCsv->at($SpecialShop['CompleteText'])['Text[0]'];
                 if (!empty($AcceptMessage)) {
                     $AcceptMessage0 = str_replace("0","",$DefaultTalkCsv->at($SpecialShop['CompleteText'])['Text[0]']);
@@ -68,6 +76,7 @@ class SpecialShop implements ParseInterface
                 } elseif (empty($AcceptMessage)) {
                     $AcceptMessage = "";
                 }
+            */
 
             //loop though every Item Receive column
             $item =[];
@@ -172,7 +181,7 @@ class SpecialShop implements ParseInterface
                 //Quest item?
                 $QuestItem = $QuestCsv->at($SpecialShop["Quest{Item}[$i]"])["Name"];
                 if (!empty($QuestItem)) {
-                    $QuestItem =  "\n    |Quest = ".$QuestItem;
+                    $QuestItem =  "\n    |Requirement=".$QuestItem;
                 } elseif (empty($QuestItem)) {
                     $QuestItem = "";
                 }
@@ -180,7 +189,7 @@ class SpecialShop implements ParseInterface
                 //Item is Unlocked from Achievement
                 $AchievementUnlock = $AchievementCsv->at($SpecialShop["AchievementUnlock[$i]"])["Name"];
                 if (!empty($AchievementUnlock)) {
-                    $AchievementUnlock =  "\n    |Achievement = ". $AchievementUnlock ."";
+                    $AchievementUnlock =  "\n    |Requirement=". $AchievementUnlock ."";
                 } elseif (empty($AchievementUnlock)) {
                     $AchievementUnlock = "";
                 }
@@ -203,9 +212,9 @@ class SpecialShop implements ParseInterface
                 '{id}'  => $id,
                 '{name}'  => (!empty($name)) ? "| $name =" : "",
                 '{item}'  => $item,
-                '{quest}'  => $QuestUnlock,
+                /*'{quest}'  => $QuestUnlock,
                 '{deny}' => $DenyMessage,
-                '{accept}' => $AcceptMessage,
+                '{accept}' => $AcceptMessage,*/
 
             ]);
             $this->data[] = $data;
@@ -214,6 +223,6 @@ class SpecialShop implements ParseInterface
 
         // save
         $console->writeln(" Saving... ");
-        $this->save("SpecialShop.txt", 999999);
+        $info = $this->save("$CurrentPatchOutput/SpecialShops - ". $Patch .".txt", 999999);
     }
 }

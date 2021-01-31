@@ -30,6 +30,8 @@ class Spearfish implements ParseInterface
 
     public function parse()
     {
+        include (dirname(__DIR__) . '/Paths.php');
+
         // grab CSV files we want to use
         $ItemCsv = $this->csv('Item');
         $SpearfishItemCsv = $this->csv('SpearfishingItem');
@@ -49,7 +51,7 @@ class Spearfish implements ParseInterface
                 continue;
             }
 
-            $SpearName = $ItemCsv->at($Spear['Item'])['Name'];
+            $Name = str_replace("#", "", ($ItemCsv->at($Spear['Item'])['Name']));
             $Territory = $TerritoryTypeCsv->at($Spear['TerritoryType'])['PlaceName'];
             $SpearLocation = $PlaceNameCsv->at($Territory)['Name'];
             $SpearfishType = [
@@ -86,9 +88,30 @@ class Spearfish implements ParseInterface
             $SpearStar = str_repeat("{{Star}}", $GatheringItemLevelConvertTableCsv->at($Spear['GatheringItemLevel'])['Stars']);
             $SpearLevelStar = "$SpearLevel $SpearStar";
 
+            // Fishing Drawing Icon copying
+            $IconNumber = $ItemCsv->at($Spear['Item'])['Icon'];
+            $Drawing = substr($IconNumber, -4);
+            $DrawingIcon = str_pad($Drawing, "6", "078", STR_PAD_LEFT);
+
+            // ensure output directory exists
+            $IconOutputDirectory = $this->getOutputFolder() . "/$CurrentPatchOutput/CavemanFishingIcons/Spearfishing";
+            // if it doesn't exist, make it
+            if (!is_dir($IconOutputDirectory)) {
+                mkdir($IconOutputDirectory, 0777, true);
+            }
+
+            // build icon input folder paths
+            $LargeIconPath = $this->getInputFolder() .'/icon/'. $this->iconize($DrawingIcon);
+
+            // give correct file names to icons for output
+            $LargeIconFileName = "{$IconOutputDirectory}/Model-$Name.png";
+            // actually copy the icons
+            copy($LargeIconPath, $LargeIconFileName);
+
+
             // Save some data
             $data = [
-                '{name}' => $SpearName,
+                '{name}' => $Name,
                 '{location}' => $SpearLocation,
                 '{level}' => ($GatheringItemLevelConvertTableCsv->at($Spear['GatheringItemLevel'])['Stars'] > 0) ? $SpearLevelStar : $SpearLevel,
                 '{type}' => $SpearfishType[$Spear['FishingRecordType']],
@@ -106,6 +129,6 @@ class Spearfish implements ParseInterface
 
         // save
         $this->io->text('Saving data ...');
-        $this->save('SpearFish.txt');
+        $info = $this->save("$CurrentPatchOutput/Spearfish - ". $Patch .".txt", 999999);
     }
 }

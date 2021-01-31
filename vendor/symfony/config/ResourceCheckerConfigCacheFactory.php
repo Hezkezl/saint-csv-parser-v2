@@ -19,12 +19,12 @@ namespace Symfony\Component\Config;
  */
 class ResourceCheckerConfigCacheFactory implements ConfigCacheFactoryInterface
 {
-    private $resourceCheckers = array();
+    private $resourceCheckers = [];
 
     /**
      * @param iterable|ResourceCheckerInterface[] $resourceCheckers
      */
-    public function __construct(iterable $resourceCheckers = array())
+    public function __construct(iterable $resourceCheckers = [])
     {
         $this->resourceCheckers = $resourceCheckers;
     }
@@ -34,13 +34,13 @@ class ResourceCheckerConfigCacheFactory implements ConfigCacheFactoryInterface
      */
     public function cache($file, $callback)
     {
-        if (!is_callable($callback)) {
-            throw new \InvalidArgumentException(sprintf('Invalid type for callback argument. Expected callable, but got "%s".', gettype($callback)));
+        if (!\is_callable($callback)) {
+            throw new \InvalidArgumentException(sprintf('Invalid type for callback argument. Expected callable, but got "%s".', \gettype($callback)));
         }
 
         $cache = new ResourceCheckerConfigCache($file, $this->resourceCheckers);
         if (!$cache->isFresh()) {
-            call_user_func($callback, $cache);
+            $callback($cache);
         }
 
         return $cache;

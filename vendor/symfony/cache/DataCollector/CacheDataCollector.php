@@ -21,17 +21,18 @@ use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 /**
  * @author Aaron Scherer <aequasi@gmail.com>
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+ *
+ * @final since Symfony 4.4
  */
 class CacheDataCollector extends DataCollector implements LateDataCollectorInterface
 {
     /**
      * @var TraceableAdapter[]
      */
-    private $instances = array();
+    private $instances = [];
 
     /**
-     * @param string           $name
-     * @param TraceableAdapter $instance
+     * @param string $name
      */
     public function addInstance($name, TraceableAdapter $instance)
     {
@@ -40,11 +41,13 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
 
     /**
      * {@inheritdoc}
+     *
+     * @param \Throwable|null $exception
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response/*, \Throwable $exception = null*/)
     {
-        $empty = array('calls' => array(), 'config' => array(), 'options' => array(), 'statistics' => array());
-        $this->data = array('instances' => $empty, 'total' => $empty);
+        $empty = ['calls' => [], 'config' => [], 'options' => [], 'statistics' => []];
+        $this->data = ['instances' => $empty, 'total' => $empty];
         foreach ($this->instances as $name => $instance) {
             $this->data['instances']['calls'][$name] = $instance->getCalls();
         }
@@ -55,7 +58,7 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
 
     public function reset()
     {
-        $this->data = array();
+        $this->data = [];
         foreach ($this->instances as $instance) {
             $instance->clearCalls();
         }
@@ -63,7 +66,7 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
 
     public function lateCollect()
     {
-        $this->data = $this->cloneVar($this->data);
+        $this->data['instances']['calls'] = $this->cloneVar($this->data['instances']['calls']);
     }
 
     /**
@@ -106,9 +109,9 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
 
     private function calculateStatistics(): array
     {
-        $statistics = array();
+        $statistics = [];
         foreach ($this->data['instances']['calls'] as $name => $calls) {
-            $statistics[$name] = array(
+            $statistics[$name] = [
                 'calls' => 0,
                 'time' => 0,
                 'reads' => 0,
@@ -116,12 +119,20 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
                 'deletes' => 0,
                 'hits' => 0,
                 'misses' => 0,
-            );
+            ];
             /** @var TraceableAdapterEvent $call */
             foreach ($calls as $call) {
                 ++$statistics[$name]['calls'];
                 $statistics[$name]['time'] += $call->end - $call->start;
-                if ('getItem' === $call->name) {
+                if ('get' === $call->name) {
+                    ++$statistics[$name]['reads'];
+                    if ($call->hits) {
+                        ++$statistics[$name]['hits'];
+                    } else {
+                        ++$statistics[$name]['misses'];
+                        ++$statistics[$name]['writes'];
+                    }
+                } elseif ('getItem' === $call->name) {
                     ++$statistics[$name]['reads'];
                     if ($call->hits) {
                         ++$statistics[$name]['hits'];
@@ -158,7 +169,7 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
     private function calculateTotalStatistics(): array
     {
         $statistics = $this->getStatistics();
-        $totals = array(
+        $totals = [
             'calls' => 0,
             'time' => 0,
             'reads' => 0,
@@ -166,7 +177,7 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
             'deletes' => 0,
             'hits' => 0,
             'misses' => 0,
-        );
+        ];
         foreach ($statistics as $name => $values) {
             foreach ($totals as $key => $value) {
                 $totals[$key] += $statistics[$name][$key];

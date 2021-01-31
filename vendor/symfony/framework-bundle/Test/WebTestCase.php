@@ -11,7 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Test;
 
-use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
 /**
  * WebTestCase is the base class for functional tests.
@@ -20,21 +21,43 @@ use Symfony\Bundle\FrameworkBundle\Client;
  */
 abstract class WebTestCase extends KernelTestCase
 {
+    use ForwardCompatTestTrait;
+    use WebTestAssertionsTrait;
+    use MailerAssertionsTrait;
+
+    private function doTearDown()
+    {
+        parent::tearDown();
+        self::getClient(null);
+    }
+
     /**
-     * Creates a Client.
+     * Creates a KernelBrowser.
      *
-     * @param array $options An array of options to pass to the createKernel class
+     * @param array $options An array of options to pass to the createKernel method
      * @param array $server  An array of server parameters
      *
-     * @return Client A Client instance
+     * @return KernelBrowser A KernelBrowser instance
      */
-    protected static function createClient(array $options = array(), array $server = array())
+    protected static function createClient(array $options = [], array $server = [])
     {
+        if (static::$booted) {
+            @trigger_error(sprintf('Calling "%s()" while a kernel has been booted is deprecated since Symfony 4.4 and will throw in 5.0, ensure the kernel is shut down before calling the method.', __METHOD__), E_USER_DEPRECATED);
+        }
+
         $kernel = static::bootKernel($options);
 
-        $client = $kernel->getContainer()->get('test.client');
+        try {
+            $client = $kernel->getContainer()->get('test.client');
+        } catch (ServiceNotFoundException $e) {
+            if (class_exists(KernelBrowser::class)) {
+                throw new \LogicException('You cannot create the client used in functional tests if the "framework.test" config is not set to true.');
+            }
+            throw new \LogicException('You cannot create the client used in functional tests if the BrowserKit component is not available. Try running "composer require symfony/browser-kit"');
+        }
+
         $client->setServerParameters($server);
 
-        return $client;
+        return self::getClient($client);
     }
 }

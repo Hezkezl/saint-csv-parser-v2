@@ -100,7 +100,7 @@ class ParseCsvCommand extends Command
         $parser
             ->setInputOutput($input, $output)
             ->setProjectDirectory($this->projectDirectory)
-            ->init()
+            //->init()
             ->parse();
 
         $stopWatchFinish = microtime(true);

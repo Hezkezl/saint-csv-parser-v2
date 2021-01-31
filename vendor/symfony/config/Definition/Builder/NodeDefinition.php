@@ -12,8 +12,8 @@
 namespace Symfony\Component\Config\Definition\Builder;
 
 use Symfony\Component\Config\Definition\BaseNode;
-use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
+use Symfony\Component\Config\Definition\NodeInterface;
 
 /**
  * This class provides a fluent interface for defining a node.
@@ -36,7 +36,7 @@ abstract class NodeDefinition implements NodeParentInterface
     protected $falseEquivalent = false;
     protected $pathSeparator = BaseNode::DEFAULT_PATH_SEPARATOR;
     protected $parent;
-    protected $attributes = array();
+    protected $attributes = [];
 
     public function __construct(?string $name, NodeParentInterface $parent = null)
     {
@@ -343,7 +343,7 @@ abstract class NodeDefinition implements NodeParentInterface
     /**
      * Instantiate and configure the node according to this definition.
      *
-     * @return NodeInterface $node The node instance
+     * @return NodeInterface The node instance
      *
      * @throws InvalidDefinitionException When the definition is invalid
      */
@@ -351,8 +351,6 @@ abstract class NodeDefinition implements NodeParentInterface
 
     /**
      * Set PathSeparator to use.
-     *
-     * @param string $separator
      *
      * @return $this
      */
@@ -364,7 +362,7 @@ abstract class NodeDefinition implements NodeParentInterface
                     $child->setPathSeparator($separator);
                 }
             } else {
-                @trigger_error('Passing a ParentNodeDefinitionInterface without getChildNodeDefinitions() is deprecated since Symfony 4.1.', E_USER_DEPRECATED);
+                @trigger_error(sprintf('Not implementing the "%s::getChildNodeDefinitions()" method in "%s" is deprecated since Symfony 4.1.', ParentNodeDefinitionInterface::class, \get_class($this)), E_USER_DEPRECATED);
             }
         }
 

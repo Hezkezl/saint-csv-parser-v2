@@ -13,6 +13,7 @@ namespace Symfony\Flex\Configurator;
 
 use Composer\Composer;
 use Composer\IO\IOInterface;
+use Symfony\Flex\Lock;
 use Symfony\Flex\Options;
 use Symfony\Flex\Path;
 use Symfony\Flex\Recipe;
@@ -32,16 +33,16 @@ abstract class AbstractConfigurator
         $this->composer = $composer;
         $this->io = $io;
         $this->options = $options;
-        $this->path = new Path(getcwd());
+        $this->path = new Path($options->get('root-dir'));
     }
 
-    abstract public function configure(Recipe $recipe, $config);
+    abstract public function configure(Recipe $recipe, $config, Lock $lock, array $options = []);
 
-    abstract public function unconfigure(Recipe $recipe, $config);
+    abstract public function unconfigure(Recipe $recipe, $config, Lock $lock);
 
     protected function write($messages)
     {
-        if (!is_array($messages)) {
+        if (!\is_array($messages)) {
             $messages = [$messages];
         }
         foreach ($messages as $i => $message) {
@@ -68,5 +69,30 @@ abstract class AbstractConfigurator
     protected function markXmlData(Recipe $recipe, string $data): string
     {
         return "\n".sprintf('        <!-- ###+ %s ### -->%s%s%s        <!-- ###- %s ### -->%s', $recipe->getName(), "\n", rtrim($data, "\r\n"), "\n", $recipe->getName(), "\n");
+    }
+
+    /**
+     * @return bool True if section was found and replaced
+     */
+    protected function updateData(string $file, string $data): bool
+    {
+        if (!file_exists($file)) {
+            return false;
+        }
+
+        $pieces = explode("\n", trim($data));
+        $startMark = trim(reset($pieces));
+        $endMark = trim(end($pieces));
+        $contents = file_get_contents($file);
+
+        if (false === strpos($contents, $startMark) || false === strpos($contents, $endMark)) {
+            return false;
+        }
+
+        $pattern = '/'.preg_quote($startMark, '/').'.*?'.preg_quote($endMark, '/').'/s';
+        $newContents = preg_replace($pattern, trim($data), $contents);
+        file_put_contents($file, $newContents);
+
+        return true;
     }
 }

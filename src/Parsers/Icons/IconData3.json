@@ -1,0 +1,854 @@
+[
+        {
+            "id": 24498,
+            "name_en": "Eggcentric Crown Roast"
+        },
+        {
+            "id": 24499,
+            "name_en": "Eggcentric Chocolate Cake"
+        },
+        {
+            "id": 24535,
+            "name_en": "Simple Treehouse"
+        },
+        {
+            "id": 24626,
+            "name_en": "Demi-Ozma"
+        },
+        {
+            "id": 24630,
+            "name_en": "Eurekan Petrel Horn"
+        },
+        {
+            "id": 24631,
+            "name_en": "Magitek Avenger A-1 Identification Key"
+        },
+        {
+            "id": 24635,
+            "name_en": "Conditional Virtue"
+        },
+        {
+            "id": 24640,
+            "name_en": "Yukinko Snowflake"
+        },
+        {
+            "id": 24643,
+            "name_en": "Hydatos Sword"
+        },
+        {
+            "id": 24644,
+            "name_en": "Hydatos Knuckles"
+        },
+        {
+            "id": 24645,
+            "name_en": "Hydatos Battleaxe"
+        },
+        {
+            "id": 24646,
+            "name_en": "Hydatos Lance"
+        },
+        {
+            "id": 24647,
+            "name_en": "Hydatos Harp Bow"
+        },
+        {
+            "id": 24648,
+            "name_en": "Hydatos Knives"
+        },
+        {
+            "id": 24649,
+            "name_en": "Hydatos Guillotine"
+        },
+        {
+            "id": 24650,
+            "name_en": "Hydatos Handgonne"
+        },
+        {
+            "id": 24651,
+            "name_en": "Hydatos Cane"
+        },
+        {
+            "id": 24652,
+            "name_en": "Hydatos Rod"
+        },
+        {
+            "id": 24653,
+            "name_en": "Hydatos Grimoire"
+        },
+        {
+            "id": 24654,
+            "name_en": "Hydatos Codex"
+        },
+        {
+            "id": 24655,
+            "name_en": "Hydatos Astrometer"
+        },
+        {
+            "id": 24656,
+            "name_en": "Hydatos Blade"
+        },
+        {
+            "id": 24657,
+            "name_en": "Hydatos Tuck"
+        },
+        {
+            "id": 24658,
+            "name_en": "Hydatos Shield"
+        },
+        {
+            "id": 24659,
+            "name_en": "Hydatos Sword +1"
+        },
+        {
+            "id": 24660,
+            "name_en": "Hydatos Knuckles +1"
+        },
+        {
+            "id": 24661,
+            "name_en": "Hydatos Battleaxe +1"
+        },
+        {
+            "id": 24662,
+            "name_en": "Hydatos Lance +1"
+        },
+        {
+            "id": 24663,
+            "name_en": "Hydatos Harp Bow +1"
+        },
+        {
+            "id": 24664,
+            "name_en": "Hydatos Knives +1"
+        },
+        {
+            "id": 24665,
+            "name_en": "Hydatos Guillotine +1"
+        },
+        {
+            "id": 24666,
+            "name_en": "Hydatos Handgonne +1"
+        },
+        {
+            "id": 24667,
+            "name_en": "Hydatos Cane +1"
+        },
+        {
+            "id": 24668,
+            "name_en": "Hydatos Rod +1"
+        },
+        {
+            "id": 24669,
+            "name_en": "Hydatos Grimoire +1"
+        },
+        {
+            "id": 24670,
+            "name_en": "Hydatos Codex +1"
+        },
+        {
+            "id": 24671,
+            "name_en": "Hydatos Astrometer +1"
+        },
+        {
+            "id": 24672,
+            "name_en": "Hydatos Blade +1"
+        },
+        {
+            "id": 24673,
+            "name_en": "Hydatos Tuck +1"
+        },
+        {
+            "id": 24674,
+            "name_en": "Hydatos Shield +1"
+        },
+        {
+            "id": 24675,
+            "name_en": "Antea"
+        },
+        {
+            "id": 24676,
+            "name_en": "Dumuzis"
+        },
+        {
+            "id": 24677,
+            "name_en": "Shamash"
+        },
+        {
+            "id": 24678,
+            "name_en": "Daboya"
+        },
+        {
+            "id": 24679,
+            "name_en": "Circinae"
+        },
+        {
+            "id": 24680,
+            "name_en": "Kasasagi"
+        },
+        {
+            "id": 24681,
+            "name_en": "Xiphias"
+        },
+        {
+            "id": 24682,
+            "name_en": "Mollfrith"
+        },
+        {
+            "id": 24683,
+            "name_en": "Rose Couverte"
+        },
+        {
+            "id": 24684,
+            "name_en": "Paikea"
+        },
+        {
+            "id": 24685,
+            "name_en": "Tuah"
+        },
+        {
+            "id": 24686,
+            "name_en": "Jebat"
+        },
+        {
+            "id": 24687,
+            "name_en": "Albireo"
+        },
+        {
+            "id": 24688,
+            "name_en": "Torigashira"
+        },
+        {
+            "id": 24689,
+            "name_en": "Brunello"
+        },
+        {
+            "id": 24690,
+            "name_en": "Bellerophon"
+        },
+        {
+            "id": 24691,
+            "name_en": "Antea Eureka"
+        },
+        {
+            "id": 24692,
+            "name_en": "Dumuzis Eureka"
+        },
+        {
+            "id": 24693,
+            "name_en": "Shamash Eureka"
+        },
+        {
+            "id": 24694,
+            "name_en": "Daboya Eureka"
+        },
+        {
+            "id": 24695,
+            "name_en": "Circinae Eureka"
+        },
+        {
+            "id": 24696,
+            "name_en": "Kasasagi Eureka"
+        },
+        {
+            "id": 24697,
+            "name_en": "Xiphias Eureka"
+        },
+        {
+            "id": 24698,
+            "name_en": "Mollfrith Eureka"
+        },
+        {
+            "id": 24699,
+            "name_en": "Rose Couverte Eureka"
+        },
+        {
+            "id": 24700,
+            "name_en": "Paikea Eureka"
+        },
+        {
+            "id": 24701,
+            "name_en": "Tuah Eureka"
+        },
+        {
+            "id": 24702,
+            "name_en": "Jebat Eureka"
+        },
+        {
+            "id": 24703,
+            "name_en": "Albireo Eureka"
+        },
+        {
+            "id": 24704,
+            "name_en": "Torigashira Eureka"
+        },
+        {
+            "id": 24705,
+            "name_en": "Brunello Eureka"
+        },
+        {
+            "id": 24706,
+            "name_en": "Bellerophon Eureka"
+        },
+        {
+            "id": 24707,
+            "name_en": "Antea Physeos"
+        },
+        {
+            "id": 24708,
+            "name_en": "Dumuzis Physeos"
+        },
+        {
+            "id": 24709,
+            "name_en": "Shamash Physeos"
+        },
+        {
+            "id": 24710,
+            "name_en": "Daboya Physeos"
+        },
+        {
+            "id": 24711,
+            "name_en": "Circinae Physeos"
+        },
+        {
+            "id": 24712,
+            "name_en": "Kasasagi Physeos"
+        },
+        {
+            "id": 24713,
+            "name_en": "Xiphias Physeos"
+        },
+        {
+            "id": 24714,
+            "name_en": "Mollfrith Physeos"
+        },
+        {
+            "id": 24715,
+            "name_en": "Rose Couverte Physeos"
+        },
+        {
+            "id": 24716,
+            "name_en": "Paikea Physeos"
+        },
+        {
+            "id": 24717,
+            "name_en": "Tuah Physeos"
+        },
+        {
+            "id": 24718,
+            "name_en": "Jebat Physeos"
+        },
+        {
+            "id": 24719,
+            "name_en": "Albireo Physeos"
+        },
+        {
+            "id": 24720,
+            "name_en": "Torigashira Physeos"
+        },
+        {
+            "id": 24721,
+            "name_en": "Brunello Physeos"
+        },
+        {
+            "id": 24722,
+            "name_en": "Bellerophon Physeos"
+        },
+        {
+            "id": 24723,
+            "name_en": "Elemental Helm of Fending +1"
+        },
+        {
+            "id": 24724,
+            "name_en": "Elemental Armor of Fending +1"
+        },
+        {
+            "id": 24725,
+            "name_en": "Elemental Gauntlets of Fending +1"
+        },
+        {
+            "id": 24726,
+            "name_en": "Elemental Trousers of Fending +1"
+        },
+        {
+            "id": 24727,
+            "name_en": "Elemental Shoes of Fending +1"
+        },
+        {
+            "id": 24728,
+            "name_en": "Elemental Helm of Maiming +1"
+        },
+        {
+            "id": 24729,
+            "name_en": "Elemental Armor of Maiming +1"
+        },
+        {
+            "id": 24730,
+            "name_en": "Elemental Gauntlets of Maiming +1"
+        },
+        {
+            "id": 24731,
+            "name_en": "Elemental Trousers of Maiming +1"
+        },
+        {
+            "id": 24732,
+            "name_en": "Elemental Shoes of Maiming +1"
+        },
+        {
+            "id": 24733,
+            "name_en": "Elemental Hat of Striking +1"
+        },
+        {
+            "id": 24734,
+            "name_en": "Elemental Jacket of Striking +1"
+        },
+        {
+            "id": 24735,
+            "name_en": "Elemental Gloves of Striking +1"
+        },
+        {
+            "id": 24736,
+            "name_en": "Elemental Breeches of Striking +1"
+        },
+        {
+            "id": 24737,
+            "name_en": "Elemental Boots of Striking +1"
+        },
+        {
+            "id": 24738,
+            "name_en": "Elemental Hat of Aiming +1"
+        },
+        {
+            "id": 24739,
+            "name_en": "Elemental Jacket of Aiming +1"
+        },
+        {
+            "id": 24740,
+            "name_en": "Elemental Gloves of Aiming +1"
+        },
+        {
+            "id": 24741,
+            "name_en": "Elemental Breeches of Aiming +1"
+        },
+        {
+            "id": 24742,
+            "name_en": "Elemental Boots of Aiming +1"
+        },
+        {
+            "id": 24743,
+            "name_en": "Elemental Circlet of Scouting +1"
+        },
+        {
+            "id": 24744,
+            "name_en": "Elemental Jacket of Scouting +1"
+        },
+        {
+            "id": 24745,
+            "name_en": "Elemental Gloves of Scouting +1"
+        },
+        {
+            "id": 24746,
+            "name_en": "Elemental Breeches of Scouting +1"
+        },
+        {
+            "id": 24747,
+            "name_en": "Elemental Boots of Scouting +1"
+        },
+        {
+            "id": 24748,
+            "name_en": "Elemental Circlet of Healing +1"
+        },
+        {
+            "id": 24749,
+            "name_en": "Elemental Coat of Healing +1"
+        },
+        {
+            "id": 24750,
+            "name_en": "Elemental Gloves of Healing +1"
+        },
+        {
+            "id": 24751,
+            "name_en": "Elemental Bottoms of Healing +1"
+        },
+        {
+            "id": 24752,
+            "name_en": "Elemental Shoes of Healing +1"
+        },
+        {
+            "id": 24753,
+            "name_en": "Elemental Circlet of Casting +1"
+        },
+        {
+            "id": 24754,
+            "name_en": "Elemental Coat of Casting +1"
+        },
+        {
+            "id": 24755,
+            "name_en": "Elemental Gloves of Casting +1"
+        },
+        {
+            "id": 24756,
+            "name_en": "Elemental Bottoms of Casting +1"
+        },
+        {
+            "id": 24757,
+            "name_en": "Elemental Shoes of Casting +1"
+        },
+        {
+            "id": 24758,
+            "name_en": "Elemental Helm of Fending +2"
+        },
+        {
+            "id": 24759,
+            "name_en": "Elemental Armor of Fending +2"
+        },
+        {
+            "id": 24760,
+            "name_en": "Elemental Gauntlets of Fending +2"
+        },
+        {
+            "id": 24761,
+            "name_en": "Elemental Trousers of Fending +2"
+        },
+        {
+            "id": 24762,
+            "name_en": "Elemental Shoes of Fending +2"
+        },
+        {
+            "id": 24763,
+            "name_en": "Elemental Helm of Maiming +2"
+        },
+        {
+            "id": 24764,
+            "name_en": "Elemental Armor of Maiming +2"
+        },
+        {
+            "id": 24765,
+            "name_en": "Elemental Gauntlets of Maiming +2"
+        },
+        {
+            "id": 24766,
+            "name_en": "Elemental Trousers of Maiming +2"
+        },
+        {
+            "id": 24767,
+            "name_en": "Elemental Shoes of Maiming +2"
+        },
+        {
+            "id": 24768,
+            "name_en": "Elemental Hat of Striking +2"
+        },
+        {
+            "id": 24769,
+            "name_en": "Elemental Jacket of Striking +2"
+        },
+        {
+            "id": 24770,
+            "name_en": "Elemental Gloves of Striking +2"
+        },
+        {
+            "id": 24771,
+            "name_en": "Elemental Breeches of Striking +2"
+        },
+        {
+            "id": 24772,
+            "name_en": "Elemental Boots of Striking +2"
+        },
+        {
+            "id": 24773,
+            "name_en": "Elemental Hat of Aiming +2"
+        },
+        {
+            "id": 24774,
+            "name_en": "Elemental Jacket of Aiming +2"
+        },
+        {
+            "id": 24775,
+            "name_en": "Elemental Gloves of Aiming +2"
+        },
+        {
+            "id": 24776,
+            "name_en": "Elemental Breeches of Aiming +2"
+        },
+        {
+            "id": 24777,
+            "name_en": "Elemental Boots of Aiming +2"
+        },
+        {
+            "id": 24778,
+            "name_en": "Elemental Circlet of Scouting +2"
+        },
+        {
+            "id": 24779,
+            "name_en": "Elemental Jacket of Scouting +2"
+        },
+        {
+            "id": 24780,
+            "name_en": "Elemental Gloves of Scouting +2"
+        },
+        {
+            "id": 24781,
+            "name_en": "Elemental Breeches of Scouting +2"
+        },
+        {
+            "id": 24782,
+            "name_en": "Elemental Boots of Scouting +2"
+        },
+        {
+            "id": 24783,
+            "name_en": "Elemental Circlet of Healing +2"
+        },
+        {
+            "id": 24784,
+            "name_en": "Elemental Coat of Healing +2"
+        },
+        {
+            "id": 24785,
+            "name_en": "Elemental Gloves of Healing +2"
+        },
+        {
+            "id": 24786,
+            "name_en": "Elemental Bottoms of Healing +2"
+        },
+        {
+            "id": 24787,
+            "name_en": "Elemental Shoes of Healing +2"
+        },
+        {
+            "id": 24788,
+            "name_en": "Elemental Circlet of Casting +2"
+        },
+        {
+            "id": 24789,
+            "name_en": "Elemental Coat of Casting +2"
+        },
+        {
+            "id": 24790,
+            "name_en": "Elemental Gloves of Casting +2"
+        },
+        {
+            "id": 24791,
+            "name_en": "Elemental Bottoms of Casting +2"
+        },
+        {
+            "id": 24792,
+            "name_en": "Elemental Shoes of Casting +2"
+        },
+        {
+            "id": 24806,
+            "name_en": "Crystalline Scale"
+        },
+        {
+            "id": 24807,
+            "name_en": "Hydatos Crystal"
+        },
+        {
+            "id": 24808,
+            "name_en": "Eureka Fragment"
+        },
+        {
+            "id": 24809,
+            "name_en": "Obscure Logogram"
+        },
+        {
+            "id": 24810,
+            "name_en": "Wisdom of the Breathtaker"
+        },
+        {
+            "id": 24811,
+            "name_en": "Eagle Eye Shot L"
+        },
+        {
+            "id": 24812,
+            "name_en": "Double Edge L"
+        },
+        {
+            "id": 24813,
+            "name_en": "Magic Burst L"
+        },
+        {
+            "id": 24815,
+            "name_en": "Cryptic Seal"
+        },
+        {
+            "id": 24816,
+            "name_en": "Damascene Cloth"
+        },
+        {
+            "id": 24817,
+            "name_en": "Molech's Horn"
+        },
+        {
+            "id": 24818,
+            "name_en": "Goldemar's Horn"
+        },
+        {
+            "id": 24819,
+            "name_en": "Ceto's Claw"
+        },
+        {
+            "id": 24820,
+            "name_en": "Aethertight Flask"
+        },
+        {
+            "id": 24832,
+            "name_en": "Replica Pyros Sword"
+        },
+        {
+            "id": 24833,
+            "name_en": "Replica Pyros Knuckles"
+        },
+        {
+            "id": 24834,
+            "name_en": "Replica Pyros Battleaxe"
+        },
+        {
+            "id": 24835,
+            "name_en": "Replica Pyros Lance"
+        },
+        {
+            "id": 24836,
+            "name_en": "Replica Pyros Harp Bow"
+        },
+        {
+            "id": 24837,
+            "name_en": "Replica Pyros Knives"
+        },
+        {
+            "id": 24838,
+            "name_en": "Replica Pyros Guillotine"
+        },
+        {
+            "id": 24839,
+            "name_en": "Replica Pyros Handgonne"
+        },
+        {
+            "id": 24840,
+            "name_en": "Replica Pyros Cane"
+        },
+        {
+            "id": 24841,
+            "name_en": "Replica Pyros Rod"
+        },
+        {
+            "id": 24842,
+            "name_en": "Replica Pyros Grimoire"
+        },
+        {
+            "id": 24843,
+            "name_en": "Replica Pyros Codex"
+        },
+        {
+            "id": 24844,
+            "name_en": "Replica Pyros Astrometer"
+        },
+        {
+            "id": 24845,
+            "name_en": "Replica Pyros Blade"
+        },
+        {
+            "id": 24846,
+            "name_en": "Replica Pyros Tuck"
+        },
+        {
+            "id": 24847,
+            "name_en": "Replica Pyros Shield"
+        },
+        {
+            "id": 24848,
+            "name_en": "Hydatos Lockbox"
+        },
+        {
+            "id": 24849,
+            "name_en": "Moisture-warped Lockbox"
+        },
+        {
+            "id": 24850,
+            "name_en": "Kirin's Osode of Fending"
+        },
+        {
+            "id": 24851,
+            "name_en": "Kirin's Osode of Maiming"
+        },
+        {
+            "id": 24852,
+            "name_en": "Kirin's Osode of Striking"
+        },
+        {
+            "id": 24853,
+            "name_en": "Kirin's Osode of Scouting"
+        },
+        {
+            "id": 24854,
+            "name_en": "Kirin's Osode of Aiming"
+        },
+        {
+            "id": 24855,
+            "name_en": "Vermilion Cloak of Casting"
+        },
+        {
+            "id": 24856,
+            "name_en": "Vermilion Cloak of Healing"
+        },
+        {
+            "id": 24857,
+            "name_en": "Shantotto's Staff"
+        },
+        {
+            "id": 24858,
+            "name_en": "Penthesilea's Spear"
+        },
+        {
+            "id": 24870,
+            "name_en": "Dvergr Card"
+        },
+        {
+            "id": 24871,
+            "name_en": "Ejika Tsunjika Card"
+        },
+        {
+            "id": 24873,
+            "name_en": "Provenance Watcher Card"
+        },
+        {
+            "id": 24904,
+            "name_en": "Aetherially Conductive Plate"
+        },
+        {
+            "id": 24905,
+            "name_en": "Hydatos Cluster"
+        },
+        {
+            "id": 24906,
+            "name_en": "Sharlayan Aether Oil"
+        },
+        {
+            "id": 24907,
+            "name_en": "Aetheric Stabilizer"
+        },
+        {
+            "id": 24996,
+            "name_en": "Great Shin-Zantetsuken"
+        },
+        {
+            "id": 24997,
+            "name_en": "Shin-Zantetsuken"
+        },
+        {
+            "id": 24998,
+            "name_en": "Absolute Lance"
+        },
+        {
+            "id": 25001,
+            "name_en": "Ballroom Etiquette - Overzealous Affirmations"
+        },
+        {
+            "id": 25067,
+            "name_en": "Gates of Paradise Orchestrion Roll"
+        },
+        {
+            "id": 25068,
+            "name_en": "Onslaught Orchestrion Roll"
+        },
+        {
+            "id": 25069,
+            "name_en": "Turmoil Orchestrion Roll"
+        }
+]

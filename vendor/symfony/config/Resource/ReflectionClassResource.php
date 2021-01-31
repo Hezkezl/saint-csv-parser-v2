@@ -11,21 +11,25 @@
 
 namespace Symfony\Component\Config\Resource;
 
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface as LegacyServiceSubscriberInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @final since Symfony 4.3
  */
-class ReflectionClassResource implements SelfCheckingResourceInterface, \Serializable
+class ReflectionClassResource implements SelfCheckingResourceInterface
 {
-    private $files = array();
+    private $files = [];
     private $className;
     private $classReflector;
-    private $excludedVendors = array();
+    private $excludedVendors = [];
     private $hash;
 
-    public function __construct(\ReflectionClass $classReflector, array $excludedVendors = array())
+    public function __construct(\ReflectionClass $classReflector, array $excludedVendors = [])
     {
         $this->className = $classReflector->name;
         $this->classReflector = $classReflector;
@@ -57,19 +61,17 @@ class ReflectionClassResource implements SelfCheckingResourceInterface, \Seriali
         return 'reflection.'.$this->className;
     }
 
-    public function serialize()
+    /**
+     * @internal
+     */
+    public function __sleep(): array
     {
         if (null === $this->hash) {
             $this->hash = $this->computeHash();
             $this->loadFiles($this->classReflector);
         }
 
-        return serialize(array($this->files, $this->className, $this->hash));
-    }
-
-    public function unserialize($serialized)
-    {
-        list($this->files, $this->className, $this->hash) = unserialize($serialized);
+        return ['files', 'className', 'hash'];
     }
 
     private function loadFiles(\ReflectionClass $class)
@@ -81,7 +83,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface, \Seriali
             $file = $class->getFileName();
             if (false !== $file && file_exists($file)) {
                 foreach ($this->excludedVendors as $vendor) {
-                    if (0 === strpos($file, $vendor) && false !== strpbrk(substr($file, strlen($vendor), 1), '/'.DIRECTORY_SEPARATOR)) {
+                    if (0 === strpos($file, $vendor) && false !== strpbrk(substr($file, \strlen($vendor), 1), '/'.\DIRECTORY_SEPARATOR)) {
                         $file = false;
                         break;
                     }
@@ -96,7 +98,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface, \Seriali
         } while ($class = $class->getParentClass());
     }
 
-    private function computeHash()
+    private function computeHash(): string
     {
         if (null === $this->classReflector) {
             try {
@@ -115,7 +117,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface, \Seriali
         return hash_final($hash);
     }
 
-    private function generateSignature(\ReflectionClass $class)
+    private function generateSignature(\ReflectionClass $class): iterable
     {
         yield $class->getDocComment();
         yield (int) $class->isFinal();
@@ -134,17 +136,61 @@ class ReflectionClassResource implements SelfCheckingResourceInterface, \Seriali
 
             foreach ($class->getProperties(\ReflectionProperty::IS_PUBLIC | \ReflectionProperty::IS_PROTECTED) as $p) {
                 yield $p->getDocComment().$p;
-                yield print_r($defaults[$p->name], true);
+                yield print_r(isset($defaults[$p->name]) && !\is_object($defaults[$p->name]) ? $defaults[$p->name] : null, true);
             }
         }
 
         foreach ($class->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED) as $m) {
-            yield preg_replace('/^  @@.*/m', '', $m);
-
-            $defaults = array();
+            $defaults = [];
+            $parametersWithUndefinedConstants = [];
             foreach ($m->getParameters() as $p) {
-                $defaults[$p->name] = $p->isDefaultValueAvailable() ? $p->getDefaultValue() : null;
+                if (!$p->isDefaultValueAvailable()) {
+                    $defaults[$p->name] = null;
+
+                    continue;
+                }
+
+                if (!$p->isDefaultValueConstant() || \defined($p->getDefaultValueConstantName())) {
+                    $defaults[$p->name] = $p->getDefaultValue();
+
+                    continue;
+                }
+
+                $defaults[$p->name] = $p->getDefaultValueConstantName();
+                $parametersWithUndefinedConstants[$p->name] = true;
             }
+
+            if (!$parametersWithUndefinedConstants) {
+                yield preg_replace('/^  @@.*/m', '', $m);
+            } else {
+                $stack = [
+                    $m->getDocComment(),
+                    $m->getName(),
+                    $m->isAbstract(),
+                    $m->isFinal(),
+                    $m->isStatic(),
+                    $m->isPublic(),
+                    $m->isPrivate(),
+                    $m->isProtected(),
+                    $m->returnsReference(),
+                    $m->hasReturnType() ? $m->getReturnType()->getName() : '',
+                ];
+
+                foreach ($m->getParameters() as $p) {
+                    if (!isset($parametersWithUndefinedConstants[$p->name])) {
+                        $stack[] = (string) $p;
+                    } else {
+                        $stack[] = $p->isOptional();
+                        $stack[] = $p->hasType() ? $p->getType()->getName() : '';
+                        $stack[] = $p->isPassedByReference();
+                        $stack[] = $p->isVariadic();
+                        $stack[] = $p->getName();
+                    }
+                }
+
+                yield implode(',', $stack);
+            }
+
             yield print_r($defaults, true);
         }
 
@@ -154,12 +200,22 @@ class ReflectionClassResource implements SelfCheckingResourceInterface, \Seriali
 
         if (interface_exists(EventSubscriberInterface::class, false) && $class->isSubclassOf(EventSubscriberInterface::class)) {
             yield EventSubscriberInterface::class;
-            yield print_r(\call_user_func(array($class->name, 'getSubscribedEvents')), true);
+            yield print_r($class->name::getSubscribedEvents(), true);
         }
 
-        if (interface_exists(ServiceSubscriberInterface::class, false) && $class->isSubclassOf(ServiceSubscriberInterface::class)) {
+        if (interface_exists(MessageSubscriberInterface::class, false) && $class->isSubclassOf(MessageSubscriberInterface::class)) {
+            yield MessageSubscriberInterface::class;
+            foreach ($class->name::getHandledMessages() as $key => $value) {
+                yield $key.print_r($value, true);
+            }
+        }
+
+        if (interface_exists(LegacyServiceSubscriberInterface::class, false) && $class->isSubclassOf(LegacyServiceSubscriberInterface::class)) {
+            yield LegacyServiceSubscriberInterface::class;
+            yield print_r([$class->name, 'getSubscribedServices'](), true);
+        } elseif (interface_exists(ServiceSubscriberInterface::class, false) && $class->isSubclassOf(ServiceSubscriberInterface::class)) {
             yield ServiceSubscriberInterface::class;
-            yield print_r(\call_user_func(array($class->name, 'getSubscribedServices')), true);
+            yield print_r($class->name::getSubscribedServices(), true);
         }
     }
 }

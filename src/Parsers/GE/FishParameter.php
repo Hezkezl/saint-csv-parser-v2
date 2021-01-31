@@ -25,17 +25,20 @@ class FishParameter implements ParseInterface
 |Bait =
 |Fishing Log Description = {description}
 |AquariumType =
-|AquariumSize =
+|AquariumSize ={folklore}
 }}{{-stop-}}";
 
     public function parse()
     {
+        include (dirname(__DIR__) . '/Paths.php');
+
         // grab CSV files we want to use
         $ItemCsv = $this->csv('Item');
         $FishParameterCsv = $this->csv('FishParameter');
         $TerritoryTypeCsv = $this->csv('TerritoryType');
         $PlaceNameCsv = $this->csv('PlaceName');
         $GatheringItemLevelConvertTableCsv = $this->csv('GatheringItemLevelConvertTable');
+        $GatheringSubCategoryCsv = $this->csv('GatheringSubCategory');
 
         // (optional) start a progress bar
         $this->io->progressStart($FishParameterCsv->total);
@@ -49,10 +52,10 @@ class FishParameter implements ParseInterface
                 continue;
             }
 
-            $name = $ItemCsv->at($fish['Item'])['Name'];
-            $territory = $TerritoryTypeCsv->at($fish['TerritoryType'])['PlaceName'];
-            $location = $PlaceNameCsv->at($territory)['Name'];
-            $fishtype = [
+            $Name = str_replace("#", "", ($ItemCsv->at($fish['Item'])['Name']));
+            $Territory = $TerritoryTypeCsv->at($fish['TerritoryType'])['PlaceName'];
+            $Location = $PlaceNameCsv->at($Territory)['Name'];
+            $Fishtype = [
                 0 => "Coastlines",
                 1 => "Deep Sea",
                 2 => "Rivers",
@@ -81,19 +84,45 @@ class FishParameter implements ParseInterface
                 25 => null,
                 26 => null,
             ];
-            $level = $GatheringItemLevelConvertTableCsv->at($fish['GatheringItemLevel'])['GatheringItemLevel'];
-            $star = str_repeat("{{Star}}", $GatheringItemLevelConvertTableCsv->at($fish['GatheringItemLevel'])['Stars']);
-            $levelstar = "$level $star";
+            $Level = $GatheringItemLevelConvertTableCsv->at($fish['GatheringItemLevel'])['GatheringItemLevel'];
+            $Star = str_repeat("{{Star}}", $GatheringItemLevelConvertTableCsv->at($fish['GatheringItemLevel'])['Stars']);
+            $LevelStar = "$Level $Star";
+
+            $Folklore = false;
+            if (!empty($fish['GatheringSubCategory'])) {
+                $Folklore = $ItemCsv->at($GatheringSubCategoryCsv->at($fish['GatheringSubCategory'])['Item'])['Name'];
+            }
+
+            // Fishing Drawing Icon copying
+            $IconNumber = $ItemCsv->at($fish['Item'])['Icon'];
+            $Drawing = substr($IconNumber, -4);
+            $DrawingIcon = str_pad($Drawing, "6", "078", STR_PAD_LEFT);
+
+            // ensure output directory exists
+            $IconOutputDirectory = $this->getOutputFolder() . "/$CurrentPatchOutput/CavemanFishingIcons/Fishing";
+            // if it doesn't exist, make it
+            if (!is_dir($IconOutputDirectory)) {
+                mkdir($IconOutputDirectory, 0777, true);
+            }
+
+            // build icon input folder paths
+            $LargeIconPath = $this->getInputFolder() .'/icon/'. $this->iconize($DrawingIcon);
+
+            // give correct file names to icons for output
+            $LargeIconFileName = "{$IconOutputDirectory}/Model-$Name.png";
+            // actually copy the icons
+            copy($LargeIconPath, $LargeIconFileName);
 
             // Save some data
             $data = [
-                '{name}' => $name,
-                '{location}' => $location,
+                '{name}' => $Name,
+                '{location}' => $Location,
                 //'{level}' => $fish['GatheringItemLevel'],
                 //'{level}' => $levelstar,
-                '{level}' => ($GatheringItemLevelConvertTableCsv->at($fish['GatheringItemLevel'])['Stars'] > 0) ? $levelstar : $level,
-                '{type}' => $fishtype[$fish['FishingRecordType']],
+                '{level}' => ($GatheringItemLevelConvertTableCsv->at($fish['GatheringItemLevel'])['Stars'] > 0) ? $LevelStar : $Level,
+                '{type}' => $Fishtype[$fish['FishingRecordType']],
                 '{description}' => $fish['Text'],
+                '{folklore}' => $Folklore ? "\n|Folklore = $Folklore" : "",
             ];
 
             // format using Gamer Escape formatter and add to data array
@@ -106,6 +135,6 @@ class FishParameter implements ParseInterface
 
         // save
         $this->io->text('Saving data ...');
-        $this->save('FishParameter.txt');
+        $info = $this->save("$CurrentPatchOutput/FishParameter - ". $Patch .".txt", 999999);
     }
 }

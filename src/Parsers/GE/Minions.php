@@ -13,100 +13,200 @@ class Minions implements ParseInterface
     use CsvParseTrait;
 
     // the wiki output format / template we shall use
-    const WIKI_FORMAT = "{Top}{{ARR Infobox TTCard
-| Name = {Name}
-| Patch = {Patch}
-| Index = {Index}
-| Rarity = {Rarity}{Family}
-| Requires = {Name} Card
-| ValueTop    = {ValueTop}
-| ValueRight  = {ValueRight}
-| ValueBottom = {ValueBottom}
-| ValueLeft   = {ValueLeft}
-| Description = {Description}
-}}{Bottom}";
+    const WIKI_FORMAT = "{Top}{{ARR Infobox Minion
+| Patch = {patch}
+| Name = {name}
+| Description = {description}
+| Quote = {quote}
+| Behavior = {Behaviour}
+| Interacts = <!-- Comma delineated array of other minions it interacts with -->
+| Acquisition =
+| Required Item = {item}
+| Notes =
+
+<!-- Lords of Verminion details -->
+| Family = {family}
+| HP = {hp}
+| ATK = {attack}
+| DEF = {defense}
+| SPD = {speed}
+| Cost = {cost}
+| Auto-attack = {autoattack}
+| Strengths ={strengths}
+
+| Special Action = {spaction}
+| Special Action Description = {spactiondescription}
+| Special Action Duration ={duration}
+| Special Action Type = {spactiontype}
+| Special Action Points = {spactionpoints}
+| Special Action Area = {spactionarea} <!-- 0, 30, 120, 360 -->
+}}
+{Bottom}";
     public function parse()
     {
-        $Patch = '5.1';
         // if I want to use pywikibot to create these pages, this should be true. Otherwise if I want to create pages
         // manually, set to false
         $Bot = "true";
+        include (dirname(__DIR__) . '/Paths.php');
 
         // grab CSV files we want to use
-        $TripleTriadCardCsv = $this->csv('TripleTriadCard');
-        $TripleTriadCardResidentCsv = $this->csv('TripleTriadCardResident');
-        $TripleTriadCardRarityCsv = $this->csv('TripleTriadCardRarity');
-        $TripleTriadCardTypeCsv = $this->csv('TripleTriadCardType');
+        $ItemCsv = $this->csv("Item");
+        $ItemActionCsv = $this->csv("ItemAction");
+        $CompanionCsv = $this->csv("Companion");
+        $CompanionMoveCsv = $this->csv("CompanionMove");
+        $CompanionTransientCsv = $this->csv("CompanionTransient");
+        $MinionRaceCsv = $this->csv("MinionRace");
+        $MinionSkillTypeCsv = $this->csv("MinionSkillType");
+
+        //NOTES / PLAN
+        //Cycle through Item.csv and continue; on anything other than ItemUICategory = Minion,
+        //Link from Item.csv -> ItemAction -> Minion
+        //Go from Minion.csv from there on.
 
         // (optional) start a progress bar
-        $this->io->progressStart($TripleTriadCardCsv->total);
+        $this->io->progressStart($ItemCsv->total);
 
         // loop through data
-        foreach ($TripleTriadCardCsv->data as $id => $TripleTriad) {
+        foreach ($ItemCsv->data as $id => $Item) {
             $this->io->progressAdvance();
+            $ItemName = $Item["Name"];
 
-            // skip ones without a name
-            if (empty($TripleTriad['Name'])) {
-                continue;
-            }
+            // skip all but minions
+            if ($Item["ItemUICategory"] !== "81") continue;
 
             // code starts here
-            $Name = str_replace(" & ", " and ", $TripleTriad['Name']); // replace the & character with 'and' in names
-            $Description = strip_tags($TripleTriad['Description']); // strip <Emphasis> and other tags from the Description
-            $Description = str_replace("\n", "<br>", $Description); // replace literal line breaks with <br>
 
-            // Using the ID#/key from TripleTriadCard.csv, match that up with the column "TripleTriadCardType" in the file
-            // TripleTriadCardResident, and take THAT value and match it with the "Name" column from TripleTriadCardRarity.csv
-            $Family = $TripleTriadCardTypeCsv->at($TripleTriadCardResidentCsv->at($TripleTriad['id'])['TripleTriadCardType'])['Name'];
-            // Do the same process as above, except use TripleTriadCardType.csv and
-            // return the "Stars" / Rarity of the card  instead
-            $Rarity = $TripleTriadCardRarityCsv->at($TripleTriadCardResidentCsv->at($TripleTriad['id'])['TripleTriadCardRarity'])['Stars'];
+            //first link from item -> Itemaction
+            $MinionID = $ItemActionCsv->at($Item['ItemAction'])['Data[0]'];
+            $MinionName = $CompanionCsv->at($MinionID)['Singular'];
+            //give me a link to transient
+            $MinionTransient = $CompanionTransientCsv->at($MinionID);
+            //set up the base minion we want to the sheet
+            $Minion = $CompanionCsv->at($MinionID);
+            $Name = "".ucwords(strtolower(str_replace(" & ", " and ", $MinionName)))." (Minion)"; // replace the & character with 'and' in names
+            $Description = strip_tags($CompanionTransientCsv->at($MinionID)['Description{Enhanced}']); // strip tags from Description
+            $Description = str_replace(array("\n\r", "\r", "\n", "\t", "\0", "\x0b"), " ", $Description); // replace line breaks with a space in Description
+            $Description = preg_replace("/\s\s+/", " ", $Description); // replace any space that's more than two spaces with a single space in Description
+            $Quote = str_replace(array("\n\r", "\r", "\n", "\t", "\0", "\x0b"), " ", ($CompanionTransientCsv->at($MinionID)['Tooltip'])); // replace line breaks with a space in Quote
+            $Quote = preg_replace("/\s\s+\-\s*(.*)/", "<br>- [[$1]]", $Quote); // add line break before Quote giver's name and place name in [[Wiki Brackets]]
+            $Quote = preg_replace("/\s\s+/", " ", $Quote); // replace any space that's more than two spaces with a single space in Quote
 
-            // change the top and bottom code depending on if I want to bot the pages up or not
-            if ($Bot == "true") {
-                $Top = "{{-start-}}\n'''$Name (Triple Triad Card)'''\n";
-                $Bottom = "{{-stop-}}";
+            //behaviour
+            $Behaviour = $CompanionMoveCsv->at($Minion['Behavior'])['Name'];
+            //family
+            $Family = $MinionRaceCsv->at($Minion['MinionRace'])['Name'];
+            //hp
+            $HP = $Minion['HP'];
+            //cost
+            $Cost = $Minion['Cost'];
+            //Attack
+            $Attack = $MinionTransient['Attack'];
+            //Defense
+            $Defense = $MinionTransient['Defense'];
+            //Speed
+            $Speed = $MinionTransient['Speed'];
+
+            //SP Name
+            $SPAction = $MinionTransient['SpecialAction{Name}'];
+            //SP Description
+            $SPActionDescription = $MinionTransient['SpecialAction{Description}'];
+            $SPActionDescription = preg_replace("/\n.*Duration:<UIGlow>\d+<\/UIGlow><UIForeground>\d+<\/UIForeground>.*\n?/",
+                null, $SPActionDescription);
+
+            //Duration removal from Description and add to the | Special Action Duration parameter
+            $DurationRemoval = str_replace("<UIForeground>F201F8</UIForeground><UIGlow>F201F9</UIGlow>Duration:<UIGlow>01</UIGlow><UIForeground>01</UIForeground> " ,
+                null, $MinionTransient['SpecialAction{Description}']);
+            $DurationRemoval = preg_replace("/[A-Za-z<]+.*/", null, $DurationRemoval);
+            $DurationRemoval = preg_replace("/\n\s*/", null, $DurationRemoval);
+            $Duration = preg_replace("/(\d+)/", " $1s", $DurationRemoval);
+
+            //SP Angle
+            $SPActionArea = $Minion['Skill{Angle}'];
+            //SP Cost
+            $SPActionPoints = $Minion['Skill{Cost}'];
+            //SP Type
+            $SPActionType = $MinionSkillTypeCsv->at($MinionTransient['MinionSkillType'])['Name'];
+
+            if ($MinionTransient['HasAreaAttack'] == "True") {
+                $AutoAttack = "AoE";
             } else {
-                $Top = "http://ffxiv.gamerescape.com/wiki/$Name (Triple Triad Card)?action=edit\n";
-                $Bottom = "";
-            };
+                $AutoAttack = "Single-target";
+            }
 
-            // Icon copying
-            $LargeIcon = (82100 + $TripleTriad['id']);
-            $SmallIcon = (82500 + $TripleTriad['id']);
+            //List of Strengths. Turned into an array so we can implode with comma to eliminate trailing commas
+            $Strengths = [];
+            if ($MinionTransient['Strength{Gate}'] == "True") {
+                $Strengths[0] = " Gate";
+            }
+            if ($MinionTransient['Strength{Eye}'] == "True") {
+                $Strengths[1] = " Eye";
+            }
+            if ($MinionTransient['Strength{Shield}'] == "True") {
+                $Strengths[2] = " Shield";
+            }
+            if ($MinionTransient['Strength{Arcana}'] == "True") {
+                $Strengths[3] = " Arcana";
+            }
+
+            $Strengths = implode(",", $Strengths);
+
+            // beginning of Icon copying code
+            $SmallIcon = $Minion["Icon"];
+            $Icon2 = substr($SmallIcon, -3);
+            $LargeIcon = str_pad($Icon2, "6", "068", STR_PAD_LEFT);
+
             // ensure output directory exists
-            $TriadIconoutputDirectory = $this->getOutputFolder() . '/TripleTriadIcons';
+            $IconoutputDirectory = $this->getOutputFolder() . "/$CurrentPatchOutput/MinionIcons";
             // if it doesn't exist, make it
-            if (!is_dir($TriadIconoutputDirectory)) {
-                mkdir($TriadIconoutputDirectory, 0777, true);
+            if (!is_dir($IconoutputDirectory)) {
+                mkdir($IconoutputDirectory, 0777, true);
             }
 
             // build icon input folder paths
             $LargeIconPath = $this->getInputFolder() .'/icon/'. $this->iconize($LargeIcon);
-            $SmallIconPath = $this->getInputFolder() .'/icon/'. $this->iconize($SmallIcon);
+            $SmallIconPath = $this->getInputFolder() .'/icon/'. $this->iconize($Minion["Icon"]);
+
             // give correct file names to icons for output
-            $LargeIconFileName = "{$TriadIconoutputDirectory}/$Name (Triple Triad Card) Full.png";
-            $SmallIconFileName = "{$TriadIconoutputDirectory}/$Name (Triple Triad Card) icon.png";
+            $LargeIconFileName = "{$IconoutputDirectory}/$Name Patch.png";
+            $SmallIconFileName = "{$IconoutputDirectory}/$Name Icon.png";
             // actually copy the icons
-            copy($LargeIconPath, $LargeIconFileName);
             copy($SmallIconPath, $SmallIconFileName);
+            if (file_exists($LargeIconPath)) {
+                copy($LargeIconPath, $LargeIconFileName);
+            };
+
+            // change the top and bottom code depending on if I want to bot the pages up or not. Places Patch on subpage
+            if ($Bot == "true") {
+                $Top = "{{-start-}}\n'''$Name/Patch'''\n$Patch\n{{-stop-}}{{-start-}}\n'''$Name'''\n";
+                $Bottom = "{{-stop-}}";
+            } else {
+                $Top = "http://ffxiv.gamerescape.com/wiki/$Name\Patch?action=edit\n$Patch\nhttp://ffxiv.gamerescape.com/wiki/$Name?action=edit\n";
+                $Bottom = "";
+            };
 
             // Save some data
             $data = [
                 '{Top}' => $Top,
                 '{Name}' => $Name,
                 '{Patch}' => $Patch,
-                '{Index}' => $TripleTriad['id'],
-                '{Rarity}' => $Rarity,
-                '{Family}' => ($TripleTriadCardResidentCsv->at($TripleTriad['id'])['TripleTriadCardType'] > 0)
-                    ? "\n| Family = ". $Family : "\n| Family =",
-                '{ValueTop}' => $TripleTriadCardResidentCsv->at($TripleTriad['id'])['Top'],
-                '{ValueRight}' => $TripleTriadCardResidentCsv->at($TripleTriad['id'])['Right'],
-                '{ValueBottom}' => $TripleTriadCardResidentCsv->at($TripleTriad['id'])['Bottom'],
-                '{ValueLeft}' => $TripleTriadCardResidentCsv->at($TripleTriad['id'])['Left'],
                 '{Description}' => $Description,
-                '{LargeIcon}' => $LargeIcon,
-                '{SmallIcon}' => $SmallIcon,
+                '{Quote}' => $Quote,
+                '{Behaviour}' => $Behaviour,
+                '{family}' => $Family,
+                '{hp}' => $HP,
+                '{cost}' => $Cost,
+                '{attack}' => $Attack,
+                '{defense}' => $Defense,
+                '{speed}' => $Speed,
+                '{autoattack}' => $AutoAttack,
+                '{strengths}' => $Strengths,
+                '{spactionarea}' => $SPActionArea,
+                '{spactionpoints}' => $SPActionPoints,
+                '{spactiondescription}' => $SPActionDescription,
+                '{duration}' => $Duration,
+                '{spactiontype}' => $SPActionType,
+                '{spaction}' => $SPAction,
+                '{item}' => $ItemName,
                 '{Bottom}' => $Bottom,
             ];
 
@@ -115,41 +215,14 @@ class Minions implements ParseInterface
             $this->data[] = GeFormatter::format(self::WIKI_FORMAT, $data);
         };
 
-        // save our data to the filename: GeTripleTriadWiki.txt
+        // save our data to the filename: GeMountWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save('GeTripleTriadWiki.txt', 2000);
+        $info = $this->save("$CurrentPatchOutput/Minions - ". $Patch .".txt", 9999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],
             $info
         );
-    }
-
-    /**
-     * Converts SE icon "number" into a proper path
-     */
-    private function iconize($number, $hq = false)
-    {
-        $number = intval($number);
-        $extended = (strlen($number) >= 6);
-
-        if ($number == 0) {
-            return null;
-        }
-
-        // create icon filename
-        $icon = $extended ? str_pad($number, 5, "0", STR_PAD_LEFT) : '0' . str_pad($number, 5, "0", STR_PAD_LEFT);
-
-        // create icon path
-        $path = [];
-        $path[] = $extended ? $icon[0] . $icon[1] . $icon[2] .'000' : '0'. $icon[1] . $icon[2] .'000';
-
-        $path[] = $icon;
-
-        // combine
-        $icon = implode('/', $path) .'.png';
-
-        return $icon;
     }
 }

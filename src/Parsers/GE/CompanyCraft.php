@@ -4,7 +4,7 @@ namespace App\Parsers\GE;
 
 use App\Parsers\CsvParseTrait;
 use App\Parsers\ParseInterface;
-use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Config\Resource\FileResource;
 
 /**
  * php bin/console app:parse:csv GE:CompanyCraft
@@ -13,149 +13,191 @@ class CompanyCraft implements ParseInterface
 {
     use CsvParseTrait;
 
-    /**
-     * this will hold all our CSV data
-     * @var array
-     */
-    private $csvData;
-
-    /**
-     * list of CSV's to download
-     * @var array
-     */
-    private $csvFiles = [
-        'CompanyCraftSequence',
-        'CompanyCraftPart',
-        'CompanyCraftProcess',
-        'CompanyCraftSupplyItem',
-        'CompanyCraftDraft',
-        'Item'
-    ];
-
     // the wiki output format / template we shall use
-    const WIKI_FORMAT = '
-        https://ffxiv.gamerescape.com/w/index.php?title={resulturl}/Recipe&action=edit
-        {{ARR Infobox FCRecipe
-        | Acquired = {draftcsv}
-        | Result = {result}
-        {phasedata}
-    }}';
+    const WIKI_FORMAT = "{Top}{{ARR Infobox FCRecipe
+{RequiredDraftItem}
+{array}
+}}{Bottom}";
 
     public function parse()
     {
-        // console writer
-        $console = new ConsoleOutput();
+        include (dirname(__DIR__) . '/Paths.php');
 
+        // grab CSV files we want to use
+        $CompanyCraftSequenceCsv = $this->csv('CompanyCraftSequence');
+        $CompanyCraftPartCsv = $this->csv('CompanyCraftPart');
+        $CompanyCraftProcessCsv = $this->csv('CompanyCraftProcess');
+        $CompanyCraftSupplyItemCsv = $this->csv('CompanyCraftSupplyItem');
+        $CompanyCraftDraftCsv = $this->csv('CompanyCraftDraft');
+        $ItemCsv = $this->csv('Item');
+        $CompanyCraftTypeCsv = $this->csv('CompanyCraftType');
 
-        // download our CSV files
-        $console->writeln(" Loading CSVs");
+        // (optional) start a progress bar
+        $this->io->progressStart($CompanyCraftSequenceCsv->total);
+        
 
-        foreach ($this->csvFiles as $filename) {
-            $console->writeln(" >> {$filename}");
-            $this->csvData[$filename] = $this->csv($filename);
-        }
+        // if I want to use pywikibot to create these pages, this should be true. Otherwise if I want to create pages
+        // manually, set to false
+        $Bot = "false";
 
-        $console->writeln(" Processing Company Craft data");
+        // loop through data
+        foreach ($CompanyCraftSequenceCsv->data as $id => $CompanyCraftSequence) {
+            $this->io->progressAdvance();
 
-        // switch to a section so we can overwrite
-        $console = $console->section();
+            $ResultItem = $ItemCsv->at($CompanyCraftSequence["ResultItem"])["Name"];
+            $RequiredDraftItem = "";
+            $resultItemUrl  = str_replace(" ", "_", $ResultItem);
+    
+            // change the top and bottom code depending on if I want to bot the pages up or not
+            if ($Bot == "true") {
+                $Top = "{{-start-}}\n'''$resultItemUrl'''\n";
+                $Bottom = "{{-stop-}}";
+            } else {
+                $Top = "https://ffxiv.gamerescape.com/w/index.php?title=$resultItemUrl/Recipe&action=edit\n";
+                $Bottom = false;
+            };
 
-        // loop through our sequences
-        foreach ($this->getData('CompanyCraftSequence')->data as $sequence) {
-            $id = $sequence['id'];
-
-            // skip id 0
-            if ($id == 0) continue;
-
-            // reset our data row
-            $phaseData = [];
-
-            // each sequence has 8 parts
-            $numberOfParts = range(0, 7);
-
-            // loop through our parts
-            foreach ($numberOfParts as $partNumber) {
-                // grab the part id
-                $partId = $sequence[sprintf('CompanyCraftPart[%s]', $partNumber)];
-
-                // if id == 0, skip
-                if ($partId == 0) continue;
-
-                // grab the 'part row' from the 'part sheet', using our 'part id'
-                $partRow = $this->getData('CompanyCraftPart', $partId);
-
-                // each part has 3 processes
-                $numberOfProcesses = range(0, 2);
-
-                // loop through our processes
-                foreach ($numberOfProcesses as $processNumber) {
-                    // grab the process id
-                    $processId = $partRow[sprintf('CompanyCraftProcess[%s]', $processNumber)];
-
-                    // if id == 0, skip
-                    if ($processId == 0) continue;
-
-                    // grab the 'process row' from the 'process sheet', using our 'process id
-                    $processRow = $this->getData('CompanyCraftProcess', $processId);
-
-                    // each process has 12 items (with quantities and requirements)
-                    $numberOfItems = range(0, 11);
-
-                    // loop through our item sets
-                    foreach ($numberOfItems as $itemNumber) {
-                        // grab some info from the process row
-                        $supplyItemId = $processRow[sprintf('SupplyItem[%s]', $itemNumber)];
-                        $setQuantity  = $processRow[sprintf('SetQuantity[%s]', $itemNumber)];
-                        $setsRequired = $processRow[sprintf('SetsRequired[%s]', $itemNumber)] * $setQuantity;
-
-                        // if item id 0, ignore
-                        if ($supplyItemId == 0) continue;
-
-                        // get item via CompanyCraftSupplyItem
-                        $item = $this->getData('CompanyCraftSupplyItem', $supplyItemId);
-                        $item = $this->getData('Item', $item['Item']);
-
-                        // increment phase numbers by 1 just for the text output
-                        $num1 = $processNumber + 1;
-                        $num2 = $itemNumber + 1;
-
-                        // store our text
-                        $phaseData[] = "| Phase {$num1} {$num2} = {$item['Name']}";
-                        $phaseData[] = "| Phase {$num1} {$num2} Amount = {$setQuantity}/{$setsRequired}\n";
-                    }
+            if ($CompanyCraftSequence["CompanyCraftDraft"] < 0 ) {
+                $RequiredDraftItem = "";
+            } elseif ($CompanyCraftSequence["CompanyCraftDraft"] >= 0) {
+                $RequiredDraftItemString = ucwords($CompanyCraftDraftCsv->at($CompanyCraftSequence["CompanyCraftDraft"])['Name']);
+                $RequiredDraftItem = "|Acquired = ". $RequiredDraftItemString ."\n";
+            }
+            if (empty($ResultItem)) continue;
+            $DraftCategory = $CompanyCraftSequence["CompanyCraftDraftCategory"];
+            $ResultTypeSwitch = $CompanyCraftSequence["Category"];
+            switch ($ResultTypeSwitch) {
+                case 1:
+                    $ResultType = "Aetherial Wheel Stand";
+                break;
+                case 2:
+                    $ResultType = "Housing Small";
+                break;
+                case 3:
+                    $ResultType = "Housing Medium";
+                break;
+                case 4:
+                    $ResultType = "Housing Large";
+                break;
+                case 5:
+                    $ResultType = "Airship";
+                break;
+                case 6:
+                    $ResultType = "Aetherial Wheels";
+                break;
+                case 7:
+                    $ResultType = "Submersibles";
+                break;
+                
+                default:
+                    $ResultType = "";
+                break;
+            }
+            $array001 = [];
+            $array002 = [];
+            $array003 = [];
+            foreach(range(0,7) as $a) {
+                $CompanyCraftPartRaw = $CompanyCraftSequence["CompanyCraftPart[$a]"];
+                if ($CompanyCraftPartRaw == 0) continue;
+                $PhaseSwitch = "Phase";
+                $CompanyCraftTypeCsv->at($CompanyCraftPartRaw)['Name'];
+                $CompanyCraftTypeRaw = $CompanyCraftPartCsv->at($CompanyCraftPartRaw)['CompanyCraftType'];
+                $bSwitch = FALSE;
+                switch ($CompanyCraftTypeRaw) {
+                    case 0:
+                    case 1:
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+                    case 7:
+                        $PhaseSwitch = "Phase";
+                    break;
+                    case 8:
+                        $PhaseSwitch = "Exterior Wall Phase";
+                        $bSwitch = FALSE;
+                    break;
+                    case 9:
+                        $PhaseSwitch = "Roof Phase";
+                        $bSwitch = FALSE;
+                    break;
+                    case 10:
+                    case 11:
+                    case 12:
+                    case 13:
+                    case 14:
+                    case 15:
+                        $PhaseSwitch = $CompanyCraftTypeCsv->at($CompanyCraftPartCsv->at($CompanyCraftPartRaw)['CompanyCraftType'])['Name'];
+                        $bSwitch = TRUE;
+                    break;
+                    case 16:
+                    case 17:
+                    case 18:
+                    case 19:
+                        $PhaseSwitch = "Phase";
+                    break;
+                    
+                    default:
+                        $PhaseSwitch = "Phase";
+                    break;
                 }
+                $array002 = [];
+                foreach(range(0,2) as $b) {
+                    $CompanyCraftProcessRaw = $CompanyCraftPartCsv->at($CompanyCraftPartRaw)["CompanyCraftProcess[$b]"];
+                    if ($CompanyCraftProcessRaw == 0) continue;
+                    $array003 = [];
+                    foreach(range(0,11) as $c) {
+                        $SupplyItem = $ItemCsv->at($CompanyCraftSupplyItemCsv->at($CompanyCraftProcessCsv->at($CompanyCraftProcessRaw)["SupplyItem[$c]"])["Item"])["Name"];
+                        if (empty($SupplyItem)) continue;
+                        $SetQuantity = $CompanyCraftProcessCsv->at($CompanyCraftProcessRaw)["SetQuantity[$c]"];
+                        $SetRequiredRaw = $CompanyCraftProcessCsv->at($CompanyCraftProcessRaw)["SetsRequired[$c]"];
+                        $SetRequired = $SetQuantity * $SetRequiredRaw;
+                        $bAdd = $b + 1;
+                        $cAdd = $c + 1;
+                        if ($bSwitch == FALSE) {
+                            $NoPhaseSwitch = " ". $bAdd;
+                        }
+                        if ($bSwitch == TRUE) {
+                            $NoPhaseSwitch = "";
+                        }
+                        $array003[] = "|". $PhaseSwitch ."". $NoPhaseSwitch ." ". $cAdd ." = ". $SupplyItem ."\n|". $PhaseSwitch ."". $NoPhaseSwitch ." ". $cAdd ." Amount = ". $SetQuantity ." / ". $SetRequired ."\n";
+                    }
+                    $array003 = implode("\n", $array003);
+                    $array002[] = "". $array003 ."";
+                }
+                $array002 = implode("\n", $array002);
+                $array001[] = "\n". $array002 ."";
             }
+            $array001 = implode("\n", $array001);
 
+            $output = "|Result = ". $ResultItem ."\n". $array001 ."";
 
-            if (empty($phaseData)) {
-                continue;
-            }
-
-            // get company craft draft name
-            $companyCraftDraftId   = $sequence['CompanyCraftDraft'];
-            $companyCraftDraftName = $this->getData('CompanyCraftDraft', $companyCraftDraftId)['Name'];
-            $companyCraftDraftName = ucwords(strtolower($companyCraftDraftName));
-
-            // get our result item
-            $resultItemId   = $sequence['ResultItem'];
-            $resultItemName = $this->getData('Item', $resultItemId)['Name'];
-            $resultItemUrl  = str_replace(" ", "_", $resultItemName);
-
-            // build our data array using the GE Formatter
-            $data = GeFormatter::format(self::WIKI_FORMAT, [
-                '{draftcsv}'  => $companyCraftDraftName,
-                '{result}'    => $resultItemName,
+            // Save some data
+            $data = [
+                '{Top}' => $Top,
+                '{array}' => $output,
                 '{resulturl}' => $resultItemUrl,
-                '{phasedata}' => implode("\n", $phaseData)
-            ]);
+                '{RequiredDraftItem}' => $RequiredDraftItem,
+                '{Bottom}' => $Bottom,
+            ];
 
-            $this->data[] = $data;
-
-            $console->overwrite(" > Completed Sequence: {$id} --> {$resultItemName}");
+            // format using Gamer Escape formatter and add to data array
+            // need to look into using item-specific regex, if required.
+            $this->data[] = GeFormatter::format(self::WIKI_FORMAT, $data);
         }
 
-        // save
-        $console->writeln(" Saving... ");
-        $this->save("CompanyCraft.txt", 9999999);
+        // save our data to the filename: GeRecipeWiki.txt
+        $this->io->progressFinish();
+        $this->io->text('Saving ...');
+        $info = $this->save("$CurrentPatchOutput/CompanyCraft - ". $Patch .".txt", 999999);
+
+        $this->io->table(
+            [ 'Filename', 'Data Count', 'File Size' ],
+            $info
+        );
     }
 }
+
+/* Changelog
+24 / 07 / 2020 - Created
+*/

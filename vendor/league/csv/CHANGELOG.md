@@ -2,6 +2,145 @@
 
 All Notable changes to `Csv` will be documented in this file
 
+## 9.5.0 - 2019-12-15
+
+### Added
+
+- Improve package exception throwing by adding new exceptions classes that extends 
+the `League\Csv\Exception` exception marker class [#360](https://github.com/thephpleague/csv/issues/360), [#361](https://github.com/thephpleague/csv/issues/360)
+feature proposed and developed by [Darren Miller](https://github.com/dmlogic)
+    - `League\Csv\UnavailableFeature`
+    - `League\Csv\InvalidArgument`
+    - `League\Csv\SyntaxError`
+    
+### Deprecated
+
+- Nothing
+
+### Fixed
+
+- bug fix `bom_match` function see issue [#363](https://github.com/thephpleague/csv/issues/363) resolved based on PR from [Jerry Martinez](https://github.com/jmwebservices)
+- bug fix `delemiter_detect` function see issue [#366](https://github.com/thephpleague/csv/issues/366)
+
+### Removed
+
+- Nothing
+
+## 9.4.1 - 2019-10-17
+
+### Added
+
+- Nothing
+
+### Deprecated
+
+- Nothing
+
+### Fixed
+
+- bug fix the escape mechanism polyfill  [#358](https://github.com/thephpleague/csv/pull/358) fix provided by [on2](https://github.com/on2)
+
+### Removed
+
+- Nothing
+
+## 9.4.0 - 2019-10-02
+
+### Added
+
+- Adding support for controlling empty record presence in `Reader::getRecords` return value.
+    - `Reader::includeEmptyRecords`
+    - `Reader::skipEmptyRecords`
+    - `Reader::isEmptyRecordsIncluded`
+
+- Adding support for controlling Input BOM usage in the library:
+    - `AbstractCsv::skipInputBOM`
+    - `AbstractCsv::includeInputBOM`
+    - `AbstractCsv::isInputBOMIncluded`
+
+### Deprecated
+
+- Nothing
+
+### Fixed
+
+- `EmptyEscapeParser::parse` no longer auto skip empty records
+
+### Removed
+
+- Nothing
+
+## 9.3.0 - 2019-07-30
+
+### Added
+
+- `XMLConverter::import` see [#348](https://github.com/thephpleague/csv/pull/348) thanks [@kusabi](https://github.com/kusabi)
+- Support for `thead`, `tfoot` and `tbody` in `HTMLConverter::convert` via the addition of 
+protected methods `HTMLConverter::addHTMLAttributes` and `HTMLConverter::appendHeaderSection` [#348](https://github.com/thephpleague/csv/pull/348) thanks [@kusabi](https://github.com/kusabi)
+
+### Deprecated
+
+- Nothing
+
+### Fixed
+
+- Internal improvement in `Reader` dockblock thanks [@ghobaty](https://github.com/ghobaty).
+- Improve strict comparison when using `preg_match`.
+- Improve CSV control in `Stream`. 
+
+### Removed
+
+- Nothing
+
+## 9.2.1 - 2019-06-08
+
+### Added
+
+- Nothing
+
+### Deprecated
+
+- Nothing
+
+### Fixed
+
+- `AbstractCSV::chunk` see [#325](https://github.com/thephpleague/csv/pull/325) remove CSV flags from the Stream class to avoid infinite loop.
+- Internal improve `HTMLConverter`.
+
+### Removed
+
+- Nothing
+
+## 9.2.0 - 2019-03-08
+
+### Added
+
+- Supports for PHP7.4 empty string for the escape character
+- Supports for empty string for the escape character with a polyfill for PHP7.4- versions.
+- `AbstractCSV::getPathname` see [#321](https://github.com/thephpleague/csv/pull/321) thanks [@tomkyle](https://github.com/tomkyle)
+
+### Deprecated
+
+- `League\Csv\RFC4180Field` use `AbstractCSV::setEscape` method with an empty string instead.
+
+### Fixed
+
+- `AbstractCSV::__construct` correctly initializes properties
+- `AbstractCSV::createFromString` named constructor default argument is now the empty string
+- `AbstractCSV::setEscape` now accepts the empty string like `fputcsv` and `fgetcsv`
+- `Writer::insertOne` fixes throwing exception when record can not be inserted
+- `XMLConverter` convert to string the record value to avoid PHP warning on `null` value
+- Internal `Stream::createFromString` named constructor default argument is now the empty string
+- Internal `Stream::fwrite` improved
+- Internal `Stream::__destruct` no longer emit warning on invalid stream filter removal.
+- Internal `Stream::seek` returns `0` if the seeked position `0` is valid see [#321](https://github.com/thephpleague/csv/pull/332) thanks [@HaozhouChen](https://github.com/HaozhouChen) 
+
+- `Reader:getHeader` when the record is an empty line.
+
+### Removed
+
+- Nothing
+
 ## 9.1.4 - 2018-05-01
 
 ### Added
@@ -14,8 +153,7 @@ All Notable changes to `Csv` will be documented in this file
 
 ### Fixed
 
-- `Writer::setFlushThreshold` should accept 1 as an argument [#289(https://github.com/thephpleague/csv/issue/289)
-
+- `Writer::setFlushThreshold` should accept 1 as an argument [#289](https://github.com/thephpleague/csv/issue/289)
 - `CharsetConverter::convert` should not try to convert numeric value [#287](https://github.com/thephpleague/csv/issue/287)
 
 ### Removed

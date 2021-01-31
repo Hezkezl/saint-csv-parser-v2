@@ -20,6 +20,7 @@ class Lock
 {
     private $json;
     private $lock = [];
+    private $changed = false;
 
     public function __construct($lockFile)
     {
@@ -31,22 +32,53 @@ class Lock
 
     public function has($name): bool
     {
-        return array_key_exists($name, $this->lock);
+        return \array_key_exists($name, $this->lock);
     }
 
     public function add($name, $data)
     {
-        $this->lock[$name] = $data;
+        $current = $this->lock[$name] ?? [];
+        $this->lock[$name] = array_merge($current, $data);
+        $this->changed = true;
+    }
+
+    public function get($name)
+    {
+        return $this->lock[$name] ?? null;
+    }
+
+    public function set($name, $data)
+    {
+        if (!\array_key_exists($name, $this->lock) || $data !== $this->lock[$name]) {
+            $this->lock[$name] = $data;
+            $this->changed = true;
+        }
     }
 
     public function remove($name)
     {
-        unset($this->lock[$name]);
+        if (\array_key_exists($name, $this->lock)) {
+            unset($this->lock[$name]);
+            $this->changed = true;
+        }
     }
 
     public function write()
     {
-        ksort($this->lock);
-        $this->json->write($this->lock);
+        if (!$this->changed) {
+            return;
+        }
+
+        if ($this->lock) {
+            ksort($this->lock);
+            $this->json->write($this->lock);
+        } elseif ($this->json->exists()) {
+            @unlink($this->json->getPath());
+        }
+    }
+
+    public function all(): array
+    {
+        return $this->lock;
     }
 }

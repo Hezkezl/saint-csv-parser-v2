@@ -6,6 +6,10 @@ use App\Parsers\CsvParseTrait;
 use App\Parsers\ParseInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 
+/**
+ * php bin/console app:parse:csv GE:Satisfaction
+ */
+
 class Satisfaction implements ParseInterface
 {
     use CsvParseTrait;
@@ -41,13 +45,14 @@ class Satisfaction implements ParseInterface
 
     public function parse()
     {
+        include (dirname(__DIR__) . '/Paths.php');
 
         // grab CSV files
-        $SatisfactionNpcCsv = $this->csv('SatisfactionNpc');
-        $SatisfactionSupplyCsv = $this->csv('SatisfactionSupply');
-        $SatisfactionSupplyRewardCsv = $this->csv('SatisfactionSupplyReward');
-        $ItemCsv = $this->csv('Item');
-        $CurrencyCsv = $this->csv('Currency');
+        $SatisfactionNpcCsv = $this->csv("SatisfactionNpc");
+        $SatisfactionSupplyCsv = $this->csv("SatisfactionSupply");
+        $ENpcResidentCsv = $this->csv("ENpcResident");
+        $SatisfactionSupplyRewardCsv = $this->csv("SatisfactionSupplyReward");
+        $ItemCsv = $this->csv("Item");
 
         $this->io->progressStart($SatisfactionSupplyCsv->total);
 
@@ -60,29 +65,93 @@ class Satisfaction implements ParseInterface
             // Actual code definition begins below!
             //---------------------------------------------------------------------------------
 
-            $Satisfaction = [];
+            $Satisfaction = false;
 
-                if ($item["Item"] > 0) {
-                    $Name = $ItemCsv->at($item["Item"])['Name'];
+            // need to build a switch based off of the Key/id of Satisfaction Supply and have it
+            // look in SatisfactionNpc's columns of "SupplyIndex" [0] through [5] to match up to
 
-                    $BaseCollect = $item["Collectability{Base}[$i]"];
-                    $BaseScrip = $item["Reward{Scrips}[$i]"];
-                    $Bonus1Collect = $item["Collectability{Bonus}[$i]"];
-                    $Bonus2Collect = $item["Collectability{HighBonus}[$i]"];
-                    $Bonus2Scrip = floor($BaseScrip * ($BonusMultiplier["CurrencyMultiplier[0]"]/1000));
-                    $string = "{{-start-}}\n'''". $Name ."'''\n{{ARR Infobox Collectable\n";
-                    $string .= "|Class = ". $Class ."\n|Level = ". $Level ."\n|Name = ". $Name ."\n|Scrip = ". $Currency ."\n";
-                    $string .= "|Base = ". $BaseCollect ."\n|Base Scrip = ". $BaseScrip ."\n|Base EXP = ". $BaseEXP ."\n";
-                    $string .= "|Bonus2 = ". $Bonus2Collect ."\n|Bonus2 Scrip = ". $Bonus2Scrip ."\n|Bonus2 EXP = ". $Bonus2EXP ."\n}}{{-stop-}}";
-                    $Satisfaction[] = $string;
+            // skip ones without a name
+            if (empty($item['Item'])) {
+                continue;
+            } else {
+                // get the NPC name
+                $npcid = floor($item['id']);
+                if ($npcid > 25) {
+                    $npcid = $npcid - 25;
+                } elseif ($npcid > 20) {
+                    $npcid = $npcid - 20;
+                } elseif ($npcid > 15) {
+                    $npcid = $npcid - 15;
+                } elseif ($npcid > 10) {
+                    $npcid = $npcid - 10;
+                } elseif ($npcid > 5) {
+                    $npcid = $npcid - 5;
+                }
+                $npc = $ENpcResidentCsv->at($SatisfactionNpcCsv->at($npcid)['Npc'])['Singular'];
+
+                $Name = $ItemCsv->at($item["Item"])['Name'];
+                $location = "Blank";
+                $chance = $item["Probability<%>"];
+                $collectlow = $item["Collectability{Low}"];
+                $collectmid = $item["Collectability{Mid}"];
+                $collecthigh = $item["Collectability{High}"];
+                //$reward = $SatisfactionSupplyRewardCsv->at($item["Reward"]);
+                $satisfylow = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Satisfaction{Low}"];
+                $satisfymid = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Satisfaction{Mid}"];
+                $satisfyhigh = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Satisfaction{High}"];
+                $gillow = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Gil{Low}"];
+                $gilmid = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Gil{Mid}"];
+                $gilhigh = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Gil{High}"];
+                $yellowlow = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Quantity{Low}[0]"];
+                $yellowmid = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Quantity{Mid}[0]"];
+                $yellowhigh = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Quantity{High}[0]"];
+                $whitelow = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Quantity{Low}[1]"];
+                $whitemid = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Quantity{Mid}[1]"];
+                $whitehigh = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Quantity{High}[1]"];
+                $yellowtypenumber = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Reward{Currency}[0]"];
+                $whitetypenumber = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Reward{Currency}[1]"];
+
+                switch ($yellowtypenumber) {
+                    case 2:
+                        $yellowtype = "Yellow Crafters' Scrip";
+                        break;
+                    case 4:
+                        $yellowtype = "Yellow Gatherers' Scrip";
+                        break;
+                    case 6:
+                        $yellowtype = "White Crafters' Scrip";
+                        break;
+                    case 7:
+                        $yellowtype = "White Gatherers' Scrip";
+                        break;
+                    default:
+                        $yellowtype = false;
+                        break;
+                }
+                switch ($whitetypenumber) {
+                    case 2:
+                        $whitetype = "Yellow Crafters' Scrip";
+                        break;
+                    case 4:
+                        $whitetype = "Yellow Gatherers' Scrip";
+                        break;
+                    case 6:
+                        $whitetype = "White Crafters' Scrip";
+                        break;
+                    case 7:
+                        $whitetype = "White Gatherers' Scrip";
+                        break;
+                    default:
+                        $whitetype = false;
+                        break;
                 }
 
-            $Satisfaction = implode("\n", $Satisfaction);
+            }
 
             //---------------------------------------------------------------------------------
 
             $data = [
-                '{item}' => $item,
+                '{item}' => $Name,
                 '{npc}' => $npc,
                 '{location}' => $location,
                 '{id}' => $id,
@@ -113,7 +182,7 @@ class Satisfaction implements ParseInterface
         // save our data to the filename: GeSatisfactionWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save('GeSatisfactionWiki.txt');
+        $info = $this->save("$CurrentPatchOutput/SatisfactionNPC - ". $Patch .".txt", 999999);
 
         $this->io->table(
             ['Filename', 'Data Count', 'File Size'],

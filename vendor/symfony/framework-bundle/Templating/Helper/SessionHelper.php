@@ -11,13 +11,18 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
-use Symfony\Component\Templating\Helper\Helper;
+@trigger_error('The '.SessionHelper::class.' class is deprecated since version 4.3 and will be removed in 5.0; use Twig instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Templating\Helper\Helper;
 
 /**
  * SessionHelper provides read-only access to the session attributes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since version 4.3, to be removed in 5.0; use Twig instead.
  */
 class SessionHelper extends Helper
 {
@@ -42,7 +47,7 @@ class SessionHelper extends Helper
         return $this->getSession()->get($name, $default);
     }
 
-    public function getFlash($name, array $default = array())
+    public function getFlash($name, array $default = [])
     {
         return $this->getSession()->getFlashBag()->get($name, $default);
     }
@@ -57,7 +62,7 @@ class SessionHelper extends Helper
         return $this->getSession()->getFlashBag()->has($name);
     }
 
-    private function getSession()
+    private function getSession(): SessionInterface
     {
         if (null === $this->session) {
             if (!$this->requestStack->getMasterRequest()) {

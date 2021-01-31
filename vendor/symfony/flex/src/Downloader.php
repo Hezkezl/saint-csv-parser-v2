@@ -11,11 +11,11 @@
 
 namespace Symfony\Flex;
 
-use Composer\Cache;
+use Composer\Cache as ComposerCache;
 use Composer\Composer;
 use Composer\DependencyResolver\Operation\OperationInterface;
-use Composer\DependencyResolver\Operation\UpdateOperation;
 use Composer\DependencyResolver\Operation\UninstallOperation;
+use Composer\DependencyResolver\Operation\UpdateOperation;
 use Composer\Downloader\TransportException;
 use Composer\IO\IOInterface;
 use Composer\Json\JsonFile;
@@ -25,8 +25,9 @@ use Composer\Json\JsonFile;
  */
 class Downloader
 {
-    private static $DEFAULT_ENDPOINT = 'https://symfony.sh';
+    private static $DEFAULT_ENDPOINT = 'https://flex.symfony.com';
     private static $MAX_LENGTH = 1000;
+    private static $versions;
 
     private $io;
     private $sess;
@@ -36,27 +37,20 @@ class Downloader
     private $endpoint;
     private $caFile;
     private $flexId;
+    private $enabled = true;
 
     public function __construct(Composer $composer, IoInterface $io, ParallelDownloader $rfs)
     {
         if (getenv('SYMFONY_CAFILE')) {
             $this->caFile = getenv('SYMFONY_CAFILE');
         }
-        if (getenv('SYMFONY_ENDPOINT')) {
-            $endpoint = getenv('SYMFONY_ENDPOINT');
-        } else {
-            $endpoint = $composer->getPackage()->getExtra()['symfony']['endpoint'] ?? self::$DEFAULT_ENDPOINT;
-        }
-        $this->endpoint = rtrim($endpoint, '/');
+
+        $this->endpoint = rtrim(getenv('SYMFONY_ENDPOINT') ?: ($composer->getPackage()->getExtra()['symfony']['endpoint'] ?? self::$DEFAULT_ENDPOINT), '/');
         $this->io = $io;
         $config = $composer->getConfig();
         $this->rfs = $rfs;
-        $this->cache = new Cache($io, $config->get('cache-repo-dir').'/'.preg_replace('{[^a-z0-9.]}i', '-', $this->endpoint));
+        $this->cache = new ComposerCache($io, $config->get('cache-repo-dir').'/'.preg_replace('{[^a-z0-9.]}i', '-', $this->endpoint));
         $this->sess = bin2hex(random_bytes(16));
-
-        if (self::$DEFAULT_ENDPOINT !== $endpoint) {
-            $this->io->writeError('<warning>Warning: Using '.$endpoint.' as the Symfony endpoint</warning>');
-        }
     }
 
     public function getSessionId(): string
@@ -67,6 +61,21 @@ class Downloader
     public function setFlexId(string $id = null)
     {
         $this->flexId = $id;
+    }
+
+    public function isEnabled()
+    {
+        return $this->enabled;
+    }
+
+    public function disable()
+    {
+        $this->enabled = false;
+    }
+
+    public function getVersions()
+    {
+        return self::$versions ?? self::$versions = $this->get('/versions.json')->getBody();
     }
 
     /**
@@ -101,13 +110,13 @@ class Downloader
                 }
             }
 
-            // FIXME: getNames() can return n names
-            $name = str_replace('/', ',', $package->getNames()[0]);
+            // FIXME: Multi name with getNames()
+            $name = str_replace('/', ',', $package->getName());
             $path = sprintf('%s,%s%s', $name, $o, $version);
             if ($date = $package->getReleaseDate()) {
                 $path .= ','.$date->format('U');
             }
-            if (strlen($chunk) + strlen($path) > self::$MAX_LENGTH) {
+            if (\strlen($chunk) + \strlen($path) > self::$MAX_LENGTH) {
                 $paths[] = ['/p/'.$chunk];
                 $chunk = $path;
             } elseif ($chunk) {
@@ -118,6 +127,10 @@ class Downloader
         }
         if ($chunk) {
             $paths[] = ['/p/'.$chunk];
+        }
+
+        if ($this->enabled && self::$DEFAULT_ENDPOINT !== $this->endpoint) {
+            $this->io->writeError('<warning>Using "'.$this->endpoint.'" as the Symfony endpoint</>');
         }
 
         $bodies = [];
@@ -131,9 +144,6 @@ class Downloader
         foreach ($bodies as $body) {
             foreach ($body['manifests'] as $name => $manifest) {
                 $data['manifests'][$name] = $manifest;
-            }
-            foreach ($body['vulnerabilities'] as $name => $vulns) {
-                $data['vulnerabilities'][$name] = $vulns;
             }
             foreach ($body['locks'] ?? [] as $name => $lock) {
                 $data['locks'][$name] = $lock;
@@ -151,6 +161,9 @@ class Downloader
      */
     public function get(string $path, array $headers = [], $cache = true): Response
     {
+        if (!$this->enabled && '/versions.json' !== $path) {
+            return new Response([]);
+        }
         $headers[] = 'Package-Session: '.$this->sess;
         $url = $this->endpoint.'/'.ltrim($path, '/');
         $cacheKey = $cache ? ltrim($path, '/') : '';
@@ -234,10 +247,10 @@ class Downloader
     {
         $data = JsonFile::parseJson($json, $url);
         if (!empty($data['warning'])) {
-            $this->io->writeError('<warning>Warning from '.$url.': '.$data['warning'].'</warning>');
+            $this->io->writeError('<warning>Warning from '.$url.': '.$data['warning'].'</>');
         }
         if (!empty($data['info'])) {
-            $this->io->writeError('<info>Info from '.$url.': '.$data['info'].'</info>');
+            $this->io->writeError('<info>Info from '.$url.': '.$data['info'].'</>');
         }
 
         $response = new Response($data, $lastHeaders);
@@ -251,8 +264,8 @@ class Downloader
     private function switchToDegradedMode(\Exception $e, string $url)
     {
         if (!$this->degradedMode) {
-            $this->io->writeError('<warning>'.$e->getMessage().'</warning>');
-            $this->io->writeError('<warning>'.$url.' could not be fully loaded, package information was loaded from the local cache and may be out of date</warning>');
+            $this->io->writeError('<warning>'.$e->getMessage().'</>');
+            $this->io->writeError('<warning>'.$url.' could not be fully loaded, package information was loaded from the local cache and may be out of date</>');
         }
         $this->degradedMode = true;
     }
