@@ -46,7 +46,6 @@ trait CsvParseTrait
         /*
         if (!file_exists($filename)) {
             $this->io->text("Downloading: '{$content}.csv' for the first time ...");
-
             $githubFilename = str_ireplace('{content}', $content, getenv('GITHUB_CSV_FILE'));
             try {
                 $githubFiledata = file_get_contents($githubFilename);
@@ -54,21 +53,17 @@ trait CsvParseTrait
                 $this->io->error("Could not get the file: {$githubFilename} from GITHUB, are you sure it exists? Filenames are case-sensitive.");
                 die;
             }
-
             if (!$githubFiledata) {
                 $this->io->text('<error>Could not download file from github: '. $githubFilename);die;
             }
-
             $pi = pathinfo($filename);
             if (!is_dir($pi['dirname'])) {
                 mkdir($pi['dirname'], 0777, true);
             }
-
             file_put_contents($filename, $githubFiledata);
             $this->io->text('✓ Download complete');
         }
         */
-
         // grab wrapper
         $parser = new ParseWrapper($content, $filename);
         file_put_contents($filename.'.columns', json_encode($parser->columns, JSON_PRETTY_PRINT));
@@ -87,6 +82,47 @@ trait CsvParseTrait
     {
         $this->projectDirectory = $projectDirectory;
         return $this;
+    }
+    /**
+     * Generate Patch Json
+     */
+    public function PatchCheck($PatchNoData, $FileName, $CSV, $KeyName) {
+        if (!file_exists("output/PatchData/$FileName.json")) { 
+            $MakeFile = fopen("output/PatchData/$FileName.json", 'w');
+            fwrite($MakeFile, NULL);
+            fclose($MakeFile);
+        }
+        $jdata = file_get_contents("output/PatchData/$FileName.json");
+        $PatchArray = json_decode($jdata, true);
+        foreach ($CSV->data as $id => $CsvData) {
+            $Key = $CsvData[$KeyName];
+            if (empty($Key)) continue;
+            $PatchNo = $PatchNoData;
+            if (isset($PatchArray[$Key])) continue;
+            if (!isset($PatchArray[$Key])) {
+                $PatchArray[$Key] = $PatchNo;
+            }
+        }
+        $JSONOUTPUT = json_encode($PatchArray, JSON_PRETTY_PRINT);
+        //write Api file
+        if (!file_exists("output/PatchData/")) { mkdir("output/PatchData/", 0777, true); }
+        $JSON_File = fopen("output/PatchData/$FileName.json", 'w');
+        fwrite($JSON_File, $JSONOUTPUT);
+        fclose($JSON_File);
+    }
+    /**
+     * Get Patch Data
+     */
+    public function getPatch($FileName) {
+        if (!file_exists("output/PatchData/$FileName.json")) { 
+            $this->io->text(" WARNING: There is no $FileName.json to get patch data from");
+            exit();
+        }
+        if (file_exists("output/PatchData/$FileName.json")) { 
+            $jdata = file_get_contents("output/PatchData/$FileName.json");
+            $PatchArray = json_decode($jdata, true);
+            return $PatchArray;
+        }
     }
 
 
