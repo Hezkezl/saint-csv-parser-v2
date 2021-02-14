@@ -33,20 +33,17 @@ trait CsvParseTrait
         //get the current patch long ID
         $MainPath = "C:\Program Files (x86)\SquareEnix\FINAL FANTASY XIV - A Realm Reborn";
         $PatchID = file_get_contents("". $MainPath ."\game\\ffxivgame.ver");
-        //$PatchID = "2020.10.21.0001.0000";
-        //Icarus Path
+        //$PatchID = "2020.10.21.0001.0000";//Icarus Path
         //$cache = "E:\saint-csv-parser-v2-master\cache/$PatchID/rawexd";
         //Hez Path
         $cache = "F:\Rogue\SaintCoinach.Cmd/$PatchID/rawexd";
 
         //$cache = $this->projectDirectory . getenv('CACHE_DIRECTORY');
         $filename = "{$cache}/{$content}.csv";
-
         // check cache and download if it does not exist. Ignoring now since Icarus rewrite in July 2020
         /*
         if (!file_exists($filename)) {
             $this->io->text("Downloading: '{$content}.csv' for the first time ...");
-
             $githubFilename = str_ireplace('{content}', $content, getenv('GITHUB_CSV_FILE'));
             try {
                 $githubFiledata = file_get_contents($githubFilename);
@@ -54,21 +51,17 @@ trait CsvParseTrait
                 $this->io->error("Could not get the file: {$githubFilename} from GITHUB, are you sure it exists? Filenames are case-sensitive.");
                 die;
             }
-
             if (!$githubFiledata) {
                 $this->io->text('<error>Could not download file from github: '. $githubFilename);die;
             }
-
             $pi = pathinfo($filename);
             if (!is_dir($pi['dirname'])) {
                 mkdir($pi['dirname'], 0777, true);
             }
-
             file_put_contents($filename, $githubFiledata);
             $this->io->text('✓ Download complete');
         }
         */
-
         // grab wrapper
         $parser = new ParseWrapper($content, $filename);
         file_put_contents($filename.'.columns', json_encode($parser->columns, JSON_PRETTY_PRINT));
@@ -87,6 +80,47 @@ trait CsvParseTrait
     {
         $this->projectDirectory = $projectDirectory;
         return $this;
+    }
+    /**
+     * Generate Patch Json
+     */
+    public function PatchCheck($PatchNoData, $FileName, $CSV, $KeyName) {
+        if (!file_exists("output/PatchData/$FileName.json")) { 
+            $MakeFile = fopen("output/PatchData/$FileName.json", 'w');
+            fwrite($MakeFile, NULL);
+            fclose($MakeFile);
+        }
+        $jdata = file_get_contents("output/PatchData/$FileName.json");
+        $PatchArray = json_decode($jdata, true);
+        foreach ($CSV->data as $id => $CsvData) {
+            $Key = $CsvData[$KeyName];
+            if (empty($Key)) continue;
+            $PatchNo = $PatchNoData;
+            if (isset($PatchArray[$Key])) continue;
+            if (!isset($PatchArray[$Key])) {
+                $PatchArray[$Key] = $PatchNo;
+            }
+        }
+        $JSONOUTPUT = json_encode($PatchArray, JSON_PRETTY_PRINT);
+        //write Api file
+        if (!file_exists("output/PatchData/")) { mkdir("output/PatchData/", 0777, true); }
+        $JSON_File = fopen("output/PatchData/$FileName.json", 'w');
+        fwrite($JSON_File, $JSONOUTPUT);
+        fclose($JSON_File);
+    }
+    /**
+     * Get Patch Data
+     */
+    public function getPatch($FileName) {
+        if (!file_exists("output/PatchData/$FileName.json")) { 
+            $this->io->text(" WARNING: There is no $FileName.json to get patch data from");
+            exit();
+        }
+        if (file_exists("output/PatchData/$FileName.json")) { 
+            $jdata = file_get_contents("output/PatchData/$FileName.json");
+            $PatchArray = json_decode($jdata, true);
+            return $PatchArray;
+        }
     }
 
 
@@ -395,7 +429,7 @@ trait CsvParseTrait
     /**
      * Get Specialshop items and name
      */
-    public function getShop($NpcName, $ShopType, $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $SpecialShopID, $DefaultTalkCsv) {
+    public function getShop($NpcName, $ShopType, $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $SpecialShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv) {
         $WeaponArray = [];
         $ArmorArray = [];
         $AccessoryArray = [];
@@ -505,10 +539,136 @@ trait CsvParseTrait
                 $ShopOutputString .= "| Shop = \n";
                 $ShopOutputString .= "{{Tabsells3\n";
                 
-                $CompleteText = $this->getDefaultTalk($DefaultTalkCsv, $SpecialShopCsv, $SpecialShopID, "CompleteText", "| Confirm Text =\n");
+                $CompleteText = $this->getDefaultTalk($DefaultTalkCsv, $SpecialShopCsv, $SpecialShopID, "CompleteText", "");
+                $DenyText = $this->getDefaultTalk($DefaultTalkCsv, $SpecialShopCsv, $SpecialShopID, "NotCompleteText", "");
 
-                $ShopOutput["Dialogue"] = $CompleteText;
+                $DialogueOutput = "{{-start-}}\n'''". $NpcName ."/Dialogue'''\n";
+                $DialogueOutput .= "{{Dialoguebox3|Intro={{check}} Granted Access|Dialogue=$CompleteText}}\n";
+                $DialogueOutput .= "{{Dialoguebox3|Intro={{x}} Denied Access|Dialogue=$DenyText}}\n";
+                $DialogueOutput .= "{{-stop-}}\n";
+
+                if (empty($CompleteText && $DenyText)) {
+                    $DialogueOutput = "";
+                }
+
+                $ShopOutput["Dialogue"] = $DialogueOutput;
+                $ShopOutput["Number"] = $number;
                 $ShopOutput["Shop"] = "\n$ShopOutputString\n$Weapons$Armor$Accessory$Other\n}}\n}}\n{{-stop-}}";
+                return $ShopOutput;
+            break;
+            case 'GilShop':
+                $DataValue = $SpecialShopID;
+                $GilShopRequiredQuest = "";
+                if (!empty($QuestCsv->at($GilShopCsv->at($DataValue)['Quest'])['Name'])) {
+                    $GilShopRequiredQuest = "\n|Unlock Quest = ". $QuestCsv->at($GilShopCsv->at($DataValue)['Quest'])['Name'];
+                }
+                $ShopName = $GilShopCsv->at($DataValue)['Name'];
+                if (empty($ShopName)) { 
+                    $ShopName = "General";
+                }
+
+                
+                $CompleteText = $this->getDefaultTalk($DefaultTalkCsv, $GilShopCsv, $SpecialShopID, "AcceptTalk", "");
+                $DenyText = $this->getDefaultTalk($DefaultTalkCsv, $GilShopCsv, $SpecialShopID, "FailTalk", "");
+
+                $DialogueOutput = "{{-start-}}\n'''". $NpcName ."/Dialogue'''\n";
+                $DialogueOutput .= "{{Dialoguebox3|Intro={{check}} Granted Access|Dialogue=$CompleteText}}\n";
+                $DialogueOutput .= "{{Dialoguebox3|Intro={{x}} Denied Access|Dialogue=$DenyText}}\n";
+                $DialogueOutput .= "{{-stop-}}\n";
+
+                if (empty($CompleteText && $DenyText)) {
+                    $DialogueOutput = "";
+                }
+
+                $ShopOutput["Dialogue"] = $DialogueOutput;
+                foreach(range(0,50) as $b) {
+                    $GilShopSubArray = "". $DataValue . "." . $b ."";
+                    if (!empty($ItemCsv->at($GilShopItemCsv->at($GilShopSubArray)["Item"])["Name"])) {
+                        $GilShopSellsItem = $ItemCsv->at($GilShopItemCsv->at($GilShopSubArray)["Item"])["Name"];
+                        $GilShopSellsItemCost = $ItemCsv->at($GilShopItemCsv->at($GilShopSubArray)["Item"])["Price{Mid}"];
+                        $RowRequiredArray = [];
+                        foreach(range(0,2) as $c) {
+                            if (empty($QuestCsv->at($GilShopItemCsv->at($GilShopSubArray)["Row{Required}[$c]"])["Name"])) continue;
+                            $RequiredQuest = $QuestCsv->at($GilShopItemCsv->at($GilShopSubArray)["Row{Required}[$c]"])["Name"];
+                            $RowRequiredArray[] = "|Requires Quest = ". $RequiredQuest;
+                        }
+                        $NumberItems = $b + 1;
+                        $RowRequired = implode("\n", $RowRequiredArray);
+                        $CategoryPre = $ItemCsv->at($GilShopItemCsv->at($GilShopSubArray)["Item"])["EquipSlotCategory"];
+                        switch ($CategoryPre) {
+                            case '0':
+                                $Category = 4;
+                            break;
+                            case '1':
+                            case '2':
+                            case '13':
+                                $Category = 1;
+                            break;
+                            case '3':
+                            case '4':
+                            case '5':
+                            case '6':
+                            case '7':
+                            case '8':
+                            case '15':
+                            case '16':
+                            case '18':
+                            case '19':
+                            case '20':
+                            case '21':
+                                $Category = 2;
+                            break;
+                            case '9':
+                            case '10':
+                            case '11':
+                            case '12':
+                                $Category = 3;
+                            break;
+                            
+                            default:
+                                $Category = 4;
+                            break;
+                        }
+                        switch ($Category) {
+                            case 1:
+                                $WeaponArray[] = "{{Sells3|$GilShopSellsItem|Quantity=1|Cost1=Gil|Count1=$GilShopSellsItemCost$RowRequired}}";
+                            break;
+                            case 2:
+                                $ArmorArray[] = "{{Sells3|$GilShopSellsItem|Quantity=1|Cost1=Gil|Count1=$GilShopSellsItemCost$RowRequired}}";
+                            break;
+                            case 3:
+                                $AccessoryArray[] = "{{Sells3|$GilShopSellsItem|Quantity=1|Cost1=Gil|Count1=$GilShopSellsItemCost$RowRequired}}";
+                            break;
+                            case 4:
+                                $OtherArray[] = "{{Sells3|$GilShopSellsItem|Quantity=1|Cost1=Gil|Count1=$GilShopSellsItemCost$RowRequired}}";
+                            break;
+                        }
+                    }
+                }
+                if (!empty($WeaponArray)) {
+                    $Weapons = "|Weapons = \n". implode("\n", $WeaponArray). "\n";
+                }
+                if (!empty($ArmorArray)) {
+                    $Armor = "|Armor = \n".implode("\n", $ArmorArray). "\n";
+                }
+                if (!empty($AccessoryArray)) {
+                    $Accessory = "|Accessory = \n".implode("\n", $AccessoryArray). "\n";
+                }
+                if (!empty($OtherArray)) {
+                    $Other = "|Misc = \n".implode("\n", $OtherArray). "\n";
+                }
+                $ShopOutputString = "{{-start-}}\n'''". $NpcName ."/". $ShopName ."'''\n";
+                $ShopOutputString .= "{{Shop\n";
+                $ShopOutputString .= "| Shop Name = $ShopName\n";
+                $ShopOutputString .= "| NPC Name = $NpcName\n";
+                $ShopOutputString .= "| Location = \n";
+                $ShopOutputString .= "| Coordinates = \n";
+                $ShopOutputString .= "| Total Items = $NumberItems\n";
+                $ShopOutputString .= "| Shop = \n";
+                $ShopOutputString .= "{{Tabsells3\n";
+                
+                $ShopOutput["Shop"] = "\n$ShopOutputString\n$Weapons$Armor$Accessory$Other\n}}\n}}\n{{-stop-}}";
+                $ShopOutput["Number"] = $NumberItems;
                 return $ShopOutput;
             break;
             
