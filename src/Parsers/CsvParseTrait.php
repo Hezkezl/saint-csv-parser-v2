@@ -33,8 +33,10 @@ trait CsvParseTrait
         //get the current patch long ID
         $MainPath = "C:\Program Files (x86)\SquareEnix\FINAL FANTASY XIV - A Realm Reborn";
         $PatchID = file_get_contents("". $MainPath ."\game\\ffxivgame.ver");
-        //$PatchID = "2020.10.21.0001.0000";
-        $cache = "E:\saint-csv-parser-v2-master\cache/$PatchID/rawexd";
+        //$PatchID = "2020.10.21.0001.0000";//Icarus Path
+        //$cache = "E:\saint-csv-parser-v2-master\cache/$PatchID/rawexd";
+        //Hez Path
+        $cache = "F:\Rogue\SaintCoinach.Cmd/$PatchID/rawexd";
 
         //$cache = $this->projectDirectory . getenv('CACHE_DIRECTORY');
         $filename = "{$cache}/{$content}.csv";
