@@ -23,7 +23,7 @@ class Mounts implements ParseInterface
 | Notes =
 | Lore =
 | Etymology ={Flying}
-| Music = {Music}
+| Music = {Music}{Seats}
 }}{Bottom}";
     public function parse()
     {
@@ -135,6 +135,9 @@ class Mounts implements ParseInterface
                 $Action = "\n| Actions =";
             };
 
+            // Mount Music. Remove leading filename, replace extension with ogg, and replace underscores with spaces
+            $Music = str_replace("scd", "ogg", str_replace("music/ffxiv/", null, str_replace("_", " ", $BGMCsv->at($Mount['RideBGM'])['File'])));
+
             // Icon copying
             $SmallIcon = $Mount["Icon"];
             $Icon2 = substr($SmallIcon, -3);
@@ -185,8 +188,9 @@ class Mounts implements ParseInterface
                 '{RequiredItem}' => $RequiredItemName,
                 '{Action}' => $Action,
                 '{Flying}' => ($Mount['IsFlying'] > 0) ? "\n| Flying = Yes" : "\n| Flying = No",
-                '{Music}' => str_replace("music/ffxiv/", null, $BGMCsv->at($Mount['RideBGM'])['File']),
+                '{Music}' => "[[File:$Music]]",
                 '{Bottom}' => $Bottom,
+                '{Seats}' => ($Mount['ExtraSeats'] > 0) ? "\n| Seats = ". (1 + ($Mount['ExtraSeats'])) : "",
             ];
 
             // format using Gamer Escape formatter and add to data array
