@@ -684,7 +684,10 @@ trait CsvParseTrait
     public function getInputFolder()
     {
         $PatchID = file_get_contents("C:\Program Files (x86)\SquareEnix\FINAL FANTASY XIV - A Realm Reborn\game\\ffxivgame.ver");
-        return "E:\Users\user\Documents\GitHub\SaintCoinach\SaintCoinach.Cmd\bin\Release/$PatchID/ui";
+        //Icarus Path
+        //return "E:\Users\user\Documents\GitHub\SaintCoinach\SaintCoinach.Cmd\bin\Release/$PatchID/ui";
+        //Hez Path
+        return "F:\Rogue\SaintCoinach.Cmd/$PatchID/ui";
     }
 
     /**
