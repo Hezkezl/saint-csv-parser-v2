@@ -1,5 +1,4 @@
 cache/*
-output*
 input/*
 !cache/.gitkeep
 !output/.gitkeep
