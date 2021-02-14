@@ -40,6 +40,28 @@ trait CsvParseTrait
 
         //$cache = $this->projectDirectory . getenv('CACHE_DIRECTORY');
         $filename = "{$cache}/{$content}.csv";
+        // check cache and download if it does not exist. Ignoring now since Icarus rewrite in July 2020
+        /*
+        if (!file_exists($filename)) {
+            $this->io->text("Downloading: '{$content}.csv' for the first time ...");
+            $githubFilename = str_ireplace('{content}', $content, getenv('GITHUB_CSV_FILE'));
+            try {
+                $githubFiledata = file_get_contents($githubFilename);
+            } catch (\Exception $ex) {
+                $this->io->error("Could not get the file: {$githubFilename} from GITHUB, are you sure it exists? Filenames are case-sensitive.");
+                die;
+            }
+            if (!$githubFiledata) {
+                $this->io->text('<error>Could not download file from github: '. $githubFilename);die;
+            }
+            $pi = pathinfo($filename);
+            if (!is_dir($pi['dirname'])) {
+                mkdir($pi['dirname'], 0777, true);
+            }
+            file_put_contents($filename, $githubFiledata);
+            $this->io->text('✓ Download complete');
+        }
+        */
         // grab wrapper
         $parser = new ParseWrapper($content, $filename);
         file_put_contents($filename.'.columns', json_encode($parser->columns, JSON_PRETTY_PRINT));
