@@ -82,16 +82,16 @@ trait CsvParseTrait
     /**
      * Generate Patch Json
      */
-    public function PatchCheck($PatchNoData, $FileName, $CSV, $KeyName) {
-        if (!file_exists("output/PatchData/$FileName.json")) { 
-            $MakeFile = fopen("output/PatchData/$FileName.json", 'w');
+    public function PatchCheck($PatchNoData, $FileName, $CSV) {
+        if (!file_exists("Patch/$FileName.json")) { 
+            $MakeFile = fopen("Patch/$FileName.json", 'w');
             fwrite($MakeFile, NULL);
             fclose($MakeFile);
         }
-        $jdata = file_get_contents("output/PatchData/$FileName.json");
+        $jdata = file_get_contents("Patch/$FileName.json");
         $PatchArray = json_decode($jdata, true);
         foreach ($CSV->data as $id => $CsvData) {
-            $Key = $CsvData[$KeyName];
+            $Key = $CsvData["id"];
             if (empty($Key)) continue;
             $PatchNo = $PatchNoData;
             if (isset($PatchArray[$Key])) continue;
@@ -101,8 +101,8 @@ trait CsvParseTrait
         }
         $JSONOUTPUT = json_encode($PatchArray, JSON_PRETTY_PRINT);
         //write Api file
-        if (!file_exists("output/PatchData/")) { mkdir("output/PatchData/", 0777, true); }
-        $JSON_File = fopen("output/PatchData/$FileName.json", 'w');
+        if (!file_exists("Patch")) { mkdir("Patch", 0777, true); }
+        $JSON_File = fopen("Patch/$FileName.json", 'w');
         fwrite($JSON_File, $JSONOUTPUT);
         fclose($JSON_File);
     }
@@ -110,12 +110,12 @@ trait CsvParseTrait
      * Get Patch Data
      */
     public function getPatch($FileName) {
-        if (!file_exists("output/PatchData/$FileName.json")) { 
+        if (!file_exists("Patch/$FileName.json")) { 
             $this->io->text(" WARNING: There is no $FileName.json to get patch data from");
             exit();
         }
-        if (file_exists("output/PatchData/$FileName.json")) { 
-            $jdata = file_get_contents("output/PatchData/$FileName.json");
+        if (file_exists("Patch/$FileName.json")) { 
+            $jdata = file_get_contents("Patch/$FileName.json");
             $PatchArray = json_decode($jdata, true);
             return $PatchArray;
         }
