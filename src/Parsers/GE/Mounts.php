@@ -205,7 +205,7 @@ class Mounts implements ParseInterface
         // save our data to the filename: GeMountWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save("$CurrentPatchOutput/Mounts - ". $Patch .".txt", 999999);
+        $info = $this->save("Mounts.txt", 999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],
