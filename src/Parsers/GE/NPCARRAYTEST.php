@@ -90,6 +90,8 @@ class NPCARRAYTEST implements ParseInterface
         $this->io->progressStart($ENpcResidentCsv->total);
         $NpcNameArray = [];
         $NpcMainPage = [];
+        $this->PatchCheck($Patch, "ENpcResident", $ENpcResidentCsv);
+        $PatchNumber = $this->getPatch("ENpcResident");
         
         $PlaceNameLocation = ""; //TEMP
 
@@ -254,6 +256,11 @@ class NPCARRAYTEST implements ParseInterface
                     break;
                     case ($DataValue > 262100) && ($DataValue < 269999): //GILSHOP
                         $ShopCheck[] = $DataValue.",";
+                        $ShopCheck[] = "Dialogue,";
+                        $FuncShop = $this->getShop($NameFormatted, "GilShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $DataValue, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv);
+                        $ShopOutputArray[] = $FuncShop["Shop"];
+                        $ShopDialogueArray[] = $FuncShop["Dialogue"];
+                        $TotalItems[$Name][] = $FuncShop["Number"];
                     break;
                     case ($DataValue > 393000) && ($DataValue < 399999): //GUILDLEVEASSIGNMENT
                         $DialogueCheck[] = $DataValue.",";
@@ -293,6 +300,11 @@ class NPCARRAYTEST implements ParseInterface
                                     break;
                                     case ($NestDataValue > 1769000) && ($NestDataValue < 1779999)://SPECIALSHOP
                                         $ShopCheck[] = $NestDataValue.",";
+                                        $ShopCheck[] = "Dialogue,";
+                                        $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $NestDataValue, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv);
+                                        $ShopOutputArray[] = $FuncShop["Shop"];
+                                        $ShopDialogueArray[] = $FuncShop["Dialogue"];
+                                        $TotalItems[$Name][] = $FuncShop["Number"];
                                     break;
                                     case ($NestDataValue > 3407872) && ($NestDataValue < 3409999)://LotteryExchangeShop
                                         $ShopCheck[] = $NestDataValue.",";
@@ -323,16 +335,18 @@ class NPCARRAYTEST implements ParseInterface
                     break;
                     case ($DataValue > 1769000) && ($DataValue < 1779999)://SPECIALSHOP
                         $ShopCheck[] = $DataValue.",";
-                        $ShopOutputArray[] = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $DataValue, $DefaultTalkCsv)["Shop"];
-                        $ShopDialogueArray[] = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $DataValue, $DefaultTalkCsv)["Dialogue"];
+                        $ShopCheck[] = "Dialogue,";
+                        $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $DataValue, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv);
+                        $ShopOutputArray[] = $FuncShop["Shop"];
+                        $ShopDialogueArray[] = $FuncShop["Dialogue"];
+                        $TotalItems[$Name][] = $FuncShop["Number"];
                     break;
                     case ($DataValue > 2030000) && ($DataValue < 2039999)://SWITCHTALK
                         $DialogueCheck[] = $DataValue.",";
                     break;
                     case ($DataValue > 2290000) && ($DataValue < 2299999)://TRIPLETRIAD
                         $TripleTriadCheck[] = $DataValue.",";
-                        $FuncDataValue = $DataValue;
-                        $GetTripleTriadArray[] = $this->GetTripleTriad($ItemCsv, $TripleTriadCardCsv, $TripleTriadCsv, $QuestCsv, $FuncDataValue, $DefaultTalkCsv, $TripleTriadRuleCsv, $NameFormatted);
+                        $GetTripleTriadArray[] = $this->GetTripleTriad($ItemCsv, $TripleTriadCardCsv, $TripleTriadCsv, $QuestCsv, $DataValue, $DefaultTalkCsv, $TripleTriadRuleCsv, $NameFormatted);
                     break;
                     case ($DataValue > 2752000) && ($DataValue < 2752999)://FCCSHOP
                         $ShopCheck[] = $DataValue.",";
@@ -366,7 +380,12 @@ class NPCARRAYTEST implements ParseInterface
                                                 foreach(range(0,20) as $c) {
                                                     $SubDataValue = "". $ShopID .".". $c ."";
                                                     if (empty($InclusionShopSeriesCsv->at($SubDataValue)['SpecialShop'])) break;
-                                                    $ShopCheck[] = $SubDataValue.",";
+                                                    $ShopCheck[] = $InclusionShopSeriesCsv->at($SubDataValue)['SpecialShop'].",";
+                                                    $IncShopID = $InclusionShopSeriesCsv->at($SubDataValue)['SpecialShop'];
+                                                    $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $IncShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv);
+                                                    $ShopOutputArray[] = $FuncShop["Shop"];
+                                                    $ShopDialogueArray[] = $FuncShop["Dialogue"];
+                                                    $TotalItems[$Name][] = $FuncShop["Number"];
                                                 }
                                             }
                                         break;
@@ -380,6 +399,11 @@ class NPCARRAYTEST implements ParseInterface
                                 break;
                                 case ($ShopLink >= 1769000 && $ShopLink < 1779999): //Specialshop
                                     $ShopCheck[] = $ShopLink;
+                                    $ShopCheck[] = "Dialogue,";
+                                    $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $ShopLink, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv);
+                                    $ShopOutputArray[] = $FuncShop["Shop"];
+                                    $ShopDialogueArray[] = $FuncShop["Dialogue"];
+                                    $TotalItems[$Name][] = $FuncShop["Number"];
                                 break;
                                 
                                 default:
@@ -399,6 +423,11 @@ class NPCARRAYTEST implements ParseInterface
                             break;
                             case ($ShopID >= 1769000 && $ShopID < 1779999): //specialshop
                                 $ShopCheck[] = $ShopID.",";
+                                $ShopCheck[] = "Dialogue,";
+                                $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $ShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv);
+                                $ShopOutputArray[] = $FuncShop["Shop"];
+                                $ShopDialogueArray[] = $FuncShop["Dialogue"];
+                                $TotalItems[$Name][] = $FuncShop["Number"];
                             break;
                             case ($ShopID >= 3866620 && $ShopID < 3866999): //COLLECTABLESHOPS
                                 $ShopCheck[] = $ShopID.",";
@@ -410,6 +439,12 @@ class NPCARRAYTEST implements ParseInterface
                                         $SubDataValue = "". $ShopID .".". $c ."";
                                         if (empty($InclusionShopSeriesCsv->at($SubDataValue)['SpecialShop'])) break;
                                         $ShopCheck[] = $InclusionShopSeriesCsv->at($SubDataValue)['SpecialShop'].",";
+                                        $InclusionShopSpecialShopID = $InclusionShopSeriesCsv->at($SubDataValue)['SpecialShop'];
+                                        $ShopCheck[] = "Dialogue,";
+                                        $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $InclusionShopSpecialShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv);
+                                        $ShopOutputArray[] = $FuncShop["Shop"];
+                                        $ShopDialogueArray[] = $FuncShop["Dialogue"];
+                                        $TotalItems[$Name][] = $FuncShop["Number"];
                                     }
                                 }
                             break;
@@ -431,7 +466,7 @@ class NPCARRAYTEST implements ParseInterface
             }
             $WarpCheckArrayOut = implode("", $WarpCheck);
             $WarpCheckArray[$Name][] = $WarpCheckArrayOut;
-            $ShopCheckArrayOut = implode("", $ShopCheck);
+            $ShopCheckArrayOut = implode("", array_unique($ShopCheck));
             $ShopCheckArray[$Name][] = $ShopCheckArrayOut;
             $DialogueCheckArrayOut = implode("", $DialogueCheck);
             $DialogueCheckArray[$Name][] = $DialogueCheckArrayOut;
@@ -458,6 +493,10 @@ class NPCARRAYTEST implements ParseInterface
         
         }
         $this->io->progressFinish();
+        $ShopItemsNumber = [];
+        foreach ($TotalItems as $key => $value) {
+            $ShopItemsNumber[$key] = array_sum($value);
+        }
         $Warparrayimplode = [];
         foreach ($WarpCheckArray as $key => $value) {
             $Warparrayimplode[$key] = implode("", array_unique($value));
@@ -498,7 +537,7 @@ class NPCARRAYTEST implements ParseInterface
         $PorterOut = implode("\n",$PorterArray);
         $TripleTriadOut = implode("\n", $GetTripleTriadArray);
         $ShopOut = implode("\n", $ShopOutputArray);
-        $ShopDialogueOut = implode("\n", $ShopDialogueArray);
+        $ShopDialogueOut = implode("", $ShopDialogueArray);
 
         //mainpage constructor
         $this->io->text('Building NPC Final Outputs ...');
@@ -604,19 +643,27 @@ class NPCARRAYTEST implements ParseInterface
                 $MapOutputString .= "{{-stop-}}\n";
                 $MapArray[] = $MapOutputString;
             }
-
+            $ShopItemsTotalNo = null;
+            if (!empty($ShopItemsNumber[$Name])) {
+                $ShopItemsTotalNo = $ShopItemsNumber[$Name];
+            } else {
+                $ShopItemsTotalNo = "";
+            }
             $dataout = implode("\n", $datarray);
             $LastMapLocExp = explode(",",$NPCIds[$Name]);
             $LastMapLoc = end($LastMapLocExp);
+            $Patch = $PatchNumber[$id];
+            $console->overwrite(" > Completed NPC: {$Name} --> }");
             $Npcarray2[$Name][0] = "{{-start-}}
             {{Infobox NPC
-            | Patch = 
+            | Patch = $Patch
             | Name = $NameFormatted
             | Image = 
             $Race$Gender$Tribe
             | IDs = $NPCIds[$Name]
             | Quests = $QuestCheckOut
             | Shop = ".substr($Shoparrayimplode[$Name],0,-1)."
+            | TotalItems = $ShopItemsTotalNo
             | Warp = ".substr($Warparrayimplode[$Name],0,-1)."
             | Dialogue = ".substr($Dialoguearrayimplode[$Name],0,-1)."
             | Leves = ".substr($Levearrayimplode[$Name],0,-1)."
