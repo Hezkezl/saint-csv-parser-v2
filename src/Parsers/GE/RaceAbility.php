@@ -34,6 +34,9 @@ class RaceAbility implements ParseInterface
 
         // (optional) start a progress bar
         $this->io->progressStart($ChocoboRaceAbilityCsv->total);
+        
+        $this->PatchCheck($Patch, "ChocoboRaceAbility", $ChocoboRaceAbilityCsv);
+        $PatchNumber = $this->getPatch("ChocoboRaceAbility");
 
         // loop through data
         foreach ($ChocoboRaceAbilityCsv->data as $id => $ability) {
@@ -43,6 +46,7 @@ class RaceAbility implements ParseInterface
             // Your parse code here
             //
             if (empty($ability['Name'])) continue;
+            $Patch = $PatchNumber[$id];
 
             $name = $ability['Name'];
             $duration = false;
@@ -107,7 +111,7 @@ class RaceAbility implements ParseInterface
         // save our data to the filename: GeEventItemWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save("$CurrentPatchOutput/ChocoboRaceAbilities - ". $Patch .".txt", 999999);
+        $info = $this->save("ChocoboRaceAbilities.txt", 999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],

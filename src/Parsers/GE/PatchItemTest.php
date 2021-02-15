@@ -27,13 +27,13 @@ class PatchItemTest implements ParseInterface
         $this->io->progressStart($ItemCsv->total);
 
         //This checks if the patch file exists, if not then makes it + updates it with new info
-        $this->PatchCheck($Patch, "Item", $ItemCsv, "Name");
+        $this->PatchCheck($Patch, "Item", $ItemCsv);
 
         
     /**
      * this will make an array to use all over the sheet, 
      * usage: $PatchNumber[Name of item or ID depending on what is set above]
-     * Example: $PatchNumber[Rhodolite] will output "5.25"
+     * Example: $PatchNumber[id] will output "5.25"
      */
         $PatchNumber = $this->getPatch("Item");
         // loop through test data
@@ -42,7 +42,7 @@ class PatchItemTest implements ParseInterface
             $this->io->progressAdvance();
             if (empty($item['Name'])) continue;
             $ItemName = $item['Name'];
-            $PatchNo = $PatchNumber[$ItemName];
+            $PatchNo = $PatchNumber[$id];
             $PatchString = "This items name is $ItemName and patch set is $PatchNo";
             //var_dump($PatchString);
             
@@ -60,7 +60,7 @@ class PatchItemTest implements ParseInterface
         // save our data to the filename: GeSatisfactionWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save("$CurrentPatchOutput/PatchItemTest - ". $Patch .".txt", 999999);
+        $info = $this->save("PatchItemTest.txt", 999999);
 
         $this->io->table(
             ['Filename', 'Data Count', 'File Size'],

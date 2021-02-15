@@ -50,7 +50,7 @@ class RetainerEXP implements ParseInterface
         // save our data to the filename: GeQuestWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save("$CurrentPatchOutput/RetainerExp - ". $Patch .".txt", 9999999);
+        $info = $this->save("RetainerExp.txt", 9999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],

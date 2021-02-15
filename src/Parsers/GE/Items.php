@@ -54,6 +54,9 @@ class Items implements ParseInterface
 
         // (optional) start a progress bar
         $this->io->progressStart($ItemCsv->total);
+        
+        $this->PatchCheck($Patch, "Item", $ItemCsv);
+        $PatchNumber = $this->getPatch("Item");
 
         // loop through data
         foreach ($ItemCsv->data as $id => $item) {
@@ -61,6 +64,7 @@ class Items implements ParseInterface
 
             // skip ones without a name
             if (empty($item['Name'])) continue;
+            $Patch = $PatchNumber[$id];
 
             // grab item ui category for this item
             $itemUiCategory = $ItemUiCategoryCsv->at($item['ItemUICategory']);
@@ -791,7 +795,7 @@ class Items implements ParseInterface
                 }
 
                 // ensure output directory exists
-                $outputDirectory = $this->getOutputFolder() . "/$CurrentPatchOutput/40pxitemicons";
+                $outputDirectory = $this->getOutputFolder() . "/$PatchID/40pxitemicons";
                 if (!is_dir($outputDirectory)) {
                     mkdir($outputDirectory, 0777, true);
                 }
@@ -871,7 +875,7 @@ class Items implements ParseInterface
         // save our data to the filename: GeItemWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save("$CurrentPatchOutput/Items - ". $Patch .".txt", 999999);
+        $info = $this->save("Items.txt", 999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],

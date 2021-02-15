@@ -53,7 +53,7 @@ class AquariumFish implements ParseInterface
         // save our data to the filename: GeEventItemWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save("$CurrentPatchOutput/AquariumFish - ". $Patch .".txt", 999999);
+        $info = $this->save("AquariumFish.txt", 999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],

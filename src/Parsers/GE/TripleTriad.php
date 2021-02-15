@@ -39,6 +39,9 @@ class TripleTriad implements ParseInterface
 
         // (optional) start a progress bar
         $this->io->progressStart($TripleTriadCardCsv->total);
+        
+        $this->PatchCheck($Patch, "TripleTriadCard", $TripleTriadCardCsv);
+        $PatchNumber = $this->getPatch("TripleTriadCard");
 
         // loop through data
         foreach ($TripleTriadCardCsv->data as $id => $TripleTriad) {
@@ -48,6 +51,8 @@ class TripleTriad implements ParseInterface
             if (empty($TripleTriad['Name'])) {
                 continue;
             }
+            $Patch = $PatchNumber[$id];
+
 
             // code starts here
             $Name = str_replace(" & ", " and ", $TripleTriad['Name']); // replace the & character with 'and' in names
@@ -74,7 +79,7 @@ class TripleTriad implements ParseInterface
             $LargeIcon = (82100 + $TripleTriad['id']);
             $SmallIcon = (82500 + $TripleTriad['id']);
             // ensure output directory exists
-            $TriadIconoutputDirectory = $this->getOutputFolder() . "/$CurrentPatchOutput/TripleTriadIcons";
+            $TriadIconoutputDirectory = $this->getOutputFolder() . "/$PatchID/TripleTriadIcons";
             // if it doesn't exist, make it
             if (!is_dir($TriadIconoutputDirectory)) {
                 mkdir($TriadIconoutputDirectory, 0777, true);
@@ -117,7 +122,7 @@ class TripleTriad implements ParseInterface
         // save our data to the filename: GeTripleTriadWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save("$CurrentPatchOutput/TripleTriad - ". $Patch .".txt", 9999999);
+        $info = $this->save("TripleTriad.txt", 9999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],

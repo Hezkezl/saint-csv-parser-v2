@@ -279,7 +279,7 @@ Glamour Accessories=
         // save our data to the filename: GeEventItemWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save("$CurrentPatchOutput/Storable - ". $Patch .".txt", 999999);
+        $info = $this->save("Storable.txt", 999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],

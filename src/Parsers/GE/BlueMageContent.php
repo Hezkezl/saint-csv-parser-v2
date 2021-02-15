@@ -40,11 +40,18 @@ class BlueMageContent implements ParseInterface
 
         $ContentArray = [];
         // loop through data
+        //get patch for content
+        $this->PatchCheck($Patch, "ContentFinderCondition", $ContentFinderConditionCsv);
+        $PatchNumber = $this->getPatch("ContentFinderCondition");
+        
+        $this->PatchCheck($Patch, "AozAction", $AozActionCsv);
+        $PatchNumberAction = $this->getPatch("AozAction");
         foreach ($ContentFinderConditionCsv->data as $id => $Content) {
             $this->io->progressAdvance();
             $ShortCode = $Content['ShortCode'];
             if (strpos($ShortCode, 'aoz') === false) continue;
             $ContentName = $Content['Name'];
+            $Patch = $PatchNumber[$id];
             $ContentID = (int)str_ireplace("aoz","",$ShortCode);
             $OrderID = str_pad($ContentID, 2, '0', STR_PAD_LEFT);
             $ContentImage = $Content['Image'].".png";
@@ -508,7 +515,7 @@ class BlueMageContent implements ParseInterface
             $ContentString = null;
 
             $ContentString = "{{-start-}}\n'''$ContentName'''\n{{ARR Infobox Carnivale\n";
-            $ContentString .= "|Patch = \n";
+            $ContentString .= "|Patch = $Patch\n";
             $ContentString .= "|Name = $ContentName\n";
             $ContentString .= "|Number = $OrderID\n";
             $ContentString .= "|Header = $ContentImage\n\n";
@@ -563,6 +570,7 @@ class BlueMageContent implements ParseInterface
             $ActionID = $Action['Action'];
             $Name = $ActionCsv->at($ActionID)['Name'];
             if (empty($Name)) continue;
+            $Patch = $PatchNumberAction[$id];
             $Type = $ActionCategoryCsv->at($ActionCsv->at($ActionID)['ActionCategory'])['Name'];
             $Rank = $Action['unknown_2'];
             $StatsString = $AozActionTransientCsv->at($id)['Stats'];
@@ -618,7 +626,7 @@ class BlueMageContent implements ParseInterface
             $Cost = $ActionCsv->at($ActionID)['PrimaryCost{Value}'] * 100;
 
             $ActionString = "{{-start-}}\n'''$Name'''\n{{ARR Infobox Action\n";
-            $ActionString .= "|Patch = \n";
+            $ActionString .= "|Patch = $Patch\n";
             $ActionString .= "|Name = $Name\n";
             $ActionString .= "|Type = $Type\n";
             $ActionString .= "|Damage Type = $DamageType\n";
@@ -654,19 +662,29 @@ class BlueMageContent implements ParseInterface
             $ActionString .= "}}\n{{-stop-}}\n";
             $ActionArray[] = $ActionString;
 
-            if ($AozActionTransientCsv->at($id)['Location'] < 2000){
-                $ContentType = substr($ContentTypeCsv->at($ContentFinderConditionCsv->at($AozActionTransientCsv->at($id)['Location'])['ContentType'])['Name'],0,-1);
-                $ContentName = $ContentFinderConditionCsv->at($AozActionTransientCsv->at($id)['Location'])['Name'];
+            switch ($AozActionTransientCsv->at($id)['LocationKey']) {
+                case '1':
+                    $ContentType = "Mob";
+                    $ContentName = $PlaceNameCsv->at($AozActionTransientCsv->at($id)['Location'])['Name'];
+                break;
+                case '2':
+                    $ContentType = "Totem";
+                    $ContentName = "Whalaqee $Name Totem";
+                break;
+                case '3':
+                    $ContentType = "Quest";
+                    $ContentName = "Out of the Blue";
+                break;
+                case '4':
+                    $ContentType = substr($ContentTypeCsv->at($ContentFinderConditionCsv->at($AozActionTransientCsv->at($id)['Location'])['ContentType'])['Name'],0,-1);
+                    $ContentName = $ContentFinderConditionCsv->at($AozActionTransientCsv->at($id)['Location'])['Name'];
+                break;
+                
+                default:
+                    $ContentType = "Unknown";
+                    $ContentName = "Unknown";
+                break;
             }
-            if ($AozActionTransientCsv->at($id)['Location'] > 2000){
-                $ContentType = "Mob";
-                $ContentName = $PlaceNameCsv->at($AozActionTransientCsv->at($id)['Location'])['Name'];
-            }
-            if ($AozActionTransientCsv->at($id)['Location'] == 0){
-                $ContentType = "Totem";
-                $ContentName = "Whalaqee $Name Totem";
-            }
-
 
             $SpellBookArray[] = "{{BlueSpell|Name=$Name|Location1={{BSD|$ContentType|$ContentName}}}}";
             
@@ -674,7 +692,7 @@ class BlueMageContent implements ParseInterface
             $SmallIcon = $AozActionTransientCsv->at($id)['Icon'];
 
             // ensure output directory exists
-            $IconoutputDirectory = $this->getOutputFolder() . "/$CurrentPatchOutput/BluIcons";
+            $IconoutputDirectory = $this->getOutputFolder() . "/$PatchID/BluIcons";
             // if it doesn't exist, make it
             if (!is_dir($IconoutputDirectory)) {
                 mkdir($IconoutputDirectory, 0777, true);
@@ -701,7 +719,7 @@ class BlueMageContent implements ParseInterface
             $LargeIcon = $Npc['TargetLarge'];
 
             // ensure output directory exists
-            $IconoutputDirectory = $this->getOutputFolder() . "/$CurrentPatchOutput/BluIcons";
+            $IconoutputDirectory = $this->getOutputFolder() . "/$PatchID/BluIcons";
             // if it doesn't exist, make it
             if (!is_dir($IconoutputDirectory)) {
                 mkdir($IconoutputDirectory, 0777, true);
@@ -735,7 +753,7 @@ class BlueMageContent implements ParseInterface
         // save our data to the filename: GeRecipeWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save("$CurrentPatchOutput/BlueMageContent - ". $Patch .".txt", 999999999);
+        $info = $this->save("BlueMageContent.txt", 999999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],

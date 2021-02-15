@@ -19,3 +19,4 @@ PatchDayBatch.bat
 vendor/composer/autoload_real.php
 vendor/autoload.php
 vendor/composer/autoload_static.php
+src/Parsers/config.ini

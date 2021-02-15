@@ -65,6 +65,9 @@ class Minions implements ParseInterface
 
         // (optional) start a progress bar
         $this->io->progressStart($ItemCsv->total);
+        
+        $this->PatchCheck($Patch, "Item", $ItemCsv);
+        $PatchNumber = $this->getPatch("Item");
 
         // loop through data
         foreach ($ItemCsv->data as $id => $Item) {
@@ -73,6 +76,7 @@ class Minions implements ParseInterface
 
             // skip all but minions
             if ($Item["ItemUICategory"] !== "81") continue;
+            $Patch = $PatchNumber[$id];
 
             // code starts here
 
@@ -156,7 +160,7 @@ class Minions implements ParseInterface
             $LargeIcon = str_pad($Icon2, "6", "068", STR_PAD_LEFT);
 
             // ensure output directory exists
-            $IconoutputDirectory = $this->getOutputFolder() . "/$CurrentPatchOutput/MinionIcons";
+            $IconoutputDirectory = $this->getOutputFolder() . "/$PatchID/MinionIcons";
             // if it doesn't exist, make it
             if (!is_dir($IconoutputDirectory)) {
                 mkdir($IconoutputDirectory, 0777, true);
@@ -218,7 +222,7 @@ class Minions implements ParseInterface
         // save our data to the filename: GeMountWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save("$CurrentPatchOutput/Minions - ". $Patch .".txt", 9999999);
+        $info = $this->save("Minions.txt", 9999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],

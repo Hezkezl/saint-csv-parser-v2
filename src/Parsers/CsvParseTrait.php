@@ -31,12 +31,10 @@ trait CsvParseTrait
         // $cache = $this->projectDirectory . getenv('CACHE_DIRECTORY');
 
         //get the current patch long ID
-        $MainPath = "C:\Program Files (x86)\SquareEnix\FINAL FANTASY XIV - A Realm Reborn";
+        $ini = parse_ini_file('config.ini');
+        $MainPath = $ini['MainPath'];
         $PatchID = file_get_contents("". $MainPath ."\game\\ffxivgame.ver");
-        //$PatchID = "2020.10.21.0001.0000";//Icarus Path
-        //$cache = "E:\saint-csv-parser-v2-master\cache/$PatchID/rawexd";
-        //Hez Path
-        $cache = "F:\Rogue\SaintCoinach.Cmd/$PatchID/rawexd";
+        $cache = "{$ini['Cache']}/$PatchID/rawexd";
 
         //$cache = $this->projectDirectory . getenv('CACHE_DIRECTORY');
         $filename = "{$cache}/{$content}.csv";
@@ -683,11 +681,9 @@ trait CsvParseTrait
      */
     public function getInputFolder()
     {
-        $PatchID = file_get_contents("C:\Program Files (x86)\SquareEnix\FINAL FANTASY XIV - A Realm Reborn\game\\ffxivgame.ver");
-        //Icarus Path
-        //return "E:\Users\user\Documents\GitHub\SaintCoinach\SaintCoinach.Cmd\bin\Release/$PatchID/ui";
-        //Hez Path
-        return "F:\Rogue\SaintCoinach.Cmd/$PatchID/ui";
+        $ini = parse_ini_file('config.ini');
+        $PatchID = file_get_contents("{$ini['MainPath']}\game\\ffxivgame.ver");
+        return "{$ini['SaintPath']}/$PatchID/ui";
     }
 
     /**
@@ -712,6 +708,8 @@ trait CsvParseTrait
      */
     public function save($filename, $chunkSize = 200, $dataset = false)
     {
+        $ini = parse_ini_file('config.ini');
+        $PatchID = file_get_contents("{$ini['MainPath']}\game\\ffxivgame.ver");
         // create a chunk of data, if chunk size is 0/false we save the entire lot
         $dataset = $dataset ? $dataset : $this->data;
         $dataset = $chunkSize ? array_chunk($dataset, $chunkSize) : [ $dataset ];
@@ -722,7 +720,7 @@ trait CsvParseTrait
         $info = [];
         foreach ($dataset as $chunkCount => $data) {
             // build folder and filename
-            $saveto = "{$folder}/{$filename}";
+            $saveto = "{$folder}/{$PatchID}/{$filename}";
 
             // save chunked data
             file_put_contents($saveto, implode("\n", $data));

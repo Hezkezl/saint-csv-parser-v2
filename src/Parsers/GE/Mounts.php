@@ -43,11 +43,15 @@ class Mounts implements ParseInterface
 
         // (optional) start a progress bar
         $this->io->progressStart($ItemCsv->total);
+        
+        $this->PatchCheck($Patch, "Item", $ItemCsv);
+        $PatchNumber = $this->getPatch("Item");
 
         foreach ($ItemCsv->data as $id => $Item) {
             $this->io->progressAdvance();
 
             if ($ItemActionCsv->at($Item['ItemAction'])['Type'] !== "1322") continue;
+            $Patch = $PatchNumber[$id];
 
             // code starts here
             $RequiredItemName = $Item['Name'];
@@ -145,7 +149,7 @@ class Mounts implements ParseInterface
             $LargeIcon2 = str_pad($Icon2, "6", "077", STR_PAD_LEFT);
 
             // ensure output directory exists
-            $IconoutputDirectory = $this->getOutputFolder() . "/$CurrentPatchOutput/MountIcons";
+            $IconoutputDirectory = $this->getOutputFolder() . "/$PatchID/MountIcons";
             // if it doesn't exist, make it
             if (!is_dir($IconoutputDirectory)) {
                 mkdir($IconoutputDirectory, 0777, true);

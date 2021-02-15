@@ -20,7 +20,7 @@ class SmallIconConverter implements ParseInterface
         include(dirname(__DIR__) . '/Paths.php');
 
         // ensure output directory exists
-        $outputDirectory = $this->getOutputFolder() . "/$CurrentPatchOutput/40pxitemicons";
+        $outputDirectory = $this->getOutputFolder() . "/$PatchID/40pxitemicons";
         if (!is_dir($outputDirectory)) {
             mkdir($outputDirectory, 0777, true);
         }
