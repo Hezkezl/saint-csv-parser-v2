@@ -79,11 +79,12 @@ trait CsvParseTrait
         $this->projectDirectory = $projectDirectory;
         return $this;
     }
+
     /**
      * Generate Patch Json
      */
     public function PatchCheck($PatchNoData, $FileName, $CSV) {
-        if (!file_exists("Patch/$FileName.json")) { 
+        if (!file_exists("Patch/$FileName.json")) {
             $MakeFile = fopen("Patch/$FileName.json", 'w');
             fwrite($MakeFile, NULL);
             fclose($MakeFile);
@@ -106,6 +107,7 @@ trait CsvParseTrait
         fwrite($JSON_File, $JSONOUTPUT);
         fclose($JSON_File);
     }
+
     /**
      * Get Patch Data
      */
