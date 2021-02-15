@@ -108,6 +108,6 @@ class FishingSpot implements ParseInterface
 
         // save
         $this->io->text('Saving data ...');
-        $info = $this->save("$CurrentPatchOutput/FishingSpot - ". $Patch .".txt", 999999);
+        $info = $this->save("FishingSpot.txt", 999999);
     }
 }

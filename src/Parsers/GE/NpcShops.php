@@ -317,7 +317,7 @@ class NpcShops implements ParseInterface
         // save our data to the filename: GeMountWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save("$CurrentPatchOutput/NpcShops - ". $Patch .".txt", 9999999);
+        $info = $this->save("NpcShops.txt", 9999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],

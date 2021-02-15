@@ -76,6 +76,9 @@ class Leves implements ParseInterface
 
         // (optional) start a progress bar
         $this->io->progressStart($LeveCsv->total);
+        
+        $this->PatchCheck($Patch, "Leve", $LeveCsv);
+        $PatchNumber = $this->getPatch("Leve");
 
         // if I want to use pywikibot to create these pages, this should be true. Otherwise if I want to create pages
         // manually, set to false
@@ -90,6 +93,7 @@ class Leves implements ParseInterface
             if ((empty($Name)) || (preg_match("/[\x{30A0}-\x{30FF}\x{3040}-\x{309F}\x{4E00}-\x{9FBF}]+/u", $Name))) {
                 continue;
             }
+            $Patch = $PatchNumber[$id];
 
             //fordebug
             //$db = $leve['DataId'];
@@ -97,7 +101,6 @@ class Leves implements ParseInterface
             //fordebug
 
             //get the Patch and Issuing NPC from a separate file called LevemetePatch.csv which was custom made
-            $PatchFile = $LevemetePatchCsv->at($leve['Name'])['Patch'];
             $Npc = $LevemetePatchCsv->at($leve['Name'])['Levemete'];
 
             //Test to see wtf is going on with patch numbers
@@ -624,7 +627,7 @@ class Leves implements ParseInterface
             // Save some data
             $data = [
                 '{Top}' => $Top,
-                '{patch}' => $PatchFile,
+                '{patch}' => $Patch,
                 '{index}' => $leve['id'],
                 '{name}' => $leve['Name'],
                 '{level}' => $leve['ClassJobLevel'],
@@ -669,7 +672,7 @@ class Leves implements ParseInterface
         // save our data to the filename: GeLeveWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save("$CurrentPatchOutput/Leves - ". $Patch .".txt", 9999999);
+        $info = $this->save("Leves.txt", 9999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],

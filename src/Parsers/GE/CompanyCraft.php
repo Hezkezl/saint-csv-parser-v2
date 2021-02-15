@@ -189,7 +189,7 @@ class CompanyCraft implements ParseInterface
         // save our data to the filename: GeRecipeWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save("$CurrentPatchOutput/CompanyCraft - ". $Patch .".txt", 999999);
+        $info = $this->save("CompanyCraft.txt", 999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],

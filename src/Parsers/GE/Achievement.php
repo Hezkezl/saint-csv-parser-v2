@@ -51,10 +51,15 @@ class Achievement implements ParseInterface
 
         // (optional) start a progress bar
         $this->io->progressStart($AchievementCsv->total);
+        
+        $this->PatchCheck($Patch, "Achievement", $AchievementCsv);
+        $PatchNumber = $this->getPatch("Achievement");
 
         // loop through data
         foreach ($AchievementCsv->data as $id => $Achievement) {
             $this->io->progressAdvance();
+            if (empty($Achievement['Name'])) continue;
+            $Patch = $PatchNumber[$id];
 
             // if I want to use pywikibot to create these pages, this should be true. Otherwise if I want to create pages
             // manually, set to false
@@ -126,9 +131,9 @@ class Achievement implements ParseInterface
             //putting // in front of every line. ie:  */ commented out code here <line breaks etc/everything too> /*
 
             if (!empty($Achievement['Icon'])) {
-                if (!file_exists($this->getOutputFolder() ."/$CurrentPatchOutput/AchievementIcons/$icon.png")) {
+                if (!file_exists($this->getOutputFolder() ."/$PatchID/AchievementIcons/$icon.png")) {
                     // ensure output directory exists
-                    $IconOutputDirectory = $this->getOutputFolder() ."/$CurrentPatchOutput/AchievementIcons";
+                    $IconOutputDirectory = $this->getOutputFolder() ."/$PatchID/AchievementIcons";
                     if (!is_dir($IconOutputDirectory)) {
                         mkdir($IconOutputDirectory, 0777, true);
                     }
@@ -177,8 +182,7 @@ class Achievement implements ParseInterface
         // save our data to the filename: GeMountWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        //$info = $this->save('Achievement.txt', 20000);
-        $info = $this->save("$CurrentPatchOutput/Achievements - ". $Patch .".txt", 9999999);
+        $info = $this->save("Achievements.txt", 9999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],

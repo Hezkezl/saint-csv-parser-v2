@@ -58,11 +58,15 @@ class Actions implements ParseInterface
 
         // (optional) start a progress bar
         $this->io->progressStart($ActionCsv->total);
+        $this->PatchCheck($Patch, "Action", $ActionCsv);
+        $PatchNumber = $this->getPatch("Action");
 
         // loop through data
         foreach ($ActionCsv->data as $id => $Action) {
             $this->io->progressAdvance();
+            if (empty($Action['Name'])) continue;
             $index = $Action['id'];
+            $Patch = $PatchNumber[$id];
             //$Name = $Action['Name'];
 
             //commenting this code out. Will need to uncomment out the '{name}' code at bottom if $Name actually needs using
@@ -153,7 +157,7 @@ class Actions implements ParseInterface
         // save our data to the filename: GeRecipeWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save("$CurrentPatchOutput/Actions - ". $Patch .".txt", 999999999);
+        $info = $this->save("Actions.txt", 999999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],

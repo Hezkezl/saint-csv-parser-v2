@@ -44,7 +44,7 @@ class GENPCEquipment implements ParseInterface
         $NeedsFixArray = [];
 
         //color generator
-        $CMPfile= "cache/human.cmp";
+        $CMPfile= "Resources/human.cmp";
         $buffer = unpack("C*",file_get_contents($CMPfile));
         $buffer = array_chunk($buffer, 4);
         foreach ($buffer as $i => $rgba) {
@@ -1366,7 +1366,7 @@ BaseFaceCalc > ". $BaseFaceCalc ."
         // save our data to the filename: GeRecipeWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save("$CurrentPatchOutput/NPCEquipment - ". $Patch .".txt", 999999999);
+        $info = $this->save("NPCEquipment.txt", 999999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],

@@ -32,6 +32,9 @@ class MainCommandIcons implements ParseInterface
 
     // (optional) start a progress bar
         $this->io->progressStart($MainCommandCsv->total);
+        
+        $this->PatchCheck($Patch, "MainCommand", $MainCommandCsv);
+        $PatchNumber = $this->getPatch("MainCommand");
 
         // loop through data
         foreach ($MainCommandCsv->data as $id => $MainCommand) {
@@ -42,6 +45,7 @@ class MainCommandIcons implements ParseInterface
             if (empty($Icon)) {
                 continue;
             }
+            $Patch = $PatchNumber[$id];
 
             $Category = $MainCommandCategoryCsv->at($MainCommand['MainCommandCategory'])['Name'];
             $Name = $MainCommand['Name'];
@@ -65,7 +69,7 @@ class MainCommandIcons implements ParseInterface
         // save our data to the filename: GeRecipeWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ... map number');
-        $info = $this->save("$CurrentPatchOutput/MainCommandIcons - ". $Patch .".txt", 999999);
+        $info = $this->save("MainCommandIcons.txt", 999999);
         //$info = $this->save('pvp.html', 999999);
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],

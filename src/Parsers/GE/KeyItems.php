@@ -34,6 +34,9 @@ class KeyItems implements ParseInterface
 
         // (optional) start a progress bar
         $this->io->progressStart($EventItemCsv->total);
+        
+        $this->PatchCheck($Patch, "EventItem", $EventItemCsv);
+        $PatchNumber = $this->getPatch("EventItem");
 
         // loop through data
         foreach ($EventItemCsv->data as $id => $eventitem) {
@@ -43,6 +46,7 @@ class KeyItems implements ParseInterface
             if (empty($eventitem['Name']) || (empty($eventitem['Quest']))) {
                 continue;
             }
+            $Patch = $PatchNumber[$id];
 
             // set Quest name to the $quest variable
             $quest = strip_tags($QuestCsv->at($eventitem['Quest'])['Name']);
@@ -54,7 +58,7 @@ class KeyItems implements ParseInterface
                 $icon = "\n|Icon = 0". $iconstart ."000/0". ($eventitem['Icon']) .".png";
 
                 // ensure output directory exists
-                $EventIconoutputDirectory = $this->getOutputFolder() . "/$CurrentPatchOutput/KeyItemIcons";
+                $EventIconoutputDirectory = $this->getOutputFolder() . "/$PatchID/KeyItemIcons";
                 if (!is_dir($EventIconoutputDirectory)) {
                     mkdir($EventIconoutputDirectory, 0777, true);
                 }
@@ -109,7 +113,7 @@ class KeyItems implements ParseInterface
         // save our data to the filename: GeEventItemWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save("$CurrentPatchOutput/KeyItems - ". $Patch .".txt", 999999);
+        $info = $this->save("KeyItems.txt", 999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],
