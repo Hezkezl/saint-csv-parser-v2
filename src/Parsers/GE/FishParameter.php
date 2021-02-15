@@ -99,7 +99,7 @@ class FishParameter implements ParseInterface
             $DrawingIcon = str_pad($Drawing, "6", "078", STR_PAD_LEFT);
 
             // ensure output directory exists
-            $IconOutputDirectory = $this->getOutputFolder() . "/$CurrentPatchOutput/CavemanFishingIcons/Fishing";
+            $IconOutputDirectory = $this->getOutputFolder() . "/$PatchID/CavemanFishingIcons/Fishing";
             // if it doesn't exist, make it
             if (!is_dir($IconOutputDirectory)) {
                 mkdir($IconOutputDirectory, 0777, true);
@@ -135,6 +135,6 @@ class FishParameter implements ParseInterface
 
         // save
         $this->io->text('Saving data ...');
-        $info = $this->save("$CurrentPatchOutput/FishParameter - ". $Patch .".txt", 999999);
+        $info = $this->save("FishParameter.txt", 999999);
     }
 }

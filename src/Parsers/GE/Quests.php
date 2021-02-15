@@ -79,6 +79,9 @@ class Quests implements ParseInterface
         $paramGrowCsv = $this->csv("ParamGrow");
 
         $this->io->progressStart($questCsv->total);
+        
+        $this->PatchCheck($Patch, "Quest", $questCsv);
+        $PatchNumber = $this->getPatch("Quest");
 
         //loop through quest data
         $replacestring = [];
@@ -90,6 +93,7 @@ class Quests implements ParseInterface
             if (empty($quest['Name']) || $quest['Name'] === "Testdfghjkl;") {
                 continue;
             }
+            $Patch = $PatchNumber[$id];
 
             //---------------------------------------------------------------------------------
             //Actual code definition begins below!
@@ -531,9 +535,9 @@ class Quests implements ParseInterface
 
 
                 if (!empty($quest['Icon'])) {
-                    if (!file_exists($this->getOutputFolder() ."/$CurrentPatchOutput/QuestHeaderIcons/{$quest['Icon']}.png")) {
+                    if (!file_exists($this->getOutputFolder() ."/$PatchID/QuestHeaderIcons/{$quest['Icon']}.png")) {
                         // ensure output directory exists
-                        $QuestIconOutputDirectory = $this->getOutputFolder() ."/$CurrentPatchOutput/QuestHeaderIcons";
+                        $QuestIconOutputDirectory = $this->getOutputFolder() ."/$PatchID/QuestHeaderIcons";
                         if (!is_dir($QuestIconOutputDirectory)) {
                             mkdir($QuestIconOutputDirectory, 0777, true);
                         }
@@ -623,7 +627,7 @@ class Quests implements ParseInterface
         // save our data to the filename: GeQuestWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save("$CurrentPatchOutput/Quests - ". $Patch .".txt", 9999999);
+        $info = $this->save("Quests.txt", 9999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],

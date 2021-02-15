@@ -94,7 +94,7 @@ class Spearfish implements ParseInterface
             $DrawingIcon = str_pad($Drawing, "6", "078", STR_PAD_LEFT);
 
             // ensure output directory exists
-            $IconOutputDirectory = $this->getOutputFolder() . "/$CurrentPatchOutput/CavemanFishingIcons/Spearfishing";
+            $IconOutputDirectory = $this->getOutputFolder() . "/$PatchID/CavemanFishingIcons/Spearfishing";
             // if it doesn't exist, make it
             if (!is_dir($IconOutputDirectory)) {
                 mkdir($IconOutputDirectory, 0777, true);
@@ -129,6 +129,6 @@ class Spearfish implements ParseInterface
 
         // save
         $this->io->text('Saving data ...');
-        $info = $this->save("$CurrentPatchOutput/Spearfish - ". $Patch .".txt", 999999);
+        $info = $this->save("Spearfish.txt", 999999);
     }
 }

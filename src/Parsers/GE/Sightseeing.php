@@ -53,6 +53,9 @@ class Sightseeing implements ParseInterface
 
         // (optional) start a progress bar
         $this->io->progressStart($AdventureCsv->total);
+        
+        $this->PatchCheck($Patch, "Adventure", $AdventureCsv);
+        $PatchNumber = $this->getPatch("Adventure");
 
         // loop through data
         foreach ($AdventureCsv->data as $id => $item) {
@@ -60,6 +63,8 @@ class Sightseeing implements ParseInterface
 
             $name = preg_replace("/\<Emphasis>|<\/Emphasis>/", null, $item['Name']);
             $emote = $EmoteCsv->at($item['Emote'])['Name'];
+            if (empty($name)) continue;
+            $Patch = $PatchNumber[$id];
 
             // SS log number code. Needs these calculations to properly show 001, 002, 015, etc
             // $expansionshort is used to show the abbreviation of the expansion name (HW, SB, SHB) for the image name
@@ -109,8 +114,8 @@ class Sightseeing implements ParseInterface
 
             // icon copying code
             // ensure output directory exists
-            $smallIconOutputDirectory = $this->getOutputFolder() ."/$CurrentPatchOutput/SightseeingLogIcons/small";
-            $largeIconOutputDirectory = $this->getOutputFolder() ."/$CurrentPatchOutput/SightseeingLogIcons/large";
+            $smallIconOutputDirectory = $this->getOutputFolder() ."/$PatchID/SightseeingLogIcons/small";
+            $largeIconOutputDirectory = $this->getOutputFolder() ."/$PatchID/SightseeingLogIcons/large";
             if (!is_dir($smallIconOutputDirectory)) {
                 mkdir($smallIconOutputDirectory, 0777, true);
             }
@@ -153,6 +158,6 @@ class Sightseeing implements ParseInterface
 
         // save
         $this->io->text('Saving data ...');
-        $this->save("$CurrentPatchOutput/SightseeingLogs - ". $Patch .".txt", 999999);
+        $this->save("SightseeingLogs.txt", 999999);
     }
 }

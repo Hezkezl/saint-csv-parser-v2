@@ -182,7 +182,7 @@ class Satisfaction implements ParseInterface
         // save our data to the filename: GeSatisfactionWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save("$CurrentPatchOutput/SatisfactionNPC - ". $Patch .".txt", 999999);
+        $info = $this->save("SatisfactionNPC.txt", 999999);
 
         $this->io->table(
             ['Filename', 'Data Count', 'File Size'],

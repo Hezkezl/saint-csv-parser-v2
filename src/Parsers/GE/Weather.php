@@ -39,9 +39,9 @@ class Weather implements ParseInterface
             // icon copying code
             $weatherNames[] = $Name;
             if (!empty($Weather['Icon'])) {
-                if (!file_exists($this->getOutputFolder() ."/$CurrentPatchOutput/WeatherIcons/{$Name} icon.png")) {
+                if (!file_exists($this->getOutputFolder() ."/$PatchID/WeatherIcons/{$Name} icon.png")) {
                     // ensure output directory exists
-                    $IconOutputDirectory = $this->getOutputFolder() ."/$CurrentPatchOutput/WeatherIcons";
+                    $IconOutputDirectory = $this->getOutputFolder() ."/$PatchID/WeatherIcons";
                     if (!is_dir($IconOutputDirectory)) {
                         mkdir($IconOutputDirectory, 0777, true);
                     }
@@ -69,7 +69,7 @@ class Weather implements ParseInterface
         // save our data to the filename: GeMountWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save("$CurrentPatchOutput/Weather - ". $Patch .".txt", 9999999);
+        $info = $this->save("Weather.txt", 9999999);
 
         $this->io->table(
             [ 'Filename', 'Data Count', 'File Size' ],

@@ -108,7 +108,7 @@ class Collectable implements ParseInterface
         // save our data to the filename: GeCollectWiki.txt
         $this->io->progressFinish();
         $this->io->text('Saving ...');
-        $info = $this->save("$CurrentPatchOutput/Collectables - ". $Patch .".txt", 9999999);
+        $info = $this->save("Collectables.txt", 9999999);
 
         $this->io->table(
             ['Filename', 'Data Count', 'File Size'],
@@ -198,7 +198,7 @@ class Collectable implements ParseInterface
         // save our data to the filename: GeCollectWiki.txt
         $console->overwrite(" > Completed HWDCrafter ID: {$id}");
         $this->io->text('Saving ...');
-        $info = $this->save("$CurrentPatchOutput/HWDCollectables - ". $Patch .".txt", 9999999);
+        $info = $this->save("HWDCollectables.txt", 9999999);
 
         $this->io->table(
             ['Filename', 'Data Count', 'File Size'],

@@ -223,6 +223,6 @@ class SpecialShop implements ParseInterface
 
         // save
         $console->writeln(" Saving... ");
-        $info = $this->save("$CurrentPatchOutput/SpecialShops - ". $Patch .".txt", 999999);
+        $info = $this->save("SpecialShops.txt", 999999);
     }
 }
