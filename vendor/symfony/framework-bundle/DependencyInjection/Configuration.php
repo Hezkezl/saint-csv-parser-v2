@@ -306,7 +306,7 @@ class Configuration implements ConfigurationInterface
                                                 ->validate()
                                                     ->ifTrue(function ($v) { return 'method' !== $v; })
                                                     ->then(function ($v) {
-                                                        @trigger_error('Passing something else than "method" has been deprecated in Symfony 4.3.', E_USER_DEPRECATED);
+                                                        @trigger_error('Passing something else than "method" has been deprecated in Symfony 4.3.', \E_USER_DEPRECATED);
 
                                                         return $v;
                                                     })
@@ -496,7 +496,7 @@ class Configuration implements ConfigurationInterface
                                         return 'workflow' === $v['type'] && 'single_state' === ($v['marking_store']['type'] ?? false);
                                     })
                                     ->then(function ($v) {
-                                        @trigger_error('Using a workflow with type=workflow and a marking_store=single_state is deprecated since Symfony 4.3. Use type=state_machine instead.', E_USER_DEPRECATED);
+                                        @trigger_error('Using a workflow with type=workflow and a marking_store=single_state is deprecated since Symfony 4.3. Use type=state_machine instead.', \E_USER_DEPRECATED);
 
                                         return $v;
                                     })
@@ -812,7 +812,7 @@ class Configuration implements ConfigurationInterface
                     ->beforeNormalization()
                         ->ifTrue(function ($v) { return isset($v['strict_email']); })
                         ->then(function ($v) {
-                            @trigger_error('The "framework.validation.strict_email" configuration key has been deprecated in Symfony 4.1. Use the "framework.validation.email_validation_mode" configuration key instead.', E_USER_DEPRECATED);
+                            @trigger_error('The "framework.validation.strict_email" configuration key has been deprecated in Symfony 4.1. Use the "framework.validation.email_validation_mode" configuration key instead.', \E_USER_DEPRECATED);
 
                             return $v;
                         })
@@ -1122,6 +1122,8 @@ class Configuration implements ConfigurationInterface
                     ->fixXmlConfig('resource')
                     ->children()
                         ->arrayNode('resources')
+                            ->normalizeKeys(false)
+                            ->useAttributeAsKey('name')
                             ->requiresAtLeastOneElement()
                             ->defaultValue(['default' => [class_exists(SemaphoreStore::class) && SemaphoreStore::isSupported() ? 'semaphore' : 'flock']])
                             ->beforeNormalization()
@@ -1144,6 +1146,7 @@ class Configuration implements ConfigurationInterface
                                 })
                             ->end()
                             ->prototype('array')
+                                ->performNoDeepMerging()
                                 ->beforeNormalization()->ifString()->then(function ($v) { return [$v]; })->end()
                                 ->prototype('scalar')->end()
                             ->end()
@@ -1325,7 +1328,7 @@ class Configuration implements ConfigurationInterface
                                                         return $middleware;
                                                     }
                                                     if (1 < \count($middleware)) {
-                                                        throw new \InvalidArgumentException(sprintf('Invalid middleware at path "framework.messenger": a map with a single factory id as key and its arguments as value was expected, %s given.', json_encode($middleware)));
+                                                        throw new \InvalidArgumentException('Invalid middleware at path "framework.messenger": a map with a single factory id as key and its arguments as value was expected, '.json_encode($middleware).' given.');
                                                     }
 
                                                     return [
@@ -1402,7 +1405,7 @@ class Configuration implements ConfigurationInterface
                                             if (!\is_array($config)) {
                                                 return [];
                                             }
-                                            if (!isset($config['host'])) {
+                                            if (!isset($config['host'], $config['value']) || \count($config) > 2) {
                                                 return $config;
                                             }
 
@@ -1482,7 +1485,7 @@ class Configuration implements ConfigurationInterface
                                     ->thenInvalid('Either "scope" or "base_uri" should be defined.')
                                 ->end()
                                 ->validate()
-                                    ->ifTrue(function ($v) { return isset($v['query']) && !isset($v['base_uri']); })
+                                    ->ifTrue(function ($v) { return !empty($v['query']) && !isset($v['base_uri']); })
                                     ->thenInvalid('"query" applies to "base_uri" but no base URI is defined.')
                                 ->end()
                                 ->children()
@@ -1511,7 +1514,7 @@ class Configuration implements ConfigurationInterface
                                                 if (!\is_array($config)) {
                                                     return [];
                                                 }
-                                                if (!isset($config['key'])) {
+                                                if (!isset($config['key'], $config['value']) || \count($config) > 2) {
                                                     return $config;
                                                 }
 
@@ -1541,7 +1544,7 @@ class Configuration implements ConfigurationInterface
                                                 if (!\is_array($config)) {
                                                     return [];
                                                 }
-                                                if (!isset($config['host'])) {
+                                                if (!isset($config['host'], $config['value']) || \count($config) > 2) {
                                                     return $config;
                                                 }
 

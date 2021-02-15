@@ -2,6 +2,67 @@
 
 All Notable changes to `Csv` will be documented in this file
 
+## 9.6.2 - 2020-12-10
+
+### Added 
+
+- Using Github actions as development tools.
+
+### Deprecated
+
+- None
+
+### Fixed
+
+- Adding official support for PHP8 [#405](https://github.com/thephpleague/csv/pull/405) and [#406](https://github.com/thephpleague/csv/pull/406) by [Ion Bazan](https://github.com/IonBazan)
+
+### Removed
+
+- Removing Travis and Scrutinizr as development tools
+
+## 9.6.1 - 2020-09-05
+
+### Added 
+
+- None
+
+### Deprecated
+
+- None
+
+### Fixed
+
+- BOM sequence processing fix [#394](https://github.com/thephpleague/csv/issues/394)
+
+### Removed
+
+- None
+
+## 9.6.0 - 2020-03-17
+
+### Added
+
+- More return types and type parameters as supported in PHP7.2+
+- `League\Csv\Statement::create` named constructor to ease constraint builder instantiation
+- `League\Csv\Statement` can now also process `League\Csv\ResultSet` instances.
+- `League\Csv\TabularDataReader` interface to represent how to read tabular data
+- `League\Csv\ResultSet::getRecords` has an optional `$header` second argument to make the method works like `League\Csv\Reader::getRecords` 
+- `League\Csv\ResultSet::createFromTabularDataReader` create a new instance from `League\Csv\TabularDataReader` implementing class.
+
+### Deprecated
+
+- Nothing
+
+### Fixed
+
+- `League\Csv\Reader` no longer uses `__call` to implement `fetchOne`, `fetchPairs` and `fetchColumn` methods.
+
+### Removed
+
+- Internal polyfill for `is_iterable`
+- Internal polyfill for `is_nullable_int`
+- Support for PHP7.0 and PHP7.1
+
 ## 9.5.0 - 2019-12-15
 
 ### Added
