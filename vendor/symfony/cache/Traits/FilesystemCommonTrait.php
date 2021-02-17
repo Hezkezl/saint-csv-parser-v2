@@ -44,7 +44,7 @@ trait FilesystemCommonTrait
         $directory .= \DIRECTORY_SEPARATOR;
         // On Windows the whole path is limited to 258 chars
         if ('\\' === \DIRECTORY_SEPARATOR && \strlen($directory) > 234) {
-            throw new InvalidArgumentException(sprintf('Cache directory too long (%s)', $directory));
+            throw new InvalidArgumentException(sprintf('Cache directory too long (%s).', $directory));
         }
 
         $this->directory = $directory;
@@ -93,9 +93,20 @@ trait FilesystemCommonTrait
         set_error_handler(__CLASS__.'::throwError');
         try {
             if (null === $this->tmp) {
-                $this->tmp = $this->directory.uniqid('', true);
+                $this->tmp = $this->directory.bin2hex(random_bytes(6));
             }
-            file_put_contents($this->tmp, $data);
+            try {
+                $h = fopen($this->tmp, 'x');
+            } catch (\ErrorException $e) {
+                if (false === strpos($e->getMessage(), 'File exists')) {
+                    throw $e;
+                }
+
+                $this->tmp = $this->directory.bin2hex(random_bytes(6));
+                $h = fopen($this->tmp, 'x');
+            }
+            fwrite($h, $data);
+            fclose($h);
 
             if (null !== $expiresAt) {
                 touch($this->tmp, $expiresAt);
@@ -143,7 +154,7 @@ trait FilesystemCommonTrait
                     continue;
                 }
 
-                foreach (@scandir($dir, SCANDIR_SORT_NONE) ?: [] as $file) {
+                foreach (@scandir($dir, \SCANDIR_SORT_NONE) ?: [] as $file) {
                     if ('.' !== $file && '..' !== $file) {
                         yield $dir.\DIRECTORY_SEPARATOR.$file;
                     }
