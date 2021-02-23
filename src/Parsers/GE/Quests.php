@@ -71,18 +71,30 @@ class Quests implements ParseInterface
         $TraitCsv = $this->csv("Trait");
         $EventIconTypeCsv = $this->csv("EventIconType");
         $KeyItemCsv = $this->csv("EventItem");
-        /* unused files
-        $InstanceContentCsv = $this->csv("InstanceContent");
-        */
+        $ContentFinderConditionCsv = $this->csv("ContentFinderCondition");
         $LevelCsv = $this->csv("Level");
         $MapCsv = $this->csv("Map");
         $paramGrowCsv = $this->csv("ParamGrow");
+        $EObjNameCsv = $this->csv("EObjName");
 
         $this->io->progressStart($questCsv->total);
         
         $this->PatchCheck($Patch, "Quest", $questCsv);
         $PatchNumber = $this->getPatch("Quest");
 
+        //sort instance content out
+        $ContentArray = [];
+        foreach($ContentFinderConditionCsv->data as $id => $Content) {
+            $Name = $Content['Name'];
+            if (empty($Name)) {
+                $Name = "No Name";
+            }
+            $ContentLinkType = $Content['ContentLinkType'];
+            $ContentLink = $Content['Content'];
+            if ($ContentLinkType = 1) {
+                $ContentArray[$ContentLink] = $Name;
+            }
+        }
         //loop through quest data
         $replacestring = [];
         foreach($questCsv->data as $id => $quest) {
@@ -258,10 +270,12 @@ class Quests implements ParseInterface
             $instanceunlock = false;
             /* If you unlock a Dungeon during this quest, show the Name.
             commenting out because of the Patch 5.2 change to InstanceContent and the removal of 'Name'
-            if ($quest['InstanceContent{Unlock}']) {
-                $instanceunlock = "\n|Misc Reward = [[". $InstanceContentCsv->at($quest['InstanceContent{Unlock}'])['Name'] ."]] unlocked.";
-            }
             */
+            if (!empty($ContentArray[$quest['InstanceContent{Unlock}']])){
+                if ($quest['InstanceContent{Unlock}']) {
+                    $instanceunlock = "\n|Misc Reward = [[". ucfirst($ContentArray[$quest['InstanceContent{Unlock}']])."]] unlocked.";
+                }
+            }
 
             //Need to add the ClassJobLevel[0] value to the LevelOffset value to get the actual level of the quest
             $QuestLevel = ($quest['ClassJobLevel[0]'] + $quest['QuestLevelOffset']);
@@ -354,10 +368,19 @@ class Quests implements ParseInterface
             $prevquest3 = str_replace(",", "&#44;", ($questCsv->at($quest['PreviousQuest[2]'])['Name']));
 
             /* Show the names of Required Dungeons to Unlock this quest.
-            Commented out as of Patch 5.2 with the InstanceContent name removal
-            $InstanceContent1 = $InstanceContentCsv->at($quest['InstanceContent[0]'])['Name'];
-            $InstanceContent2 = $InstanceContentCsv->at($quest['InstanceContent[1]'])['Name'];
-            $InstanceContent3 = $InstanceContentCsv->at($quest['InstanceContent[2]'])['Name']; */
+            Commented out as of Patch 5.2 with the InstanceContent name removal */
+            $InstanceContent1 = "";
+            $InstanceContent2 = "";
+            $InstanceContent3 = "";
+            if (!empty($ContentArray[$quest['InstanceContent[0]']])){
+                $InstanceContent1 = $ContentArray[$quest['InstanceContent[0]']];
+            }
+            if (!empty($ContentArray[$quest['InstanceContent[1]']])){
+                $InstanceContent2 = $ContentArray[$quest['InstanceContent[1]']];
+            }
+            if (!empty($ContentArray[$quest['InstanceContent[2]']])){
+                $InstanceContent3 = $ContentArray[$quest['InstanceContent[2]']];
+            }
 
             //Array of names that should not be capitalized
             $IncorrectNames = array(" De ", " Bas ", " Mal ", " Van ", " Cen ", " Sas ", " Tol ", " Zos ", " Yae ", " The ", " Of The ", " Of ",
@@ -376,7 +399,18 @@ class Quests implements ParseInterface
                 "Vroi-Reeq", "Zao-Mosc", "Zia-Bostt", "Zoi-Chorr", "Zumie-Moa", "Zumie-Shai");
 
             //Quest Giver Name (All Words In Name Capitalized)
-            $questgiver = str_replace($IncorrectNames, $correctnames, ucwords(strtolower($ENpcResidentCsv->at($quest['Issuer{Start}'])['Singular'])));
+            switch (true) {
+                case ($quest['Issuer{Start}'] < 2000000):
+                    $questgiver = str_replace($IncorrectNames, $correctnames, ucwords(strtolower($ENpcResidentCsv->at($quest['Issuer{Start}'])['Singular'])))." (Object)";
+                break;
+                case ($quest['Issuer{Start}'] > 2000000):
+                    $questgiver = str_replace($IncorrectNames, $correctnames, ucwords(strtolower($EObjNameCsv->at($quest['Issuer{Start}'])['Singular'])));
+                break;
+                
+                default:
+                $questgiver = str_replace($IncorrectNames, $correctnames, ucwords(strtolower($ENpcResidentCsv->at($quest['Issuer{Start}'])['Singular'])));
+                break;
+            }
 
             //Start Quest Objectives / Journal Entry / Dialogue code
             //Declare variables as false so php program stops giving warnings that they weren't defined
@@ -610,10 +644,10 @@ class Quests implements ParseInterface
                     str_replace($IncorrectNames, $correctnames, ucwords(strtolower($ENpcResidentCsv->at($quest["Target{End}"])['Singular']))) ."|ID=".
                     $quest["Target{End}"] ."|Quest=". $quest['Name'] ."|Questend=True}}\n" : "",
                 '{Locks}' => $SpecialChar,
-                /* unused / old code
                 '{instancecontent1}' => $InstanceContent1 ? "\n|Dungeon Requirement = ". $InstanceContent1 : "",
                 '{instancecontent2}' => $InstanceContent2 ? ", ". $InstanceContent2 : "",
                 '{instancecontent3}' => $InstanceContent3 ? ", ". $InstanceContent3 : "",
+                /* unused / old code
                 '{script}' => $questscripts,
                 '{npclocation}' => $NpcLocation,
                 */
