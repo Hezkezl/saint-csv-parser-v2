@@ -20,7 +20,9 @@ class NPCARRAYTEST implements ParseInterface
     {TripleTriad}
     {MapOutput}
     {ShopOutput}
-    {ShopDialogue}';
+    {ShopDialogue}
+    {WarpPages}
+    {DialoguePages}';
 
     public function parse()
     {
@@ -92,6 +94,7 @@ class NPCARRAYTEST implements ParseInterface
         $NpcMainPage = [];
         $this->PatchCheck($Patch, "ENpcResident", $ENpcResidentCsv);
         $PatchNumber = $this->getPatch("ENpcResident");
+        $NpcPatchArray = [];
         
         $PlaceNameLocation = ""; //TEMP
 
@@ -103,6 +106,9 @@ class NPCARRAYTEST implements ParseInterface
             $Name = $NPCs['Singular'];
             if (empty($Name)) continue;
             $NpcNameArray[$Name][] = $id;
+            if (empty($NpcPatchArray[$Name])) {
+                $NpcPatchArray[$Name] = $PatchNumber[$id];
+            }
         }
         $this->io->progressFinish();
         $NPCIds = [];
@@ -253,6 +259,45 @@ class NPCARRAYTEST implements ParseInterface
                     break;
                     case ($DataValue > 131000) && ($DataValue < 139999): //WARP
                         $WarpCheck[] = $DataValue.",";
+                        $DefaultTalkAccept = $this->getDefaultTalk($DefaultTalkCsv, $WarpCsv, $DataValue ,'ConditionSuccessEvent', '| Success Talk =');
+                        $DefaultTalkFail = $this->getDefaultTalk($DefaultTalkCsv, $WarpCsv, $DataValue ,'ConditionFailEvent', '| Fail Talk =');
+                        $DefaultTalkConfirm = $this->getDefaultTalk($DefaultTalkCsv, $WarpCsv, $DataValue ,'ConfirmEvent', '| Unavailable Talk =');
+                        $WarpOption = $WarpCsv->at($DataValue)['Name'];
+                        $WarpTargetLocation = $PlaceNameCsv->at($TerritoryTypeCsv->at($WarpCsv->at($DataValue)['TerritoryType'])['PlaceName'])['Name'];
+                        if (empty($WarpOption)) {
+                            $WarpOption = "Teleports to $WarpTargetLocation";
+                        }
+                        $WarpConfirm = $WarpCsv->at($DataValue)['Question'];
+                        //condition
+                        $Condition = $WarpCsv->at($DataValue)['WarpCondition'];
+                        $WarpCost = $WarpConditionCsv->at($Condition)['Gil'];
+                        $RequiredQuestArray = [];
+                        foreach(range(1,4) as $b) {
+                            switch ($b) {
+                                case 1:
+                                case 2:
+                                case 4:
+                                    $QuestText = "RequiredQuest{". $b ."}";
+                                break;
+                                case 3:
+                                    $QuestText = "DRequiredQuest{". $b ."}";
+                                break;
+                            }
+                            if (empty($QuestCsv->at($WarpConditionCsv->at($Condition)[$QuestText])['Name'])) continue;
+                            $RequiredQuestArray[] = $QuestCsv->at($WarpConditionCsv->at($Condition)[$QuestText])['Name'];
+                        }
+                        $RequiredQuests = implode(",", $RequiredQuestArray);
+                        $RequiredLevel = $WarpConditionCsv->at($Condition)['Class{Level}'];
+                        $WarpString = "{{-start-}}\n'''". $NameFormatted ."/Warp/$DataValue'''\n";
+                        $WarpString .= "{{WarpTemplate\n";
+                        $WarpString .= "| Option = $WarpOption\n";
+                        $WarpString .= "| Confirm = $WarpConfirm\n";
+                        $WarpString .= "| RequiredQuests = $RequiredQuests\n";
+                        $WarpString .= "| RequiredLevel = $RequiredLevel\n";
+                        $WarpString .= "| Cost = $WarpCost\n";
+                        $WarpString .= "". $DefaultTalkAccept ."". $DefaultTalkFail ."". $DefaultTalkConfirm ."\n";
+                        $WarpString .= "}}\n\n";
+                        $WarpPagesArray[] = $WarpString;
                     break;
                     case ($DataValue > 262100) && ($DataValue < 269999): //GILSHOP
                         $ShopCheck[] = $DataValue.",";
@@ -264,6 +309,22 @@ class NPCARRAYTEST implements ParseInterface
                     break;
                     case ($DataValue > 393000) && ($DataValue < 399999): //GUILDLEVEASSIGNMENT
                         $DialogueCheck[] = $DataValue.",";
+                        $GuildLeveTalkArray = [];
+                        $GuildLeveTalkType = $GuildLeveAssignmentCsv->at($DataValue)['unknown_1'];
+                        foreach(range(31,38) as $a) {
+                            if ($GuildLeveAssignmentTalkCsv->at($GuildLeveAssignmentCsv->at($DataValue)['AssignmentTalk'])["unknown_$a"] != 0){
+                                $GuildLeveTalkString = "{{Dialoguebox3|Intro=$GuildLeveTalkType|Dialogue=\n";
+                                $GuildLeveTalkString .= $GuildLeveAssignmentTalkCsv->at($GuildLeveAssignmentCsv->at($DataValue)['AssignmentTalk'])["unknown_$a"];
+                                $GuildLeveTalkString .= "}}";
+                                $GuildLeveTalkArray[] = $GuildLeveTalkString;
+                            }
+                        }
+                        $GuildLeveTalkImpoloded = implode("\n", $GuildLeveTalkArray);
+                        $DialogueString = "{{-start-}}\n";
+                        $DialogueString .= "'''$NameFormatted/Dialogue'''";
+                        $DialogueString .= "$GuildLeveTalkImpoloded\n";
+                        $DialogueString .= "{{-stop-}}\n";
+                        $DialogueArray[] = $DialogueString;
                     break;
                     case ($DataValue > 589000) && ($DataValue < 599999)://DEFAULTTALK
                         $DialogueCheck[] = $DataValue.",";
@@ -538,6 +599,8 @@ class NPCARRAYTEST implements ParseInterface
         $TripleTriadOut = implode("\n", $GetTripleTriadArray);
         $ShopOut = implode("\n", $ShopOutputArray);
         $ShopDialogueOut = implode("", $ShopDialogueArray);
+        $WarpPages = implode("", $WarpPagesArray);
+        $DialoguePages = implode("", $DialogueArray);
 
         //mainpage constructor
         $this->io->text('Building NPC Final Outputs ...');
@@ -652,8 +715,7 @@ class NPCARRAYTEST implements ParseInterface
             $dataout = implode("\n", $datarray);
             $LastMapLocExp = explode(",",$NPCIds[$Name]);
             $LastMapLoc = end($LastMapLocExp);
-            $Patch = $PatchNumber[$id];
-            $console->overwrite(" > Completed NPC: {$Name} --> }");
+            $Patch = $NpcPatchArray[$Name];
             $Npcarray2[$Name][0] = "{{-start-}}
             {{Infobox NPC
             | Patch = $Patch
@@ -695,6 +757,8 @@ class NPCARRAYTEST implements ParseInterface
             '{MapOutput}' => $MapOutput,
             '{ShopOutput}' => $ShopOut,
             '{ShopDialogue}' => $ShopDialogueOut,
+            '{WarpPages}' => $WarpPages,
+            '{DialoguePages}' => $DialoguePages,
         ];
 
         // format using Gamer Escape formatter and add to data array
