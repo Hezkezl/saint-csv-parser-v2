@@ -126,9 +126,7 @@ class Satisfaction implements ParseInterface
                             break;
                     }
                     
-                    $OutputString = "{{-start-}}\n";
-                    $OutputString .= "'''$Name/Collectable'''\n";
-                    $OutputString .= "{{Custom Delivery\n";
+                    $OutputString = "{{Custom Delivery\n";
                     $OutputString .= "|Name = $Name\n";
                     $OutputString .= "|NPC = $Npc\n";
                     $OutputString .= "|Location = $location\n";
@@ -152,11 +150,13 @@ class Satisfaction implements ParseInterface
                     $OutputString .= "|White Mid = $whitemid\n";
                     $OutputString .= "|White High = $whitehigh\n";
                     $OutputString .= "}}\n";
-                    $OutputString .= "{{-stop-}}\n";
-                    $Array[] = $OutputString;
+                    $Array[$Name][] = $OutputString;
                 }
 
             }
+        }
+        foreach ($Array as $key => $value) {
+            $Array[$key] = "{{-start-}}\n'''$key/Collectable'''\n".implode($value)."\n{{-stop-}}";
         }
         $Output = implode("\n", $Array);
         $this->io->progressFinish();
