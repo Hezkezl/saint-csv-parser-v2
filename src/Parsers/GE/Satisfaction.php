@@ -130,7 +130,7 @@ class Satisfaction implements ParseInterface
                     $OutputString .= "|Name = $Name\n";
                     $OutputString .= "|NPC = $Npc\n";
                     $OutputString .= "|Location = $location\n";
-                    $OutputString .= "|Level = ". floor($SubDataValue) ."\n";
+                    $OutputString .= "|Level = $a\n";
                     $OutputString .= "|Chance = $chance\n";
                     $OutputString .= "|Collectability Low = $collectlow\n";
                     $OutputString .= "|Collectability Mid = $collectmid\n";
