@@ -49,13 +49,12 @@ class Satisfaction implements ParseInterface
         $this->io->text('Generating Satisfaction NPCs ...');
         foreach ($SatisfactionNpcCsv->data as $id => $supplynpc) {
             // ---------------------------------------------------------
+
             $this->io->progressAdvance();
 
             //---------------------------------------------------------------------------------
             // Actual code definition begins below!
             //---------------------------------------------------------------------------------
-
-            $Satisfaction = false;
 
             // skip ones without a name
             $Npc = $ENpcResidentCsv->at($supplynpc['Npc'])['Singular'];
@@ -70,12 +69,12 @@ class Satisfaction implements ParseInterface
                     if(empty($LGBArray[$NpcId]['Location'])){
                         $location = "Blank";
                     }
+
                     $location = $LGBArray[$NpcId]['Location'];
                     $chance = $SatisfactionSupplyCsv->at($SubDataValue)["Probability<%>"];
                     $collectlow = $SatisfactionSupplyCsv->at($SubDataValue)["Collectability{Low}"];
                     $collectmid = $SatisfactionSupplyCsv->at($SubDataValue)["Collectability{Mid}"];
                     $collecthigh = $SatisfactionSupplyCsv->at($SubDataValue)["Collectability{High}"];
-                    //$reward = $SatisfactionSupplyRewardCsv->at($SatisfactionSupplyCsv->at($SubDataValue)["Reward"]);
                     $satisfylow = $SatisfactionSupplyRewardCsv->at($SatisfactionSupplyCsv->at($SubDataValue)["Reward"])["Satisfaction{Low}"];
                     $satisfymid = $SatisfactionSupplyRewardCsv->at($SatisfactionSupplyCsv->at($SubDataValue)["Reward"])["Satisfaction{Mid}"];
                     $satisfyhigh = $SatisfactionSupplyRewardCsv->at($SatisfactionSupplyCsv->at($SubDataValue)["Reward"])["Satisfaction{High}"];
@@ -108,6 +107,7 @@ class Satisfaction implements ParseInterface
                             $yellowtype = false;
                             break;
                     }
+
                     switch ($whitetypenumber) {
                         case 2:
                             $whitetype = "Yellow Crafters' Scrip";
@@ -130,7 +130,7 @@ class Satisfaction implements ParseInterface
                     $OutputString .= "|Name = $Name\n";
                     $OutputString .= "|NPC = $Npc\n";
                     $OutputString .= "|Location = $location\n";
-                    $OutputString .= "|Level = $SubDataValue\n";
+                    $OutputString .= "|Level = ". floor($SubDataValue) ."\n";
                     $OutputString .= "|Chance = $chance\n";
                     $OutputString .= "|Collectability Low = $collectlow\n";
                     $OutputString .= "|Collectability Mid = $collectmid\n";
@@ -149,15 +149,16 @@ class Satisfaction implements ParseInterface
                     $OutputString .= "|White Low = $whitelow\n";
                     $OutputString .= "|White Mid = $whitemid\n";
                     $OutputString .= "|White High = $whitehigh\n";
-                    $OutputString .= "}}\n";
+                    $OutputString .= "}}";
                     $Array[$Name][] = $OutputString;
                 }
-
             }
         }
+
         foreach ($Array as $key => $value) {
-            $Array[$key] = "{{-start-}}\n'''$key/Collectable'''\n".implode($value)."\n{{-stop-}}";
+            $Array[$key] = "{{-start-}}\n'''$key/Collectable'''\n".implode($value)."\n{{-stop-}}\n";
         }
+
         $Output = implode("\n", $Array);
         $this->io->progressFinish();
 
