@@ -22,7 +22,8 @@ class NPCARRAYTEST implements ParseInterface
     {ShopOutput}
     {ShopDialogue}
     {WarpPages}
-    {DialoguePages}';
+    {DialoguePages}
+    {Equipment}';
 
     public function parse()
     {
@@ -87,6 +88,11 @@ class NPCARRAYTEST implements ParseInterface
         $TerritoryTypeCsv = $this->csv('TerritoryType');
         $MapCsv = $this->csv('Map');
         $LevelCsv = $this->csv('Level');
+        $CraftLeveTalkCsv = $this->csv('CraftLeveTalk');
+        $CharaMakeCustomizeCsv = $this->csv('CharaMakeCustomize');
+        $CharaMakeTypeCsv = $this->csv('CharaMakeType');
+        $NpcEquipCsv = $this->csv('NpcEquip');
+        $StainCsv = $this->csv('Stain');
 
         $this->io->text('Generating NPC Name Array ...');
         $this->io->progressStart($ENpcResidentCsv->total);
@@ -95,8 +101,6 @@ class NPCARRAYTEST implements ParseInterface
         $this->PatchCheck($Patch, "ENpcResident", $ENpcResidentCsv);
         $PatchNumber = $this->getPatch("ENpcResident");
         $NpcPatchArray = [];
-        
-        $PlaceNameLocation = ""; //TEMP
 
         foreach ($ENpcResidentCsv->data as $id => $NPCs) {
             // ---------------------------------------------------------
@@ -236,7 +240,60 @@ class NPCARRAYTEST implements ParseInterface
         foreach ($ENpcResidentCsv->data as $id => $NPCs) {
             $this->io->progressAdvance();
             $Name = $NPCs['Singular'];//Array of names that should not be capitalized
-            $NameFormatted = $this->NameFormat($id, $ENpcResidentCsv, $ENpcBaseCsv, $PlaceNameLocation);
+
+            
+            $subLocation = "";
+            if (!empty($LGBArray[$id]['Territory'])){
+                $Territory = $LGBArray[$id]['Territory'];
+                $X = $LGBArray[$id]['x'];
+                $Y = $LGBArray[$id]['y'];
+                $keyarray = [];
+                foreach (range(0, 1000) as $i) {
+                    if (empty($JSONTeriArray[$Territory][$i]["x"])) break;
+                    $calcA = ($X - $JSONTeriArray[$Territory][$i]["x"]); 
+                    $calcB = ($Y - $JSONTeriArray[$Territory][$i]["y"]);
+                    $calcX = $calcA * $calcB;
+                    $keyarray[] = abs($calcX);
+                }
+                asort($keyarray);
+                $smallestNumber = key($keyarray);
+                if (empty($JSONTeriArray[$Territory][$smallestNumber]["placename"])) {
+                    $subLocation = "";
+                } else {
+                    $subLocation = $JSONTeriArray[$Territory][$smallestNumber]["placename"];
+                }
+            }
+            //produce map
+            $MapOutputString = "";
+            $sub = "";
+            $NpcPlaceName = "";
+            if (!empty($LGBArray[$id]['x'])) {
+                $MapX = $this->GetLGBPos($LGBArray[$id]['x'], $LGBArray[$id]['y'], $LGBArray[$id]['Territory'], $TerritoryTypeCsv, $MapCsv)["X"];
+                $MapY = $this->GetLGBPos($LGBArray[$id]['x'], $LGBArray[$id]['y'], $LGBArray[$id]['Territory'], $TerritoryTypeCsv, $MapCsv)["Y"];
+                $MapXPix = $this->GetLGBPos($LGBArray[$id]['x'], $LGBArray[$id]['y'], $LGBArray[$id]['Territory'], $TerritoryTypeCsv, $MapCsv)["PX"];
+                $MapYPix = $this->GetLGBPos($LGBArray[$id]['x'], $LGBArray[$id]['y'], $LGBArray[$id]['Territory'], $TerritoryTypeCsv, $MapCsv)["PY"];
+
+                $CoordLocation = "". $MapX ."-". $MapY ."";
+                $SubLocation = $subLocation;
+                $NpcPlaceName = $SubLocation;
+                $MapName = $PlaceNameCsv->at($TerritoryTypeCsv->at($LGBArray[$id]['Territory'])['PlaceName'])['Name'];
+                $NpcMapCodeName = $TerritoryTypeCsv->at($LGBArray[$id]['Territory'])['Name'];
+                $MapID = $TerritoryTypeCsv->at($LGBArray[$id]['id'])['Map'];
+                if ($MapCsv->at($MapID)["PlaceName{Sub}"] > 0) {
+                    $sub = " - ".$PlaceNameCsv->at($MapCsv->at($MapID)["PlaceName{Sub}"])['Name']."";
+                } elseif ($MapCsv->at($MapID)["PlaceName"] > 0) {
+                    $sub = "";
+                }
+                $code = substr($NpcMapCodeName, 0, 4);
+                //if ($code == "z3e2") {
+                //    $NpcPlaceName = "The Prima Vista Tiring Room";
+                //}
+                $BasePlaceName = "$code - {$MapName}{$sub}";
+    
+                $LevelID = $LGBArray[$id]['id'];
+                $MapArray[] = $MapOutputString;
+            }
+            $NameFormatted = $this->NameFormat($id, $ENpcResidentCsv, $ENpcBaseCsv, $NpcPlaceName);
 
             $datarray = [];
             $QuestCheck = [];
@@ -254,9 +311,6 @@ class NPCARRAYTEST implements ParseInterface
                 $DataValue = $ENpcBaseCsv->at($id)["ENpcData[$i]"];
                 //check for each type of subpage:
                 switch (true) {
-                    case ($DataValue > 65535) && ($DataValue < 69999):
-                        $QuestCheck[] = $QuestCsv->at($DataValue)["Name"].",";
-                    break;
                     case ($DataValue > 131000) && ($DataValue < 139999): //WARP
                         $WarpCheck[] = $DataValue.",";
                         $DefaultTalkAccept = $this->getDefaultTalk($DefaultTalkCsv, $WarpCsv, $DataValue ,'ConditionSuccessEvent', '| Success Talk =');
@@ -300,19 +354,19 @@ class NPCARRAYTEST implements ParseInterface
                         $WarpPagesArray[] = $WarpString;
                     break;
                     case ($DataValue > 262100) && ($DataValue < 269999): //GILSHOP
-                        $ShopCheck[] = $DataValue.",";
                         $ShopCheck[] = "Dialogue,";
-                        $FuncShop = $this->getShop($NameFormatted, "GilShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $DataValue, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv);
+                        $FuncShop = $this->getShop($NameFormatted, "GilShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $DataValue, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
                         $ShopOutputArray[] = $FuncShop["Shop"];
                         $ShopDialogueArray[] = $FuncShop["Dialogue"];
                         $TotalItems[$Name][] = $FuncShop["Number"];
+                        $ShopCheck[] = $FuncShop["Name"].",";
                     break;
                     case ($DataValue > 393000) && ($DataValue < 399999): //GUILDLEVEASSIGNMENT
                         $DialogueCheck[] = $DataValue.",";
                         $GuildLeveTalkArray = [];
                         $GuildLeveTalkType = $GuildLeveAssignmentCsv->at($DataValue)['unknown_1'];
                         foreach(range(31,38) as $a) {
-                            if ($GuildLeveAssignmentTalkCsv->at($GuildLeveAssignmentCsv->at($DataValue)['AssignmentTalk'])["unknown_$a"] != 0){
+                            if ($GuildLeveAssignmentTalkCsv->at($GuildLeveAssignmentCsv->at($DataValue)['AssignmentTalk'])["unknown_$a"] != "0"){
                                 $GuildLeveTalkString = "{{Dialoguebox3|Intro=$GuildLeveTalkType|Dialogue=\n";
                                 $GuildLeveTalkString .= $GuildLeveAssignmentTalkCsv->at($GuildLeveAssignmentCsv->at($DataValue)['AssignmentTalk'])["unknown_$a"];
                                 $GuildLeveTalkString .= "}}";
@@ -321,13 +375,24 @@ class NPCARRAYTEST implements ParseInterface
                         }
                         $GuildLeveTalkImpoloded = implode("\n", $GuildLeveTalkArray);
                         $DialogueString = "{{-start-}}\n";
-                        $DialogueString .= "'''$NameFormatted/Dialogue'''";
+                        $DialogueString .= "'''$NameFormatted/Dialogue/$id'''\n";
                         $DialogueString .= "$GuildLeveTalkImpoloded\n";
                         $DialogueString .= "{{-stop-}}\n";
                         $DialogueArray[] = $DialogueString;
                     break;
                     case ($DataValue > 589000) && ($DataValue < 599999)://DEFAULTTALK
                         $DialogueCheck[] = $DataValue.",";
+                        $DefaultTalk = [];
+                        foreach(range(0,2) as $b) {
+                            if (empty($DefaultTalkCsv->at($DataValue)["Text[$b]"])) continue;
+                            $DefaultTalk[] = "{{Dialoguebox3|Intro=|Dialogue=". $DefaultTalkCsv->at($DataValue)["Text[$b]"]. "}}";
+                        }
+                        $DefaultTalkImplode = implode("\n", $DefaultTalk);
+                        $DialogueString = "{{-start-}}\n";
+                        $DialogueString .= "'''$NameFormatted/Dialogue/$id'''\n";
+                        $DialogueString .= "$DefaultTalkImplode\n";
+                        $DialogueString .= "{{-stop-}}\n";
+                        $DialogueArray[] = $DialogueString;
                     break;
                     case ($DataValue > 720000) && ($DataValue < 729999): //CUSTOMTALK
                         $DialogueCheck[] = $DataValue.",";
@@ -339,13 +404,30 @@ class NPCARRAYTEST implements ParseInterface
                                 case (strpos($Instruction, 'HOWTO') !== false):
                                     $HowToCheck[] = $HowToCsv->at($Argument)['unknown_1'].",";
                                     $DataValue = $Argument;
-                                    //$GetHowToArray[] = $this->GetHowTo($HowToCsv, $HowToCategoryCsv, $HowToPageCsv, $DataValue);
                                 break;
                                 case (strpos($Instruction, 'DISPOSAL') !== false):
-                                    $ShopCheck[] = $Argument.",";
                                 break;
-                                case (($Argument > 65535) && ($Argument < 69999)):
-                                    $QuestCheck[] = $QuestCsv->at($Argument)["Name"].",";
+                                case (strpos($Instruction, 'SHOP') !== false):
+                                    switch (true) {
+                                        case ($Argument > 262100) && ($Argument < 269999): //GILSHOP
+                                            $FuncShop = $this->getShop($NameFormatted, "GilShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $Argument, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
+                                            $ShopOutputArray[] = $FuncShop["Shop"];
+                                            $ShopDialogueArray[] = $FuncShop["Dialogue"];
+                                            $TotalItems[$Name][] = $FuncShop["Number"];
+                                            $ShopCheck[] = $FuncShop["Name"].",";
+                                        break;
+                                        case ($Argument > 1769000) && ($Argument < 1779999)://SPECIALSHOP
+                                            $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $Argument, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
+                                            $ShopOutputArray[] = $FuncShop["Shop"];
+                                            $ShopDialogueArray[] = $FuncShop["Dialogue"];
+                                            $TotalItems[$Name][] = $FuncShop["Number"];
+                                            $ShopCheck[] = $FuncShop["Name"].",";
+                                        break;
+                                        //need to add instance content?
+                                        default:
+                                        $ShopCheck[] = "CUSTOM TALK ERROR,";
+                                        break;
+                                    }
                                 break;
                                 default:
                                 break;
@@ -357,21 +439,24 @@ class NPCARRAYTEST implements ParseInterface
                                 $NestDataValue = $CustomTalkNestHandlersCsv->at("". $DataValue. ".". $b ."")['NestHandler'];
                                 switch (true) {
                                     case ($NestDataValue > 262100) && ($NestDataValue < 269999)://Gilshop
-                                        $ShopCheck[] = $NestDataValue.",";
-                                    break;
-                                    case ($NestDataValue > 1769000) && ($NestDataValue < 1779999)://SPECIALSHOP
-                                        $ShopCheck[] = $NestDataValue.",";
                                         $ShopCheck[] = "Dialogue,";
-                                        $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $NestDataValue, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv);
+                                        $FuncShop = $this->getShop($NameFormatted, "GilShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $NestDataValue, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
                                         $ShopOutputArray[] = $FuncShop["Shop"];
                                         $ShopDialogueArray[] = $FuncShop["Dialogue"];
                                         $TotalItems[$Name][] = $FuncShop["Number"];
+                                        $ShopCheck[] = $FuncShop["Name"].",";
                                     break;
-                                    case ($NestDataValue > 3407872) && ($NestDataValue < 3409999)://LotteryExchangeShop
-                                        $ShopCheck[] = $NestDataValue.",";
+                                    case ($NestDataValue > 1769000) && ($NestDataValue < 1779999)://SPECIALSHOP
+                                        $ShopCheck[] = "Dialogue,";
+                                        $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $NestDataValue, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
+                                        $ShopOutputArray[] = $FuncShop["Shop"];
+                                        $ShopDialogueArray[] = $FuncShop["Dialogue"];
+                                        $TotalItems[$Name][] = $FuncShop["Number"];
+                                        $ShopCheck[] = $FuncShop["Name"].",";
                                     break;
-                                    case ($NestDataValue > 3470000) && ($NestDataValue < 3479999)://disposal
-                                        $ShopCheck[] = $NestDataValue.",";
+                                    case ($NestDataValue > 3407872) && ($NestDataValue < 3409999)://LotteryExchangeShop // omitted
+                                    break;
+                                    case ($NestDataValue > 3470000) && ($NestDataValue < 3479999)://disposal // omitted
                                     break;
                                     default:
                                     break;
@@ -379,31 +464,88 @@ class NPCARRAYTEST implements ParseInterface
                             }
                         }
                     break;
-                    case ($DataValue > 910000) && ($DataValue < 919999): //CRAFT LEVE
+                    case ($DataValue > 910000) && ($DataValue < 919999): //CRAFT LEVE //doesnt work?
                         $LeveCheck[] = $DataValue.",";
+                        $DialogueCheck[] = $DataValue.",";
+                        $CraftLeveTalkArray = [];
+                        $CraftLeveTalkType = $LeveCsv->at($CraftLeveCsv->at($DataValue)['Leve'])['Name'];
+                        foreach(range(37,42) as $a) {
+                            if ($CraftLeveTalkCsv->at($CraftLeveCsv->at($DataValue)['CraftLeveTalk'])["unknown_$a"] != "0"){
+                                $CraftLeveTalkStringSub .= $CraftLeveTalkCsv->at($CraftLeveCsv->at($DataValue)['CraftLeveTalk'])["unknown_$a"];
+                                $CraftLeveTalkStringSub .= "\n";
+                                $CraftLeveTalkArray[] = $CraftLeveTalkStringSub;
+                            }
+                        }
+                        $CraftLeveTradesArray = [];
+                        foreach(range(0,3) as $a) {
+                            while (!empty($CraftLeveCsv->at($DataValue)["Item[$a]"])) {
+                                $ItemTradeIn = $CraftLeveCsv->at($DataValue)["Item[$a]"];
+                                $ItemTradeAmount = $CraftLeveCsv->at($DataValue)["Item[$a]"];
+                                $CraftLeveTradesArray[] = "Trades in $ItemTradeAmount x $ItemTradeIn";
+                            }
+                        }
+                        $CraftLeveTrades = implode("\n", $CraftLeveTradesArray);
+                        $CraftLeveTalkImpoloded = implode("\n", $CraftLeveTalkArray);
+                        $CraftLeveTalkString = "{{Dialoguebox3|Intro=$CraftLeveTalkType|Dialogue=\n";
+                        $CraftLeveTalkString .= "$CraftLeveTrades\n";
+                        $CraftLeveTalkString .= $CraftLeveTalkImpoloded;
+                        $CraftLeveTalkString .= "\n}}";
+                        $DialogueString = "{{-start-}}\n";
+                        $DialogueString .= "'''$NameFormatted/Dialogue/$id'''\n";
+                        $DialogueString .= "$CraftLeveTalkString\n";
+                        $DialogueString .= "{{-stop-}}\n";
+                        $DialogueArray[] = $DialogueString;
                     break;
                     case ($DataValue > 1179000) && ($DataValue < 1179999): //CHOCOBOTAXISTAND
                         $ChocoboTaxiCheck[] = $DataValue.",";
                         $FuncDataValue = $DataValue;
                         $GetPorterArray[] = $this->GetChocoboTaxi($ChocoboTaxiStandCsv, $ChocoboTaxiCsv, $FuncDataValue);
                     break;
-                    case ($DataValue > 1440000) && ($DataValue < 1449999): //GCSHOP
-                        $ShopCheck[] = $DataValue.",";
+                    case ($DataValue > 1440000) && ($DataValue < 1449999): //GCSHOP// omitted
                     break;
-                    case ($DataValue > 1507000) && ($DataValue < 1509999): //GUILDORDERGUIDE
+                    case ($DataValue > 1507000) && ($DataValue < 1509999): //GUILDORDERGUIDE// omitted
                     break;
-                    case ($DataValue > 1570000) && ($DataValue < 1579999): //GUILDORDEROFFICER
+                    case ($DataValue > 1570000) && ($DataValue < 1579999): //GUILDORDEROFFICER// omitted
                     break;
                     case ($DataValue > 1769000) && ($DataValue < 1779999)://SPECIALSHOP
-                        $ShopCheck[] = $DataValue.",";
                         $ShopCheck[] = "Dialogue,";
-                        $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $DataValue, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv);
+                        $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $DataValue, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
                         $ShopOutputArray[] = $FuncShop["Shop"];
                         $ShopDialogueArray[] = $FuncShop["Dialogue"];
                         $TotalItems[$Name][] = $FuncShop["Number"];
+                        $ShopCheck[] = $FuncShop["Name"].",";
                     break;
                     case ($DataValue > 2030000) && ($DataValue < 2039999)://SWITCHTALK
                         $DialogueCheck[] = $DataValue.",";
+                        $SwitchTalkArray = [];
+                        foreach(range(0,20) as $b) {
+                            $SubDataValue = "". $DataValue .".". $b ."";
+                            if (empty($SwitchTalkVariationCsv->at($SubDataValue)['DefaultTalk'])) break;
+                            $Quest0 = "";
+                            $Quest1 = "";
+                            if (!empty($QuestCsv->at($SwitchTalkVariationCsv->at($SubDataValue)['Quest[0]'])['Name'])) {
+                                $Quest0 = "". $QuestCsv->at($SwitchTalkVariationCsv->at($SubDataValue)['Quest[0]'])['Name'];
+
+                            }
+                            $TextStringArray = [];
+                            foreach(range(0,2) as $c) {
+                                if ($DefaultTalkCsv->at($SwitchTalkVariationCsv->at($SubDataValue)["DefaultTalk"])["Text[$c]"] === "0") continue;
+                                $TextStringArray[] = $DefaultTalkCsv->at($SwitchTalkVariationCsv->at($SubDataValue)["DefaultTalk"])["Text[$c]"];
+                            }
+                            $TextString = implode("\n", $TextStringArray);
+                            if (empty($Quest0)) {
+                                $SwitchTalkArray[] = "{{Dialoguebox3|Intro=Default|Dialogue=\n". $TextString ."}}\n";
+                            }
+                            if (!empty($Quest0)) {
+                                $SwitchTalkArray[] = "{{Dialoguebox3|Intro=After|Quest=". $Quest0 ."|Dialogue=\n". $TextString ."}}\n";
+                            }
+                        }
+                        $SwitchTalkOut = implode("\n", $SwitchTalkArray);
+                        $DialogueString = "{{-start-}}\n";
+                        $DialogueString .= "'''$NameFormatted/Dialogue/$id'''\n";
+                        $DialogueString .= "$SwitchTalkOut\n";
+                        $DialogueString .= "{{-stop-}}\n";
+                        $DialogueArray[] = $DialogueString;
                     break;
                     case ($DataValue > 2290000) && ($DataValue < 2299999)://TRIPLETRIAD
                         $TripleTriadCheck[] = $DataValue.",";
@@ -411,6 +553,32 @@ class NPCARRAYTEST implements ParseInterface
                     break;
                     case ($DataValue > 2752000) && ($DataValue < 2752999)://FCCSHOP
                         $ShopCheck[] = $DataValue.",";
+                        $ShopName = $FCCShopCsv->at($DataValue)['Name'];
+                        if (empty($ShopName)) {$ShopName = "General";};
+                        $FccShopArray = [];
+                        $NumberItems = 0;
+                        foreach(range(0,9) as $b) {
+                            if (empty($ItemCsv->at($FCCShopCsv->at($DataValue)["Item[$b]"])['Name'])) break;
+                            $Item = $ItemCsv->at($FCCShopCsv->at($DataValue)["Item[$b]"])['Name'];
+                            $Amount = $FCCShopCsv->at($DataValue)["Cost[$b]"];
+                            $Rank = $FCCShopCsv->at($DataValue)["FCRank{Required}[$b]"];
+                            $FccShopArray[] = "{{Sells3|$Item|Quantity=1|Cost1=Credits|Count1=$Amount|Requires Rank = $Rank}}";
+                            $NumberItems = $b + 1;
+                        }
+                        $FcshopImplode = implode("\n", $FccShopArray);
+                        $ShopOutputString = "{{-start-}}\n'''". $NameFormatted ."/". $ShopName ."'''\n";
+                        $ShopOutputString .= "{{Shop\n";
+                        $ShopOutputString .= "| Shop Name = $ShopName\n";
+                        $ShopOutputString .= "| NPC Name = $NameFormatted\n";
+                        $ShopOutputString .= "| Location = \n";
+                        $ShopOutputString .= "| Coordinates = \n";
+                        $ShopOutputString .= "| Total Items = $NumberItems\n";
+                        $ShopOutputString .= "| Shop = \n";
+                        $ShopOutputString .= "{{Tabsells3\n";
+                        $ShopOutputString .= "|Misc = \n";
+                        $ShopOutputString .= "$FcshopImplode\n";
+                        $ShopOutputString .= "}}\n}}\n{{-stop-}}\n";
+                        $ShopOutputArray[] = $ShopOutputString;
                     break;
                     case ($DataValue > 3080000) && ($DataValue < 3089999): //DPSCHALLENGEOFFICER
                         $DPSChallengeCheck[] = $DataValue.",";
@@ -421,19 +589,33 @@ class NPCARRAYTEST implements ParseInterface
                             $ShopLink = $TopicSelectCsv->at($DataValue)["Shop[$a]"];
                             switch (true) {
                                 case ($ShopLink >= 262000 && $ShopLink < 264000): //gilshop
-                                    $ShopCheck[] = $ShopLink.",";
+                                    $ShopCheck[] = "Dialogue,";
+                                    $FuncShop = $this->getShop($NameFormatted, "GilShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $ShopLink, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
+                                    $ShopOutputArray[] = $FuncShop["Shop"];
+                                    $ShopDialogueArray[] = $FuncShop["Dialogue"];
+                                    $TotalItems[$Name][] = $FuncShop["Number"];
+                                    $ShopCheck[] = $FuncShop["Name"].",";
                                 break;
                                 case ($ShopLink >= 3538900 && $ShopLink < 3540000): //Prehandler
                                     $ShopID = $PreHandlerCsv->at($ShopLink)["Target"];
                                     switch (true) {
                                         case ($ShopID > 262100 && $ShopID < 269999): //gilshop
-                                            $ShopCheck[] = $ShopID.",";
+                                            $ShopCheck[] = "Dialogue,";
+                                            $FuncShop = $this->getShop($NameFormatted, "GilShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $ShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
+                                            $ShopOutputArray[] = $FuncShop["Shop"];
+                                            $ShopDialogueArray[] = $FuncShop["Dialogue"];
+                                            $TotalItems[$Name][] = $FuncShop["Number"];
+                                            $ShopCheck[] = $FuncShop["Name"].",";
                                         break;
                                         case ($ShopID >= 1769000 && $ShopID < 1779999): //specialshop
-                                            $ShopCheck[] = $ShopID.",";
+                                            $ShopCheck[] = "Dialogue,";
+                                            $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $DataValue, $DefaultTalkCsv, $ShopID, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
+                                            $ShopOutputArray[] = $FuncShop["Shop"];
+                                            $ShopDialogueArray[] = $FuncShop["Dialogue"];
+                                            $TotalItems[$Name][] = $FuncShop["Number"];
+                                            $ShopCheck[] = $FuncShop["Name"].",";
                                         break;
-                                        case ($ShopID >= 3866620 && $ShopID < 3866999): //COLLECTABLESHOPS
-                                            $ShopCheck[] = $ShopID.",";
+                                        case ($ShopID >= 3866620 && $ShopID < 3866999): //COLLECTABLESHOPS //omitted
                                         break;
                                         case ($ShopID >= 3801000 && $ShopID < 3809999): //InclusionShop
                                             foreach(range(0,29) as $b) {
@@ -441,16 +623,16 @@ class NPCARRAYTEST implements ParseInterface
                                                 foreach(range(0,20) as $c) {
                                                     $SubDataValue = "". $ShopID .".". $c ."";
                                                     if (empty($InclusionShopSeriesCsv->at($SubDataValue)['SpecialShop'])) break;
-                                                    $ShopCheck[] = $InclusionShopSeriesCsv->at($SubDataValue)['SpecialShop'].",";
                                                     $IncShopID = $InclusionShopSeriesCsv->at($SubDataValue)['SpecialShop'];
-                                                    $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $IncShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv);
+                                                    $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $IncShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
                                                     $ShopOutputArray[] = $FuncShop["Shop"];
                                                     $ShopDialogueArray[] = $FuncShop["Dialogue"];
                                                     $TotalItems[$Name][] = $FuncShop["Number"];
+                                                    $ShopCheck[] = $FuncShop["Name"].",";
                                                 }
                                             }
                                         break;
-                                        case ($ShopID >= 3604400 && $ShopID < 3609999): //Description
+                                        case ($ShopID >= 3604400 && $ShopID < 3609999): //Description //unsure
                                             $DialogueCheck[] = $ShopID.",";
                                         break;
 
@@ -459,12 +641,12 @@ class NPCARRAYTEST implements ParseInterface
                                     }
                                 break;
                                 case ($ShopLink >= 1769000 && $ShopLink < 1779999): //Specialshop
-                                    $ShopCheck[] = $ShopLink;
                                     $ShopCheck[] = "Dialogue,";
-                                    $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $ShopLink, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv);
+                                    $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $ShopLink, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
                                     $ShopOutputArray[] = $FuncShop["Shop"];
                                     $ShopDialogueArray[] = $FuncShop["Dialogue"];
                                     $TotalItems[$Name][] = $FuncShop["Number"];
+                                    $ShopCheck[] = $FuncShop["Name"].",";
                                 break;
                                 
                                 default:
@@ -473,25 +655,28 @@ class NPCARRAYTEST implements ParseInterface
                         }
 
                     break;
-                    case ($DataValue > 3470000) && ($DataValue < 3479999): //DISPOSAL SHOP
-                        $ShopCheck[] = $DataValue.",";
+                    case ($DataValue > 3470000) && ($DataValue < 3479999): //DISPOSAL SHOP //omitted
                     break;
                     case ($DataValue > 3530000) && ($DataValue < 3539999)://PREHANDLER
                         $ShopID = $PreHandlerCsv->at($DataValue)["Target"];
                         switch (true) {
                             case ($ShopID > 262100 && $ShopID < 269999): //gilshop
-                                $ShopCheck[] = $ShopID.",";
-                            break;
-                            case ($ShopID >= 1769000 && $ShopID < 1779999): //specialshop
-                                $ShopCheck[] = $ShopID.",";
                                 $ShopCheck[] = "Dialogue,";
-                                $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $ShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv);
+                                $FuncShop = $this->getShop($NameFormatted, "GilShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $ShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
                                 $ShopOutputArray[] = $FuncShop["Shop"];
                                 $ShopDialogueArray[] = $FuncShop["Dialogue"];
                                 $TotalItems[$Name][] = $FuncShop["Number"];
+                                $ShopCheck[] = $FuncShop["Name"].",";
                             break;
-                            case ($ShopID >= 3866620 && $ShopID < 3866999): //COLLECTABLESHOPS
-                                $ShopCheck[] = $ShopID.",";
+                            case ($ShopID >= 1769000 && $ShopID < 1779999): //specialshop
+                                $ShopCheck[] = "Dialogue,";
+                                $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $ShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
+                                $ShopOutputArray[] = $FuncShop["Shop"];
+                                $ShopDialogueArray[] = $FuncShop["Dialogue"];
+                                $TotalItems[$Name][] = $FuncShop["Number"];
+                                $ShopCheck[] = $FuncShop["Name"].",";
+                            break;
+                            case ($ShopID >= 3866620 && $ShopID < 3866999): //COLLECTABLESHOPS //omitted
                             break;
                             case ($ShopID >= 3801000 && $ShopID < 3809999): //InclusionShop
                                 foreach(range(0,29) as $b) {
@@ -499,17 +684,17 @@ class NPCARRAYTEST implements ParseInterface
                                     foreach(range(0,20) as $c) {
                                         $SubDataValue = "". $ShopID .".". $c ."";
                                         if (empty($InclusionShopSeriesCsv->at($SubDataValue)['SpecialShop'])) break;
-                                        $ShopCheck[] = $InclusionShopSeriesCsv->at($SubDataValue)['SpecialShop'].",";
                                         $InclusionShopSpecialShopID = $InclusionShopSeriesCsv->at($SubDataValue)['SpecialShop'];
                                         $ShopCheck[] = "Dialogue,";
-                                        $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $InclusionShopSpecialShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv);
+                                        $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $InclusionShopSpecialShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
                                         $ShopOutputArray[] = $FuncShop["Shop"];
                                         $ShopDialogueArray[] = $FuncShop["Dialogue"];
                                         $TotalItems[$Name][] = $FuncShop["Number"];
+                                        $ShopCheck[] = $FuncShop["Name"].",";
                                     }
                                 }
                             break;
-                            case ($ShopID >= 3604400 && $ShopID < 3609999): //Description
+                            case ($ShopID >= 3604400 && $ShopID < 3609999): //Description //unsure
                                 $DialogueCheck[] = $ShopID.",";
                             break;
 
@@ -517,7 +702,7 @@ class NPCARRAYTEST implements ParseInterface
                             break;
                         }
                     break;
-                    case ($DataValue > 3604000) && ($DataValue < 3609999): //DESCRIPTION
+                    case ($DataValue > 3604000) && ($DataValue < 3609999): //DESCRIPTION //unsure
                         $DialogueCheck[] = $DataValue.",";
                     break;
                     default:
@@ -539,8 +724,6 @@ class NPCARRAYTEST implements ParseInterface
             $ChocoboTaxiCheckArray[$Name][] = $ChocoboTaxiCheckArrayOut;
             $TripleTriadCheckArrayOut = implode("", $TripleTriadCheck);
             $TripleTriadCheckArray[$Name][] = $TripleTriadCheckArrayOut;
-            $QuestCheckArrayOut = implode("", $QuestCheck);
-            $QuestCheckArray[$Name][] = $QuestCheckArrayOut;
             $dataout = implode(",", $datarray);
             $dataarray[$Name][] = $dataout;
             
@@ -586,10 +769,6 @@ class NPCARRAYTEST implements ParseInterface
         foreach ($TripleTriadCheckArray as $key => $value) {
             $TripleTriadarrayimplode[$key] = implode("", array_unique($value));
         }
-        $Questarrayimplode = [];
-        foreach ($QuestCheckArray as $key => $value) {
-            $Questarrayimplode[$key] = implode("", array_unique($value));
-        }
         $dataarrayimplode = [];
         foreach ($dataarray as $key => $value) {
             $dataarrayimplode[$key] = implode("", array_unique($value));
@@ -602,13 +781,695 @@ class NPCARRAYTEST implements ParseInterface
         $WarpPages = implode("", $WarpPagesArray);
         $DialoguePages = implode("", $DialogueArray);
 
+        //equipment/appearance 
+        //color generator
+        $CMPfile= "Resources/human.cmp";
+        $buffer = unpack("C*",file_get_contents($CMPfile));
+        $buffer = array_chunk($buffer, 4);
+        foreach ($buffer as $i => $rgba) {
+            [$r, $g, $b, $a] = $rgba;
+        
+            $hex = sprintf("%02x%02x%02x", $r, $g, $b,);
+        
+            $buffer[$i] = $hex;
+        }
+        //hair style array
+        $hairStyles = [];
+
+        foreach ($CharaMakeCustomizeCsv->data as $id => $CharaMakeCustomize) {
+            $roundId = floor($CharaMakeCustomize['id'] / 100) * 100;
+            $featureId = $CharaMakeCustomize['FeatureID'];
+
+            $hairStyles[$roundId][$featureId] = $CharaMakeCustomize;
+        }
+
+        //loop through Item.csv to make a model array
+        $itemArray = [];
+        $weaponArray = [];
+
+        foreach ($ItemCsv->data as $id => $ItemData) {
+            if ($ItemData['EquipSlotCategory'] = 0) continue;
+            $Category = $ItemData['ItemUICategory'];
+            $Weapon = $ItemData['EquipSlotCategory'];
+            $ModelMainBase = str_replace(", ", "-", $ItemData['Model{Main}']);
+            $ModelSubBase = str_replace(", ", "-", $ItemData['Model{Sub}']);
+
+            $name = $ItemData['Name'];
+            $itemArray[$Category][$ModelMainBase] = $ItemData;
+            $itemArray[$Category][$ModelSubBase] = $ItemData;
+            $weaponArray[$ModelMainBase] = $ItemData;
+            $weaponArray[$ModelSubBase] = $ItemData;
+        }
+        //generate appearances
+        $this->io->text('Building NPC Appearance Outputs ...');
+        $this->io->progressStart($ENpcBaseCsv->total);
+        foreach ($ENpcBaseCsv->data as $id => $EnpcBase) {
+            $this->io->progressAdvance();
+            $Name = $ENpcResidentCsv->at($id)['Singular'];//Array of names that should not be capitalized
+            if (empty($Name)) continue;
+            $Index = $EnpcBase['id'];
+            $debug = false;
+            $needsFix = "FALSE";
+            $Race = $RaceCsv->at($EnpcBase['Race'])['Masculine'];
+            if ($EnpcBase['Race'] < 1) continue;
+            $genderBase = $EnpcBase['Gender'];
+            $Gender = $EnpcBase['Gender'];
+            if ($Gender == 0) {
+                $Gender = "Male";
+            } elseif ($Gender == 1) {
+                $Gender = "Female";
+            }
+            $BaseFace = $EnpcBase['Face'];
+            $face = null;
+            $face = $BaseFace % 100; // Value matches the asset number, % 100 approximate face # nicely.
+            $BodyTypeBase = $EnpcBase['BodyType'];
+            switch ($BodyTypeBase)
+            {
+                case 1:
+                    $BodyType = "Adult";
+                    break;
+                case 2:
+                    $BodyType = "Adult";
+                    break;
+                case 3:
+                    $BodyType = "Elderly";
+                    break;
+                case 4:
+                    $BodyType = "Child";
+                    break;
+                default:
+                    $BodyType = "Unknown";
+                    break;
+            }
+            $Height = $EnpcBase['Height'];
+            $Tribe = $TribeCsv->at($EnpcBase['Tribe'])['Masculine'];
+            $HairStyle = $EnpcBase['HairStyle'];$GenderCalc = $EnpcBase['Gender'];
+            $TribeCalc = $EnpcBase['Tribe'];
+            if (($GenderCalc = 0) && ($TribeCalc = 1)) {
+                $Calc = false;
+            }
+            if (($GenderCalc = 1) && ($TribeCalc = 1)) {
+                $Calc = "10";
+            }
+            $extraFeatureShape = $EnpcBase['ExtraFeature1'];
+            $extraFeatureSize = $EnpcBase['ExtraFeature2OrBust'];
+            $isMale = boolval($genderBase) ? 'false' : 'true';
+            $tribeKey = $EnpcBase['Tribe'];
+            $tailIconIndex = null;
+            switch ($tribeKey)
+            {
+                case 1: // Midlander
+                    $tribeKeyCalc = ($isMale == "true") ? 0 : 1;
+                    break;
+                case 2: // Highlander
+                    $tribeKeyCalc = ($isMale == "true") ? 2 : 3;
+                    break;
+                case 3: // Wildwood
+                    $tribeKeyCalc = ($isMale == "true") ? 4 : 5;
+                    break;
+                case 4: // Duskwight
+                    $tribeKeyCalc = ($isMale == "true") ? 6 : 7;
+                    break;
+                case 5: // Plainsfolks
+                    $tribeKeyCalc = ($isMale == "true") ? 8 : 9;
+                    break;
+                case 6: // Dunesfolk
+                    $tribeKeyCalc = ($isMale == "true") ? 10 : 11;
+                    break;
+                case 7: // Seeker of the Sun
+                    $tribeKeyCalc = ($isMale == "true") ? 12 : 13;
+                    break;
+                case 8: // Keeper of the Moon
+                    $tribeKeyCalc = ($isMale == "true") ? 14 : 15;
+                    break;
+                case 9: // Sea Wolf
+                    $tribeKeyCalc = ($isMale == "true") ? 16 : 17;
+                    break;
+                case 10: // Hellsguard
+                    $tribeKeyCalc = ($isMale == "true") ? 18 : 19;
+                    break;
+                case 11: // Raen
+                    $tribeKeyCalc = ($isMale == "true") ? 20 : 21;
+                    break;
+                case 12: // Xaela
+                    $tribeKeyCalc = ($isMale == "true") ? 22 : 23;
+                    break;
+                case 13: // Helions
+                    $tribeKeyCalc = ($isMale == "true") ? 24 : 25;
+                    break;
+                case 14: // The Lost
+                    $tribeKeyCalc = ($isMale == "true") ? 26 : 27;
+                    break;
+                case 15: // Rava
+                    $tribeKeyCalc = ($isMale == "true") ? 28 : 29;
+                    break;
+                case 16: // Veena
+                    $tribeKeyCalc = ($isMale == "true") ? 30 : 31;
+                    break;
+            }
+            //face/fur/tail icons
+            $BaseFaceCalc = $face - 1;
+            $race = $EnpcBase['Race'];
+            //var_dump($race);
+            $warning = false;
+            $warningGen = false;
+            if ($face > 6) {
+                $warning = "\n|Custom Face = yes";
+                $BaseFaceCalc = 1;
+            }
+            if ($BaseFaceCalc < 1) {
+                $warning = "\n|Custom Face = yes";
+                $BaseFaceCalc = 1;
+            }
+            $tailOrEarShape = $extraFeatureShape -1;
+            if ($tailOrEarShape > 50) {
+                $warningGen = " - Custom ?";
+                $tailOrEarShape = 1;
+            }
+            if ($tailOrEarShape < 1) {
+                $warningGen = " - Custom ?";
+                $tailOrEarShape = 1;
+            }
+            switch ($tribeKey)
+            {
+                case 1: // Midlander
+                    $tribeCode = ($isMale == "true") ? 0 : 100;
+                    $headIconIndex = ($isMale == "true") ? 5 : 6;
+                    $headIcon = $CharaMakeTypeCsv->at($tribeKeyCalc)["SubMenuParam[$headIconIndex][$BaseFaceCalc]"];
+                    $extraIcons = "|Face = ". $headIcon .".png". $warning ."";
+                    break;
+                case 2: // Highlander
+                    $tribeCode = ($isMale == "true") ? 200 : 300;
+                    $headIconIndex = ($isMale == "true") ? 5 : 6;
+                    $headIcon = $CharaMakeTypeCsv->at($tribeKeyCalc)["SubMenuParam[$headIconIndex][$BaseFaceCalc]"];
+                    $extraIcons = "|Face = ". $headIcon .".png". $warning ."";
+                    break;
+                case 3: // Wildwood
+                case 4: // Duskwight
+                    $tribeCode = ($isMale == "true") ? 400 : 500;
+                    $headIconIndex = ($isMale == "true") ? 4 : 5;
+                    $headIcon = $CharaMakeTypeCsv->at($tribeKeyCalc)["SubMenuParam[$headIconIndex][$BaseFaceCalc]"];
+                    $EarShape = $extraFeatureShape;
+                    $extraIcons = "|Face = ". $headIcon .".png". $warning ."\n|Ear Shape = ". $EarShape ."";
+                    break;
+                case 5: // Plainsfolks
+                case 6: // Dunesfolk
+                    $tribeCode = ($isMale == "true") ? 600 : 700;
+                    $headIconIndex = ($isMale == "true") ? 4 : 5;
+                    $headIcon = $CharaMakeTypeCsv->at($tribeKeyCalc)["SubMenuParam[$headIconIndex][$BaseFaceCalc]"];
+                    $EarShape = $extraFeatureShape;
+                    $extraIcons = "|Face = ". $headIcon .".png". $warning ."\n|Ear Shape = ". $EarShape ."";
+                    break;
+                case 7: // Seeker of the Sun
+                case 8: // Keeper of the Moon
+                    $tribeCode = ($isMale == "true") ? 800 : 900;
+                    $headIconIndex = ($isMale == "true") ? 6 : 7;
+                    $tailIconIndex = ($isMale == "true") ? 2 : 3;
+                    $headIcon = $CharaMakeTypeCsv->at($tribeKeyCalc)["SubMenuParam[$headIconIndex][$BaseFaceCalc]"];
+                    $tailIcon = $CharaMakeTypeCsv->at($tribeKeyCalc)["SubMenuParam[$tailIconIndex][$tailOrEarShape]"];
+                    $extraIcons = "|Face = ". $headIcon .".png". $warning ."\n|Tail Shape = ". $tailIcon .".png";
+                    break;
+                case 9: // Sea Wolf
+                case 10: // Hellsguard
+                    $tribeCode = ($isMale == "true") ? 1000 : 1100;
+                    $headIconIndex = ($isMale == "true") ? 5 : 6;
+                    $headIcon = $CharaMakeTypeCsv->at($tribeKeyCalc)["SubMenuParam[$headIconIndex][$BaseFaceCalc]"];
+                    $extraIcons = "|Face = ". $headIcon .".png". $warning ."";
+                    break;
+                case 11: // Raen
+                case 12: // Xaela
+                    $tribeCode = ($isMale == "true") ? 1200 : 1300;
+                    $headIconIndex = ($isMale == "true") ? 6 : 7;
+                    $tailIconIndex = ($isMale == "true") ? 2 : 3;
+                    $headIcon = $CharaMakeTypeCsv->at($tribeKeyCalc)["SubMenuParam[$headIconIndex][$BaseFaceCalc]"];
+                    $tailIcon = $CharaMakeTypeCsv->at($tribeKeyCalc)["SubMenuParam[$tailIconIndex][$tailOrEarShape]"];
+                    $extraIcons = "|Face = ". $headIcon .".png". $warning ."\n|Tail Shape = ". $tailIcon .".png";
+                    break;
+
+                // No alternate genders for Hrothgar, Viera.
+                // For Hrothgar, these might be faces too?
+                case 13: // Helions
+                case 14: // The Lost
+                    $tribeCode = 1400;
+                    $furIconIndex = 2;
+                    $tailIconIndex = 4;
+                    $furIcon = $CharaMakeTypeCsv->at($tribeKeyCalc)["SubMenuParam[$furIconIndex][$BaseFaceCalc]"];
+                    $tailIcon = $CharaMakeTypeCsv->at($tribeKeyCalc)["SubMenuParam[$tailIconIndex][$tailOrEarShape]"];
+                    $extraIcons = "|Fur Type = ". $furIcon .".png\n|Tail Shape = ". $tailIcon .".png";
+                    break;
+                case 15: // Rava
+                case 16: // Veena
+                    $tribeCode = 1500;
+                    $headIconIndex = 5;
+                    $earIconIndex = 14;
+                    $headIcon = $CharaMakeTypeCsv->at($tribeKeyCalc)["SubMenuParam[$headIconIndex][$BaseFaceCalc]"];
+                    $earIcon = $CharaMakeTypeCsv->at($tribeKeyCalc)["SubMenuParam[$earIconIndex][$tailOrEarShape]"];
+                    $extraIcons = "|Face = ". $headIcon .".png". $warning ."\n|Ear Shape = ". $earIcon .".png";
+                    break;
+            }
+            //HairColor
+            $GenderValue = ($isMale == "true") ? 0 : 1;
+            $listIndex = ($tribeKey * 2 + $GenderValue) * 5 + 4;
+            $hairIndex = $listIndex * 256;
+            $hairColorBase = $EnpcBase['HairColor'];
+            $hairColorIndex = $hairIndex + $hairColorBase;
+            $hairColor = $buffer[$hairColorIndex];
+            $hairHighlightColor = false;
+            if ($EnpcBase['HairHighlightColor'] != 0) {
+                $HairHighlightColorOffset = 1 * 256;
+                $hairHighlightColorBase = $EnpcBase['HairHighlightColor'];
+                $hairHighlightColorIndex = $HairHighlightColorOffset + $hairHighlightColorBase;
+                $hairHighlightColor = $buffer[$hairHighlightColorIndex];
+            }
+            //HairStyle
+            $hairStyleBase = $EnpcBase['HairStyle'];
+            $warningHair = false;
+            if ($hairStyleBase > 200) {
+                $hairStyleBase = 1;
+                $warningHair = "\n|Custom Hair = yes";
+            }
+            $hairStyleRaw = $hairStyles[$tribeCode][$hairStyleBase];
+            $hairStyleIcon = "".$hairStyleRaw['Icon'] .".png".$warningHair ."";
+            //Skin Colour
+            $listIndex = ($tribeKey * 2 + $GenderValue) * 5 + 3;
+            $skinIndex = $listIndex * 256;
+
+            $skinColorBase = $EnpcBase['SkinColor'];
+            $skinColorIndex = $skinIndex + $skinColorBase;
+            $skinColor = $buffer[$skinColorIndex];
+
+            //Eyes
+            $EyeColorOffset = 0 * 256;
+            $eyeColorBase = $EnpcBase['EyeColor'];
+            $eyeColorBuffer = $eyeColorBase + $EyeColorOffset;
+            $eyeColor = $buffer[$eyeColorBuffer];
+
+            $heterochromiaColor ="";
+            $eyeHeterochromia = $EnpcBase['EyeHeterochromia'];
+            if ($eyeHeterochromia != $eyeColorBase) {
+                $heterochromiaBuffer = $eyeHeterochromia + $EyeColorOffset;
+                $heterochromiaColor = $buffer[$heterochromiaBuffer];
+            }
+            $eyeSize = "Large";
+            $eyeShapeBase = $EnpcBase['EyeShape'];
+            $eyeShape = $eyeShapeBase + 1;
+            if ($eyeShapeBase >= 128) {
+                $eyeShape = ($eyeShapeBase - 128) + 1;
+                $eyeSize = "Small";
+            }
+            //Mouth and Lips
+            $LightLipFacePaintColorOffset = 7 * 256;
+            $DarkLipFacePaintColorOffset = 2 * 256;
+            $mouthShape = $EnpcBase['Mouth'];
+            if ($tribeKey == 13 || 14) {
+                $lipColourBase = $EnpcBase['LipColor'];
+                $mouthData = "|Mouth = ". $mouthShape ."\n|FurType = ". $lipColourBase ."";
+            }
+            if ($mouthShape >= 128) {
+                $mouthShape = 1 + ($mouthShape - 128);
+                if ($EnpcBase['LipColor'] >= 128) {
+                    $lipShade = "Light";
+                    $lipColourCalc = $EnpcBase['LipColor'] + $LightLipFacePaintColorOffset;
+                    $lipColour = $buffer[$lipColourCalc];
+                } elseif ($EnpcBase['LipColor'] < 128){
+                    $lipShade = "Dark";
+                    $lipColourCalc = $EnpcBase['LipColor'] + $DarkLipFacePaintColorOffset;
+                    $lipColour = $buffer[$lipColourCalc];
+                }
+                $mouthData = "|Mouth = ". $mouthShape ."\n|Lip Color = ". $lipColour ."\n|Lip Shade = ". $lipShade ."";
+            } elseif ($mouthShape < 128) {
+                $mouthShape = $mouthShape + 1;
+                $lipShade = false;
+                $lipColour = false;
+                $mouthData = "|Mouth = ". $mouthShape ."";
+            }
+            //Face Paint
+            //get facepaint keys based on gender/race
+            $baseRowKey = 1600;
+            switch ($tribeKey)
+            {
+                case 1: // Midlander
+                case 2: // Highlander
+                case 3: // Wildwood
+                case 4: // Duskwight
+                case 5: // Plainsfolks
+                case 6: // Dunesfolk
+                case 7: // Seeker of the Sun
+                case 8: // Keeper of the Moon
+                case 9: // Sea Wolf
+                case 10: // Hellsguard
+                case 11: // Raen
+                case 12: // Xaela
+                    $tribeOffset = $baseRowKey + (($tribeKey - 1) * 100);
+                    $FacePaintCustomizeIndex = ($isMale == "true") ? $tribeOffset : $tribeOffset + 50;
+                    break;
+
+                case 13: // Helions
+                    $FacePaintCustomizeIndex = 2800;
+                    break;
+                case 14: // The Lost
+                    $FacePaintCustomizeIndex = 2850;
+                    break;
+                case 15: // Rava
+                    $FacePaintCustomizeIndex = 2900;
+                    break;
+                case 16: // Veena
+                    $FacePaintCustomizeIndex = 2950;
+                    break;
+            }
+            //Face Paint Color
+            $facePaintColorBase = $EnpcBase['FacePaintColor'];
+            $facePaintColor = false;
+            $facePaintColorShade = "Light";
+            if ($facePaintColorBase >= 128) {
+                $facePaintColorShade = "Light";
+                $facePaintColourIndex = 1 + ($facePaintColorBase - 128);
+                $facePaintColourCalc = $EnpcBase['FacePaintColor'] + $LightLipFacePaintColorOffset;
+                $facePaintColorRGB = $buffer[$facePaintColourCalc];
+                $facePaintColor = "|Face Paint Color = ". $facePaintColorRGB ."\n|Face Paint Shade = ". $facePaintColorShade ."";
+            } elseif ($facePaintColorBase < 128) {
+                $facePaintColorShade = "Dark";
+                $facePaintColourCalc = $EnpcBase['FacePaintColor'] + $DarkLipFacePaintColorOffset;
+                $facePaintColorRGB = $buffer[$facePaintColourCalc];
+                $facePaintColor = "|Face Paint Color = ". $facePaintColorRGB ."\n|Face Paint Shade = ". $facePaintColorShade ."";
+            }
+            //Face Paint Icon
+            $facePaintBase = $EnpcBase['FacePaint'] + 1;
+            $facePaintIcon = false;
+            if ($facePaintBase >= 128) {
+                $facePaint = 1 + ($facePaintBase - 128);
+                $facePaintReverse = "|Face Paint Reversed = True";
+                $facePaintIconIndex = $FacePaintCustomizeIndex + $facePaint;
+                $facePaintIconImage = $CharaMakeCustomizeCsv->at($facePaintIconIndex)['Icon'];
+                if ($facePaintIconImage > 0) {
+                    $facePaint = $facePaintIconImage;
+                    $facePaintIcon = "|Face Paint = ". $facePaintIconImage ."\n". $facePaintReverse ."";
+                }
+            } elseif ($facePaintBase < 128) {
+                $facePaintIconIndex = $FacePaintCustomizeIndex + $facePaintBase;
+                $facePaintIconImage = $CharaMakeCustomizeCsv->at($facePaintIconIndex)['Icon'];
+                $facePaint = $facePaintIconImage;
+                $facePaintReverse = "|Face Paint Reversed = False";
+                if ($facePaintIconImage > 0) {
+                    $facePaint = $facePaintIconImage;
+                    $facePaintIcon = "|Face Paint = ". $facePaintIconImage ."\n". $facePaintReverse ."\n". $facePaintColor ."";
+                }
+            }
+            //Extra Features
+            $raceKey = $EnpcBase['Race'];
+            switch ($raceKey)
+            {
+                case 1: // Hyur
+                case 5: // Roegadyn
+                    $extraFeatureName = null;
+                    break;
+
+                case 2: // Elezen
+                case 3: // Lalafell
+                case 8: // Viera
+                    $extraFeatureName = "Ear";
+                    break;
+
+                case 4: // Miqo'te
+                case 6: // Au Ra
+                case 7: // Hrothgar
+                    $extraFeatureName = "Tail";
+                    break;
+            }
+            // Bust & Muscles - flex fields.
+            $bust = false;
+            $bustAndMuscle = false;
+            if ($raceKey == 5 || $raceKey == 1)
+            {
+                // Roegadyn & Hyur
+                $bust = false;
+                $muscle = $EnpcBase["BustOrTone1"];
+                if ($isMale == "false"){
+                    $bust = "\n|BustSize = ". $EnpcBase["ExtraFeature2OrBust"] ."";
+                }
+                $bustAndMuscle = "\n|Muscles = ". $muscle ."". $bust ."";
+            }
+            else if ($raceKey == 6 && $isMale == "true")
+            {
+                // Au Ra male muscles
+                $muscle = $EnpcBase["BustOrTone1"];
+                $bustAndMuscle = "\n|Muscles = ". $muscle ."";
+            }
+            else if ($isMale == "false")
+            {
+                // Other female bust sizes
+                $bust = $EnpcBase["BustOrTone1"];
+                $bustAndMuscle = "\n|BustSize = ". $bust ."";
+            }
+            $extraFeature = false;
+            if ($extraFeatureName != null) {
+                $extraFeature = "\n|". $extraFeatureName ." Length = ". $extraFeatureSize ."";
+            }
+            //Facial Feature
+            $facialFeature = null;
+            $facialFeatureArray = null;
+            $facialFeatureArray = [];
+            $facialFeatureBase =  null;
+            $facialFeatureBasePad = null;
+            $facialFeatureIcon = null;
+            $facialFeatureIcon = [];
+            // ^ i couldn't find the cause so i emptied out all values ^
+            $facialFeatureBase = $EnpcBase['FacialFeature'];
+            $facialFeatureArray = array(($facialFeatureBase & 1) == 1, ($facialFeatureBase & 2) == 2, ($facialFeatureBase & 4) == 4, ($facialFeatureBase & 8) == 8, ($facialFeatureBase & 16) == 16, ($facialFeatureBase & 32) == 32, ($facialFeatureBase & 64) == 64, ($facialFeatureBase & 128) == 128);
+            $facialFeatureArraysplit = str_split($facialFeatureBasePad);
+            //facial features
+            // colors
+            $listIndex = ($tribeKey * 2 + $GenderValue) * 5 + 4;
+            $facialFeatureIndex = $listIndex * 256;
+            $facialFeatureColorBase = $EnpcBase['FacialFeatureColor'];
+            $facialFeatureColorIndex = $facialFeatureIndex + $facialFeatureColorBase;
+            $facialFeatureColor = $buffer[$facialFeatureColorIndex];
+            $tribe = $EnpcBase['Tribe'];
+            switch ($tribeKey)
+            {
+                case 1: // Midlander
+                case 2: // Highlander
+                case 3: // Wildwood
+                case 4: // Duskwight
+                case 5: // Plainsfolks
+                case 6: // Dunesfolk
+                case 7: // Seeker of the Sun
+                case 8: // Keeper of the Moon
+                case 9: // Sea Wolf
+                case 10: // Hellsguard
+                case 11: // Raen
+                case 12: // Xaela
+                    $facialFace = $face - 1;
+                    break;
+                case 13: // Helions
+                case 14: // The Lost
+                    $facialFace = $face;
+                    break;
+                case 15: // Rava
+                case 16: // Veena
+                    $facialFace = $face - 1;
+                    break;
+            }
+            if ($face < 7) {
+                for ($i=0; $i < 5; $i++) {
+                    if ($facialFeatureArray[$i] == 1) {
+                        $facialFeatureIcon[$i] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
+                    }
+                }
+            } elseif ($face > 6) {
+                $facialFeatureicon = [];
+            }
+
+
+            if (!empty($facialFeatureIcon)) {
+                $facialFeature = implode(",", $facialFeatureIcon);
+            }
+            //tattoos
+            $facialFeatureExtraPre = false;
+            $facialFeatureExtraImplode = false;
+            $facialFeatureExtraColor = false;
+            $facialFeatureExtra = [];
+            if ($face < 7) {
+                for ($i=5; $i < 7; $i++) {
+                    if ($facialFeatureArray[$i] == 1) {
+
+                        switch ($tribeKey)
+                        {
+                            case 1: // Midlander
+                            case 2: // Highlander
+                                $facialFeatureExtraPre = "\n|Tattoos = ";
+                                $facialFeatureExtraColor = "\n|Tattoo Color = ". $facialFeatureColor ."";
+                                $facialFeatureExtra[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
+                                break;
+                            case 3: // Wildwood
+                                $facialFeatureExtraPre = "\n|Ear Clasp = ";
+                                $facialFeatureExtraColor = "\n|Ear Clasp Color = ". $facialFeatureColor ."";
+                                $facialFeatureExtra[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
+                                break;
+                            case 4: // Duskwight
+                            case 5: // Plainsfolks
+                            case 6: // Dunesfolk
+                            case 7: // Seeker of the Sun
+                                $facialFeatureExtraPre = "\n|Tattoos = ";
+                                $facialFeatureExtraColor = "\n|Tattoo Color = ". $facialFeatureColor ."";
+                                $facialFeatureExtra[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
+                                break;
+                            case 8: // Keeper of the Moon
+                                if ($GenderCalc == 0) {
+                                    $facialFeatureExtraPre = "\n|Tattoos = ";
+                                    $facialFeatureExtraColor = "\n|Tattoo Color = ". $facialFeatureColor ."";
+                                    $facialFeatureExtra[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
+                                } elseif ($GenderCalc == 1) {
+                                    $facialFeatureExtraPre = "\n|Ear Clasp = ";
+                                    $facialFeatureExtraColor = "\n|Ear Clasp Color = ". $facialFeatureColor ."";
+                                    $facialFeatureExtra[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
+                                }
+                                break;
+                            case 9: // Sea Wolf
+                            case 10: // Hellsguard
+                                $facialFeatureExtraPre = "\n|Tattoos = ";
+                                $facialFeatureExtraColor = "\n|Tattoo Color = ". $facialFeatureColor ."";
+                                $facialFeatureExtra[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
+                                break;
+                            case 11: // Raen
+                            case 12: // Xaela
+                                $facialFeatureExtraPre = "\n|Limbal Rings = ";
+                                $facialFeatureExtraColor = "\n|Limbal Ring Color = ". $facialFeatureColor ."";
+                                $facialFeatureExtra[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
+                                break;
+                            case 13: // Helions
+                            case 14: // The Lost
+                                $facialFeatureExtraPre = "\n|Tattoos = ";
+                                $facialFeatureExtraColor = false;
+                                $facialFeatureExtra[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
+                                break;
+                            case 15: // Rava
+                            case 16: // Veena
+                                $facialFeatureExtraPre = "\n|Tattoos = ";
+                                $facialFeatureExtraColor = "\n|Tattoo Color = ". $facialFeatureColor ."";
+                                $facialFeatureExtra[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
+                                break;
+                        }
+                    }
+                }
+            } elseif ($face > 6) {
+                $facialFeatureicon = [];
+            }
+            if (!empty($facialFeatureExtra)) {
+                $facialFeatureExtraImplode = implode(",", $facialFeatureExtra);
+            }
+            $facialFeatureExtra = "". $facialFeatureExtraPre ."". $facialFeatureExtraImplode ."". $facialFeatureExtraColor ."";
+            if ($headIcon < 1) {
+                $headIcon = "CustomFace";
+            }
+            //pure debugging of certain strings
+            if ($debug == true) {
+                var_dump($facialFeatureBase);
+                var_dump($facialFeatureArray);
+                var_dump($facialFeatureBasePad);
+
+                $ex = $EnpcBase['FacialFeature'];
+                $cusomizekeystring = "
+                tribeCode > ". $tribeCode ."
+                isMale  > ". $isMale ."
+                FacePaintCustomizeIndex > ". $FacePaintCustomizeIndex ."
+                genderBase > ". $genderBase ."
+                face > ". $face ."
+                tribeKey > ". $tribeKey ."
+                hairColorIndex > ". $hairColorIndex ."
+                extraFeatureName > ". $extraFeatureName ."
+                hairColorIndex > ". $extraFeatureShape ."
+                hairColorIndex > ". $extraFeatureSize ."
+                bustAndMuscle > ". $bustAndMuscle ."
+                FacialFeature > ". $facialFeature ."". $facialFeatureExtra ."
+                FacePaintCustomizeIndex > ". $FacePaintCustomizeIndex ."
+                facePaint > ". $facePaint ."
+                facePaintIconIndex > ". $facePaintIconIndex ."
+                extrafea > ". $ex ."
+                extraIcons > ". $extraIcons . "
+                BaseFace > ". $BaseFace ."
+                hairStyleBase > ". $hairStyleBase ."
+                hairStyleIcon > ". $hairStyleIcon ."
+                BaseFaceCalc > ". $BaseFaceCalc ."
+                ";
+            }
+            if ($debug == false) {
+                $cusomizekeystring = false;
+            }
+            $eyebrowsBase = $EnpcBase['Eyebrows'];
+            $Eyebrows = $eyebrowsBase + 1;
+            $noseBase = $EnpcBase['Nose'];
+            $Nose = $noseBase + 1;
+            $jawBase = $EnpcBase['Jaw'];
+            $Jaw = $jawBase + 1;
+            $NameFormatted = $this->NameFormat($id, $ENpcResidentCsv, $ENpcBaseCsv, $NpcPlaceName);
+
+            $BodyOutput = "|Race = ". $Race ."\n";
+            $BodyOutput .= "|Gender = ". $Gender ."\n";
+            $BodyOutput .= "|Body Type = ". $BodyType ."\n";
+            $BodyOutput .= "|Height = ". $Height ."\n";
+            $BodyOutput .= "|Clan = ". $Tribe ."\n";
+            $BodyOutput .= "". $extraIcons ."\n";
+            $BodyOutput .= "|Hair Style = ". $hairStyleIcon ."\n";
+            $BodyOutput .= "|Skin Color = ". $skinColor ."\n";
+            $BodyOutput .= "|Hair Color = ". $hairColor ."\n";
+            $BodyOutput .= "|Hair Highlight Color = ". $hairHighlightColor ."\n";
+            $BodyOutput .= "|Facial Feature = ". $facialFeature ."". $facialFeatureExtra ."". $extraFeature ."". $bustAndMuscle ."\n";
+            $BodyOutput .= "|Eyebrows = ". $Eyebrows ."\n";
+            $BodyOutput .= "|Eye Shape = ". $eyeShape ."\n";
+            $BodyOutput .= "|Eye Size = ". $eyeSize ."\n";
+            $BodyOutput .= "|Eye Color = ". $eyeColor ."\n";
+            $BodyOutput .= "|Eye Heterochromia = ". $heterochromiaColor ."\n";
+            $BodyOutput .= "|Nose = ". $Nose ."\n";
+            $BodyOutput .= "|Jaw = ". $Jaw ."\n";
+            $BodyOutput .= "". $mouthData ."\n";
+            $BodyOutput .= "". $facePaintIcon ."\n";
+            $EquipmentArray = $this->getEquipment($ENpcBaseCsv, $NpcEquipCsv, $weaponArray, $isMale, $StainCsv, $id, $itemArray);
+            
+            $EquipmentOutput = "|Head = ". $EquipmentArray['Head']['Item'] ."\n";
+            $EquipmentOutput .= "|Head Dye = ". $EquipmentArray['Head']['Dye'] ."\n";
+            $EquipmentOutput .= "|Visor = ". $EquipmentArray['Visor'] ."\n";
+            $EquipmentOutput .= "|Body = ". $EquipmentArray['Body']['Item'] ."\n";
+            $EquipmentOutput .= "|Body Dye = ". $EquipmentArray['Body']['Dye'] ."\n";
+            $EquipmentOutput .= "|Hands = ". $EquipmentArray['Hands']['Item'] ."\n";
+            $EquipmentOutput .= "|Hands Dye = ". $EquipmentArray['Hands']['Dye'] ."\n";
+            $EquipmentOutput .= "|Legs = ". $EquipmentArray['Legs']['Item'] ."\n";
+            $EquipmentOutput .= "|Legs Dye = ". $EquipmentArray['Legs']['Dye'] ."\n";
+            $EquipmentOutput .= "|Feet = ". $EquipmentArray['Feet']['Item'] ."\n";
+            $EquipmentOutput .= "|Feet Dye = ". $EquipmentArray['Feet']['Dye'] ."\n";
+            $EquipmentOutput .= "|Main Hand = ". $EquipmentArray['MainHand']['Item'] ."\n";
+            $EquipmentOutput .= "|Off Hand = ". $EquipmentArray['OffHand']['Item'] ."\n";
+
+            $NPCEquipmentArray[$NameFormatted][] = "$BodyOutput\n$EquipmentOutput";
+
+
+        }
+        $NPCUniqueApperanceIDs = [];
+        $EquipmentarrayUnique = [];
+        foreach ($NPCEquipmentArray as $key => $value) {
+            $EquipmentarrayUnique[$key] = array_unique($value);
+            $EquipmentArrayFormatted = [];
+            $a = 0;
+            foreach ($EquipmentarrayUnique[$key] as $key1 => $value1) {
+                $a++;
+                $EquipmentArrayFormatted[$key1] = "{{-start-}}\n'''$key/Appearance/$a'''\n$value1\n{{-stop-}}";
+            }
+            $EquipmentarrayUnique[$key] = implode("\n", $EquipmentArrayFormatted);
+            $NPCUniqueApperanceIDs[$key] = $a;
+        }
+        $EquipmentOut = implode("\n", $EquipmentarrayUnique);
+        //if (!file_exists("output/$PatchID")) { mkdir("output/$PatchID", 0777, true); }
+        //$EquipFile = fopen("output/$PatchID/ENPCEquipment.txt", 'w');
+        //fwrite($EquipFile, json_encode($EquipmentarrayImplode));
+        //fclose($EquipFile);
+        $this->io->progressFinish();
         //mainpage constructor
         $this->io->text('Building NPC Final Outputs ...');
         $this->io->progressStart($ENpcResidentCsv->total);
         foreach ($ENpcResidentCsv->data as $id => $NPCs) {
             $this->io->progressAdvance();
             $Name = $NPCs['Singular'];//Array of names that should not be capitalized
-            $NameFormatted = $this->NameFormat($id, $ENpcResidentCsv, $ENpcBaseCsv, $PlaceNameLocation);
+            $NameFormatted = $this->NameFormat($id, $ENpcResidentCsv, $ENpcBaseCsv, $NpcPlaceName);
             if ((empty($NameFormatted)) || (preg_match("/[\x{30A0}-\x{30FF}\x{3040}-\x{309F}\x{4E00}-\x{9FBF}]+/u", $NameFormatted))) {
                 continue;
             }
@@ -634,14 +1495,6 @@ class NPCARRAYTEST implements ParseInterface
                 break;
             }
 
-            
-            //safety checks
-            if (!empty($Questarrayimplode[$Name])) {
-                $QuestCheckOut = substr($Questarrayimplode[$Name],0,-1);
-            }
-            if (empty($Questarrayimplode[$Name])) {
-                $QuestCheckOut = "";
-            } 
             $subLocation = "";
             if (!empty($LGBArray[$id]['Territory'])){
                 $Territory = $LGBArray[$id]['Territory'];
@@ -663,6 +1516,7 @@ class NPCARRAYTEST implements ParseInterface
                     $subLocation = $JSONTeriArray[$Territory][$smallestNumber]["placename"];
                 }
             }
+            //$NpcEquipmentArrayOpen = "{{-start-}}\n". implode("\n", )."";
             //produce map
             $MapOutputString = "";
             $sub = "";
@@ -688,6 +1542,7 @@ class NPCARRAYTEST implements ParseInterface
                 $BasePlaceName = "$code - {$MapName}{$sub}";
     
                 $LevelID = $LGBArray[$id]['id'];
+                $Patch = $PatchNumber[$id];
                 //MapOutput = 
                 $MapOutputString = "{{-start-}}\n'''". $NameFormatted ."/Map/". $id ."'''\n";
                 $MapOutputString .= "{{NPCMap\n";
@@ -700,7 +1555,7 @@ class NPCARRAYTEST implements ParseInterface
                 $MapOutputString .= "  | zone = $MapName\n";
                 $MapOutputString .= "  | level_id = $LevelID\n";
                 $MapOutputString .= "  | npc_id = $id\n";
-                $MapOutputString .= "  | patch = REPLACEMEWITHPATCH\n";
+                $MapOutputString .= "  | patch = $Patch\n";
                 $MapOutputString .= "  | Sublocation = $SubLocation\n";
                 $MapOutputString .= "}}\n";
                 $MapOutputString .= "{{-stop-}}\n";
@@ -711,6 +1566,11 @@ class NPCARRAYTEST implements ParseInterface
                 $ShopItemsTotalNo = $ShopItemsNumber[$Name];
             } else {
                 $ShopItemsTotalNo = "";
+            }
+            if (!empty($NPCUniqueApperanceIDs[$NameFormatted])) {
+                $UniqueApperances = $NPCUniqueApperanceIDs[$NameFormatted];
+            } else {
+                $UniqueApperances = "";
             }
             $dataout = implode("\n", $datarray);
             $LastMapLocExp = explode(",",$NPCIds[$Name]);
@@ -723,7 +1583,7 @@ class NPCARRAYTEST implements ParseInterface
             | Image = 
             $Race$Gender$Tribe
             | IDs = $NPCIds[$Name]
-            | Quests = $QuestCheckOut
+            | Apperance IDs = $UniqueApperances
             | Shop = ".substr($Shoparrayimplode[$Name],0,-1)."
             | TotalItems = $ShopItemsTotalNo
             | Warp = ".substr($Warparrayimplode[$Name],0,-1)."
@@ -737,6 +1597,11 @@ class NPCARRAYTEST implements ParseInterface
             {{-stop-}}";
         
         }
+            
+        //if (!file_exists("output/$PatchID")) { mkdir("output/$PatchID", 0777, true); }
+        //$EquipFile = fopen("output/$PatchID/ENPCEquipment.txt", 'w');
+        //fwrite($EquipFile, $htmlString);
+        //fclose($EquipFile);
             
         //---------------------------------------------------------------------------------
         $finaloutputarray = [];
@@ -759,6 +1624,7 @@ class NPCARRAYTEST implements ParseInterface
             '{ShopDialogue}' => $ShopDialogueOut,
             '{WarpPages}' => $WarpPages,
             '{DialoguePages}' => $DialoguePages,
+            '{Equipment}' => $EquipmentOut,
         ];
 
         // format using Gamer Escape formatter and add to data array
