@@ -79,12 +79,11 @@ trait CsvParseTrait
         $this->projectDirectory = $projectDirectory;
         return $this;
     }
-
     /**
      * Generate Patch Json
      */
     public function PatchCheck($PatchNoData, $FileName, $CSV) {
-        if (!file_exists("Patch/$FileName.json")) {
+        if (!file_exists("Patch/$FileName.json")) { 
             $MakeFile = fopen("Patch/$FileName.json", 'w');
             fwrite($MakeFile, NULL);
             fclose($MakeFile);
@@ -107,7 +106,6 @@ trait CsvParseTrait
         fwrite($JSON_File, $JSONOUTPUT);
         fclose($JSON_File);
     }
-
     /**
      * Get Patch Data
      */
@@ -135,23 +133,188 @@ trait CsvParseTrait
             "Kee-satt", "Lewto-sai", "Lue-reeq", "Mao-ladd", "Mei-tatch", "Moa-mosch", "Mosha-moa", "Moshei-lea", "Nunsi-lue", "O-app-pesi", "Qeshi-rae",
             "Rae-qesh", "Rae-satt", "Raya-o-senna", "Renda-sue", "Riqi-mao", "Roi-tatch", "Rua-hann", "Sai-lewq", "Sai-qesh", "Sasha-rae", "Shai-satt",
             "Shai-tistt", "Shee-tatch", "Shira-kee", "Shue-hann", "Sue-lewq", "Tao-tistt", "Tatcha-mei", "Tatcha-roi", "Tio-reeq", "Tista-bie", "Tui-shirr",
-            "Vroi-reeq", "Zao-mosc", "Zia-bostt", "Zoi-chorr", "Zumie-moa", "Zumie-shai");
+            "Vroi-reeq", "Zao-mosc", "Zia-bostt", "Zoi-chorr", "Zumie-moa", "Zumie-shai", "“", "”", "é", "ö");
         $correctnames = array(" de ", " bas ", " mal ", " van ", " cen ", " sas ", " tol ", " zos ", " yae ", " the ", " of the ", " of ",
             "A-Ruhn-Senna", "A-Towa-Cant", "Bea-Chorr", "Bie-Zumm", "Bosta-Bea", "Bosta-Loe", "Chai-Nuzz", "Chei-Ladd", "Chora-Kai", "Chora-Lue",
             "Chue-Zumm", "Dulia-Chai", "E-Sumi-Yan", "E-Una-Kotor", "Fae-Hann", "Hangi-Rua", "Hanji-Fae", "Kai-Shirr", "Kan-E-Senna", "Kee-Bostt",
             "Kee-Satt", "Lewto-Sai", "Lue-Reeq", "Mao-Ladd", "Mei-Tatch", "Moa-Mosch", "Mosha-Moa", "Moshei-Lea", "Nunsi-Lue", "O-App-Pesi", "Qeshi-Rae",
             "Rae-Qesh", "Rae-Satt", "Raya-O-Senna", "Renda-Sue", "Riqi-Mao", "Roi-Tatch", "Rua-Hann", "Sai-Lewq", "Sai-Qesh", "Sasha-Rae", "Shai-Satt",
             "Shai-Tistt", "Shee-Tatch", "Shira-Kee", "Shue-Hann", "Sue-Lewq", "Tao-Tistt", "Tatcha-Mei", "Tatcha-Roi", "Tio-Reeq", "Tista-Bie", "Tui-Shirr",
-            "Vroi-Reeq", "Zao-Mosc", "Zia-Bostt", "Zoi-Chorr", "Zumie-Moa", "Zumie-Shai");
-        
+            "Vroi-Reeq", "Zao-Mosc", "Zia-Bostt", "Zoi-Chorr", "Zumie-Moa", "Zumie-Shai", "\"", "\"", "e", "o");
+        //array (Airship_Ticketer,Ala_Mhigan_Resistance_Gate_Guard,Alehouse_Wench,Alisaie%27s_Assistant,Apartment_Caretaker,Arms_Supplier,Arms_Supplier_%26_Mender,Arrivals_Attendant,Calamity_Salvager,Celestine,Chocobokeep,Collectable_Appraiser,Concerned_Mother,Eggsaminer,Enthralling Illusionist (same NPC, just different years),Expedition_Artisan (needs checking 2 if NPCs?),Expedition_Birdwatcher (maybe same NPC just needs copying),Expedition_Scholar (same as above),Faire_Crier (why didn’t this overwrite?),Ferry_Skipper,Flame Officer,Flame Private,Flame Recruit,Flame Scout,Flame Sergeant,Flame Soldier,Gate_Keeper (why didn’t this overwrite?),Gold_Saucer_Attendant (should be 4),Gridanian_Merchant (fix with moves),Haermaga,Housing_Enthusiast,Hunt_Billmaster,Hunter-scholar,Hunter-Scholar,Imperial_Centurion,Imperial_Deserter,Independent_Armorer,Independent_Armorfitter,Independent_Arms_Mender,Independent_Arms_Mender,Independent_Mender,Independent_Merchant,Independent_Sutler,Inu_Doshin,Irate_Coachman (why only 1),Ironworks_Engineer,Ironworks_Engineer (needs attention),Junkmonger,Keeper_of_the_Entwined_Serpents,Local_Merchant,Lonesome_Lass,Long-haired_Pirate (why only 1),Malevolent_Mummer (why only 1),Mammet Dispensator #012P,Mammet Dispensator #012T,Materia_Melder,Material_Supplier,Mender,Minion_Enthusiast (why 1?),Moonfire_Faire_Vendor,Moonfire_Marine,Oic_Administrator,Oic_Officer_of_Arms,Oic_Quartermaster,Pernicious_Temple_Knight,Picker of Locks,Recompense_Officer,Resident_Caretaker,Resistance Fighter,Resistance Officer,Rising_Attendant (needs more investigation),Rising_Vendor (only 1),Royal_Handmaiden,Royal_Seneschal,Royal_Servant,Saint%27s_Little_Helper,Saucer_Attendant (needs more investigation),Scrip_Exchange,Seasoned Adventurer,Serpent Lieutenant,Serpent Officer,Serpent Private,Serpent Recruit,Serpent Scout,Shady_Smock,Splendors_Vendor,Spoils_Collector (needs more investigation),Spoils_Trader,Starlight_Celebrant,Starlight_Celebration_Crier,Starlight_Supplier,Steersman,Storm Captain,Storm Officer,Storm Recruit,Storm Soldier,Storm_Private,Storm_Sergeant (only 3?),Sultansworn_Elite,Suspicious_Coerthan,The_Smith,Tournament_Registrar,Traveling_Merchant,Traveling_Trader,Triple_Triad_Trader,Triple_Triad_Trader,Troubled_Coachman (why 1?),Uncanny_Illusionist,Untrustworthy_Illusionist,Unusual_Illusionist,Well-informed_Adventurer,Wounded Imperial,Wounded Resistance Fighter,Wunthyll,Yellow_Moon_Admirer,Enie)
+        $PLAddition = "";
         switch ($NameFormatted) {
-            case 'amarokeep':
-                $NameFormatted = "Amarokeep ($PlaceNameLocation)";
+            case "airship ticketer";
+            case "ala mhigan resistance gate guard";
+            case "alehouse wench";
+            case "alisaie's assistant";
+            case "apartment caretaker";
+            case "arms supplier";
+            case "arms supplier & mender";
+            case "arrivals attendant";
+            case "calamity salvager";
+            case "celestine";
+            case "chocobokeep";
+            case "collectable appraiser";
+            case "concerned mother";
+            case "eggsaminer";
+            case "enthralling illusionist";
+            case "expedition artisan";
+            case "expedition birdwatcher";
+            case "expedition scholar";
+            case "faire crier";
+            case "ferry skipper";
+            case "flame officer";
+            case "flame private";
+            case "flame recruit";
+            case "flame scout";
+            case "flame sergeant";
+            case "flame soldier";
+            case "gate keeper";
+            case "gold saucer attendant";
+            case "gridanian merchant";
+            case "haermaga";
+            case "housing enthusiast";
+            case "hunt billmaster";
+            case "hunter-scholar";
+            case "hunter-scholar";
+            case "imperial centurion";
+            case "imperial deserter";
+            case "independent armorer";
+            case "independent armorfitter";
+            case "independent arms mender";
+            case "independent arms mender";
+            case "independent mender";
+            case "independent merchant";
+            case "independent sutler";
+            case "inu doshin";
+            case "irate coachman";
+            case "ironworks engineer";
+            case "ironworks engineer";
+            case "junkmonger";
+            case "keeper of the entwined serpents";
+            case "local merchant";
+            case "lonesome lass";
+            case "long-haired pirate";
+            case "malevolent mummer";
+            case "mammet dispensator #012p";
+            case "mammet dispensator #012t";
+            case "materia melder";
+            case "material supplier";
+            case "mender";
+            case "minion enthusiast";
+            case "moonfire faire vendor";
+            case "moonfire marine";
+            case "oic administrator";
+            case "oic officer of arms";
+            case "oic quartermaster";
+            case "pernicious temple knight";
+            case "picker of locks";
+            case "recompense officer";
+            case "resident caretaker";
+            case "resistance fighter";
+            case "resistance officer";
+            case "rising attendant";
+            case "rising vendor";
+            case "royal handmaiden";
+            case "royal seneschal";
+            case "royal servant";
+            case "saint's little helper";
+            case "saucer attendant";
+            case "scrip exchange";
+            case "seasoned adventurer";
+            case "serpent lieutenant";
+            case "serpent officer";
+            case "serpent private";
+            case "serpent recruit";
+            case "serpent scout";
+            case "shady smock";
+            case "splendors vendor";
+            case "spoils collector";
+            case "spoils trader";
+            case "starlight celebrant";
+            case "starlight celebration crier";
+            case "starlight supplier";
+            case "steersman";
+            case "storm captain";
+            case "storm officer";
+            case "storm recruit";
+            case "storm soldier";
+            case "storm private";
+            case "storm sergeant";
+            case "sultansworn elite";
+            case "suspicious coerthan";
+            case "the smith";
+            case "tournament registrar";
+            case "traveling merchant";
+            case "traveling trader";
+            case "triple triad trader";
+            case "troubled coachman";
+            case "uncanny illusionist";
+            case "untrustworthy illusionist";
+            case "unusual illusionist";
+            case "well-informed adventurer";
+            case "wounded imperial";
+            case "wounded resistance fighter";
+            case "wunthyll";
+            case "Yellow Moon admirer";
+            case "Enie";
+            case "amarokeep";
+                $PLAddition = " ($PlaceNameLocation)";
+                if (empty($PlaceNameLocation)){
+                    switch ($NameFormatted) {
+                        case 'junkmonger': // housing NPCs
+                        case 'independent mender':
+                        case 'independent merchant':
+                        case 'material supplier':
+                        case 'mender':
+                        case 'materia melder':
+                            $PLAddition = "(Housing)";
+                        break;
+                        case 'storm soldier': //MSQ
+                        case 'flame officer':
+                        case 'storm officer':
+                        case 'serpent officer':
+                        case 'serpent scout':
+                        case 'flame scout':
+                        case 'flame private':
+                        case 'flame sergeant':
+                        case 'serpent lieutenant':
+                        case 'serpent private':
+                        case 'storm private':
+                        case 'flame soldier':
+                        case 'imperial centurion':
+                        case 'flame recruit':
+                        case 'wounded imperial':
+                            $PLAddition = "(MSQ)";
+                        break;
+                        case 'yellow moon admirer': //Event
+                        case "saint's little helper":
+                        case 'enthralling illusionist':
+                        case 'royal handmaiden':
+                        case 'royal seneschal':
+                            $PLAddition = "(Event)";
+                        break;
+                        case 'ferry skipper': //Unknowns
+                        case 'chocobokeep':
+                        case 'tournament registrar':
+                        case 'expedition scholar':
+                        case 'traveling merchant':
+                        case 'seasoned adventurer':
+                        case 'Enie':
+                            $PLAddition = "(Unknown)";
+                        break;
+                        
+                        default:
+                            # code...
+                            break;
+                    }
+                }
             break;
             
             default:
                 # code...
-                break;
+            break;
         }
 
         //Quest Giver Name (All Words In Name Capitalized)
@@ -162,7 +325,7 @@ trait CsvParseTrait
             $NpcName = ucwords(strtolower($ENpcResidentCsv->at($NPCID)['Singular']));
             $NpcName = implode('-', array_map('ucfirst', explode('-', $NpcName)));
         }
-        $NameFormatted = str_replace($IncorrectNames, $correctnames, $NpcName);
+        $NameFormatted = str_replace($IncorrectNames, $correctnames, $NpcName)."$PLAddition";
         return $NameFormatted;
     }
     /**
@@ -214,7 +377,7 @@ trait CsvParseTrait
         $RewardsArray = [];
         foreach(range(0,3) as $i) {
             if (empty($ItemCsv->at($TripleTriadCsv->at($FuncDataValue)["Item{PossibleReward}[$i]"])['Name'])) continue;
-            $RewardsArray[] = str_replace(" Card", "", $ItemCsv->at($TripleTriadCsv->at($FuncDataValue)["Item{PossibleReward}[$i]"])['Name']);
+            $RewardsArray[] = str_replace("&", "and",str_replace(" Card", "", $ItemCsv->at($TripleTriadCsv->at($FuncDataValue)["Item{PossibleReward}[$i]"])['Name']));
         }
         $Rewards = implode(",", $RewardsArray);
         $PreviousQuestsArray = [];
@@ -229,10 +392,9 @@ trait CsvParseTrait
             $PreviousQuests = "";
         }
         //TALK
-        $TextOutputArray = [];     
+        $TextStringArray = [];     
 
         foreach(range(0,4) as $a) {
-            $TextStringArray = [];
             $Header = "";
             switch ($a) {
                 case 0:
@@ -256,19 +418,17 @@ trait CsvParseTrait
                     $TextFronter = "NPCDraw";
                 break;
             }
-            $TargetColumn = "DefaultTalk{".$ColumnType."}";
-            $TextStringArray[0] = "\n|$TextFronter = ";
-            $TextStringArray[] = $this->getDefaultTalk($DefaultTalkCsv, $TripleTriadCsv, $FuncDataValue, $TargetColumn, $Header);
-            $TextOutputArray[] = implode("\n", $TextOutputArray);
+            $TargetColumn = "DefaultTalk{{$ColumnType}}";
+            $TextStringArray[] = $this->getDefaultTalk($DefaultTalkCsv, $TripleTriadCsv, $FuncDataValue, $TargetColumn, "\n|$TextFronter = ");
         }
-        $TextOutput = implode("\n", $TextOutputArray);
+        $TextOutput = implode("", $TextStringArray);
 
         //UsesCards : 
         
         $UsesCardsFixedArray = [];
         foreach(range(0,4) as $i) {
             if (empty($TripleTriadCardCsv->at($TripleTriadCsv->at($FuncDataValue)["TripleTriadCard{Fixed}[$i]"])["Name"])) continue;
-            $UsesCardsFixedArray[] = $TripleTriadCardCsv->at($TripleTriadCsv->at($FuncDataValue)["TripleTriadCard{Fixed}[$i]"])["Name"];
+            $UsesCardsFixedArray[] = str_replace("&", "and",$TripleTriadCardCsv->at($TripleTriadCsv->at($FuncDataValue)["TripleTriadCard{Fixed}[$i]"])["Name"]);
         }
         $UsesCardsFixed = implode(",", $UsesCardsFixedArray);
 
@@ -276,7 +436,7 @@ trait CsvParseTrait
         $UsesCardsVariableArray = [];
         foreach(range(0,4) as $i) {
             if (empty($TripleTriadCardCsv->at($TripleTriadCsv->at($FuncDataValue)["TripleTriadCard{Variable}[$i]"])["Name"])) continue;
-            $UsesCardsVariableArray[] = $TripleTriadCardCsv->at($TripleTriadCsv->at($FuncDataValue)["TripleTriadCard{Variable}[$i]"])["Name"];
+            $UsesCardsVariableArray[] = str_replace("&", "and",$TripleTriadCardCsv->at($TripleTriadCsv->at($FuncDataValue)["TripleTriadCard{Variable}[$i]"])["Name"]);
         }
         $UsesCardsVariable = implode(",", $UsesCardsVariableArray);
 
@@ -294,7 +454,7 @@ trait CsvParseTrait
         $Rules = implode(",", $RulesArray);
         return "{{-start-}}
         '''$NpcName/$FuncDataValue/TripleTriad'''
-        {{TripleTriadTemplate?
+        {{TripleTriadTemplate
         |Fee = $Fee
         |RegionalRules = $RegionalRules
         |Rules = $Rules
@@ -315,7 +475,7 @@ trait CsvParseTrait
         foreach(range(0,2) as $b) {
             if (empty($DefaultTalkCsv->at($TargetCsv->at($FuncDataValue)[$TargetColumn])["Text[$b]"])) continue;
             $DefaultTalk[0] = "\n". $Header ." ";
-            $DefaultTalk[] = "". $DefaultTalkCsv->at($TargetCsv->at($FuncDataValue)[$TargetColumn])["Text[$b]"];
+            $DefaultTalk[] = "". str_replace("─","-",$DefaultTalkCsv->at($TargetCsv->at($FuncDataValue)[$TargetColumn])["Text[$b]"]);
         }
         return implode($DefaultTalk);
     }
@@ -429,7 +589,7 @@ trait CsvParseTrait
     /**
      * Get Specialshop items and name
      */
-    public function getShop($NpcName, $ShopType, $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $SpecialShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv) {
+    public function getShop($NpcName, $ShopType, $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $SpecialShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation) {
         $WeaponArray = [];
         $ArmorArray = [];
         $AccessoryArray = [];
@@ -440,11 +600,12 @@ trait CsvParseTrait
         $Accessory = "";
         $Other = "";
         $ShopOutput = [];
+        $NumberItems = 0;
         switch ($ShopType) {
             case 'SpecialShop':  
                 $ShopName = $SpecialShopCsv->at($SpecialShopID)["Name"];
                 if (empty($ShopName)) { 
-                    $ShopName = "General";
+                    $ShopName = $SpecialShopID;
                 }
                 foreach(range(0,59) as $specialshopc) {
                     if (empty($ItemCsv->at($SpecialShopCsv->at($SpecialShopID)["Item{Cost}[$specialshopc][0]"])['Name'])) continue;
@@ -533,8 +694,8 @@ trait CsvParseTrait
                 $ShopOutputString .= "{{Shop\n";
                 $ShopOutputString .= "| Shop Name = $ShopName\n";
                 $ShopOutputString .= "| NPC Name = $NpcName\n";
-                $ShopOutputString .= "| Location = \n";
-                $ShopOutputString .= "| Coordinates = \n";
+                $ShopOutputString .= "| Location = $NpcPlaceName\n";
+                $ShopOutputString .= "| Coordinates = $CoordLocation\n";
                 $ShopOutputString .= "| Total Items = $number\n";
                 $ShopOutputString .= "| Shop = \n";
                 $ShopOutputString .= "{{Tabsells3\n";
@@ -554,6 +715,7 @@ trait CsvParseTrait
                 $ShopOutput["Dialogue"] = $DialogueOutput;
                 $ShopOutput["Number"] = $number;
                 $ShopOutput["Shop"] = "\n$ShopOutputString\n$Weapons$Armor$Accessory$Other\n}}\n}}\n{{-stop-}}";
+                $ShopOutput["Name"] = $ShopName;
                 return $ShopOutput;
             break;
             case 'GilShop':
@@ -564,7 +726,7 @@ trait CsvParseTrait
                 }
                 $ShopName = $GilShopCsv->at($DataValue)['Name'];
                 if (empty($ShopName)) { 
-                    $ShopName = "General";
+                    $ShopName = $SpecialShopID;
                 }
 
                 
@@ -661,14 +823,15 @@ trait CsvParseTrait
                 $ShopOutputString .= "{{Shop\n";
                 $ShopOutputString .= "| Shop Name = $ShopName\n";
                 $ShopOutputString .= "| NPC Name = $NpcName\n";
-                $ShopOutputString .= "| Location = \n";
-                $ShopOutputString .= "| Coordinates = \n";
+                $ShopOutputString .= "| Location = $NpcPlaceName\n";
+                $ShopOutputString .= "| Coordinates = $CoordLocation\n";
                 $ShopOutputString .= "| Total Items = $NumberItems\n";
                 $ShopOutputString .= "| Shop = \n";
                 $ShopOutputString .= "{{Tabsells3\n";
                 
                 $ShopOutput["Shop"] = "\n$ShopOutputString\n$Weapons$Armor$Accessory$Other\n}}\n}}\n{{-stop-}}";
                 $ShopOutput["Number"] = $NumberItems;
+                $ShopOutput["Name"] = $ShopName;
                 return $ShopOutput;
             break;
             
@@ -676,6 +839,206 @@ trait CsvParseTrait
                 # code...
             break;
         }
+    }
+
+    /**
+     * Get Equipment for NPCs
+     */
+    public function getEquipment($EnpcBase, $NpcEquipCsv, $weaponArray, $isMale, $StainCsv, $id, $itemArray)
+    {
+        foreach(range(0,1) as $a) {
+            switch ($a) {
+                case 0://mainhand
+                    $ENPCOffset0 = "MainHand";
+                    $StringOffset0 = "Main Hand";
+                break;
+                case 1://OffHand
+                    $ENPCOffset0 = "OffHand";
+                    $StringOffset0 = "Off Hand";
+                break;
+            }
+            $ModelBase = str_replace(", ", "-", $EnpcBase->at($id)["Model{{$ENPCOffset0}}"]);
+            $guess = false;
+            $Model = false;
+            if ($ModelBase == 0) {
+                $Model = false;
+                if ($NpcEquipCsv->at($EnpcBase->at($id)['NpcEquip'])["Model{{$ENPCOffset0}}"] != 0) {
+                    $ModelBase = str_replace(", ", "-", $NpcEquipCsv->at($EnpcBase->at($id)['NpcEquip'])["Model{{$ENPCOffset0}}"]);
+                    $ModelBaseDye = $NpcEquipCsv->at($EnpcBase->at($id)['NpcEquip'])["Dye{{$ENPCOffset0}}"];
+                }
+            }
+            if ($ModelBase > 0) {
+                $MainModMain = explode("-", $ModelBase);
+                $MainModa = $MainModMain[0];
+                $MainModb = $MainModMain[1];
+                $MainModc = $MainModMain[2];
+                $MainModd = $MainModMain[3];
+                $MainModMaina = $MainModa;
+                if ($MainModMaina < 8999) {
+                    $ModelbOrigin = $MainModb;
+                    $MainModel = "". $MainModa ."-". $MainModb ."-". $MainModc ."-". $MainModd ."";
+                    if (empty($weaponArray[$MainModel]["Name"])) {
+                        do {
+                            $MainModb--;
+                            $MainModel = "". $MainModa ."-". $MainModb ."-". $MainModc ."-". $MainModd ."";
+                            $guess = "\n|$StringOffset0 Guess = yes";
+                            if ($MainModb < 0) {
+                                break;
+                            }
+                        } while (empty($weaponArray[$MainModel]["Name"]));
+                    }
+                    if (empty($weaponArray[$MainModel]["Name"])) {
+                        do {
+                            $MainModb++;
+                            $MainModel = "". $MainModa ."-". $MainModb ."-". $MainModc ."-". $MainModd ."";
+                            $guess = "\n|$StringOffset0 Guess = yes";
+                            if ($MainModb > $ModelbOrigin) {
+                                break;
+                            }
+                        } while (empty($weaponArray[$MainModel]["Name"]));
+                    }
+                    if ($MainModa < 8999) {
+                        if (empty($weaponArray[$MainModel]["Name"])) {
+                            $Model = "Custom $StringOffset0";
+                        }
+                        if (!empty($weaponArray[$MainModel]["Name"])) {
+                            if ($MainModb >= 0) {
+                                $MainModel = "". $MainModa ."-". $MainModb ."-". $MainModc ."-". $MainModd ."";
+                                $Model = "". $weaponArray[$MainModel]["Name"] ."". $guess ."";
+                            }
+                            if ($MainModb < 0) {
+                                $Model = "Custom $StringOffset0";
+                            }
+                        }
+                    }
+                }
+                if ($MainModa > 8999) {
+                    $Model = "Custom $StringOffset0";
+                }
+            }
+            $Output["$ENPCOffset0"]["Item"] = $Model;
+        }
+        $Visor = $EnpcBase->at($id)['Visor'];
+        $Output["Visor"] = $Visor;
+        foreach(range(0,4) as $a) {
+            switch ($a) {
+                case 0://Head
+                    $ENPCOffset0 = "Head";
+                    $Cat = "34";
+                break;
+                case 1://Body
+                    $ENPCOffset0 = "Body";
+                    $Cat = "35";
+                break;
+                case 2://Hands
+                    $ENPCOffset0 = "Hands";
+                    $Cat = "37";
+                break;
+                case 3://Legs
+                    $ENPCOffset0 = "Legs";
+                    $Cat = "36";
+                break;
+                case 4://Feet
+                    $ENPCOffset0 = "Feet";
+                    $Cat = "38";
+                break;
+            }
+            $guess = false;
+            $Model = false;
+            $Modela = null;
+            $Modelb = null;
+            $isMale = 
+            $Base = $EnpcBase->at($id)["Model{{$ENPCOffset0}}"];
+            $DyeBase = $StainCsv->at($EnpcBase->at($id)["Dye{{$ENPCOffset0}}"])['Name'];
+            if ($Base == 0) {
+                $Model = false;
+                if ($NpcEquipCsv->at($EnpcBase->at($id)['NpcEquip'])["Model{{$ENPCOffset0}}"] != 0) {
+                    $Base = $NpcEquipCsv->at($EnpcBase->at($id)['NpcEquip'])["Model{{$ENPCOffset0}}"];
+                    $DyeBase = $NpcEquipCsv->at($EnpcBase->at($id)['NpcEquip'])["Dye{{$ENPCOffset0}}"];
+                }
+            }
+            if ($Base == 4294967295) {
+                $Model = false;
+                $Base = 0;
+            }
+            if ($Base > 0) {
+                $Modela = $Base & 0xFFFF;
+                if ($Modela < 8999) {
+                    $Modelb = ($Base >> 16) & 0xFFFF;
+                    $Modelc = ($Base >> 32) & 0xFFFF;
+                    $Modeld = ($Base >> 48) & 0xFFFF;
+                    $ModelbOrigin = ($Base >> 16) & 0xFFFF;
+                    $CompModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
+                    if (empty($itemArray[$Cat][$CompModel]["Name"])) {
+                        $Modelb = $ModelbOrigin;
+                        do {
+                            $Modelb--;
+                            if ($Modelb < 0) {
+                                break;
+                            }
+                            $CompModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
+                            $guess = "\n|$ENPCOffset0 Guess = yes";
+                        } while (empty($itemArray[$Cat][$CompModel]["Name"]));
+                    }
+                    if (empty($itemArray[$Cat][$CompModel]["Name"])) {
+                        do {
+                            $Modelb++;
+                            $CompModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
+                            $guess = "\n|$ENPCOffset0 Guess = yes";
+                            if ($Modelb > 300) {
+                                break;
+                            }
+                        } while (empty($itemArray[$Cat][$CompModel]["Name"]));
+                    }
+                    if ($Modela < 8999) {
+                        if ($Modelb >= 0) {
+                            $CompModel = "". $Modela ."-". $Modelb ."-". $Modelc ."-". $Modeld ."";
+                            $canWearBool = "";
+                            $ItemRestriction = 0;
+                            if (!empty($itemArray[$Cat][$CompModel]["EquipRestriction"])){
+                                $ItemRestriction = $itemArray[$Cat][$CompModel]["EquipRestriction"];
+                                switch ($ItemRestriction) {
+                                    case 0:
+                                        $canWearBool = "";
+                                    break;
+                                    case 1:
+                                        $canWearBool = ($isMale == "true") ? "" : "\n|Needs Verification = yes";
+                                    break;
+                                    case 2:
+                                        $canWearBool = ($isMale == "true") ? "\n|Needs Verification = yes" : "";
+                                    break;
+                                    
+                                    default:
+                                        $canWearBool = "";
+                                    break;
+                                }
+                                $Model = "". $itemArray[$Cat][$CompModel]["Name"] ."". $guess ."";
+                            }
+                        }
+                        if ($Modelb < 0) {
+                            $Model = "Custom $ENPCOffset0";
+                        }
+                    }
+                }
+                if ($Modela > 8999) {
+                    $Model = "Custom $ENPCOffset0";
+                }
+                if ($a === 2){                        
+                    if ($Modela > 8999) {
+                        $Model = "Custom Hands";
+                    }
+                    if ($Modela == 9903) {
+                        $Model = false;
+                    }
+                    if ($Modela == 0) {
+                        $Model = false;
+                    }
+                }
+            }
+            $Output["$ENPCOffset0"]["Item"] = $Model;
+            $Output["$ENPCOffset0"]["Dye"] = $DyeBase;
+        }
+        return $Output;
     }
 
     /**
