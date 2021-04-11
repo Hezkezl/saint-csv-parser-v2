@@ -91,7 +91,7 @@ class Quests implements ParseInterface
                 $Name = $Content['Name'];
             }
             $ContentLink = $Content['Content'];
-            if ($Content['ContentLinkType'] = 1) {
+            if ($Content['ContentLinkType'] === "1") {
                 $ContentArray[$ContentLink] = $Name;
             }
         }
