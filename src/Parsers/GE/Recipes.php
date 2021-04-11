@@ -46,8 +46,24 @@ class Recipes implements ParseInterface
         $HugeCraftworksNpcCsv = $this->csv('HugeCraftworksNpc');
         $SatisfactionSupplyCsv = $this->csv('SatisfactionSupply');
         $HWDCrafterSupplyCsv = $this->csv('HWDCrafterSupply');
+        $NotebookDivisionCsv = $this->csv('NotebookDivision');
+        $RecipeNotebookListCsv = $this->csv('RecipeNotebookList');
 
         // (optional) start a progress bar
+        //foreach ($NotebookDivisionCsv->data as $id => $Notebook) {
+        //    //$RecipeID = $ItemCsv->at($RecipeCsv->at($Notebook['Recipe[0]'])['Item{Result}'])['Name'];
+        //    foreach(range(0,7) as $a) {
+        //        if ($id < 1000){
+        //            $output = (40 * $a + $id);
+        //        } elseif ($id < 2000) {
+        //          // DoH masterbooks
+        //          $output = (1000 + 8 * ($id - 1000) + $a);
+        //        } else {
+        //          // DoL folklores, only 4 DoLs tho
+        //          $output = ($a < 4 ? (2000 + 4 * ($id - 2000) + $a) : -1);
+        //        }
+        //    }
+        //}
         $this->io->progressStart($RecipeCsv->total);
 
         //make arrays for QuestClassJobSupply and Quest to re-order index
@@ -131,6 +147,8 @@ class Recipes implements ParseInterface
             if (in_array($ResultItemID, $SatisfactionItemArray)) {
                 $SpecialString = "\n|Special Recipe      = Custom Delivery";
             }
+
+
 
             //use description for |Special Recipe
             if (empty($SpecialString)) {
