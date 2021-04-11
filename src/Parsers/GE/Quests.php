@@ -85,16 +85,17 @@ class Quests implements ParseInterface
         //sort instance content out
         $ContentArray = [];
         foreach($ContentFinderConditionCsv->data as $id => $Content) {
-            $Name = $Content['Name'];
-            if (empty($Name)) {
+            if (empty($Content['Name'])) {
                 $Name = "No Name";
+            } else {
+                $Name = $Content['Name'];
             }
-            $ContentLinkType = $Content['ContentLinkType'];
             $ContentLink = $Content['Content'];
-            if ($ContentLinkType = 1) {
+            if ($Content['ContentLinkType'] = 1) {
                 $ContentArray[$ContentLink] = $Name;
             }
         }
+
         //loop through quest data
         $replacestring = [];
         foreach($questCsv->data as $id => $quest) {
@@ -273,7 +274,7 @@ class Quests implements ParseInterface
             */
             if (!empty($ContentArray[$quest['InstanceContent{Unlock}']])){
                 if ($quest['InstanceContent{Unlock}']) {
-                    $instanceunlock = "\n|Misc Reward = [[". ucfirst($ContentArray[$quest['InstanceContent{Unlock}']])."]] unlocked.";
+                    $instanceunlock = "\n|Misc Reward = [[". preg_replace("/\<Emphasis>|\<\/Emphasis>/", null, ucfirst($ContentArray[$quest['InstanceContent{Unlock}']])) ."]] unlocked.";
                 }
             }
 
@@ -399,17 +400,10 @@ class Quests implements ParseInterface
                 "Vroi-Reeq", "Zao-Mosc", "Zia-Bostt", "Zoi-Chorr", "Zumie-Moa", "Zumie-Shai");
 
             //Quest Giver Name (All Words In Name Capitalized)
-            switch (true) {
-                case ($quest['Issuer{Start}'] < 2000000):
-                    $questgiver = str_replace($IncorrectNames, $correctnames, ucwords(strtolower($ENpcResidentCsv->at($quest['Issuer{Start}'])['Singular'])))." (Object)";
-                break;
-                case ($quest['Issuer{Start}'] > 2000000):
-                    $questgiver = str_replace($IncorrectNames, $correctnames, ucwords(strtolower($EObjNameCsv->at($quest['Issuer{Start}'])['Singular'])));
-                break;
-                
-                default:
+            if ($quest['Issuer{Start}'] > 2000000) {
+                $questgiver = str_replace($IncorrectNames, $correctnames, ucwords(strtolower($EObjNameCsv->at($quest['Issuer{Start}'])['Singular']))) . " (Object)";
+            } else {
                 $questgiver = str_replace($IncorrectNames, $correctnames, ucwords(strtolower($ENpcResidentCsv->at($quest['Issuer{Start}'])['Singular'])));
-                break;
             }
 
             //Start Quest Objectives / Journal Entry / Dialogue code
