@@ -125,7 +125,10 @@ trait CsvParseTrait
     /**
      * Format NPC Names for Wiki
      */
-    public function NameFormat($NPCID, $ENpcResidentCsv, $ENpcBaseCsv, $PlaceNameLocation) {
+    public function NameFormat($NPCID, $ENpcResidentCsv, $ENpcBaseCsv, $PlaceNameLocation, $LGBArray) {
+        
+        $Festivaljdata = file_get_contents("Patch/FestivalNames.json");
+        $FestivaldecodeJdata = json_decode($Festivaljdata, true);
         $NameFormatted = $ENpcResidentCsv->at($NPCID)['Singular'];
         $IncorrectNames = array(" De ", " Bas ", " Mal ", " Van ", " Cen ", " Sas ", " Tol ", " Zos ", " Yae ", " The ", " Of The ", " Of ",
             "A-ruhn-senna", "A-towa-cant", "Bea-chorr", "Bie-zumm", "Bosta-bea", "Bosta-loe", "Chai-nuzz", "Chei-ladd", "Chora-kai", "Chora-lue",
@@ -145,24 +148,21 @@ trait CsvParseTrait
         $PLAddition = "";
         switch ($NameFormatted) {
             case "airship ticketer";
-            case "ala mhigan resistance gate guard";
+            case "Ala Mhigan Resistance gate guard";
             case "alehouse wench";
-            case "alisaie's assistant";
+            case "Alisaie's assistant";
             case "apartment caretaker";
             case "arms supplier";
             case "arms supplier & mender";
             case "arrivals attendant";
             case "calamity salvager";
-            case "celestine";
+            case "Celestine";
             case "chocobokeep";
             case "collectable appraiser";
             case "concerned mother";
-            case "eggsaminer";
-            case "enthralling illusionist";
             case "expedition artisan";
             case "expedition birdwatcher";
             case "expedition scholar";
-            case "faire crier";
             case "ferry skipper";
             case "flame officer";
             case "flame private";
@@ -171,15 +171,14 @@ trait CsvParseTrait
             case "flame sergeant";
             case "flame soldier";
             case "gate keeper";
-            case "gold saucer attendant";
-            case "gridanian merchant";
-            case "haermaga";
+            case "Gridanian merchant";
+            case "Haermaga";
             case "housing enthusiast";
-            case "hunt billmaster";
+            case "Hunt billmaster";
             case "hunter-scholar";
             case "hunter-scholar";
-            case "imperial centurion";
-            case "imperial deserter";
+            case "Imperial centurion";
+            case "Imperial deserter";
             case "independent armorer";
             case "independent armorfitter";
             case "independent arms mender";
@@ -189,38 +188,26 @@ trait CsvParseTrait
             case "independent sutler";
             case "inu doshin";
             case "irate coachman";
-            case "ironworks engineer";
-            case "ironworks engineer";
+            case "Ironworks engineer";
             case "junkmonger";
-            case "keeper of the entwined serpents";
+            case "Keeper of the Entwined Serpents";
             case "local merchant";
-            case "lonesome lass";
-            case "long-haired pirate";
-            case "malevolent mummer";
-            case "mammet dispensator #012p";
-            case "mammet dispensator #012t";
+            case "mammet dispensator #012P";
+            case "mammet dispensator #012T";
             case "materia melder";
             case "material supplier";
             case "mender";
             case "minion enthusiast";
-            case "moonfire faire vendor";
-            case "moonfire marine";
-            case "oic administrator";
-            case "oic officer of arms";
-            case "oic quartermaster";
-            case "pernicious temple knight";
+            case "OIC administrator";
+            case "OIC officer of arms";
+            case "OIC quartermaster";
+            case "pernicious Temple Knight";
             case "picker of locks";
             case "recompense officer";
-            case "resident caretaker";
-            case "resistance fighter";
-            case "resistance officer";
-            case "rising attendant";
-            case "rising vendor";
-            case "royal handmaiden";
-            case "royal seneschal";
-            case "royal servant";
-            case "saint's little helper";
-            case "saucer attendant";
+            case "Resident caretaker";
+            case "Resistance fighter";
+            case "Resistance officer";
+            case "Saucer attendant";
             case "scrip exchange";
             case "seasoned adventurer";
             case "serpent lieutenant";
@@ -232,9 +219,6 @@ trait CsvParseTrait
             case "splendors vendor";
             case "spoils collector";
             case "spoils trader";
-            case "starlight celebrant";
-            case "starlight celebration crier";
-            case "starlight supplier";
             case "steersman";
             case "storm captain";
             case "storm officer";
@@ -242,22 +226,18 @@ trait CsvParseTrait
             case "storm soldier";
             case "storm private";
             case "storm sergeant";
-            case "sultansworn elite";
-            case "suspicious coerthan";
-            case "the smith";
+            case "Sultansworn elite";
+            case "suspicious Coerthan";
+            case "the Smith";
             case "tournament registrar";
             case "traveling merchant";
             case "traveling trader";
-            case "triple triad trader";
+            case "Triple Triad trader";
             case "troubled coachman";
-            case "uncanny illusionist";
-            case "untrustworthy illusionist";
-            case "unusual illusionist";
             case "well-informed adventurer";
             case "wounded imperial";
-            case "wounded resistance fighter";
+            case "wounded Resistance fighter";
             case "wunthyll";
-            case "Yellow Moon admirer";
             case "Enie";
             case "amarokeep";
                 $PLAddition = " ($PlaceNameLocation)";
@@ -269,7 +249,7 @@ trait CsvParseTrait
                         case 'material supplier':
                         case 'mender':
                         case 'materia melder':
-                            $PLAddition = "(Housing)";
+                            $PLAddition = " (Housing)";
                         break;
                         case 'storm soldier': //MSQ
                         case 'flame officer':
@@ -286,14 +266,14 @@ trait CsvParseTrait
                         case 'imperial centurion':
                         case 'flame recruit':
                         case 'wounded imperial':
-                            $PLAddition = "(MSQ)";
+                            $PLAddition = " (MSQ)";
                         break;
-                        case 'yellow moon admirer': //Event
+                        case 'Yellow Moon admirer': //Event
                         case "saint's little helper":
                         case 'enthralling illusionist':
                         case 'royal handmaiden':
                         case 'royal seneschal':
-                            $PLAddition = "(Event)";
+                            $PLAddition = " (Event)";
                         break;
                         case 'ferry skipper': //Unknowns
                         case 'chocobokeep':
@@ -302,7 +282,7 @@ trait CsvParseTrait
                         case 'traveling merchant':
                         case 'seasoned adventurer':
                         case 'Enie':
-                            $PLAddition = "(Unknown)";
+                            $PLAddition = " (Unknown)";
                         break;
                         
                         default:
@@ -310,6 +290,37 @@ trait CsvParseTrait
                             break;
                     }
                 }
+            break;
+            case "uncanny illusionist"; // events
+            case "untrustworthy illusionist";
+            case "unusual illusionist";
+            case "Yellow Moon admirer";
+            case "Starlight celebrant";
+            case "Starlight Celebration crier";
+            case "Starlight supplier";
+            case "Rising attendant";
+            case "Rising vendor";
+            case "royal handmaiden";
+            case "royal seneschal";
+            case "royal servant";
+            case "saint's little helper";
+            case "Moonfire Faire vendor";
+            case "Moonfire marine";
+            case "eggsaminer";
+            case "enthralling illusionist";
+            case "Faire crier";
+                $PLAddition = "(Event)";
+                if (!empty($LGBArray[$NPCID]['festivalID'])) {
+                    $FestivalNameAddition = $LGBArray[$NPCID]['festivalID'];
+                    $PLAddition = " (". str_replace("_", " ", $FestivaldecodeJdata[$FestivalNameAddition]). ")";
+                }
+            break;
+            case "malevolent mummer"; // race
+            case "long-haired pirate";
+            case "Gold Saucer attendant";
+                $RaceCsv = $this->csv('Race');
+                $nameRace = $RaceCsv->at($ENpcBaseCsv->at($NPCID)['Race'])['Masculine'];
+                $PLAddition = " ($nameRace)";
             break;
             
             default:
@@ -391,6 +402,7 @@ trait CsvParseTrait
         else {
             $PreviousQuests = "";
         }
+        $Resident = $this->csv('TripleTriadResident');
         //TALK
         $TextStringArray = [];     
 
@@ -444,7 +456,34 @@ trait CsvParseTrait
         
         $RegionalRules = $TripleTriadCsv->at($FuncDataValue)["UsesRegionalRules"];
         
+
+        //unknowns 
+        $UnknownValue1 = 0;
+        if(!empty($Resident->at($FuncDataValue)['unknown_1'])){
+            $UnknownValue1 = $Resident->at($FuncDataValue)['unknown_1'];
+        }
+        //}
+        /**
+        $Unknown2 = $TripleTriadCsv->at($FuncDataValue)["unknown_26"];
+        $UnknownArray = [];
+        foreach(range(0,1) as $e) {
+            if (empty($TripleTriadRuleCsv->at($TripleTriadCsv->at($FuncDataValue)["TripleTriadRule[$e]"])["Name"])) continue;
+            $UnknownArray[] = "3 -> ". $TripleTriadRuleCsv->at($TripleTriadCsv->at($FuncDataValue)["TripleTriadRule[$e]"])["unknown_3"]."\n";
+            $UnknownArray[] = "4 -> ". $TripleTriadRuleCsv->at($TripleTriadCsv->at($FuncDataValue)["TripleTriadRule[$e]"])["unknown_4"]."\n";
+            $UnknownArray[] = "5 -> ". $TripleTriadRuleCsv->at($TripleTriadCsv->at($FuncDataValue)["TripleTriadRule[$e]"])["Unknown[5-4]"]."\n";
+            $UnknownArray[] = "6 ->". $TripleTriadRuleCsv->at($TripleTriadCsv->at($FuncDataValue)["TripleTriadRule[$e]"])["unknown_6"]."\n";
+            $UnknownArray[] = "7 ->". $TripleTriadRuleCsv->at($TripleTriadCsv->at($FuncDataValue)["TripleTriadRule[$e]"])["unknown_7"]."\n";
+        }
+        $UnknownRules = implode("", $UnknownArray);
         //RULES
+        /**
+        TripleTriadResident ->
+        |Unknown 1 = $UnknownValue1
+        TripleTriad ->
+        |Unknown 2 = $Unknown2
+        Rule = 
+        |Unknown Rules = $UnknownRules
+         */
         
         $RulesArray = [];
         foreach(range(0,1) as $i) {
@@ -1122,6 +1161,34 @@ trait CsvParseTrait
 
         // combine
         $icon = implode('/', $path) .'.png';
+
+        return $icon;
+    }
+
+    
+    /**
+     * Converts SE icon "number" into a proper path for /EN 
+     */
+    private function iconizeEN($number, $hq = false)
+    {
+        $number = intval($number);
+        $extended = (strlen($number) >= 6);
+
+        if ($number == 0) {
+            return null;
+        }
+
+        // create icon filename
+        $icon = $extended ? str_pad($number, 5, "0", STR_PAD_LEFT) : '0' . str_pad($number, 5, "0", STR_PAD_LEFT);
+
+        // create icon path
+        $path = [];
+        $path[] = $extended ? $icon[0] . $icon[1] . $icon[2] .'000' : '0'. $icon[1] . $icon[2] .'000';
+
+        $path[] = $icon;
+
+        // combine
+        $icon = implode('/en/', $path) .'.png';
 
         return $icon;
     }
