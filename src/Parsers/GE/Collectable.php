@@ -21,8 +21,6 @@ class Collectable implements ParseInterface
     {
         include (dirname(__DIR__) . '/Paths.php');
         // grab CSV files
-        $MasterpieceCsv = $this->csv("MasterpieceSupplyDuty");
-        $MultiplierCsv = $this->csv("MasterpieceSupplyMultiplier");
         $ParamgrowCsv = $this->csv("ParamGrow");
         $ItemCsv = $this->csv("Item");
         $ClassJobCsv = $this->csv("ClassJob");
@@ -32,9 +30,16 @@ class Collectable implements ParseInterface
         $HWDGathererInspectTermCsv = $this->csv("HWDGathereInspectTerm");
         $HWDGathererInspectionCsv = $this->csv("HWDGathererInspection");
         $HWDGathererInspectionRewardCsv = $this->csv("HWDGathererInspectionReward");
-
-        $this->io->progressStart($MasterpieceCsv->total);
-        foreach ($MasterpieceCsv->data as $id => $item) {
+        $CollectablesShopCsv = $this->csv("CollectablesShop");
+        $CollectablesShopItemCsv = $this->csv("CollectablesShopItem");
+        $CollectablesShopItemGroupCsv = $this->csv("CollectablesShopItemGroup");
+        $CollectablesShopRefineCsv = $this->csv("CollectablesShopRefine");
+        $CollectablesShopRewardScripCsv = $this->csv("CollectablesShopRewardScrip");
+        $CollectablesShopRewardItemCsv = $this->csv("CollectablesShopRewardItem");
+        
+        $CurrencyArray = $this->GetCurrency();
+        $this->io->progressStart($CollectablesShopCsv->total);
+        foreach ($CollectablesShopCsv->data as $id => $Shop) {
             // ---------------------------------------------------------
             $this->io->progressAdvance();
 
@@ -42,58 +47,124 @@ class Collectable implements ParseInterface
             // Actual code definition begins below!
             //---------------------------------------------------------------------------------
 
-            $Collectable = [];
-
-            foreach (range(0, 7) as $i) {
-                $Class = $ClassJobCsv->at($item['ClassJob'])['Name{English}'];
-                //$CurrencyID = $CurrencyCsv->at($item['Reward{Currency}'])['Item'];
-                //$Currency = $ItemCsv->at($CurrencyID)['Name'];
-                switch ($item['Reward{Currency}']) {
-                    case 2:
-                        $Currency = "Yellow Crafters' Scrip";
+            $StringArray = [];
+            
+            $RewardType = $Shop['RewardType'];
+            foreach (range(0, 10) as $i) {
+                //if ($Shop["ShopItems[$i]"] === 0) continue;
+                switch($i) {
+                        case 0:
+                            $Class = "Carpenter";
                         break;
-                    case 4:
-                        $Currency = "Yellow Gatherers' Scrip";
+                        case 1:
+                            $Class = "Blacksmith";
                         break;
-                    case 6:
-                        $Currency = "White Crafters' Scrip";
+                        case 2:
+                            $Class = "Armorer";
                         break;
-                    case 7:
-                        $Currency = "White Gatherers' Scrip";
+                        case 3:
+                            $Class = "Goldsmith";
                         break;
-                    default:
-                        $Currency = false;
+                        case 4:
+                            $Class = "Leatherworker";
+                        break;
+                        case 5:
+                            $Class = "Weaver";
+                        break;
+                        case 6:
+                            $Class = "Alchemist";
+                        break;
+                        case 7:
+                            $Class = "Culinarian";
+                        break;
+                        case 8:
+                            $Class = "Miner";
+                        break;
+                        case 9:
+                            $Class = "Botanist";
+                        break;
+                        case 10:
+                            $Class = "Fisher";
                         break;
                 }
-                if ($item["RequiredItem[$i]"] > 0) {
-                    $Name = $ItemCsv->at($item["RequiredItem[$i]"])['Name'];
-                    $BonusMultiplier = $MultiplierCsv->at($item["BonusMultiplier[$i]"]);
-                    $Level = $item["ClassJobLevel{Max}[$i]"];
-                    $Star = str_repeat("{{Star}}", $item["Stars[$i]"]);
-                    $LevelStar = ($item["Stars[$i]"] > 0) ? "$Level $Star" : "$Level";
-                    $BaseCollect = $item["Collectability{Base}[$i]"];
-                    $ExpModifier = $item["ExpModifier[$i]"];
-                    $BaseScrip = $item["Reward{Scrips}[$i]"];
-                    $ParamgrowEXP = $ParamgrowCsv->at($item["ClassJobLevel{Max}[$i]"])['ExpToNext'];
-                    $BaseEXP = floor($ParamgrowEXP * ($ExpModifier/1000));
-                    $Bonus1Collect = $item["Collectability{Bonus}[$i]"];
-                    $Bonus1Scrip = floor($BaseScrip * ($BonusMultiplier["CurrencyMultiplier[1]"]/1000));
-                    $Multiplier1 = $MultiplierCsv->at($item["BonusMultiplier[$i]"])['XpMultiplier[1]'];
-                    $Bonus1EXP = floor($BaseEXP * ($Multiplier1/1000));
-                    $Bonus2Collect = $item["Collectability{HighBonus}[$i]"];
-                    $Bonus2Scrip = floor($BaseScrip * ($BonusMultiplier["CurrencyMultiplier[0]"]/1000));
-                    $Multiplier2 = $MultiplierCsv->at($item["BonusMultiplier[$i]"])['XpMultiplier[0]'];
-                    $Bonus2EXP = floor($BaseEXP * ($Multiplier2/1000));
-                    $string = "{{-start-}}\n'''". $Name ."/Collectable'''\n{{ARR Infobox Collectable\n";
-                    $string .= "|Class = ". $Class ."\n|Level = ". $LevelStar ."\n|Name = ". $Name ."\n|Scrip = ". $Currency ."\n";
-                    $string .= "|Base = ". $BaseCollect ."\n|Base Scrip = ". $BaseScrip ."\n|Base EXP = ". $BaseEXP ."\n";
-                    $string .= "|Bonus1 = ". $Bonus1Collect ."\n|Bonus1 Scrip = ". $Bonus1Scrip ."\n|Bonus1 EXP = ". $Bonus1EXP ."\n";
-                    $string .= "|Bonus2 = ". $Bonus2Collect ."\n|Bonus2 Scrip = ". $Bonus2Scrip ."\n|Bonus2 EXP = ". $Bonus2EXP ."\n}}{{-stop-}}";
-                    $Collectable[] = $string;
+                $ShopItemID = $Shop["ShopItems[$i]"];
+                foreach(range(0,999) as $b) {
+                    $SubDataValue = "". $ShopItemID .".". $b ."";
+                    if (empty($ItemCsv->at($CollectablesShopItemCsv->at($SubDataValue)['Item'])['Name'])) break;
+                    $Group = $CollectablesShopItemGroupCsv->at($CollectablesShopItemCsv->at($SubDataValue)['CollectablesShopItemGroup'])['Name'];
+                    $Item = $ItemCsv->at($CollectablesShopItemCsv->at($SubDataValue)['Item'])['Name'];
+                    $LevelMin = $CollectablesShopItemCsv->at($SubDataValue)['LevelMin'];
+                    $LevelMax = $CollectablesShopItemCsv->at($SubDataValue)['LevelMax'];
+                    $LowCollect = $CollectablesShopRefineCsv->at($CollectablesShopItemCsv->at($SubDataValue)['CollectablesShopRefine'])['LowCollectability'];
+                    $MidCollect = $CollectablesShopRefineCsv->at($CollectablesShopItemCsv->at($SubDataValue)['CollectablesShopRefine'])['MidCollectability'];
+                    $HighCollect = $CollectablesShopRefineCsv->at($CollectablesShopItemCsv->at($SubDataValue)['CollectablesShopRefine'])['HighCollectability'];
+                    $Star = str_repeat("★",$CollectablesShopItemCsv->at($SubDataValue)['Stars']);
+                    //gather rewards script 
+                    if ($RewardType === "1") {
+                        $RewardSheetLink = $CollectablesShopItemCsv->at($SubDataValue)['CollectablesShopRewardScrip'];
+                        $Currency = $ItemCsv->at($CurrencyArray[$CollectablesShopRewardScripCsv->at($RewardSheetLink)['Currency']])['Name'];
+                        $LowReward = $CollectablesShopRewardScripCsv->at($RewardSheetLink)['LowReward'];
+                        $MidReward = $CollectablesShopRewardScripCsv->at($RewardSheetLink)['MidReward'];
+                        $HighReward = $CollectablesShopRewardScripCsv->at($RewardSheetLink)['HighReward'];
+                        $ExpRatioLow = $CollectablesShopRewardScripCsv->at($RewardSheetLink)['ExpRatioLow'];
+                        $ExpRatioMid = $CollectablesShopRewardScripCsv->at($RewardSheetLink)['ExpRatioMid'];
+                        $ExpRatioHigh = $CollectablesShopRewardScripCsv->at($RewardSheetLink)['ExpRatioHigh'];
+
+                        //ExpMaths
+                        $ParamgrowEXP = $ParamgrowCsv->at($LevelMax)['ExpToNext'];
+                        $BaseExp = floor($ParamgrowEXP * ($ExpRatioLow/1000));
+                        $Bonus1EXP = floor($ParamgrowEXP * ($ExpRatioMid/1000));
+                        $Bonus2EXP = floor($ParamgrowEXP * ($ExpRatioHigh/1000));
+                        $String = "{{-start-}}\n";
+                        $String .= "'''$Item/Collectable'''\n";
+                        $String .= "{{ARR Infobox Collectable\n";
+                        $String .= "|Class = $Class\n";
+                        $String .= "|Level = $LevelMax\n";
+                        $String .= "|Name = $Item\n";
+                        $String .= "|Scrip = $Currency\n";
+                        $String .= "|Base = $LowCollect\n";
+                        $String .= "|Base Scrip = $LowReward\n";
+                        $String .= "|Base EXP = $BaseExp\n";
+                        $String .= "|Bonus1 = $MidCollect\n";
+                        $String .= "|Bonus1 Scrip = $MidReward\n";
+                        $String .= "|Bonus1 EXP = $Bonus1EXP\n";
+                        $String .= "|Bonus2 = $HighCollect\n";
+                        $String .= "|Bonus2 Scrip = $HighReward\n";
+                        $String .= "|Bonus2 EXP = $Bonus2EXP\n";
+                        $String .= "|Group = $Group\n";
+                        $String .= "}}\n";
+                        $String .= "{{-stop-}}\n";
+                        $String .= "\n";
+                    }
+                    if ($RewardType === "2") {
+                        $RewardSheetLink = $CollectablesShopItemCsv->at($SubDataValue)['CollectablesShopRewardScrip'];
+                        $ItemReward = $ItemCsv->at($CollectablesShopRewardItemCsv->at($RewardSheetLink)['Item'])['Name'];
+                        $LowReward = $CollectablesShopRewardItemCsv->at($RewardSheetLink)['RewardLow'];
+                        $MidReward = $CollectablesShopRewardItemCsv->at($RewardSheetLink)['RewardMid'];
+                        $HighReward = $CollectablesShopRewardItemCsv->at($RewardSheetLink)['RewardHigh'];
+                        $String = "{{-start-}}\n";
+                        $String .= "'''$Item/Collectable'''\n";
+                        $String .= "{{ARR Infobox Collectable\n";
+                        $String .= "|Class = $Class\n";
+                        $String .= "|Level = $LevelMax\n";
+                        $String .= "|Name = $Item\n";
+                        $String .= "|Scrip = \n";
+                        $String .= "|Base = $LowCollect\n";
+                        $String .= "|Base Scrip = $LowReward\n";
+                        $String .= "|Bonus1 = $MidCollect\n";
+                        $String .= "|Bonus1 Scrip = $MidReward\n";
+                        $String .= "|Bonus2 = $HighCollect\n";
+                        $String .= "|Bonus2 Scrip = $HighReward\n";
+                        $String .= "|Group = $Group\n";
+                        $String .= "}}\n";
+                        $String .= "{{-stop-}}\n";
+                        $String .= "\n";
+                    }
+                    $StringArray[] = $String;
                 }
             }
 
-            $Collectable = implode("\n", $Collectable);
+            $Collectable = implode("\n", $StringArray);
 
             //---------------------------------------------------------------------------------
 
