@@ -68,7 +68,7 @@ class Items implements ParseInterface
 
             // grab item ui category for this item
             $itemUiCategory = $ItemUiCategoryCsv->at($item['ItemUICategory']);
-
+            $Collectable = $item['IsCollectable'];
             // remove Emphasis, comma, and wiki italic '' code in names
             $BadCharacterSearch = array("–", "—", "<Emphasis>", "</Emphasis>", "''", "?");
             $BadCharacterReplace = array("-", "-", null, null, null, null);
@@ -864,6 +864,7 @@ class Items implements ParseInterface
                 '{bonus}' => $BonusStat,
                 '{itemaction}' => $ItemAction,
                 '{MarketProhib}' => $MarketProhib,
+                '{Collectable}' => " |Collectable = ". $Collectable,
                 '{Bottom}' => $Bottom,
             ];
 

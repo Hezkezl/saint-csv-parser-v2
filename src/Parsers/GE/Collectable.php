@@ -98,6 +98,9 @@ class Collectable implements ParseInterface
                     $LowCollect = $CollectablesShopRefineCsv->at($CollectablesShopItemCsv->at($SubDataValue)['CollectablesShopRefine'])['LowCollectability'];
                     $MidCollect = $CollectablesShopRefineCsv->at($CollectablesShopItemCsv->at($SubDataValue)['CollectablesShopRefine'])['MidCollectability'];
                     $HighCollect = $CollectablesShopRefineCsv->at($CollectablesShopItemCsv->at($SubDataValue)['CollectablesShopRefine'])['HighCollectability'];
+                    if ($HighCollect === "0") {
+                        $HighCollect = "";
+                    }
                     $Star = str_repeat("★",$CollectablesShopItemCsv->at($SubDataValue)['Stars']);
                     //gather rewards script 
                     if ($RewardType === "1") {
@@ -106,6 +109,9 @@ class Collectable implements ParseInterface
                         $LowReward = $CollectablesShopRewardScripCsv->at($RewardSheetLink)['LowReward'];
                         $MidReward = $CollectablesShopRewardScripCsv->at($RewardSheetLink)['MidReward'];
                         $HighReward = $CollectablesShopRewardScripCsv->at($RewardSheetLink)['HighReward'];
+                        if ($HighReward === "0") {
+                            $HighReward = "";
+                        }
                         $ExpRatioLow = $CollectablesShopRewardScripCsv->at($RewardSheetLink)['ExpRatioLow'];
                         $ExpRatioMid = $CollectablesShopRewardScripCsv->at($RewardSheetLink)['ExpRatioMid'];
                         $ExpRatioHigh = $CollectablesShopRewardScripCsv->at($RewardSheetLink)['ExpRatioHigh'];
@@ -119,17 +125,17 @@ class Collectable implements ParseInterface
                         $String .= "'''$Item/Collectable'''\n";
                         $String .= "{{ARR Infobox Collectable\n";
                         $String .= "|Class = $Class\n";
-                        $String .= "|Level = $LevelMax\n";
+                        $String .= "|Level = $LevelMax$Star\n";
                         $String .= "|Name = $Item\n";
-                        $String .= "|Scrip = $Currency\n";
+                        $String .= "|Reward = $Currency\n";
                         $String .= "|Base = $LowCollect\n";
-                        $String .= "|Base Scrip = $LowReward\n";
+                        $String .= "|Base Reward = $LowReward\n";
                         $String .= "|Base EXP = $BaseExp\n";
                         $String .= "|Bonus1 = $MidCollect\n";
-                        $String .= "|Bonus1 Scrip = $MidReward\n";
+                        $String .= "|Bonus1 Reward = $MidReward\n";
                         $String .= "|Bonus1 EXP = $Bonus1EXP\n";
                         $String .= "|Bonus2 = $HighCollect\n";
-                        $String .= "|Bonus2 Scrip = $HighReward\n";
+                        $String .= "|Bonus2 Reward = $HighReward\n";
                         $String .= "|Bonus2 EXP = $Bonus2EXP\n";
                         $String .= "|Group = $Group\n";
                         $String .= "}}\n";
@@ -142,19 +148,22 @@ class Collectable implements ParseInterface
                         $LowReward = $CollectablesShopRewardItemCsv->at($RewardSheetLink)['RewardLow'];
                         $MidReward = $CollectablesShopRewardItemCsv->at($RewardSheetLink)['RewardMid'];
                         $HighReward = $CollectablesShopRewardItemCsv->at($RewardSheetLink)['RewardHigh'];
+                        if ($HighReward === "0") {
+                            $HighReward = "";
+                        }
                         $String = "{{-start-}}\n";
                         $String .= "'''$Item/Collectable'''\n";
                         $String .= "{{ARR Infobox Collectable\n";
                         $String .= "|Class = $Class\n";
-                        $String .= "|Level = $LevelMax\n";
+                        $String .= "|Level = $LevelMax$Star\n";
                         $String .= "|Name = $Item\n";
-                        $String .= "|Scrip = \n";
+                        $String .= "|Reward = $ItemReward\n";
                         $String .= "|Base = $LowCollect\n";
-                        $String .= "|Base Scrip = $LowReward\n";
+                        $String .= "|Base Reward = $LowReward\n";
                         $String .= "|Bonus1 = $MidCollect\n";
-                        $String .= "|Bonus1 Scrip = $MidReward\n";
+                        $String .= "|Bonus1 Reward = $MidReward\n";
                         $String .= "|Bonus2 = $HighCollect\n";
-                        $String .= "|Bonus2 Scrip = $HighReward\n";
+                        $String .= "|Bonus2 Reward = $HighReward\n";
                         $String .= "|Group = $Group\n";
                         $String .= "}}\n";
                         $String .= "{{-stop-}}\n";
@@ -265,15 +274,15 @@ class Collectable implements ParseInterface
             // format using Gamer Escape formatter and add to data array
             $this->data[] = GeFormatter::format(self::WIKI_FORMAT, $data);
         }
-
-        // save our data to the filename: GeCollectWiki.txt
-        $console->overwrite(" > Completed HWDCrafter ID: {$id}");
-        $this->io->text('Saving ...');
-        $info = $this->save("HWDCollectables.txt", 9999999);
-
-        $this->io->table(
-            ['Filename', 'Data Count', 'File Size'],
-            $info
-        );
-    }
+        $this->saveExtra("HWDCollectables.txt", $HWDCollectable);
+        //// save our data to the filename: GeCollectWiki.txt
+        //$console->overwrite(" > Completed HWDCrafter ID: {$id}");
+        //$this->io->text('Saving ...');
+        //$info = $this->save("HWDCollectables.txt", 9999999);
+//
+        //$this->io->table(
+        //    ['Filename', 'Data Count', 'File Size'],
+        //    $info
+        //);
+    }//
 }

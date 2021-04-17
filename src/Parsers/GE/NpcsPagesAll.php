@@ -15,16 +15,7 @@ class NpcsPagesAll implements ParseInterface
     use CsvParseTrait;
 
     // the wiki output format / template we shall use
-    const WIKI_FORMAT = '{Output}
-    {Porter}
-    {TripleTriad}
-    {MapOutput}
-    {ShopOutput}
-    {ShopDialogue}
-    {WarpPages}
-    {DialoguePages}
-    {Equipment}
-    {FinalNpcPlayerData}';
+    const WIKI_FORMAT = '{Output}';
 
     public function parse()
     {
@@ -160,6 +151,8 @@ class NpcsPagesAll implements ParseInterface
                 'festivalName' => $Name
             );
         }
+        $Festivaljdata = file_get_contents("Patch/FestivalNames.json");
+        $FestivalArray = json_decode($Festivaljdata, true);
         $this->io->progressFinish();
         //gather lgb from LGB.json
         $this->io->text('Generating LGB.json Positions ...');
@@ -1627,9 +1620,10 @@ class NpcsPagesAll implements ParseInterface
                 $LevelID = $LGBArray[$id]['id'];
                 $Patch = $PatchNumber[$id];
                 $MapFestival = "";
+                $FestivalID = $LGBArray[$id]["festivalID"];
                 if ($LGBArray[$id]["festivalID"] != 0) {
-                    $FesitvalName = $LGBArray[$id]["festivalName"];
-                    $MapFestival = "  | Festival = $FesitvalName\n";
+                    $FesitvalName = $FestivalArray[$FestivalID];
+                    $MapFestival = "  | Event = ". str_replace("_", " (", $FesitvalName). ")";
                 }  
                 //MapOutput = 
                 $MapOutputString = "{{-start-}}\n'''". $NameFormatted ."/Map/". $id ."'''\n";
@@ -1735,15 +1729,15 @@ class NpcsPagesAll implements ParseInterface
         
         $data = [
             '{Output}' => $Output,
-            '{Porter}' => $PorterOut,
-            '{TripleTriad}' => $TripleTriadOut,
-            '{MapOutput}' => $MapOutput,
-            '{ShopOutput}' => $ShopOut,
-            '{ShopDialogue}' => $ShopDialogueOut,
-            '{WarpPages}' => $WarpPages,
-            '{DialoguePages}' => $DialoguePages,
-            '{Equipment}' => $EquipmentOut,
-            '{FinalNpcPlayerData}' => $FinalNpcPlayerData,
+            //'{Porter}' => $PorterOut,
+            //'{TripleTriad}' => $TripleTriadOut,
+            //'{MapOutput}' => $MapOutput,
+            //'{ShopOutput}' => $ShopOut,
+            //'{ShopDialogue}' => $ShopDialogueOut,
+            //'{WarpPages}' => $WarpPages,
+            //'{DialoguePages}' => $DialoguePages,
+            //'{Equipment}' => $EquipmentOut,
+            //'{FinalNpcPlayerData}' => $FinalNpcPlayerData,
         ];
 
         // format using Gamer Escape formatter and add to data array
@@ -1751,12 +1745,21 @@ class NpcsPagesAll implements ParseInterface
 
         // save our data to the filename: GeCollectWiki.txt
         $this->io->progressFinish();
-        $this->io->text('Saving ...');
-        $info = $this->save("NpcsPagesAll.txt", 9999999);
+        $this->io->text(' Saving NPC_Main');
+        $info = $this->save("NPC_Main.txt", 9999999);
 
         $this->io->table(
             ['Filename', 'Data Count', 'File Size'],
             $info
         );
+        $this->saveExtra("NPC_TripleTriad.txt", $TripleTriadOut);
+        $this->saveExtra("NPC_Porter.txt", $PorterOut);
+        $this->saveExtra("NPC_Map.txt", $MapOutput);
+        $this->saveExtra("NPC_Shop.txt", $ShopOut);
+        $this->saveExtra("NPC_Shop_Dialogue.txt", $ShopDialogueOut);
+        $this->saveExtra("NPC_Warp.txt", $WarpPages);
+        $this->saveExtra("NPC_Dialogue.txt", $DialoguePages);
+        $this->saveExtra("NPC_Appearance.txt", $EquipmentOut);
+        $this->saveExtra("NPC_Player_Data.txt", $FinalNpcPlayerData);
     }
 }
