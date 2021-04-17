@@ -45,8 +45,25 @@ class Recipes implements ParseInterface
         $ENpcResidentCsv = $this->csv('ENpcResident');
         $HugeCraftworksNpcCsv = $this->csv('HugeCraftworksNpc');
         $SatisfactionSupplyCsv = $this->csv('SatisfactionSupply');
+        $HWDCrafterSupplyCsv = $this->csv('HWDCrafterSupply');
+        $NotebookDivisionCsv = $this->csv('NotebookDivision');
+        $RecipeNotebookListCsv = $this->csv('RecipeNotebookList');
 
         // (optional) start a progress bar
+        //foreach ($NotebookDivisionCsv->data as $id => $Notebook) {
+        //    //$RecipeID = $ItemCsv->at($RecipeCsv->at($Notebook['Recipe[0]'])['Item{Result}'])['Name'];
+        //    foreach(range(0,7) as $a) {
+        //        if ($id < 1000){
+        //            $output = (40 * $a + $id);
+        //        } elseif ($id < 2000) {
+        //          // DoH masterbooks
+        //          $output = (1000 + 8 * ($id - 1000) + $a);
+        //        } else {
+        //          // DoL folklores, only 4 DoLs tho
+        //          $output = ($a < 4 ? (2000 + 4 * ($id - 2000) + $a) : -1);
+        //        }
+        //    }
+        //}
         $this->io->progressStart($RecipeCsv->total);
 
         //make arrays for QuestClassJobSupply and Quest to re-order index
@@ -70,6 +87,15 @@ class Recipes implements ParseInterface
             $QuestIDSupply = $QuestData['QuestClassJobSupply'];
             $QuestArray[$QuestIDSupply] = $QuestData;
             // example = var_dump($QuestArray['25']['id']);
+        }
+
+        $HWDArray = [];
+
+        foreach ($HWDCrafterSupplyCsv->data as $id => $HWDData) {
+            foreach(range(0,22) as $a) {
+                $HWDArray[] = $HWDData["Item{TradeIn}[$a]"];
+            }
+            // example = var_dump($HWDArray['28728']);
         }
 
         $CrystariumArray = [];
@@ -104,6 +130,14 @@ class Recipes implements ParseInterface
                 $SpecialString = "\n|Special Recipe      = $BeastTribe Quest\n|Recipe Quest        = ". $QuestArray["$keyID"]['Name'] ."\n|Recipe HandInNPC    = $HandInNpc";
             }
 
+            //is HWD Item? 
+            
+            if (in_array($ResultItemID, $HWDArray)) {
+                $SpecialString = "\n|Special Recipe      = Ishgard Restoration";
+            }
+            //uncomment this to only output HWD Items
+            //if (!in_array($ResultItemID, $HWDArray)) continue;
+
             //is it Crystarium Item?
             if (in_array($ResultItemID, $CrystariumArray)) {
                 $SpecialString = "\n|Special Recipe      = Crystarium Deliveries";
@@ -113,6 +147,8 @@ class Recipes implements ParseInterface
             if (in_array($ResultItemID, $SatisfactionItemArray)) {
                 $SpecialString = "\n|Special Recipe      = Custom Delivery";
             }
+
+
 
             //use description for |Special Recipe
             if (empty($SpecialString)) {
@@ -210,4 +246,5 @@ class Recipes implements ParseInterface
 1st Aug 2020 - Added checks and data for "Special Recipe" (used in beast tribes etc)
 3rd Aug 2020 - Added checks for collectable
 11th Aug 2020 - Added checks for Dwarf Beast Tribe
+02nd Apr 2021 - Added HWD (Ishgard) Special Recipe
 */

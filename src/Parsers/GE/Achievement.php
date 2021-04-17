@@ -66,8 +66,17 @@ class Achievement implements ParseInterface
             $Bot = "true";
 
             $descriptionPre = $Achievement['Description'];
-            $oldwords = ["gladiator", "pugilist", "marauder", "lancer", "archer", "conjurer", "thaumaturge", "carpenter", "blacksmith", "armorer", "goldsmith", "leatherworker", "weaver", "alchemist", "culinarian", "miner", "botanist", "fisher", "paladin", "monk", "monk", "dragoon", "bard", "white mage", "black mage", "arcanist", "summoner", "scholar", "rogue", "ninja", "machinist", "dark knight", "astrologian", "samurai", "black mage", "red mage", "blue mage", "gunbreaker", "dancer"];
-            $newwords = ["[[Gladiator]]", "[[Pugilist]]", "[[Marauder]]", "[[Lancer]]", "[[Archer]]", "[[Conjurer]]", "[[Thaumaturge]]", "[[Carpenter]]", "[[Blacksmith]]", "[[Armorer]]", "[[Goldsmith]]", "[[Leatherworker]]", "[[Weaver]]", "[[Alchemist]]", "[[Culinarian]]", "[[Miner]]", "[[Botanist]]", "[[Fisher]]", "[[Paladin]]", "[[Monk]]", "[[Warrior]]", "[[Dragoon]]", "[[Bard]]", "[[White Mage]]", "[[Black Mage]]", "[[Arcanist]]", "[[Summoner]]", "[[Scholar]]", "[[Rogue]]", "[[Ninja]]", "[[Machinist]]", "[[Dark Knight]]", "[[Astrologian]]", "[[Samurai]]", "[[Black Mage]]", "[[Red Mage]]", "[[Blue Mage]]", "[[Gunbreaker]]", "[[Dancer]]"];
+            $oldwords = ["gladiator", "pugilist", "marauder", "lancer", "archer", "conjurer", "thaumaturge", "carpenter",
+                "blacksmith", "armorer", "goldsmith", "leatherworker", "weaver", "alchemist", "culinarian", "miner",
+                "botanist", "fisher", "paladin", "monk", "monk", "dragoon", "bard", "white mage", "black mage", "arcanist",
+                "summoner", "scholar", "rogue", "ninja", "machinist", "dark knight", "astrologian", "samurai", "black mage",
+                "red mage", "blue mage", "gunbreaker", "dancer"];
+            $newwords = ["[[Gladiator]]", "[[Pugilist]]", "[[Marauder]]", "[[Lancer]]", "[[Archer]]", "[[Conjurer]]",
+                "[[Thaumaturge]]", "[[Carpenter]]", "[[Blacksmith]]", "[[Armorer]]", "[[Goldsmith]]", "[[Leatherworker]]",
+                "[[Weaver]]", "[[Alchemist]]", "[[Culinarian]]", "[[Miner]]", "[[Botanist]]", "[[Fisher]]", "[[Paladin]]",
+                "[[Monk]]", "[[Warrior]]", "[[Dragoon]]", "[[Bard]]", "[[White Mage]]", "[[Black Mage]]", "[[Arcanist]]",
+                "[[Summoner]]", "[[Scholar]]", "[[Rogue]]", "[[Ninja]]", "[[Machinist]]", "[[Dark Knight]]", "[[Astrologian]]",
+                "[[Samurai]]", "[[Black Mage]]", "[[Red Mage]]", "[[Blue Mage]]", "[[Gunbreaker]]", "[[Dancer]]"];
             $description = str_replace($oldwords, $newwords, $descriptionPre);
             //if its a type 6 then add the link to the description for quests
             if ($Achievement['Type'] == 6) {
@@ -139,7 +148,7 @@ class Achievement implements ParseInterface
                     }
 
                     // build icon input folder paths
-                    $InputIcon = $this->getInputFolder() . '/icon/' . $this->iconize($icon);
+                    $InputIcon = $this->getInputFolder() . '/icon/' . $this->iconizeHR($icon);
 
                     // if icon doesn't exist (not in the input folder icon list), then skip
                     //if (!file_exists($questIcon)) continue;

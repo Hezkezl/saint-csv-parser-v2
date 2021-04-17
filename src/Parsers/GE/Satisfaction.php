@@ -15,33 +15,7 @@ class Satisfaction implements ParseInterface
     use CsvParseTrait;
 
     // the wiki output format / template we shall use
-    const WIKI_FORMAT = '
-{{-start-}}
-\'\'\'{item}/Collectable\'\'\'
-{{Custom Delivery
-|Name = {item}
-|NPC = {npc}
-|Location = {location}
-|Level = {id}
-|Chance = {chance}
-|Collectability Low = {collectlow}
-|Collectability Mid = {collectmid}
-|Collectability High = {collecthigh}
-|Satisfaction Low = {satisfylow}
-|Satisfaction Mid = {satisfymid}
-|Satisfaction High = {satisfyhigh}
-|Gil Low = {gillow}
-|Gil Mid = {gilmid}
-|Gil High = {gilhigh}
-|Yellow Type = {yellowtype}
-|Yellow Low = {yellowlow}
-|Yellow Mid = {yellowmid}
-|Yellow High = {yellowhigh}
-|White Type = {whitetype}
-|White Low = {whitelow}
-|White Mid = {whitemid}
-|White High = {whitehigh}
-}}{{-stop-}}';
+    const WIKI_FORMAT = '{Output}';
 
     public function parse()
     {
@@ -53,134 +27,151 @@ class Satisfaction implements ParseInterface
         $ENpcResidentCsv = $this->csv("ENpcResident");
         $SatisfactionSupplyRewardCsv = $this->csv("SatisfactionSupplyReward");
         $ItemCsv = $this->csv("Item");
+        $LevelCsv = $this->csv("Level");
+        $TerritoryTypeCsv = $this->csv("TerritoryType");
+        $PlaceNameCsv = $this->csv("PlaceName");
 
-        $this->io->progressStart($SatisfactionSupplyCsv->total);
+        $this->io->text('Generating Locations ...');
+        $this->io->progressStart($LevelCsv->total);
+        foreach($LevelCsv->data as $id => $Level) {
+            $this->io->progressAdvance();
+            if ($Level['Type'] != 8) continue;
+            $NPCID = $Level['Object'];
+            $LGBArray[$NPCID] = array(
+                'Location' => $PlaceNameCsv->at($TerritoryTypeCsv->at($Level['Territory'])['PlaceName'])['Name']
+            );
+        }
+        $this->io->progressFinish();
 
-        // loop through quest data
-        foreach ($SatisfactionSupplyCsv->data as $id => $item) {
+        // loop through npc data
+        $Array = []; 
+        $this->io->progressStart($SatisfactionNpcCsv->total);
+        $this->io->text('Generating Satisfaction NPCs ...');
+        foreach ($SatisfactionNpcCsv->data as $id => $supplynpc) {
             // ---------------------------------------------------------
+
             $this->io->progressAdvance();
 
             //---------------------------------------------------------------------------------
             // Actual code definition begins below!
             //---------------------------------------------------------------------------------
 
-            $Satisfaction = false;
-
-            // need to build a switch based off of the Key/id of Satisfaction Supply and have it
-            // look in SatisfactionNpc's columns of "SupplyIndex" [0] through [5] to match up to
-
             // skip ones without a name
-            if (empty($item['Item'])) {
-                continue;
-            } else {
-                // get the NPC name
-                $npcid = floor($item['id']);
-                if ($npcid > 25) {
-                    $npcid = $npcid - 25;
-                } elseif ($npcid > 20) {
-                    $npcid = $npcid - 20;
-                } elseif ($npcid > 15) {
-                    $npcid = $npcid - 15;
-                } elseif ($npcid > 10) {
-                    $npcid = $npcid - 10;
-                } elseif ($npcid > 5) {
-                    $npcid = $npcid - 5;
-                }
-                $npc = $ENpcResidentCsv->at($SatisfactionNpcCsv->at($npcid)['Npc'])['Singular'];
+            $Npc = $ENpcResidentCsv->at($supplynpc['Npc'])['Singular'];
+            $NpcId = $supplynpc['Npc'];
+            // get the NPC name
+            if (empty($Npc)) continue;
+            foreach(range(1,5) as $a) {
+                foreach(range(0,20) as $b) {
+                    $SubDataValue = "". $supplynpc["SupplyIndex[$a]"] .".". $b ."";
+                    if (empty($ItemCsv->at($SatisfactionSupplyCsv->at($SubDataValue)['Item'])['Name'])) break;
+                    $Name = $ItemCsv->at($SatisfactionSupplyCsv->at($SubDataValue)['Item'])['Name'];
+                    if(empty($LGBArray[$NpcId]['Location'])){
+                        $location = "Blank";
+                    }
 
-                $Name = $ItemCsv->at($item["Item"])['Name'];
-                $location = "Blank";
-                $chance = $item["Probability<%>"];
-                $collectlow = $item["Collectability{Low}"];
-                $collectmid = $item["Collectability{Mid}"];
-                $collecthigh = $item["Collectability{High}"];
-                //$reward = $SatisfactionSupplyRewardCsv->at($item["Reward"]);
-                $satisfylow = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Satisfaction{Low}"];
-                $satisfymid = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Satisfaction{Mid}"];
-                $satisfyhigh = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Satisfaction{High}"];
-                $gillow = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Gil{Low}"];
-                $gilmid = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Gil{Mid}"];
-                $gilhigh = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Gil{High}"];
-                $yellowlow = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Quantity{Low}[0]"];
-                $yellowmid = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Quantity{Mid}[0]"];
-                $yellowhigh = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Quantity{High}[0]"];
-                $whitelow = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Quantity{Low}[1]"];
-                $whitemid = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Quantity{Mid}[1]"];
-                $whitehigh = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Quantity{High}[1]"];
-                $yellowtypenumber = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Reward{Currency}[0]"];
-                $whitetypenumber = $SatisfactionSupplyRewardCsv->at($item["Reward"])["Reward{Currency}[1]"];
+                    $location = $LGBArray[$NpcId]['Location'];
+                    $chance = $SatisfactionSupplyCsv->at($SubDataValue)["Probability<%>"];
+                    $collectlow = $SatisfactionSupplyCsv->at($SubDataValue)["Collectability{Low}"];
+                    $collectmid = $SatisfactionSupplyCsv->at($SubDataValue)["Collectability{Mid}"];
+                    $collecthigh = $SatisfactionSupplyCsv->at($SubDataValue)["Collectability{High}"];
+                    $satisfylow = $SatisfactionSupplyRewardCsv->at($SatisfactionSupplyCsv->at($SubDataValue)["Reward"])["Satisfaction{Low}"];
+                    $satisfymid = $SatisfactionSupplyRewardCsv->at($SatisfactionSupplyCsv->at($SubDataValue)["Reward"])["Satisfaction{Mid}"];
+                    $satisfyhigh = $SatisfactionSupplyRewardCsv->at($SatisfactionSupplyCsv->at($SubDataValue)["Reward"])["Satisfaction{High}"];
+                    $gillow = $SatisfactionSupplyRewardCsv->at($SatisfactionSupplyCsv->at($SubDataValue)["Reward"])["Gil{Low}"];
+                    $gilmid = $SatisfactionSupplyRewardCsv->at($SatisfactionSupplyCsv->at($SubDataValue)["Reward"])["Gil{Mid}"];
+                    $gilhigh = $SatisfactionSupplyRewardCsv->at($SatisfactionSupplyCsv->at($SubDataValue)["Reward"])["Gil{High}"];
+                    $yellowlow = $SatisfactionSupplyRewardCsv->at($SatisfactionSupplyCsv->at($SubDataValue)["Reward"])["Quantity{Low}[0]"];
+                    $yellowmid = $SatisfactionSupplyRewardCsv->at($SatisfactionSupplyCsv->at($SubDataValue)["Reward"])["Quantity{Mid}[0]"];
+                    $yellowhigh = $SatisfactionSupplyRewardCsv->at($SatisfactionSupplyCsv->at($SubDataValue)["Reward"])["Quantity{High}[0]"];
+                    $whitelow = $SatisfactionSupplyRewardCsv->at($SatisfactionSupplyCsv->at($SubDataValue)["Reward"])["Quantity{Low}[1]"];
+                    $whitemid = $SatisfactionSupplyRewardCsv->at($SatisfactionSupplyCsv->at($SubDataValue)["Reward"])["Quantity{Mid}[1]"];
+                    $whitehigh = $SatisfactionSupplyRewardCsv->at($SatisfactionSupplyCsv->at($SubDataValue)["Reward"])["Quantity{High}[1]"];
+                    $yellowtypenumber = $SatisfactionSupplyRewardCsv->at($SatisfactionSupplyCsv->at($SubDataValue)["Reward"])["Reward{Currency}[0]"];
+                    $whitetypenumber = $SatisfactionSupplyRewardCsv->at($SatisfactionSupplyCsv->at($SubDataValue)["Reward"])["Reward{Currency}[1]"];
+        
+                    switch ($yellowtypenumber) {
+                        case 2:
+                            $yellowtype = "Yellow Crafters' Scrip";
+                            break;
+                        case 4:
+                            $yellowtype = "Yellow Gatherers' Scrip";
+                            break;
+                        case 6:
+                            $yellowtype = "White Crafters' Scrip";
+                            break;
+                        case 7:
+                            $yellowtype = "White Gatherers' Scrip";
+                            break;
+                        default:
+                            $yellowtype = false;
+                            break;
+                    }
 
-                switch ($yellowtypenumber) {
-                    case 2:
-                        $yellowtype = "Yellow Crafters' Scrip";
-                        break;
-                    case 4:
-                        $yellowtype = "Yellow Gatherers' Scrip";
-                        break;
-                    case 6:
-                        $yellowtype = "White Crafters' Scrip";
-                        break;
-                    case 7:
-                        $yellowtype = "White Gatherers' Scrip";
-                        break;
-                    default:
-                        $yellowtype = false;
-                        break;
+                    switch ($whitetypenumber) {
+                        case 2:
+                            $whitetype = "Yellow Crafters' Scrip";
+                            break;
+                        case 4:
+                            $whitetype = "Yellow Gatherers' Scrip";
+                            break;
+                        case 6:
+                            $whitetype = "White Crafters' Scrip";
+                            break;
+                        case 7:
+                            $whitetype = "White Gatherers' Scrip";
+                            break;
+                        default:
+                            $whitetype = false;
+                            break;
+                    }
+                    
+                    $OutputString = "{{Custom Delivery\n";
+                    $OutputString .= "|Name = $Name\n";
+                    $OutputString .= "|NPC = $Npc\n";
+                    $OutputString .= "|Location = $location\n";
+                    $OutputString .= "|Level = $a\n";
+                    $OutputString .= "|Chance = $chance\n";
+                    $OutputString .= "|Collectability Low = $collectlow\n";
+                    $OutputString .= "|Collectability Mid = $collectmid\n";
+                    $OutputString .= "|Collectability High = $collecthigh\n";
+                    $OutputString .= "|Satisfaction Low = $satisfylow\n";
+                    $OutputString .= "|Satisfaction Mid = $satisfymid\n";
+                    $OutputString .= "|Satisfaction High = $satisfyhigh\n";
+                    $OutputString .= "|Gil Low = $gillow\n";
+                    $OutputString .= "|Gil Mid = $gilmid\n";
+                    $OutputString .= "|Gil High = $gilhigh\n";
+                    $OutputString .= "|Yellow Type = $yellowtype\n";
+                    $OutputString .= "|Yellow Low = $yellowlow\n";
+                    $OutputString .= "|Yellow Mid = $yellowmid\n";
+                    $OutputString .= "|Yellow High = $yellowhigh\n";
+                    $OutputString .= "|White Type = $whitetype\n";
+                    $OutputString .= "|White Low = $whitelow\n";
+                    $OutputString .= "|White Mid = $whitemid\n";
+                    $OutputString .= "|White High = $whitehigh\n";
+                    $OutputString .= "}}";
+                    $Array[$Name][] = $OutputString;
                 }
-                switch ($whitetypenumber) {
-                    case 2:
-                        $whitetype = "Yellow Crafters' Scrip";
-                        break;
-                    case 4:
-                        $whitetype = "Yellow Gatherers' Scrip";
-                        break;
-                    case 6:
-                        $whitetype = "White Crafters' Scrip";
-                        break;
-                    case 7:
-                        $whitetype = "White Gatherers' Scrip";
-                        break;
-                    default:
-                        $whitetype = false;
-                        break;
-                }
-
             }
-
-            //---------------------------------------------------------------------------------
-
-            $data = [
-                '{item}' => $Name,
-                '{npc}' => $npc,
-                '{location}' => $location,
-                '{id}' => $id,
-                '{chance}' => $chance,
-                '{collectlow}' => $collectlow,
-                '{collectmid}' => $collectmid,
-                '{collecthigh}' => $collecthigh,
-                '{satisfylow}' => $satisfylow,
-                '{satisfymid}' => $satisfymid,
-                '{satisfyhigh}' => $satisfyhigh,
-                '{gillow}' => $gillow,
-                '{gilmid}' => $gilmid,
-                '{gilhigh}' => $gilhigh,
-                '{yellowtype}' => $yellowtype,
-                '{yellowlow}' => $yellowlow,
-                '{yellowmid}' => $yellowmid,
-                '{yellowhigh}' => $yellowhigh,
-                '{whitetype}' => $whitetype,
-                '{whitelow}' => $whitelow,
-                '{whitemid}' => $whitemid,
-                '{whitehigh}' => $whitehigh,
-            ];
-
-            // format using Gamer Escape formatter and add to data array
-            $this->data[] = GeFormatter::format(self::WIKI_FORMAT, $data);
         }
 
-        // save our data to the filename: GeSatisfactionWiki.txt
+        foreach ($Array as $key => $value) {
+            $Array[$key] = "{{-start-}}\n'''$key/Collectable'''\n".implode($value)."\n{{-stop-}}\n";
+        }
+
+        $Output = implode("\n", $Array);
         $this->io->progressFinish();
+
+        //---------------------------------------------------------------------------------
+
+        $data = [
+            '{Output}' => $Output,
+        ];
+
+        // format using Gamer Escape formatter and add to data array
+        $this->data[] = GeFormatter::format(self::WIKI_FORMAT, $data);
+
+        // save our data to the filename: GeSatisfactionWiki.txt
         $this->io->text('Saving ...');
         $info = $this->save("SatisfactionNPC.txt", 999999);
 

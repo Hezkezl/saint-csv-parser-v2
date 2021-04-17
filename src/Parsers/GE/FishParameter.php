@@ -106,7 +106,7 @@ class FishParameter implements ParseInterface
             }
 
             // build icon input folder paths
-            $LargeIconPath = $this->getInputFolder() .'/icon/'. $this->iconize($DrawingIcon);
+            $LargeIconPath = $this->getInputFolder() .'/icon/'. $this->iconizeHR($DrawingIcon);
 
             // give correct file names to icons for output
             $LargeIconFileName = "{$IconOutputDirectory}/Model-$Name.png";

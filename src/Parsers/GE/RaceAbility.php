@@ -73,13 +73,13 @@ class RaceAbility implements ParseInterface
             if (!empty($ability['Icon'])) {
 
                 // ensure output directory exists
-                $EventIconoutputDirectory = $this->getOutputFolder() . "/$CurrentPatchOutput/ChocoboAbilityIcons";
+                $EventIconoutputDirectory = $this->getOutputFolder() . "/$PatchID/ChocoboAbilityIcons";
                 if (!is_dir($EventIconoutputDirectory)) {
                     mkdir($EventIconoutputDirectory, 0777, true);
                 }
 
                 // build icon input folder paths
-                $abilityIcon = $this->getInputFolder() .'/icon/'. $this->iconize($ability['Icon']);
+                $abilityIcon = $this->getInputFolder() .'/icon/'. $this->iconizeHR($ability['Icon']);
 
                 // if icon doesn't exist (not in the input folder icon list), then skip
                 if (!file_exists($abilityIcon)) continue;
