@@ -88,12 +88,25 @@ trait CsvParseTrait
             fwrite($MakeFile, NULL);
             fclose($MakeFile);
         }
+        switch ($FileName) {
+            case 'Item':
+                $offset = '"Name"';
+            break;
+            case 'Quest':
+                $offset = '"Name"';
+            break;
+            
+            default:
+                $offset = '"id"';
+            break;
+        }
         $jdata = file_get_contents("Patch/$FileName.json");
         $PatchArray = json_decode($jdata, true);
         foreach ($CSV->data as $id => $CsvData) {
             $Key = $CsvData["id"];
             if (empty($Key)) continue;
             $PatchNo = $PatchNoData;
+            if (empty($CsvData[$offset])) continue;
             if (isset($PatchArray[$Key])) continue;
             if (!isset($PatchArray[$Key])) {
                 $PatchArray[$Key] = $PatchNo;
@@ -1218,5 +1231,42 @@ trait CsvParseTrait
         $icon = implode('/', $path) .'_hr1.png';
 
         return $icon;
+    }
+
+    /**
+     * Array of currencies. Usage: $GetCurrency[1]; will give the item ID of the currency
+     */
+    private function GetCurrency()
+    {
+        $CurencyArray[1] = 10309;
+        $CurencyArray[2] = 17833;
+        $CurencyArray[3] = 10311;
+        $CurencyArray[4] = 17834;
+        $CurencyArray[5] = 10307;
+        $CurencyArray[6] = 25199;
+        $CurencyArray[7] = 25200;
+        $CurencyArray[8] = 21072;
+        $CurencyArray[9] = 21073;
+        $CurencyArray[10] = 21074;
+        $CurencyArray[11] = 21075;
+        $CurencyArray[12] = 21076;
+        $CurencyArray[13] = 21077;
+        $CurencyArray[14] = 21078;
+        $CurencyArray[15] = 21079;
+        $CurencyArray[16] = 21080;
+        $CurencyArray[17] = 21081;
+        $CurencyArray[18] = 21172;
+        $CurencyArray[19] = 21173;
+        $CurencyArray[20] = 21935;
+        $CurencyArray[21] = 22525;
+        $CurencyArray[22] = 26533;
+        $CurencyArray[23] = 26807;
+        $CurencyArray[24] = 28063;
+        $CurencyArray[25] = 28186;
+        $CurencyArray[26] = 28187;
+        $CurencyArray[27] = 28188;
+        $CurencyArray[28] = 30341;
+
+        return $CurencyArray;
     }
 }
