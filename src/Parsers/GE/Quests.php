@@ -571,7 +571,7 @@ class Quests implements ParseInterface
                         }
 
                         // build icon input folder paths
-                        $questIcon = $this->getInputFolder() .'/icon/'. $this->iconize($quest['Icon']);
+                        $questIcon = $this->getInputFolder() .'/icon/'. $this->iconizeHR($quest['Icon']);
 
                         $questiconFileName = "{$QuestIconOutputDirectory}/{$quest['Icon']}.png";
 

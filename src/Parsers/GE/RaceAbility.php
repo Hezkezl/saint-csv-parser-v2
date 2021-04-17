@@ -79,7 +79,7 @@ class RaceAbility implements ParseInterface
                 }
 
                 // build icon input folder paths
-                $abilityIcon = $this->getInputFolder() .'/icon/'. $this->iconize($ability['Icon']);
+                $abilityIcon = $this->getInputFolder() .'/icon/'. $this->iconizeHR($ability['Icon']);
 
                 // if icon doesn't exist (not in the input folder icon list), then skip
                 if (!file_exists($abilityIcon)) continue;

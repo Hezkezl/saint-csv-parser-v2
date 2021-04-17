@@ -23,7 +23,8 @@ class NpcsPagesAll implements ParseInterface
     {ShopDialogue}
     {WarpPages}
     {DialoguePages}
-    {Equipment}';
+    {Equipment}
+    {FinalNpcPlayerData}';
 
     public function parse()
     {
@@ -35,7 +36,6 @@ class NpcsPagesAll implements ParseInterface
         $QuestCsv = $this->csv('Quest');
         $CustomTalkCsv = $this->csv('CustomTalk');
         $CustomTalkNestHandlersCsv = $this->csv('CustomTalkNestHandlers');
-        $CustomTalkDynamicIconCsv = $this->csv('CustomTalkDynamicIcon');
         $HowToCsv = $this->csv('HowTo');
         $HowToCategoryCsv = $this->csv('HowToCategory');
         $HowToPageCsv = $this->csv('HowToPage');
@@ -386,7 +386,7 @@ class NpcsPagesAll implements ParseInterface
                         }
                         $RequiredQuests = implode(",", $RequiredQuestArray);
                         $RequiredLevel = $WarpConditionCsv->at($Condition)['Class{Level}'];
-                        $WarpString = "{{-start-}}\n'''". $NameFormatted ."/Warp/$DataValue'''\n";
+                        $WarpString = "{{-start-}}\n'''". $NameFormatted ."/$DataValue/Warp'''\n";
                         $WarpString .= "{{WarpTemplate\n";
                         $WarpString .= "| Option = $WarpOption\n";
                         $WarpString .= "| Confirm = $WarpConfirm\n";
@@ -408,18 +408,18 @@ class NpcsPagesAll implements ParseInterface
                     case ($DataValue > 393000) && ($DataValue < 399999): //GUILDLEVEASSIGNMENT
                         $DialogueCheck[] = $DataValue.",";
                         $GuildLeveTalkArray = [];
-                        $GuildLeveTalkType = $GuildLeveAssignmentCsv->at($DataValue)['unknown_1'];
-                        foreach(range(31,38) as $a) {
-                            if ($GuildLeveAssignmentTalkCsv->at($GuildLeveAssignmentCsv->at($DataValue)['AssignmentTalk'])["unknown_$a"] != "0"){
+                        $GuildLeveTalkType = $GuildLeveAssignmentCsv->at($DataValue)['Type'];
+                        foreach(range(0,7) as $a) {
+                            if ($GuildLeveAssignmentTalkCsv->at($GuildLeveAssignmentCsv->at($DataValue)['AssignmentTalk'])["Talk[$a]"] != "0"){
                                 $GuildLeveTalkString = "{{Dialoguebox3|Intro=$GuildLeveTalkType|Dialogue=\n";
-                                $GuildLeveTalkString .= $GuildLeveAssignmentTalkCsv->at($GuildLeveAssignmentCsv->at($DataValue)['AssignmentTalk'])["unknown_$a"];
+                                $GuildLeveTalkString .= $GuildLeveAssignmentTalkCsv->at($GuildLeveAssignmentCsv->at($DataValue)['AssignmentTalk'])["Talk[$a]"];
                                 $GuildLeveTalkString .= "}}";
                                 $GuildLeveTalkArray[] = $GuildLeveTalkString;
                             }
                         }
                         $GuildLeveTalkImpoloded = implode("\n", $GuildLeveTalkArray);
                         $DialogueString = "{{-start-}}\n";
-                        $DialogueString .= "'''$NameFormatted/Dialogue/$id'''\n";
+                        $DialogueString .= "'''$NameFormatted/$id/Dialogue'''\n";
                         $DialogueString .= "$GuildLeveTalkImpoloded\n";
                         $DialogueString .= "{{-stop-}}\n";
                         $DialogueArray[] = $DialogueString;
@@ -433,7 +433,7 @@ class NpcsPagesAll implements ParseInterface
                         }
                         $DefaultTalkImplode = implode("\n", $DefaultTalk);
                         $DialogueString = "{{-start-}}\n";
-                        $DialogueString .= "'''$NameFormatted/Dialogue/$id'''\n";
+                        $DialogueString .= "'''$NameFormatted/$id/Dialogue'''\n";
                         $DialogueString .= "$DefaultTalkImplode\n";
                         $DialogueString .= "{{-stop-}}\n";
                         $DialogueArray[] = $DialogueString;
@@ -445,7 +445,7 @@ class NpcsPagesAll implements ParseInterface
                             $Argument = $CustomTalkCsv->at($DataValue)["Script{Arg}[$a]"];
                             switch (true) {
                                 case (strpos($Instruction, 'HOWTO') !== false):
-                                    $HowToCheck[] = $HowToCsv->at($Argument)['unknown_1'].",";
+                                    $HowToCheck[] = $HowToCsv->at($Argument)['Name'].",";
                                     $DataValue = $Argument;
                                 break;
                                 case (strpos($Instruction, 'DISPOSAL') !== false):
@@ -542,7 +542,7 @@ class NpcsPagesAll implements ParseInterface
                         $CraftLeveTalkType = $LeveCsv->at($CraftLeveCsv->at($DataValue)['Leve'])['Name'];
                         foreach(range(37,42) as $a) {
                             if ($CraftLeveTalkCsv->at($CraftLeveCsv->at($DataValue)['CraftLeveTalk'])["unknown_$a"] != "0"){
-                                $CraftLeveTalkStringSub .= $CraftLeveTalkCsv->at($CraftLeveCsv->at($DataValue)['CraftLeveTalk'])["unknown_$a"];
+                                $CraftLeveTalkStringSub .= $CraftLeveTalkCsv->at($CraftLeveCsv->at($DataValue)['CraftLeveTalk'])["Talk[$a]"];
                                 $CraftLeveTalkStringSub .= "\n";
                                 $CraftLeveTalkArray[] = $CraftLeveTalkStringSub;
                             }
@@ -562,7 +562,7 @@ class NpcsPagesAll implements ParseInterface
                         $CraftLeveTalkString .= $CraftLeveTalkImpoloded;
                         $CraftLeveTalkString .= "\n}}";
                         $DialogueString = "{{-start-}}\n";
-                        $DialogueString .= "'''$NameFormatted/Dialogue/$id'''\n";
+                        $DialogueString .= "'''$NameFormatted/$id/Dialogue'''\n";
                         $DialogueString .= "$CraftLeveTalkString\n";
                         $DialogueString .= "{{-stop-}}\n";
                         $DialogueArray[] = $DialogueString;
@@ -613,7 +613,7 @@ class NpcsPagesAll implements ParseInterface
                         }
                         $SwitchTalkOut = implode("\n", $SwitchTalkArray);
                         $DialogueString = "{{-start-}}\n";
-                        $DialogueString .= "'''$NameFormatted/Dialogue/$id'''\n";
+                        $DialogueString .= "'''$NameFormatted/$id/Dialogue'''\n";
                         $DialogueString .= "$SwitchTalkOut\n";
                         $DialogueString .= "{{-stop-}}\n";
                         $DialogueArray[] = $DialogueString;
@@ -1480,7 +1480,8 @@ class NpcsPagesAll implements ParseInterface
                 continue;
             }
 
-            $BodyOutput = "|Race = ". $Race ."\n";
+            $BodyOutput = "{{NPC Appearance\n";
+            $BodyOutput .= "|Race = ". $Race ."\n";
             $BodyOutput .= "|Gender = ". $Gender ."\n";
             $BodyOutput .= "|Body Type = ". $BodyType ."\n";
             $BodyOutput .= "|Height = ". $Height ."\n";
@@ -1515,6 +1516,7 @@ class NpcsPagesAll implements ParseInterface
             $EquipmentOutput .= "|Feet Dye = ". $EquipmentArray['Feet']['Dye'] ."\n";
             $EquipmentOutput .= "|Main Hand = ". $EquipmentArray['MainHand']['Item'] ."\n";
             $EquipmentOutput .= "|Off Hand = ". $EquipmentArray['OffHand']['Item'] ."\n";
+            $EquipmentOutput .= "}}\n";
 
             $NPCEquipmentArray[$NameFormatted][] = "$BodyOutput\n$EquipmentOutput";
 
@@ -1526,12 +1528,15 @@ class NpcsPagesAll implements ParseInterface
             $EquipmentarrayUnique[$key] = array_unique($value);
             $EquipmentArrayFormatted = [];
             $a = 0;
+            $ApperanceCounter = [];
             foreach ($EquipmentarrayUnique[$key] as $key1 => $value1) {
                 $a++;
                 $EquipmentArrayFormatted[$key1] = "{{-start-}}\n'''$key/Appearance/$a'''\n$value1\n{{-stop-}}";
+                $ApperanceCounter[] = $a;
             }
+            $ApperanceCount = implode(",", $ApperanceCounter);
             $EquipmentarrayUnique[$key] = implode("\n", $EquipmentArrayFormatted);
-            $NPCUniqueApperanceIDs[$key] = $a;
+            $NPCUniqueApperanceIDs[$key] = $ApperanceCount;
         }
         $EquipmentOut = implode("\n", $EquipmentarrayUnique);
         //if (!file_exists("output/$PatchID")) { mkdir("output/$PatchID", 0777, true); }
@@ -1688,6 +1693,21 @@ class NpcsPagesAll implements ParseInterface
             | Last Position = $LastMapLoc
             }}
             {{-stop-}}";
+            $NpcPlayerDataString = "{{-start-}}\n'''". $NameFormatted ."/Player_Data'''\n";
+            $NpcPlayerDataString .= "{{Player Data\n";
+            $NpcPlayerDataString .= "|Name = $NameFormatted\n";
+            $NpcPlayerDataString .= "|Full Name = \n";
+            $NpcPlayerDataString .= "|Title = \n";
+            $NpcPlayerDataString .= "|Employer = \n";
+            $NpcPlayerDataString .= "|Occupation = \n";
+            $NpcPlayerDataString .= "|Affiliation = \n";
+            $NpcPlayerDataString .= "|Bio = \n";
+            $NpcPlayerDataString .= "|Notes = \n";
+            $NpcPlayerDataString .= "|Images = \n";
+            $NpcPlayerDataString .= "|Pre-Calamity Dialogue =\n";
+            $NpcPlayerDataString .= "}}\n";
+            $NpcPlayerDataString .= "{{-stop-}}\n";
+            $NpcPlayerDataArray[$NameFormatted][0] = $NpcPlayerDataString;
         
         }
             
@@ -1701,6 +1721,11 @@ class NpcsPagesAll implements ParseInterface
         foreach ($Npcarray2 as $key => $value) {
             $finaloutput[$key] = implode("\n", $value);
         }
+        $FinalNpcPlayerDataArray = [];
+        foreach ($NpcPlayerDataArray as $key => $value) {
+            $FinalNpcPlayerDataArray[$key] = implode("\n", $value);
+        }
+        $FinalNpcPlayerData = implode("\n", $FinalNpcPlayerDataArray);
 
         $Output = implode("\n", $finaloutput);
 
@@ -1718,6 +1743,7 @@ class NpcsPagesAll implements ParseInterface
             '{WarpPages}' => $WarpPages,
             '{DialoguePages}' => $DialoguePages,
             '{Equipment}' => $EquipmentOut,
+            '{FinalNpcPlayerData}' => $FinalNpcPlayerData,
         ];
 
         // format using Gamer Escape formatter and add to data array

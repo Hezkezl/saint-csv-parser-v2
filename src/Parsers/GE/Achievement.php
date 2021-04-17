@@ -148,7 +148,7 @@ class Achievement implements ParseInterface
                     }
 
                     // build icon input folder paths
-                    $InputIcon = $this->getInputFolder() . '/icon/' . $this->iconize($icon);
+                    $InputIcon = $this->getInputFolder() . '/icon/' . $this->iconizeHR($icon);
 
                     // if icon doesn't exist (not in the input folder icon list), then skip
                     //if (!file_exists($questIcon)) continue;

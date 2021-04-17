@@ -70,8 +70,8 @@ class Items implements ParseInterface
             $itemUiCategory = $ItemUiCategoryCsv->at($item['ItemUICategory']);
 
             // remove Emphasis, comma, and wiki italic '' code in names
-            $BadCharacterSearch = array("–", "—", "<Emphasis>", "</Emphasis>", "''");
-            $BadCharacterReplace = array("-", "-", "", "", "");
+            $BadCharacterSearch = array("–", "—", "<Emphasis>", "</Emphasis>", "''", "?");
+            $BadCharacterReplace = array("-", "-", null, null, null, null);
             $Name = str_replace($BadCharacterSearch, $BadCharacterReplace, $item['Name']);
             //$Name = str_replace("&", "and", $Name);
 
@@ -788,20 +788,20 @@ class Items implements ParseInterface
             // Icon copying. Uncomment this section if you want icon copying to run while Item parsing is happening.
 
             if ($item['Icon']) {
-                $itemIcon = $this->getInputFolder() .'/icon/'. $this->iconize($item['Icon']);
+                $itemIcon = $this->getInputFolder() .'/icon/'. $this->iconizeHR($item['Icon']);
                 //$itemIconHq = $this->getInputFolder() .'/icon/'. $this->iconize($item['Icon'], true);
                 if (!file_exists($itemIcon)) {
                     continue;
                 }
 
                 // ensure output directory exists
-                $outputDirectory = $this->getOutputFolder() . "/$PatchID/40pxitemicons";
+                $outputDirectory = $this->getOutputFolder() . "/$PatchID/80pxitemicons";
                 if (!is_dir($outputDirectory)) {
                     mkdir($outputDirectory, 0777, true);
                 }
 
-                $iconFileName = "{$outputDirectory}/". str_replace(" ", "_", str_replace("/", "-", $item['Name'])) ."_Icon.png";
-                //$iconFileNameHq = "{$outputDirectory}/". str_replace(" ", "_", str_replace("/", "-", $item['Name'])) ."_HQ_Icon.png";
+                $iconFileName = "{$outputDirectory}/". str_replace(" ", "_", str_replace("/", "-", $Name)) ."_Icon.png";
+                //$iconFileNameHq = "{$outputDirectory}/". str_replace(" ", "_", str_replace("/", "-", $Name)) ."_HQ_Icon.png";
 
                 copy($itemIcon, $iconFileName);
                 // if hq exists, copy that

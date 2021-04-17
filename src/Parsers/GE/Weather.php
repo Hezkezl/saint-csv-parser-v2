@@ -47,7 +47,7 @@ class Weather implements ParseInterface
                     }
 
                     // build icon input folder paths
-                    $IconFileName = $this->getInputFolder() .'/icon/'. $this->iconize($Icon);
+                    $IconFileName = $this->getInputFolder() .'/icon/'. $this->iconizeHR($Icon);
                     $IconOutputFileName = "{$IconOutputDirectory}/{$Name} icon.png";
 
                     // copy the input icon to the output filename
