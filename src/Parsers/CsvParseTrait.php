@@ -1205,10 +1205,11 @@ trait CsvParseTrait
 
         return $icon;
     }
+
     /**
-     * Converts SE icon "number" into a proper path for /EN 
+     * Converts SE icon "number" into a proper path for HIGH RES icons
      */
-    private function iconizeHD($number, $hq = false)
+    private function iconizeHR($number, $hq = false)
     {
         $number = intval($number);
         $extended = (strlen($number) >= 6);
@@ -1231,6 +1232,7 @@ trait CsvParseTrait
 
         return $icon;
     }
+
     /**
      * Array of currencies. Usage: $GetCurrency[1]; will give the item ID of the currency
      */

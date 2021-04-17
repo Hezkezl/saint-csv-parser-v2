@@ -64,7 +64,7 @@ class KeyItems implements ParseInterface
                 }
 
                 // build icon input folder paths
-                $eventitemIcon = $this->getInputFolder() .'/icon/'. $this->iconize($eventitem['Icon']);
+                $eventitemIcon = $this->getInputFolder() .'/icon/'. $this->iconizeHR($eventitem['Icon']);
 
                 // if icon doesn't exist (not in the input folder icon list), then skip
                 if (!file_exists($eventitemIcon)) {

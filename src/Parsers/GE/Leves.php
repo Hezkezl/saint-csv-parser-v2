@@ -607,7 +607,7 @@ class Leves implements ParseInterface
                     }
 
                     // build icon input folder paths
-                    $levequestIcon = $this->getInputFolder() . '/icon/' . $this->iconize($Header);
+                    $levequestIcon = $this->getInputFolder() . '/icon/' . $this->iconizeHR($Header);
 
                     $levequesticonFileName = "{$QuestIconOutputDirectory}/{$Header}.png";
 
