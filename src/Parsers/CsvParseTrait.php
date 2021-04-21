@@ -79,6 +79,14 @@ trait CsvParseTrait
         $this->projectDirectory = $projectDirectory;
         return $this;
     }
+    function is_english($str)
+    {
+    if (strlen($str) != strlen(utf8_decode($str))) {
+        return false;
+    } else {
+        return true;
+    }
+    }
     /**
      * Generate Patch Json
      */
@@ -144,7 +152,7 @@ trait CsvParseTrait
     public function NameFormat($NPCID, $ENpcResidentCsv, $ENpcBaseCsv, $PlaceNameLocation, $LGBArray) {
         
         $Festivaljdata = file_get_contents("Patch/FestivalNames.json");
-        $FestivaldecodeJdata = json_decode($Festivaljdata, true);
+        $FestivaldecodeJdata = json_decode($Festivaljdata, true);        
         $NameFormatted = $ENpcResidentCsv->at($NPCID)['Singular'];
         $IncorrectNames = array(" De ", " Bas ", " Mal ", " Van ", " Cen ", " Sas ", " Tol ", " Zos ", " Yae ", " The ", " Of The ", " Of ",
             "A-ruhn-senna", "A-towa-cant", "Bea-chorr", "Bie-zumm", "Bosta-bea", "Bosta-loe", "Chai-nuzz", "Chei-ladd", "Chora-kai", "Chora-lue",
@@ -152,15 +160,14 @@ trait CsvParseTrait
             "Kee-satt", "Lewto-sai", "Lue-reeq", "Mao-ladd", "Mei-tatch", "Moa-mosch", "Mosha-moa", "Moshei-lea", "Nunsi-lue", "O-app-pesi", "Qeshi-rae",
             "Rae-qesh", "Rae-satt", "Raya-o-senna", "Renda-sue", "Riqi-mao", "Roi-tatch", "Rua-hann", "Sai-lewq", "Sai-qesh", "Sasha-rae", "Shai-satt",
             "Shai-tistt", "Shee-tatch", "Shira-kee", "Shue-hann", "Sue-lewq", "Tao-tistt", "Tatcha-mei", "Tatcha-roi", "Tio-reeq", "Tista-bie", "Tui-shirr",
-            "Vroi-reeq", "Zao-mosc", "Zia-bostt", "Zoi-chorr", "Zumie-moa", "Zumie-shai", "“", "”", "é", "ö");
+            "Vroi-reeq", "Zao-mosc", "Zia-bostt", "Zoi-chorr", "Zumie-moa", "Zumie-shai", "“", "”", "é", "ö", "2B", "�", "#", "&");
         $correctnames = array(" de ", " bas ", " mal ", " van ", " cen ", " sas ", " tol ", " zos ", " yae ", " the ", " of the ", " of ",
             "A-Ruhn-Senna", "A-Towa-Cant", "Bea-Chorr", "Bie-Zumm", "Bosta-Bea", "Bosta-Loe", "Chai-Nuzz", "Chei-Ladd", "Chora-Kai", "Chora-Lue",
             "Chue-Zumm", "Dulia-Chai", "E-Sumi-Yan", "E-Una-Kotor", "Fae-Hann", "Hangi-Rua", "Hanji-Fae", "Kai-Shirr", "Kan-E-Senna", "Kee-Bostt",
             "Kee-Satt", "Lewto-Sai", "Lue-Reeq", "Mao-Ladd", "Mei-Tatch", "Moa-Mosch", "Mosha-Moa", "Moshei-Lea", "Nunsi-Lue", "O-App-Pesi", "Qeshi-Rae",
             "Rae-Qesh", "Rae-Satt", "Raya-O-Senna", "Renda-Sue", "Riqi-Mao", "Roi-Tatch", "Rua-Hann", "Sai-Lewq", "Sai-Qesh", "Sasha-Rae", "Shai-Satt",
             "Shai-Tistt", "Shee-Tatch", "Shira-Kee", "Shue-Hann", "Sue-Lewq", "Tao-Tistt", "Tatcha-Mei", "Tatcha-Roi", "Tio-Reeq", "Tista-Bie", "Tui-Shirr",
-            "Vroi-Reeq", "Zao-Mosc", "Zia-Bostt", "Zoi-Chorr", "Zumie-Moa", "Zumie-Shai", "\"", "\"", "e", "o");
-        //array (Airship_Ticketer,Ala_Mhigan_Resistance_Gate_Guard,Alehouse_Wench,Alisaie%27s_Assistant,Apartment_Caretaker,Arms_Supplier,Arms_Supplier_%26_Mender,Arrivals_Attendant,Calamity_Salvager,Celestine,Chocobokeep,Collectable_Appraiser,Concerned_Mother,Eggsaminer,Enthralling Illusionist (same NPC, just different years),Expedition_Artisan (needs checking 2 if NPCs?),Expedition_Birdwatcher (maybe same NPC just needs copying),Expedition_Scholar (same as above),Faire_Crier (why didn’t this overwrite?),Ferry_Skipper,Flame Officer,Flame Private,Flame Recruit,Flame Scout,Flame Sergeant,Flame Soldier,Gate_Keeper (why didn’t this overwrite?),Gold_Saucer_Attendant (should be 4),Gridanian_Merchant (fix with moves),Haermaga,Housing_Enthusiast,Hunt_Billmaster,Hunter-scholar,Hunter-Scholar,Imperial_Centurion,Imperial_Deserter,Independent_Armorer,Independent_Armorfitter,Independent_Arms_Mender,Independent_Arms_Mender,Independent_Mender,Independent_Merchant,Independent_Sutler,Inu_Doshin,Irate_Coachman (why only 1),Ironworks_Engineer,Ironworks_Engineer (needs attention),Junkmonger,Keeper_of_the_Entwined_Serpents,Local_Merchant,Lonesome_Lass,Long-haired_Pirate (why only 1),Malevolent_Mummer (why only 1),Mammet Dispensator #012P,Mammet Dispensator #012T,Materia_Melder,Material_Supplier,Mender,Minion_Enthusiast (why 1?),Moonfire_Faire_Vendor,Moonfire_Marine,Oic_Administrator,Oic_Officer_of_Arms,Oic_Quartermaster,Pernicious_Temple_Knight,Picker of Locks,Recompense_Officer,Resident_Caretaker,Resistance Fighter,Resistance Officer,Rising_Attendant (needs more investigation),Rising_Vendor (only 1),Royal_Handmaiden,Royal_Seneschal,Royal_Servant,Saint%27s_Little_Helper,Saucer_Attendant (needs more investigation),Scrip_Exchange,Seasoned Adventurer,Serpent Lieutenant,Serpent Officer,Serpent Private,Serpent Recruit,Serpent Scout,Shady_Smock,Splendors_Vendor,Spoils_Collector (needs more investigation),Spoils_Trader,Starlight_Celebrant,Starlight_Celebration_Crier,Starlight_Supplier,Steersman,Storm Captain,Storm Officer,Storm Recruit,Storm Soldier,Storm_Private,Storm_Sergeant (only 3?),Sultansworn_Elite,Suspicious_Coerthan,The_Smith,Tournament_Registrar,Traveling_Merchant,Traveling_Trader,Triple_Triad_Trader,Triple_Triad_Trader,Troubled_Coachman (why 1?),Uncanny_Illusionist,Untrustworthy_Illusionist,Unusual_Illusionist,Well-informed_Adventurer,Wounded Imperial,Wounded Resistance Fighter,Wunthyll,Yellow_Moon_Admirer,Enie)
+            "Vroi-Reeq", "Zao-Mosc", "Zia-Bostt", "Zoi-Chorr", "Zumie-Moa", "Zumie-Shai", "\"", "\"", "e", "o", "2b", "", "", "and");
         $PLAddition = "";
         switch ($NameFormatted) {
             case "airship ticketer";
@@ -256,6 +263,14 @@ trait CsvParseTrait
             case "wunthyll";
             case "Enie";
             case "amarokeep";
+            case "merchant & mender";
+            case "Calamity salvager";
+            case "estate manservant";
+            case "estate maidservant";
+            case "hokonin";
+            case "mammet dispensator #012P";
+            case "mammet interchanger #012T";
+            case "journeyman salvager";
                 $PLAddition = " ($PlaceNameLocation)";
                 if (empty($PlaceNameLocation)){
                     switch ($NameFormatted) {
@@ -265,6 +280,10 @@ trait CsvParseTrait
                         case 'material supplier':
                         case 'mender':
                         case 'materia melder':
+                        case "estate manservant";
+                        case "estate maidservant";
+                        case "hokonin";
+                        case "journeyman salvager";
                             $PLAddition = " (Housing)";
                         break;
                         case 'storm soldier': //MSQ
@@ -284,11 +303,13 @@ trait CsvParseTrait
                         case 'wounded imperial':
                             $PLAddition = " (MSQ)";
                         break;
-                        case 'Yellow Moon admirer': //Event
+                         //Event
                         case "saint's little helper":
                         case 'enthralling illusionist':
                         case 'royal handmaiden':
                         case 'royal seneschal':
+                        case "mammet dispensator #012P";
+                        case "mammet interchanger #012T";
                             $PLAddition = " (Event)";
                         break;
                         case 'ferry skipper': //Unknowns
@@ -298,6 +319,7 @@ trait CsvParseTrait
                         case 'traveling merchant':
                         case 'seasoned adventurer':
                         case 'Enie':
+                        case "journeyman salvager";
                             $PLAddition = " (Unknown)";
                         break;
                         
@@ -325,15 +347,29 @@ trait CsvParseTrait
             case "eggsaminer";
             case "enthralling illusionist";
             case "Faire crier";
-                $PLAddition = "(Event)";
-                if (!empty($LGBArray[$NPCID]['festivalID'])) {
-                    $FestivalNameAddition = $LGBArray[$NPCID]['festivalID'];
-                    $PLAddition = " (". str_replace("_", " ", $FestivaldecodeJdata[$FestivalNameAddition]). ")";
+                $PLAddition = " (Event)";
+                if (!empty($PlaceNameLocation)) {
+                    if (!empty($LGBArray[$NPCID]['festivalID'])) {
+                        $FestivalNameAddition = $LGBArray[$NPCID]['festivalID'];
+                        $splitfes = explode("_", $FestivaldecodeJdata[$FestivalNameAddition]);
+                        $fesYear = $splitfes[1];
+                        $PLAddition = " ($splitfes[1]) ($PlaceNameLocation)";
+                    }
+                }
+                if (empty($PlaceNameLocation)){
+                    if (!empty($LGBArray[$NPCID]['festivalID'])) {
+                        $FestivalNameAddition = $LGBArray[$NPCID]['festivalID'];
+                        $splitfes = explode("_", $FestivaldecodeJdata[$FestivalNameAddition]);
+                        $fesYear = $splitfes[1];
+                        $PLAddition = " ($splitfes[1])";
+                    }
                 }
             break;
             case "malevolent mummer"; // race
             case "long-haired pirate";
             case "Gold Saucer attendant";
+            case 'Yellow Moon admirer':
+            case 'tournament registrar':
                 $RaceCsv = $this->csv('Race');
                 $nameRace = $RaceCsv->at($ENpcBaseCsv->at($NPCID)['Race'])['Masculine'];
                 $PLAddition = " ($nameRace)";
@@ -346,14 +382,27 @@ trait CsvParseTrait
 
         //Quest Giver Name (All Words In Name Capitalized)
         $NpcMiqoCheck = $ENpcBaseCsv->at($NPCID)['Race']; //see if miqote
-        $NpcName = ucwords(strtolower($ENpcResidentCsv->at($NPCID)['Singular']));
         //this explodes miqote's names into 2 words, capitalizes them and then puts it back together with a hyphen
         if ($NpcMiqoCheck == 4) {
-            $NpcName = ucwords(strtolower($ENpcResidentCsv->at($NPCID)['Singular']));
-            $NpcName = implode('-', array_map('ucfirst', explode('-', $NpcName)));
+            $NameFormatted = implode('-', array_map('ucfirst', explode('-', $NameFormatted)));
         }
-        $NameFormatted = str_replace($IncorrectNames, $correctnames, $NpcName)."$PLAddition";
-        return $NameFormatted;
+        $NameFormatted = ucwords($NameFormatted);
+        $NameFormatted = str_replace($IncorrectNames, $correctnames, $NameFormatted);
+        $NameFormatted = iconv('UTF-8', 'ISO-8859-1//TRANSLIT//IGNORE', $NameFormatted);
+        $output['Name'] = $NameFormatted."$PLAddition";
+        $output['IsEnglish'] = $this->is_english($NameFormatted);
+        if (stripos($NameFormatted,"�")){
+            $output['IsEnglish'] = false;
+        }
+        if (($NameFormatted === "A") || 
+            ($NameFormatted === "B" )||
+            ($NameFormatted ===  "C")||
+            ($NameFormatted ===  "D")||
+            ($NameFormatted ===  "E"))
+            {
+            $output['IsEnglish'] = false;
+        }
+        return $output;
     }
     /**
      * Generate ChocoboTaxi Pages
@@ -662,6 +711,10 @@ trait CsvParseTrait
                 if (empty($ShopName)) { 
                     $ShopName = $SpecialShopID;
                 }
+                $QuestUnlock = "";
+                if (!empty($QuestCsv->at($SpecialShopCsv->at($SpecialShopID)["Quest{Unlock}"])['Name'])) {
+                    $QuestUnlock = "|Requires Quest = ". $QuestCsv->at($SpecialShopCsv->at($SpecialShopID)["Quest{Unlock}"])['Name']."\n";
+                }
                 foreach(range(0,59) as $specialshopc) {
                     if (empty($ItemCsv->at($SpecialShopCsv->at($SpecialShopID)["Item{Cost}[$specialshopc][0]"])['Name'])) continue;
                     $ItemInputArray = [];
@@ -728,15 +781,19 @@ trait CsvParseTrait
                         case 3:
                             $AccessoryArray[] = "{{Sells3|$ItemInput$SpecialShopCostOutput$AchivementRequired$QuestRequired}}";
                         break;
+                        case 0:
                         case 4:
+                            $OtherArray[] = "{{Sells3|$ItemInput$SpecialShopCostOutput$AchivementRequired$QuestRequired}}";
+                        break;
+                        default:
                             $OtherArray[] = "{{Sells3|$ItemInput$SpecialShopCostOutput$AchivementRequired$QuestRequired}}";
                         break;
                     }
                 }
-                ksort($WeaponArray);
-                ksort($ArmorArray);
-                ksort($AccessoryArray);
-                ksort($OtherArray);
+                asort($WeaponArray);
+                asort($ArmorArray);
+                asort($AccessoryArray);
+                asort($OtherArray);
                 if (!empty($WeaponArray)) {
                     $Weapons = "|Weapons = \n". implode("\n", $WeaponArray). "\n";
                 }
@@ -756,6 +813,7 @@ trait CsvParseTrait
                 $ShopOutputString .= "| Location = $NpcPlaceName\n";
                 $ShopOutputString .= "| Coordinates = $CoordLocation\n";
                 $ShopOutputString .= "| Total Items = $number\n";
+                $ShopOutputString .= "$QuestUnlock";
                 $ShopOutputString .= "| Shop = \n";
                 $ShopOutputString .= "{{Tabsells3\n";
                 
@@ -777,11 +835,137 @@ trait CsvParseTrait
                 $ShopOutput["Name"] = $ShopName;
                 return $ShopOutput;
             break;
+            case 'CollectablesShop':  
+                $CollectablesShopCsv = $this->csv('CollectablesShop');
+                $CollectablesShopItemCsv = $this->csv('CollectablesShopItem');
+                $CollectablesShopRewardItemCsv = $this->csv('CollectablesShopRewardItem');
+                $CollectablesShopRewardScripCsv = $this->csv('CollectablesShopRewardScrip');
+                $CollectablesShopRefineCsv = $this->csv('CollectablesShopRefine');
+                $CurrencyArray = $this->GetCurrency();
+                $QuestRequired = "";
+                if (!empty($QuestCsv->at($CollectablesShopCsv->at($SpecialShopID)["Quest"])["Name"])) {
+                    $QuestRequired = "|Requires Quest = ". $QuestCsv->at($CollectablesShopCsv->at($SpecialShopID)["Quest"])["Name"];
+                }
+
+                $ShopName = $CollectablesShopCsv->at($SpecialShopID)["Name"];
+                if (empty($ShopName)) { 
+                    $ShopName = $SpecialShopID;
+                }
+                foreach (range(0, 10) as $i) {
+                    $ShopItemID = $CollectablesShopCsv->at($SpecialShopID)["ShopItems[$i]"];
+                    foreach(range(0,999) as $b) {
+                        $number = $b + 1;
+                        $SubDataValue = "". $ShopItemID .".". $b ."";
+                        if (empty($ItemCsv->at($CollectablesShopItemCsv->at($SubDataValue)['Item'])['Name'])) break;
+                        $Item = $ItemCsv->at($CollectablesShopItemCsv->at($SubDataValue)['Item'])['Name'];
+                        foreach(range(0,2) as $a) {
+                            //gather rewards script 
+                            $RewardType = $CollectablesShopCsv->at($SpecialShopID)['RewardType'];
+                            $CollectabilityLink = $CollectablesShopItemCsv->at($SubDataValue)['CollectablesShopRefine'];
+                            if ($RewardType === "1") {
+                                $RewardSheetLink = $CollectablesShopItemCsv->at($SubDataValue)['CollectablesShopRewardScrip'];
+                                $Currency = $ItemCsv->at($CurrencyArray[$CollectablesShopRewardScripCsv->at($RewardSheetLink)['Currency']])['Name'];
+                                switch ($a) {
+                                    case 0:
+                                        $RewardAmt = $CollectablesShopRewardScripCsv->at($RewardSheetLink)['LowReward'];
+                                        $collect1 = $CollectablesShopRefineCsv->at($CollectabilityLink)['LowCollectability'];
+                                        $collect2 = intval($CollectablesShopRefineCsv->at($CollectabilityLink)['MidCollectability']);
+                                        if ($collect2 > 0){
+                                            $collect2Calc = $collect2 - 1;
+                                            $Collectability = "$collect1 - $collect2Calc";
+                                        }else {
+                                            $Collectability = "$collect1+";
+                                        }
+                                    break;
+                                    case 1:
+                                        $RewardAmt = $CollectablesShopRewardScripCsv->at($RewardSheetLink)['MidReward'];
+                                        $collect1 = $CollectablesShopRefineCsv->at($CollectabilityLink)['MidCollectability'];
+                                        $collect2 = intval($CollectablesShopRefineCsv->at($CollectabilityLink)['HighCollectability']);
+                                        if ($collect2 > 0){
+                                            $collect2Calc = $collect2 - 1;
+                                            $Collectability = "$collect1 - $collect2Calc";
+                                        }else {
+                                            $Collectability = "$collect1+";
+                                        }
+                                    break;
+                                    case 2:
+                                        $RewardAmt = $CollectablesShopRewardScripCsv->at($RewardSheetLink)['HighReward'];
+                                        $collect1 = $CollectablesShopRefineCsv->at($CollectabilityLink)['HighCollectability'];
+                                        $Collectability = "$collect1+";
+                                    break;
+                                }
+                                $OtherArray[] = "{{Sells3|$Currency|Quantity=$RewardAmt|Cost1=$Item|Count1=1$QuestRequired|Collectable=$Collectability}}";
+                            }
+                            if ($RewardType === "2") {
+                                $RewardSheetLink = $CollectablesShopItemCsv->at($SubDataValue)['CollectablesShopRewardScrip'];
+                                switch ($a) {
+                                    case 0:
+                                        $RewardAmt = $CollectablesShopRewardItemCsv->at($RewardSheetLink)['RewardLow'];
+                                        $collect1 = $CollectablesShopRefineCsv->at($CollectabilityLink)['LowCollectability'];
+                                        $collect2 = intval($CollectablesShopRefineCsv->at($CollectabilityLink)['MidCollectability']);
+                                        if ($collect2 > 0){
+                                            $collect2Calc = $collect2 - 1;
+                                            $Collectability = "$collect1 - $collect2Calc";
+                                        }else {
+                                            $Collectability = "$collect1+";
+                                        }
+                                    break;
+                                    case 1:
+                                        $RewardAmt = $CollectablesShopRewardItemCsv->at($RewardSheetLink)['RewardMid'];
+                                        $collect1 = $CollectablesShopRefineCsv->at($CollectabilityLink)['MidCollectability'];
+                                        $collect2 = intval($CollectablesShopRefineCsv->at($CollectabilityLink)['HighCollectability']);
+                                        if ($collect2 > 0){
+                                            $collect2Calc = $collect2 - 1;
+                                            $Collectability = "$collect1 - $collect2Calc";
+                                        }else {
+                                            $Collectability = "$collect1+";
+                                        }
+                                    break;
+                                    case 2:
+                                        $RewardAmt = $CollectablesShopRewardItemCsv->at($RewardSheetLink)['RewardHigh'];
+                                        $collect1 = $CollectablesShopRefineCsv->at($CollectabilityLink)['HighCollectability'];
+                                        $Collectability = "$collect1+";
+                                    break;
+                                }
+                                $ItemReward = $ItemCsv->at($CollectablesShopRewardItemCsv->at($RewardSheetLink)['Item'])['Name'];
+                                $OtherArray[] = "{{Sells3|$ItemReward|Quantity=$RewardAmt|Cost1=$Item|Count1=1$QuestRequired|Collectable=$Collectability}}";
+                            }
+                        }
+                    }
+                }
+                //asort($OtherArray);
+                usort($OtherArray, function($a, $b) {
+                    $cmp = strcmp(preg_replace('/\d+/', '', $a), preg_replace('/\d+/', '', $b));
+                    if ($cmp) {
+                        return $cmp;
+                    } else {
+                        return strnatcmp($a, $b);
+                    }
+                });
+                if (!empty($OtherArray)) {
+                    $Other = "|Misc = \n".implode("\n", $OtherArray). "\n";
+                }
+                $ShopOutputString = "{{-start-}}\n'''". $NpcName ."/". $ShopName ."'''\n";
+                $ShopOutputString .= "{{Shop\n";
+                $ShopOutputString .= "| Shop Name = $ShopName\n";
+                $ShopOutputString .= "| NPC Name = $NpcName\n";
+                $ShopOutputString .= "| Location = $NpcPlaceName\n";
+                $ShopOutputString .= "| Coordinates = $CoordLocation\n";
+                $ShopOutputString .= "| Total Items = $number\n";
+                $ShopOutputString .= "| Requires Quest = $QuestRequired\n";
+                $ShopOutputString .= "| Shop = \n";
+                $ShopOutputString .= "{{Tabsells3\n";
+
+                $ShopOutput["Number"] = $number;
+                $ShopOutput["Shop"] = "\n$ShopOutputString\n$Other\n}}\n}}\n{{-stop-}}";
+                $ShopOutput["Name"] = $ShopName;
+                return $ShopOutput;
+            break;
             case 'GilShop':
                 $DataValue = $SpecialShopID;
                 $GilShopRequiredQuest = "";
                 if (!empty($QuestCsv->at($GilShopCsv->at($DataValue)['Quest'])['Name'])) {
-                    $GilShopRequiredQuest = "\n|Unlock Quest = ". $QuestCsv->at($GilShopCsv->at($DataValue)['Quest'])['Name'];
+                    $GilShopRequiredQuest = "|Requires Quest =". $QuestCsv->at($GilShopCsv->at($DataValue)['Quest'])['Name']."\n";
                 }
                 $ShopName = $GilShopCsv->at($DataValue)['Name'];
                 if (empty($ShopName)) { 
@@ -866,10 +1050,10 @@ trait CsvParseTrait
                         }
                     }
                 }
-                ksort($WeaponArray);
-                ksort($ArmorArray);
-                ksort($AccessoryArray);
-                ksort($OtherArray);
+                asort($WeaponArray);
+                asort($ArmorArray);
+                asort($AccessoryArray);
+                asort($OtherArray);
                 if (!empty($WeaponArray)) {
                     $Weapons = "|Weapons = \n". implode("\n", $WeaponArray). "\n";
                 }
@@ -889,6 +1073,7 @@ trait CsvParseTrait
                 $ShopOutputString .= "| Location = $NpcPlaceName\n";
                 $ShopOutputString .= "| Coordinates = $CoordLocation\n";
                 $ShopOutputString .= "| Total Items = $NumberItems\n";
+                $ShopOutputString .= "$GilShopRequiredQuest";
                 $ShopOutputString .= "| Shop = \n";
                 $ShopOutputString .= "{{Tabsells3\n";
                 
@@ -928,6 +1113,9 @@ trait CsvParseTrait
                 if ($NpcEquipCsv->at($EnpcBase->at($id)['NpcEquip'])["Model{{$ENPCOffset0}}"] != 0) {
                     $ModelBase = str_replace(", ", "-", $NpcEquipCsv->at($EnpcBase->at($id)['NpcEquip'])["Model{{$ENPCOffset0}}"]);
                     $ModelBaseDye = $NpcEquipCsv->at($EnpcBase->at($id)['NpcEquip'])["Dye{{$ENPCOffset0}}"];
+                    if ($ModelBaseDye === "0"){
+                        $ModelBaseDye = "";
+                    }
                 }
             }
             if ($ModelBase > 0) {
@@ -1013,6 +1201,9 @@ trait CsvParseTrait
             $isMale = 
             $Base = $EnpcBase->at($id)["Model{{$ENPCOffset0}}"];
             $DyeBase = $StainCsv->at($EnpcBase->at($id)["Dye{{$ENPCOffset0}}"])['Name'];
+            if ($DyeBase === "0"){
+                $DyeBase = "";
+            }
             if ($Base == 0) {
                 $Model = false;
                 if ($NpcEquipCsv->at($EnpcBase->at($id)['NpcEquip'])["Model{{$ENPCOffset0}}"] != 0) {
@@ -1194,6 +1385,9 @@ trait CsvParseTrait
         $ini = parse_ini_file('config.ini');
         $PatchID = file_get_contents("{$ini['MainPath']}\game\\ffxivgame.ver");
         $folder = $this->projectDirectory . getenv('OUTPUT_DIRECTORY');
+        if (!file_exists("{$folder}/{$PatchID}/")) {
+            mkdir("{$folder}/{$PatchID}/", 0777, true);
+        }
         $fileopen = fopen("{$folder}/{$PatchID}/{$filename}", 'w');
         fwrite($fileopen, $data);
         fclose($fileopen);

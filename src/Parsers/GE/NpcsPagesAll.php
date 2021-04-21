@@ -66,8 +66,6 @@ class NpcsPagesAll implements ParseInterface
         $DisposalShopCsv = $this->csv('DisposalShop');
         $DisposalShopItemCsv = $this->csv('DisposalShopItem');
         $DescriptionCsv = $this->csv('Description');
-        $CollectablesShopCsv = $this->csv('CollectablesShop');
-        $CollectablesShopItemCsv = $this->csv('CollectablesShopItem');
         $ClassJobCategoryCsv = $this->csv('ClassJobCategory');
         $BalloonCsv = $this->csv('Balloon');
         $BehaviourCsv = $this->csv('Behavior');
@@ -132,6 +130,33 @@ class NpcsPagesAll implements ParseInterface
             }
         }
         $this->io->progressFinish();
+        //gather Festivals from quests
+        $this->io->text('Generating list of Festivals from Quests ...');
+        $this->io->progressStart($QuestCsv->total);
+        foreach($QuestCsv->data as $id => $Quest) {
+            $this->io->progressAdvance();
+            if ($Quest['Festival'] === "0") continue;
+            $QuestFestival = $Quest['Festival'];
+            $Issuer = $Quest['Issuer{Start}'];
+            if (!empty($ENpcResidentCsv->at($Issuer)['Singular'])) {
+                $NpcFestivalQuestArray[$Issuer] = $QuestFestival;
+            }
+            foreach(range(0,49) as $i) {
+                $Npc = $Quest["Script{Arg}[$i]"];
+                if (($Npc > 1000000) && ($Npc < 1100000)) {
+                    if (empty($ENpcResidentCsv->at($Npc)['Singular'])) continue;
+                    $NpcFestivalQuestArray[$Npc] = $QuestFestival; 
+                }
+            }
+            foreach(range(0,63) as $i) {
+                $Npc = $Quest["Listener[$i]"];
+                if (($Npc > 1000000) && ($Npc < 1100000)) {
+                    if (empty($ENpcResidentCsv->at($Npc)['Singular'])) continue;
+                    $NpcFestivalQuestArray[$Npc] = $QuestFestival; 
+                }
+            }
+        }
+        $this->io->progressFinish();
 
         //gather lgb from level.exd
         $this->io->text('Generating Level.exd Positions ...');
@@ -141,6 +166,9 @@ class NpcsPagesAll implements ParseInterface
             if ($Level['Type'] != 8) continue;
             $NPCID = $Level['Object'];
             $Festival = 0;
+            if (!empty($NpcFestivalQuestArray[$NPCID])){
+                $Festival = $NpcFestivalQuestArray[$NPCID];
+            }
             $Name = "";
             $LGBArray[$NPCID] = array(
                 'Territory' => $Level['Territory'],
@@ -195,6 +223,11 @@ class NpcsPagesAll implements ParseInterface
                             $x = $Object->Transform->Translation->x;
                             $y = $Object->Transform->Translation->z;
                             $NPCID = $BaseId;
+                            if (!empty($NpcFestivalQuestArray[$NPCID])){
+                                if ($Festival === "0") {
+                                    $Festival = $NpcFestivalQuestArray[$NPCID];
+                                }
+                            }
                             $LGBArray[$NPCID] = array(
                                 'Territory' => $id,
                                 'x' => $x,
@@ -213,7 +246,10 @@ class NpcsPagesAll implements ParseInterface
 
         
             
+        $this->io->text('Generating NPC -> Sublocation Positions ...');
+        $this->io->progressStart($ENpcResidentCsv->total);
         foreach ($ENpcResidentCsv->data as $id => $NPCs) {
+            $this->io->progressAdvance();
             $subLocation = "";
             if (!empty($LGBArray[$id]['Territory'])){
                 $Territory = $LGBArray[$id]['Territory'];
@@ -241,6 +277,7 @@ class NpcsPagesAll implements ParseInterface
             $NameFormatted = $this->NameFormat($id, $ENpcResidentCsv, $ENpcBaseCsv, $subLocation, $LGBArray);
             $NPCNameLocationArrray[$id] = $subLocation;
         }
+        $this->io->progressFinish();
 
         $this->io->text('Generating NPC Name Array ...');
         $this->io->progressStart($ENpcResidentCsv->total);
@@ -249,10 +286,11 @@ class NpcsPagesAll implements ParseInterface
             $this->io->progressAdvance();
             //main NPC constructor
 
-            $NameFormatted = $this->NameFormat($id, $ENpcResidentCsv, $ENpcBaseCsv, $NPCNameLocationArrray[$id], $LGBArray);
-            if ((empty($NameFormatted)) || (preg_match('/[\x{30A0}-\x{30FF}\x{3040}-\x{309F}\x{4E00}-\x{9FBF}]+|[^\x00-\x7F]+/u', $NameFormatted))) {
-                continue;
-            }
+            
+            $NameFunc = $this->NameFormat($id, $ENpcResidentCsv, $ENpcBaseCsv, $NPCNameLocationArrray[$id], $LGBArray);
+            $NameFormatted = $NameFunc['Name'];
+            if ($NameFunc['IsEnglish'] === false) continue;
+            if (empty($NameFormatted)) continue;
             if (empty($NameFormatted)) continue;
             $NpcNameArray[$NameFormatted][] = $id;
             if (empty($NpcPatchArray[$NameFormatted])) {
@@ -267,6 +305,20 @@ class NpcsPagesAll implements ParseInterface
         //subpage arrays
         //$GetHowToArray = [];
 
+        $IssuerArray = [];
+        $this->io->text('Generating Quest Issuer Array ...');
+        $this->io->progressStart($QuestCsv->total);
+        foreach ($QuestCsv->data as $id => $Quests) {
+            // ---------------------------------------------------------
+            $this->io->progressAdvance();
+            if (empty($Quests['Issuer{Start}'])) continue;
+            $IssuerArray[$Quests['Issuer{Start}']][] = str_ireplace(",","&#44;",$Quests['Name']);
+        }
+        $Issuers = [];
+        foreach ($IssuerArray as $key => $value) {
+            $Issuers[$key] = implode(",", $value);
+        }
+        $this->io->progressFinish();
 
 
         $PorterArray = [];
@@ -326,11 +378,12 @@ class NpcsPagesAll implements ParseInterface
                 $LevelID = $LGBArray[$id]['id'];
                 $MapArray[] = $MapOutputString;
             }
-            $NameFormatted = $this->NameFormat($id, $ENpcResidentCsv, $ENpcBaseCsv, $NPCNameLocationArrray[$id], $LGBArray);
             
-            if ((empty($NameFormatted)) || (preg_match('/[\x{30A0}-\x{30FF}\x{3040}-\x{309F}\x{4E00}-\x{9FBF}]+|[^\x00-\x7F]+/u', $NameFormatted))) {
-                continue;
-            }
+            $NameFunc = $this->NameFormat($id, $ENpcResidentCsv, $ENpcBaseCsv, $NPCNameLocationArrray[$id], $LGBArray);
+            $NameFormatted = $NameFunc['Name'];
+            
+            if ($NameFunc['IsEnglish'] === false) continue;
+            if (empty($NameFormatted)) continue;
 
             $datarray = [];
             $QuestCheck = [];
@@ -432,6 +485,14 @@ class NpcsPagesAll implements ParseInterface
                         $DialogueArray[] = $DialogueString;
                     break;
                     case ($DataValue > 720000) && ($DataValue < 729999): //CUSTOMTALK
+                        $CollectableShopCheck = $CustomTalkCsv->at($DataValue)["SpecialLinks"];
+                        if ($CollectableShopCheck >= 3866620 && $CollectableShopCheck < 3866999){//COLLECTABLESHOPS
+                            $FuncShop = $this->getShop($NameFormatted, "CollectablesShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $CollectableShopCheck, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
+                            $ShopCheck[] = $FuncShop["Name"].",";
+                            $ShopOutputArray[] = $FuncShop["Shop"];
+                            $TotalItems[$NameFormatted][] = $FuncShop["Number"];
+                        } 
+                            
                         foreach(range(0,29) as $a) {
                             if (empty($CustomTalkCsv->at($DataValue)["Script{Instruction}[$a]"])) continue;
                             $Instruction = $CustomTalkCsv->at($DataValue)["Script{Instruction}[$a]"];
@@ -473,6 +534,7 @@ class NpcsPagesAll implements ParseInterface
                                                 $FccShopArray[] = "{{Sells3|$Item|Quantity=1|Cost1=Credits|Count1=$Amount|Requires Rank = $Rank}}";
                                                 $NumberItems = $b + 1;
                                             }
+                                            asort($FccShopArray);
                                             $FcshopImplode = implode("\n", $FccShopArray);
                                             $ShopOutputString = "{{-start-}}\n'''". $NameFormatted ."/". $ShopName ."'''\n";
                                             $ShopOutputString .= "{{Shop\n";
@@ -629,6 +691,7 @@ class NpcsPagesAll implements ParseInterface
                             $FccShopArray[] = "{{Sells3|$Item|Quantity=1|Cost1=Credits|Count1=$Amount|Requires Rank = $Rank}}";
                             $NumberItems = $b + 1;
                         }
+                        asort($FccShopArray);
                         $FcshopImplode = implode("\n", $FccShopArray);
                         $ShopOutputString = "{{-start-}}\n'''". $NameFormatted ."/". $ShopName ."'''\n";
                         $ShopOutputString .= "{{Shop\n";
@@ -673,13 +736,17 @@ class NpcsPagesAll implements ParseInterface
                                         break;
                                         case ($ShopID >= 1769000 && $ShopID < 1779999): //specialshop
                                             $ShopCheck[] = "Dialogue,";
-                                            $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $DataValue, $DefaultTalkCsv, $ShopID, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
+                                            $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $ShopID, $DefaultTalkCsv, $ShopID, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
                                             $ShopOutputArray[] = $FuncShop["Shop"];
                                             $ShopDialogueArray[] = $FuncShop["Dialogue"];
                                             $TotalItems[$NameFormatted][] = $FuncShop["Number"];
                                             $ShopCheck[] = $FuncShop["Name"].",";
                                         break;
-                                        case ($ShopID >= 3866620 && $ShopID < 3866999): //COLLECTABLESHOPS //omitted
+                                        case ($ShopID >= 3866620 && $ShopID < 3866999): //COLLECTABLESHOPS
+                                            $FuncShop = $this->getShop($NameFormatted, "CollectablesShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $ShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
+                                            $ShopCheck[] = $FuncShop["Name"].",";
+                                            $ShopOutputArray[] = $FuncShop["Shop"];
+                                            $TotalItems[$NameFormatted][] = $FuncShop["Number"];
                                         break;
                                         case ($ShopID >= 3801000 && $ShopID < 3809999): //InclusionShop
                                             foreach(range(0,29) as $b) {
@@ -740,7 +807,11 @@ class NpcsPagesAll implements ParseInterface
                                 $TotalItems[$NameFormatted][] = $FuncShop["Number"];
                                 $ShopCheck[] = $FuncShop["Name"].",";
                             break;
-                            case ($ShopID >= 3866620 && $ShopID < 3866999): //COLLECTABLESHOPS //omitted
+                            case ($ShopID >= 3866620 && $ShopID < 3866999): //COLLECTABLESHOPS 
+                                $FuncShop = $this->getShop($NameFormatted, "CollectablesShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $ShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
+                                $ShopCheck[] = $FuncShop["Name"].",";
+                                $ShopOutputArray[] = $FuncShop["Shop"];
+                                $TotalItems[$NameFormatted][] = $FuncShop["Number"];
                             break;
                             case ($ShopID >= 3801000 && $ShopID < 3809999): //InclusionShop
                                 foreach(range(0,29) as $b) {
@@ -768,6 +839,12 @@ class NpcsPagesAll implements ParseInterface
                     break;
                     case ($DataValue > 3604000) && ($DataValue < 3609999): //DESCRIPTION //unsure
                         $DialogueCheck[] = $DataValue.",";
+                    break;
+                    case ($DataValue >= 3866620 && $DataValue < 3866999): //COLLECTABLESHOPS 
+                        $FuncShop = $this->getShop($NameFormatted, "CollectablesShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $DataValue, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
+                        $ShopCheck[] = $FuncShop["Name"].",";
+                        $ShopOutputArray[] = $FuncShop["Shop"];
+                        $TotalItems[$NameFormatted][] = $FuncShop["Number"];
                     break;
                     default:
                         $datarray[] = $ENpcBaseCsv->at($id)["ENpcData[$i]"];
@@ -889,10 +966,11 @@ class NpcsPagesAll implements ParseInterface
         $this->io->progressStart($ENpcBaseCsv->total);
         foreach ($ENpcBaseCsv->data as $id => $EnpcBase) {
             $this->io->progressAdvance();
-            $NameFormatted = $this->NameFormat($id, $ENpcResidentCsv, $ENpcBaseCsv, $NpcPlaceName, $LGBArray);
-            if ((empty($NameFormatted)) || (preg_match('/[\x{30A0}-\x{30FF}\x{3040}-\x{309F}\x{4E00}-\x{9FBF}]+|[^\x00-\x7F]+/u', $NameFormatted))) {
-                continue;
-            }
+            
+            $NameFunc = $this->NameFormat($id, $ENpcResidentCsv, $ENpcBaseCsv, $NPCNameLocationArrray[$id], $LGBArray);
+            $NameFormatted = $NameFunc['Name'];
+            if ($NameFunc['IsEnglish'] === false) continue;
+            if (empty($NameFormatted)) continue;
             $Index = $EnpcBase['id'];
             $debug = false;
             $needsFix = "FALSE";
@@ -1468,10 +1546,11 @@ class NpcsPagesAll implements ParseInterface
             $Nose = $noseBase + 1;
             $jawBase = $EnpcBase['Jaw'];
             $Jaw = $jawBase + 1;
-            $NameFormatted = $this->NameFormat($id, $ENpcResidentCsv, $ENpcBaseCsv, $NpcPlaceName, $LGBArray);
-            if ((empty($NameFormatted)) || (preg_match('/[\x{30A0}-\x{30FF}\x{3040}-\x{309F}\x{4E00}-\x{9FBF}]+|[^\x00-\x7F]+/u', $NameFormatted))) {
-                continue;
-            }
+            
+            $NameFunc = $this->NameFormat($id, $ENpcResidentCsv, $ENpcBaseCsv, $NPCNameLocationArrray[$id], $LGBArray);
+            $NameFormatted = $NameFunc['Name'];
+            if ($NameFunc['IsEnglish'] === false) continue;
+            if (empty($NameFormatted)) continue;
 
             $BodyOutput = "{{NPC Appearance\n";
             $BodyOutput .= "|Race = ". $Race ."\n";
@@ -1497,16 +1576,16 @@ class NpcsPagesAll implements ParseInterface
             $EquipmentArray = $this->getEquipment($ENpcBaseCsv, $NpcEquipCsv, $weaponArray, $isMale, $StainCsv, $id, $itemArray);
             
             $EquipmentOutput = "|Head = ". $EquipmentArray['Head']['Item'] ."\n";
-            $EquipmentOutput .= "|Head Dye = ". $EquipmentArray['Head']['Dye'] ."\n";
+            $EquipmentOutput .= "|Head Dye = ". str_ireplace("0", "", $EquipmentArray['Head']['Dye']) ."\n";
             $EquipmentOutput .= "|Visor = ". $EquipmentArray['Visor'] ."\n";
             $EquipmentOutput .= "|Body = ". $EquipmentArray['Body']['Item'] ."\n";
-            $EquipmentOutput .= "|Body Dye = ". $EquipmentArray['Body']['Dye'] ."\n";
+            $EquipmentOutput .= "|Body Dye = ". str_ireplace("0", "", $EquipmentArray['Body']['Dye']) ."\n";
             $EquipmentOutput .= "|Hands = ". $EquipmentArray['Hands']['Item'] ."\n";
-            $EquipmentOutput .= "|Hands Dye = ". $EquipmentArray['Hands']['Dye'] ."\n";
+            $EquipmentOutput .= "|Hands Dye = ". str_ireplace("0", "", $EquipmentArray['Hands']['Dye']) ."\n";
             $EquipmentOutput .= "|Legs = ". $EquipmentArray['Legs']['Item'] ."\n";
-            $EquipmentOutput .= "|Legs Dye = ". $EquipmentArray['Legs']['Dye'] ."\n";
+            $EquipmentOutput .= "|Legs Dye = ". str_ireplace("0", "", $EquipmentArray['Legs']['Dye']) ."\n";
             $EquipmentOutput .= "|Feet = ". $EquipmentArray['Feet']['Item'] ."\n";
-            $EquipmentOutput .= "|Feet Dye = ". $EquipmentArray['Feet']['Dye'] ."\n";
+            $EquipmentOutput .= "|Feet Dye = ". str_ireplace("0", "", $EquipmentArray['Feet']['Dye']) ."\n";
             $EquipmentOutput .= "|Main Hand = ". $EquipmentArray['MainHand']['Item'] ."\n";
             $EquipmentOutput .= "|Off Hand = ". $EquipmentArray['OffHand']['Item'] ."\n";
             $EquipmentOutput .= "}}\n";
@@ -1542,10 +1621,11 @@ class NpcsPagesAll implements ParseInterface
         $this->io->progressStart($ENpcResidentCsv->total);
         foreach ($ENpcResidentCsv->data as $id => $NPCs) {
             $this->io->progressAdvance();
-            $NameFormatted = $this->NameFormat($id, $ENpcResidentCsv, $ENpcBaseCsv, $NPCNameLocationArrray[$id], $LGBArray);
-            if ((empty($NameFormatted)) || (preg_match('/[\x{30A0}-\x{30FF}\x{3040}-\x{309F}\x{4E00}-\x{9FBF}]+|[^\x00-\x7F]+/u', $NameFormatted))) {
-                continue;
-            }
+            
+            $NameFunc = $this->NameFormat($id, $ENpcResidentCsv, $ENpcBaseCsv, $NPCNameLocationArrray[$id], $LGBArray);
+            $NameFormatted = $NameFunc['Name'];
+            if ($NameFunc['IsEnglish'] === false) continue;
+            if (empty($NameFormatted)) continue;
             //Race/Gender/Tribe
             switch ($ENpcBaseCsv->at($id)['Race']) {
                 case 0:
@@ -1602,7 +1682,7 @@ class NpcsPagesAll implements ParseInterface
                 $SubLocation = $subLocation;
                 $MapName = $PlaceNameCsv->at($TerritoryTypeCsv->at($LGBArray[$id]['Territory'])['PlaceName'])['Name'];
                 $NpcMapCodeName = $TerritoryTypeCsv->at($LGBArray[$id]['Territory'])['Name'];
-                $MapID = $TerritoryTypeCsv->at($LGBArray[$id]['id'])['Map'];
+                $MapID = $TerritoryTypeCsv->at($LGBArray[$id]['Territory'])['Map'];
                 if ($MapCsv->at($MapID)["PlaceName{Sub}"] > 0) {
                     $sub = " - ".$PlaceNameCsv->at($MapCsv->at($MapID)["PlaceName{Sub}"])['Name']."";
                 } elseif ($MapCsv->at($MapID)["PlaceName"] > 0) {
@@ -1621,10 +1701,14 @@ class NpcsPagesAll implements ParseInterface
                 $Patch = $PatchNumber[$id];
                 $MapFestival = "";
                 $FestivalID = $LGBArray[$id]["festivalID"];
-                if ($LGBArray[$id]["festivalID"] != 0) {
+                if (!empty($LGBArray[$id]["festivalID"])) {
                     $FesitvalName = $FestivalArray[$FestivalID];
                     $MapFestival = "  | Event = ". str_replace("_", " (", $FesitvalName). ")";
-                }  
+                }
+                $QuestIssuer = "";
+                if (!empty($Issuers[$id])){
+                    $QuestIssuer = "  | Issuer = ".$Issuers[$id]."\n";
+                }
                 //MapOutput = 
                 $MapOutputString = "{{-start-}}\n'''". $NameFormatted ."/Map/". $id ."'''\n";
                 $MapOutputString .= "{{NPCMap\n";
@@ -1637,6 +1721,7 @@ class NpcsPagesAll implements ParseInterface
                 $MapOutputString .= "  | zone = $MapName\n";
                 $MapOutputString .= "  | level_id = $LevelID\n";
                 $MapOutputString .= "  | npc_id = $id\n";
+                $MapOutputString .= "$QuestIssuer";
                 $MapOutputString .= "  | patch = $Patch\n";
                 $MapOutputString .= "  | Sublocation = $SubLocation\n";
                 $MapOutputString .= "$MapFestival";
@@ -1655,13 +1740,19 @@ class NpcsPagesAll implements ParseInterface
             } else {
                 $UniqueApperances = "";
             }
+            //check festival
+            $FestivalNPC = "";
+            if (!empty($LGBArray[$id]["festivalID"])) {
+                $FesitvalName = $FestivalArray[$FestivalID];
+                $FestivalNPC = "\n    | Event = ". str_replace("_", " (", $FesitvalName). ")";
+            }
+
             $dataout = implode("\n", $datarray);
             $LastMapLocExp = explode(",",$NPCIds[$NameFormatted]);
             $LastMapLoc = end($LastMapLocExp);
             $Patch = $NpcPatchArray[$NameFormatted];
-            if ((empty($NameFormatted)) || (preg_match('/[\x{30A0}-\x{30FF}\x{3040}-\x{309F}\x{4E00}-\x{9FBF}]+|[^\x00-\x7F]+/u', $NameFormatted))) {
-                continue;
-            }
+            if ($NameFunc['IsEnglish'] === false) continue;
+            if (empty($NameFormatted)) continue;
             $Npcarray2[$NameFormatted][0] = "{{-start-}}\n'''". $NameFormatted ."'''
             {{Infobox NPC
             <!-- 
@@ -1684,7 +1775,7 @@ class NpcsPagesAll implements ParseInterface
             | Active Help = ".substr($HowToarrayimplode[$NameFormatted],0,-1)."
             | Porter = ".substr($ChocoboTaxiarrayimplode[$NameFormatted],0,-1)."
             | Triple Triad = ".substr($TripleTriadarrayimplode[$NameFormatted],0,-1)."
-            | Last Position = $LastMapLoc
+            | Last Position = $LastMapLoc$FestivalNPC
             }}
             {{-stop-}}";
             $NpcPlayerDataString = "{{-start-}}\n'''". $NameFormatted ."/Player_Data'''\n";
@@ -1729,15 +1820,6 @@ class NpcsPagesAll implements ParseInterface
         
         $data = [
             '{Output}' => $Output,
-            //'{Porter}' => $PorterOut,
-            //'{TripleTriad}' => $TripleTriadOut,
-            //'{MapOutput}' => $MapOutput,
-            //'{ShopOutput}' => $ShopOut,
-            //'{ShopDialogue}' => $ShopDialogueOut,
-            //'{WarpPages}' => $WarpPages,
-            //'{DialoguePages}' => $DialoguePages,
-            //'{Equipment}' => $EquipmentOut,
-            //'{FinalNpcPlayerData}' => $FinalNpcPlayerData,
         ];
 
         // format using Gamer Escape formatter and add to data array
