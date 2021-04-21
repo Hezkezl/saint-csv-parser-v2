@@ -82,7 +82,7 @@ class ActiveHelp implements ParseInterface
                     }
                     $ImageID = sprintf("%06d", $HowToPageCsv->at($PageID)['Image']);
                     // build icon input folder paths
-                    $ImageIcon = $this->getInputFolder() .'/icon/'. $this->iconizeEN($ImageID);
+                    $ImageIcon = $this->getInputFolder() .'/icon/'. $this->iconize($ImageID, true);
                     // if icon doesn't exist (not in the input folder icon list), then skip
                     if (!file_exists($ImageIcon)) continue;
                     $ImageIconFileName = "$IconoutputDirectory/$ImageID.png";

@@ -292,10 +292,11 @@ class NpcsPagesAll implements ParseInterface
             if ($NameFunc['IsEnglish'] === false) continue;
             if (empty($NameFormatted)) continue;
             if (empty($NameFormatted)) continue;
-            $NpcNameArray[$NameFormatted][] = $id;
             if (empty($NpcPatchArray[$NameFormatted])) {
                 $NpcPatchArray[$NameFormatted] = $PatchNumber[$id];
             }
+            if (empty($LGBArray[$id]['x'])) continue;
+            $NpcNameArray[$NameFormatted][] = $id;
         }
         $this->io->progressFinish();
         $NPCIds = [];
@@ -440,14 +441,17 @@ class NpcsPagesAll implements ParseInterface
                         $WarpString .= "| RequiredLevel = $RequiredLevel\n";
                         $WarpString .= "| Cost = $WarpCost\n";
                         $WarpString .= "". $DefaultTalkAccept ."". $DefaultTalkFail ."". $DefaultTalkConfirm ."\n";
-                        $WarpString .= "}}\n\n";
+                        $WarpString .= "}}\n";
+                        $WarpString .= "{{-stop-}}\n\n";
                         $WarpPagesArray[] = $WarpString;
                     break;
                     case ($DataValue > 262100) && ($DataValue < 269999): //GILSHOP
-                        $ShopCheck[] = "Dialogue,";
                         $FuncShop = $this->getShop($NameFormatted, "GilShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $DataValue, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
                         $ShopOutputArray[] = $FuncShop["Shop"];
                         $ShopDialogueArray[] = $FuncShop["Dialogue"];
+                        if(!empty($FuncShop["Dialogue"])){
+                            $ShopCheck[] = "Dialogue,";
+                        }
                         $TotalItems[$NameFormatted][] = $FuncShop["Number"];
                         $ShopCheck[] = $FuncShop["Name"].",";
                     break;
@@ -465,7 +469,7 @@ class NpcsPagesAll implements ParseInterface
                         }
                         $GuildLeveTalkImpoloded = implode("\n", $GuildLeveTalkArray);
                         $DialogueString = "{{-start-}}\n";
-                        $DialogueString .= "'''$NameFormatted/$id/Dialogue'''\n";
+                        $DialogueString .= "'''$NameFormatted/$DataValue/Dialogue'''\n";
                         $DialogueString .= "$GuildLeveTalkImpoloded\n";
                         $DialogueString .= "{{-stop-}}\n";
                         $DialogueArray[] = $DialogueString;
@@ -479,7 +483,7 @@ class NpcsPagesAll implements ParseInterface
                         }
                         $DefaultTalkImplode = implode("\n", $DefaultTalk);
                         $DialogueString = "{{-start-}}\n";
-                        $DialogueString .= "'''$NameFormatted/$id/Dialogue'''\n";
+                        $DialogueString .= "'''$NameFormatted/$DataValue/Dialogue'''\n";
                         $DialogueString .= "$DefaultTalkImplode\n";
                         $DialogueString .= "{{-stop-}}\n";
                         $DialogueArray[] = $DialogueString;
@@ -565,24 +569,36 @@ class NpcsPagesAll implements ParseInterface
                                 $NestDataValue = $CustomTalkNestHandlersCsv->at("". $DataValue. ".". $b ."")['NestHandler'];
                                 switch (true) {
                                     case ($NestDataValue > 262100) && ($NestDataValue < 269999)://Gilshop
-                                        $ShopCheck[] = "Dialogue,";
                                         $FuncShop = $this->getShop($NameFormatted, "GilShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $NestDataValue, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
                                         $ShopOutputArray[] = $FuncShop["Shop"];
                                         $ShopDialogueArray[] = $FuncShop["Dialogue"];
+                                        if(!empty($FuncShop["Dialogue"])){
+                                            $ShopCheck[] = "Dialogue,";
+                                        }
                                         $TotalItems[$NameFormatted][] = $FuncShop["Number"];
                                         $ShopCheck[] = $FuncShop["Name"].",";
                                     break;
                                     case ($NestDataValue > 1769000) && ($NestDataValue < 1779999)://SPECIALSHOP
-                                        $ShopCheck[] = "Dialogue,";
                                         $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $NestDataValue, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
                                         $ShopOutputArray[] = $FuncShop["Shop"];
                                         $ShopDialogueArray[] = $FuncShop["Dialogue"];
+                                        if(!empty($FuncShop["Dialogue"])){
+                                            $ShopCheck[] = "Dialogue,";
+                                        }
                                         $TotalItems[$NameFormatted][] = $FuncShop["Number"];
                                         $ShopCheck[] = $FuncShop["Name"].",";
                                     break;
-                                    case ($NestDataValue > 3407872) && ($NestDataValue < 3409999)://LotteryExchangeShop // omitted
+                                    case ($NestDataValue > 3407872) && ($NestDataValue < 3409999)://LotteryExchangeShop
+                                        $FuncShop = $this->getShop($NameFormatted, "LotteryExchangeShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $NestDataValue, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
+                                        $ShopCheck[] = $FuncShop["Name"].",";
+                                        $ShopOutputArray[] = $FuncShop["Shop"];
+                                        $TotalItems[$NameFormatted][] = $FuncShop["Number"];
                                     break;
-                                    case ($NestDataValue > 3470000) && ($NestDataValue < 3479999)://disposal // omitted
+                                    case ($NestDataValue > 3470000) && ($NestDataValue < 3479999)://disposal
+                                        $FuncShop = $this->getShop($NameFormatted, "DisposalShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $NestDataValue, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
+                                        $ShopCheck[] = $FuncShop["Name"].",";
+                                        $ShopOutputArray[] = $FuncShop["Shop"];
+                                        $TotalItems[$NameFormatted][] = $FuncShop["Number"];
                                     break;
                                     default:
                                     break;
@@ -617,7 +633,7 @@ class NpcsPagesAll implements ParseInterface
                         $CraftLeveTalkString .= $CraftLeveTalkImpoloded;
                         $CraftLeveTalkString .= "\n}}";
                         $DialogueString = "{{-start-}}\n";
-                        $DialogueString .= "'''$NameFormatted/$id/Dialogue'''\n";
+                        $DialogueString .= "'''$NameFormatted/$DataValue/Dialogue'''\n";
                         $DialogueString .= "$CraftLeveTalkString\n";
                         $DialogueString .= "{{-stop-}}\n";
                         $DialogueArray[] = $DialogueString;
@@ -634,11 +650,13 @@ class NpcsPagesAll implements ParseInterface
                     case ($DataValue > 1570000) && ($DataValue < 1579999): //GUILDORDEROFFICER// omitted
                     break;
                     case ($DataValue > 1769000) && ($DataValue < 1779999)://SPECIALSHOP
-                        $ShopCheck[] = "Dialogue,";
                         $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $DataValue, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
                         $ShopOutputArray[] = $FuncShop["Shop"];
                         $ShopDialogueArray[] = $FuncShop["Dialogue"];
                         $TotalItems[$NameFormatted][] = $FuncShop["Number"];
+                        if(!empty($FuncShop["Dialogue"])){
+                            $ShopCheck[] = "Dialogue,";
+                        }
                         $ShopCheck[] = $FuncShop["Name"].",";
                     break;
                     case ($DataValue > 2030000) && ($DataValue < 2039999)://SWITCHTALK
@@ -668,7 +686,7 @@ class NpcsPagesAll implements ParseInterface
                         }
                         $SwitchTalkOut = implode("\n", $SwitchTalkArray);
                         $DialogueString = "{{-start-}}\n";
-                        $DialogueString .= "'''$NameFormatted/$id/Dialogue'''\n";
+                        $DialogueString .= "'''$NameFormatted/$DataValue/Dialogue'''\n";
                         $DialogueString .= "$SwitchTalkOut\n";
                         $DialogueString .= "{{-stop-}}\n";
                         $DialogueArray[] = $DialogueString;
@@ -716,30 +734,36 @@ class NpcsPagesAll implements ParseInterface
                             $ShopLink = $TopicSelectCsv->at($DataValue)["Shop[$a]"];
                             switch (true) {
                                 case ($ShopLink >= 262000 && $ShopLink < 264000): //gilshop
-                                    $ShopCheck[] = "Dialogue,";
                                     $FuncShop = $this->getShop($NameFormatted, "GilShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $ShopLink, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
                                     $ShopOutputArray[] = $FuncShop["Shop"];
                                     $ShopDialogueArray[] = $FuncShop["Dialogue"];
                                     $TotalItems[$NameFormatted][] = $FuncShop["Number"];
+                                    if(!empty($FuncShop["Dialogue"])){
+                                        $ShopCheck[] = "Dialogue,";
+                                    }
                                     $ShopCheck[] = $FuncShop["Name"].",";
                                 break;
                                 case ($ShopLink >= 3538900 && $ShopLink < 3540000): //Prehandler
                                     $ShopID = $PreHandlerCsv->at($ShopLink)["Target"];
                                     switch (true) {
                                         case ($ShopID > 262100 && $ShopID < 269999): //gilshop
-                                            $ShopCheck[] = "Dialogue,";
                                             $FuncShop = $this->getShop($NameFormatted, "GilShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $ShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
                                             $ShopOutputArray[] = $FuncShop["Shop"];
                                             $ShopDialogueArray[] = $FuncShop["Dialogue"];
                                             $TotalItems[$NameFormatted][] = $FuncShop["Number"];
+                                            if(!empty($FuncShop["Dialogue"])){
+                                                $ShopCheck[] = "Dialogue,";
+                                            }
                                             $ShopCheck[] = $FuncShop["Name"].",";
                                         break;
                                         case ($ShopID >= 1769000 && $ShopID < 1779999): //specialshop
-                                            $ShopCheck[] = "Dialogue,";
                                             $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $ShopID, $DefaultTalkCsv, $ShopID, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
                                             $ShopOutputArray[] = $FuncShop["Shop"];
                                             $ShopDialogueArray[] = $FuncShop["Dialogue"];
                                             $TotalItems[$NameFormatted][] = $FuncShop["Number"];
+                                            if(!empty($FuncShop["Dialogue"])){
+                                                $ShopCheck[] = "Dialogue,";
+                                            }
                                             $ShopCheck[] = $FuncShop["Name"].",";
                                         break;
                                         case ($ShopID >= 3866620 && $ShopID < 3866999): //COLLECTABLESHOPS
@@ -763,8 +787,9 @@ class NpcsPagesAll implements ParseInterface
                                                 }
                                             }
                                         break;
-                                        case ($ShopID >= 3604400 && $ShopID < 3609999): //Description //unsure
-                                            $DialogueCheck[] = $ShopID.",";
+                                        case ($ShopID >= 3604400 && $ShopID < 3609999): //Description
+                                            $DescriptionTitle = $DescriptionCsv->at($ShopID)['Text[Long]'];
+                                            $HowToCheck[] = $DescriptionTitle.",";
                                         break;
 
                                         default:
@@ -772,11 +797,13 @@ class NpcsPagesAll implements ParseInterface
                                     }
                                 break;
                                 case ($ShopLink >= 1769000 && $ShopLink < 1779999): //Specialshop
-                                    $ShopCheck[] = "Dialogue,";
                                     $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $ShopLink, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
                                     $ShopOutputArray[] = $FuncShop["Shop"];
                                     $ShopDialogueArray[] = $FuncShop["Dialogue"];
                                     $TotalItems[$NameFormatted][] = $FuncShop["Number"];
+                                    if(!empty($FuncShop["Dialogue"])){
+                                        $ShopCheck[] = "Dialogue,";
+                                    }
                                     $ShopCheck[] = $FuncShop["Name"].",";
                                 break;
                                 
@@ -786,25 +813,34 @@ class NpcsPagesAll implements ParseInterface
                         }
 
                     break;
-                    case ($DataValue > 3470000) && ($DataValue < 3479999): //DISPOSAL SHOP //omitted
+                    case ($DataValue > 3470000) && ($DataValue < 3479999): //DISPOSAL SHOP
+                        $FuncShop = $this->getShop($NameFormatted, "DisposalShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $DataValue, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
+                        $ShopCheck[] = $FuncShop["Name"].",";
+                        $ShopOutputArray[] = $FuncShop["Shop"];
+                        $TotalItems[$NameFormatted][] = $FuncShop["Number"];
+
                     break;
                     case ($DataValue > 3530000) && ($DataValue < 3539999)://PREHANDLER
                         $ShopID = $PreHandlerCsv->at($DataValue)["Target"];
                         switch (true) {
                             case ($ShopID > 262100 && $ShopID < 269999): //gilshop
-                                $ShopCheck[] = "Dialogue,";
                                 $FuncShop = $this->getShop($NameFormatted, "GilShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $ShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
                                 $ShopOutputArray[] = $FuncShop["Shop"];
                                 $ShopDialogueArray[] = $FuncShop["Dialogue"];
                                 $TotalItems[$NameFormatted][] = $FuncShop["Number"];
+                                if(!empty($FuncShop["Dialogue"])){
+                                    $ShopCheck[] = "Dialogue,";
+                                }
                                 $ShopCheck[] = $FuncShop["Name"].",";
                             break;
                             case ($ShopID >= 1769000 && $ShopID < 1779999): //specialshop
-                                $ShopCheck[] = "Dialogue,";
                                 $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $ShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
                                 $ShopOutputArray[] = $FuncShop["Shop"];
                                 $ShopDialogueArray[] = $FuncShop["Dialogue"];
                                 $TotalItems[$NameFormatted][] = $FuncShop["Number"];
+                                if(!empty($FuncShop["Dialogue"])){
+                                    $ShopCheck[] = "Dialogue,";
+                                }
                                 $ShopCheck[] = $FuncShop["Name"].",";
                             break;
                             case ($ShopID >= 3866620 && $ShopID < 3866999): //COLLECTABLESHOPS 
@@ -820,25 +856,29 @@ class NpcsPagesAll implements ParseInterface
                                         $SubDataValue = "". $ShopID .".". $c ."";
                                         if (empty($InclusionShopSeriesCsv->at($SubDataValue)['SpecialShop'])) break;
                                         $InclusionShopSpecialShopID = $InclusionShopSeriesCsv->at($SubDataValue)['SpecialShop'];
-                                        $ShopCheck[] = "Dialogue,";
                                         $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $InclusionShopSpecialShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
                                         $ShopOutputArray[] = $FuncShop["Shop"];
                                         $ShopDialogueArray[] = $FuncShop["Dialogue"];
                                         $TotalItems[$NameFormatted][] = $FuncShop["Number"];
+                                        if(!empty($FuncShop["Dialogue"])){
+                                            $ShopCheck[] = "Dialogue,";
+                                        }
                                         $ShopCheck[] = $FuncShop["Name"].",";
                                     }
                                 }
                             break;
-                            case ($ShopID >= 3604400 && $ShopID < 3609999): //Description //unsure
-                                $DialogueCheck[] = $ShopID.",";
+                            case ($ShopID >= 3604400 && $ShopID < 3609999): //Description
+                                $DescriptionTitle = $DescriptionCsv->at($ShopID)['Text[Long]'];
+                                $HowToCheck[] = $DescriptionTitle.",";
                             break;
 
                             default:
                             break;
                         }
                     break;
-                    case ($DataValue > 3604000) && ($DataValue < 3609999): //DESCRIPTION //unsure
-                        $DialogueCheck[] = $DataValue.",";
+                    case ($DataValue > 3604000) && ($DataValue < 3609999): //DESCRIPTION 
+                        $DescriptionTitle = $DescriptionCsv->at($DataValue)['Text[Long]'];
+                        $HowToCheck[] = $DescriptionTitle.",";
                     break;
                     case ($DataValue >= 3866620 && $DataValue < 3866999): //COLLECTABLESHOPS 
                         $FuncShop = $this->getShop($NameFormatted, "CollectablesShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $DataValue, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
@@ -1703,7 +1743,7 @@ class NpcsPagesAll implements ParseInterface
                 $FestivalID = $LGBArray[$id]["festivalID"];
                 if (!empty($LGBArray[$id]["festivalID"])) {
                     $FesitvalName = $FestivalArray[$FestivalID];
-                    $MapFestival = "  | Event = ". str_replace("_", " (", $FesitvalName). ")";
+                    $MapFestival = "  | Event = ". str_replace("_", " (", $FesitvalName). ")\n";
                 }
                 $QuestIssuer = "";
                 if (!empty($Issuers[$id])){
@@ -1748,11 +1788,19 @@ class NpcsPagesAll implements ParseInterface
             }
 
             $dataout = implode("\n", $datarray);
-            $LastMapLocExp = explode(",",$NPCIds[$NameFormatted]);
-            $LastMapLoc = end($LastMapLocExp);
+            $LastMapLoc = "";
+            if (!empty($NPCIds[$NameFormatted])) {
+                $LastMapLocExp = explode(",",$NPCIds[$NameFormatted]);
+                $LastMapLoc = end($LastMapLocExp);
+            }
+            
             $Patch = $NpcPatchArray[$NameFormatted];
             if ($NameFunc['IsEnglish'] === false) continue;
             if (empty($NameFormatted)) continue;
+            $ListofIDS = "";
+            if (!empty($NPCIds[$NameFormatted])){
+                $ListofIDS = $NPCIds[$NameFormatted];
+            }
             $Npcarray2[$NameFormatted][0] = "{{-start-}}\n'''". $NameFormatted ."'''
             {{Infobox NPC
             <!-- 
@@ -1765,7 +1813,7 @@ class NpcsPagesAll implements ParseInterface
             | Image = 
             $Race$Gender$Tribe
             | Title = ". $NPCs["Title"] ."
-            | IDs = $NPCIds[$NameFormatted]
+            | IDs = $ListofIDS
             | Apperance IDs = $UniqueApperances
             | Shop = ".substr($Shoparrayimplode[$NameFormatted],0,-1)."
             | TotalItems = $ShopItemsTotalNo

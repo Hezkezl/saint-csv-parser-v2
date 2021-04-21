@@ -106,6 +106,9 @@ trait CsvParseTrait
             case 'ENpcResident':
                 $offset = '"Singular"';
             break;
+            case 'Description':
+                $offset = '"Text[Long]"';
+            break;
             
             default:
                 $offset = '"id"';
@@ -170,107 +173,103 @@ trait CsvParseTrait
             "Vroi-Reeq", "Zao-Mosc", "Zia-Bostt", "Zoi-Chorr", "Zumie-Moa", "Zumie-Shai", "\"", "\"", "e", "o", "2b", "", "", "and");
         $PLAddition = "";
         switch ($NameFormatted) {
-            case "airship ticketer";
-            case "Ala Mhigan Resistance gate guard";
-            case "alehouse wench";
-            case "Alisaie's assistant";
-            case "apartment caretaker";
-            case "arms supplier";
-            case "arms supplier & mender";
-            case "arrivals attendant";
-            case "calamity salvager";
-            case "Celestine";
-            case "chocobokeep";
-            case "collectable appraiser";
-            case "concerned mother";
-            case "expedition artisan";
-            case "expedition birdwatcher";
-            case "expedition scholar";
-            case "ferry skipper";
-            case "flame officer";
-            case "flame private";
-            case "flame recruit";
-            case "flame scout";
-            case "flame sergeant";
-            case "flame soldier";
-            case "gate keeper";
-            case "Gridanian merchant";
-            case "Haermaga";
-            case "housing enthusiast";
-            case "Hunt billmaster";
-            case "hunter-scholar";
-            case "hunter-scholar";
-            case "Imperial centurion";
-            case "Imperial deserter";
-            case "independent armorer";
-            case "independent armorfitter";
-            case "independent arms mender";
-            case "independent arms mender";
-            case "independent mender";
-            case "independent merchant";
-            case "independent sutler";
-            case "inu doshin";
-            case "irate coachman";
-            case "Ironworks engineer";
-            case "junkmonger";
-            case "Keeper of the Entwined Serpents";
-            case "local merchant";
-            case "mammet dispensator #012P";
-            case "mammet dispensator #012T";
-            case "materia melder";
-            case "material supplier";
-            case "mender";
-            case "minion enthusiast";
-            case "OIC administrator";
-            case "OIC officer of arms";
-            case "OIC quartermaster";
-            case "pernicious Temple Knight";
-            case "picker of locks";
-            case "recompense officer";
-            case "Resident caretaker";
-            case "Resistance fighter";
-            case "Resistance officer";
-            case "Saucer attendant";
-            case "scrip exchange";
-            case "seasoned adventurer";
-            case "serpent lieutenant";
-            case "serpent officer";
-            case "serpent private";
-            case "serpent recruit";
-            case "serpent scout";
-            case "shady smock";
-            case "splendors vendor";
-            case "spoils collector";
-            case "spoils trader";
-            case "steersman";
-            case "storm captain";
-            case "storm officer";
-            case "storm recruit";
-            case "storm soldier";
-            case "storm private";
-            case "storm sergeant";
-            case "Sultansworn elite";
-            case "suspicious Coerthan";
-            case "the Smith";
-            case "tournament registrar";
-            case "traveling merchant";
-            case "traveling trader";
-            case "Triple Triad trader";
-            case "troubled coachman";
-            case "well-informed adventurer";
-            case "wounded imperial";
-            case "wounded Resistance fighter";
-            case "wunthyll";
-            case "Enie";
-            case "amarokeep";
-            case "merchant & mender";
-            case "Calamity salvager";
-            case "estate manservant";
-            case "estate maidservant";
-            case "hokonin";
-            case "mammet dispensator #012P";
-            case "mammet interchanger #012T";
-            case "journeyman salvager";
+            case "airship ticketer":
+            case "Ala Mhigan Resistance gate guard":
+            case "alehouse wench":
+            case "Alisaie's assistant":
+            case "apartment caretaker":
+            case "arms supplier":
+            case "arms supplier & mender":
+            case "arrivals attendant":
+            case "calamity salvager":
+            case "Celestine":
+            case "chocobokeep":
+            case "collectable appraiser":
+            case "concerned mother":
+            case "expedition artisan":
+            case "expedition birdwatcher":
+            case "expedition scholar":
+            case "ferry skipper":
+            case "flame officer":
+            case "flame private":
+            case "flame recruit":
+            case "flame scout":
+            case "flame sergeant":
+            case "flame soldier":
+            case "gate keeper":
+            case "Gridanian merchant":
+            case "Haermaga":
+            case "housing enthusiast":
+            case "Hunt billmaster":
+            case "hunter-scholar":
+            case "hunter-scholar":
+            case "Imperial centurion":
+            case "Imperial deserter":
+            case "independent armorer":
+            case "independent armorfitter":
+            case "independent arms mender":
+            case "independent arms mender":
+            case "independent mender":
+            case "independent merchant":
+            case "independent sutler":
+            case "inu doshin":
+            case "irate coachman":
+            case "Ironworks engineer":
+            case "junkmonger":
+            case "Keeper of the Entwined Serpents":
+            case "local merchant":
+            case "mammet dispensator #012P":
+            case "mammet dispensator #012T":
+            case "materia melder":
+            case "material supplier":
+            case "mender":
+            case "minion enthusiast":
+            case "OIC administrator":
+            case "OIC officer of arms":
+            case "OIC quartermaster":
+            case "pernicious Temple Knight":
+            case "picker of locks":
+            case "recompense officer":
+            case "Resident caretaker":
+            case "Resistance fighter":
+            case "Resistance officer":
+            case "Saucer attendant":
+            case "scrip exchange":
+            case "seasoned adventurer":
+            case "serpent lieutenant":
+            case "serpent officer":
+            case "serpent private":
+            case "serpent recruit":
+            case "serpent scout":
+            case "splendors vendor":
+            case "spoils collector":
+            case "spoils trader":
+            case "steersman":
+            case "storm captain":
+            case "storm officer":
+            case "storm recruit":
+            case "storm soldier":
+            case "storm private":
+            case "storm sergeant":
+            case "Sultansworn elite":
+            case "suspicious Coerthan":
+            case "the Smith":
+            case "tournament registrar":
+            case "traveling merchant":
+            case "traveling trader":
+            case "Triple Triad trader":
+            case "troubled coachman":
+            case "wounded imperial":
+            case "wounded Resistance fighter":
+            case "wunthyll":
+            case "Enie":
+            case "amarokeep":
+            case "merchant & mender":
+            case "Calamity salvager":
+            case "estate manservant":
+            case "estate maidservant":
+            case "hokonin":
+            case "journeyman salvager":
                 $PLAddition = " ($PlaceNameLocation)";
                 if (empty($PlaceNameLocation)){
                     switch ($NameFormatted) {
@@ -280,10 +279,10 @@ trait CsvParseTrait
                         case 'material supplier':
                         case 'mender':
                         case 'materia melder':
-                        case "estate manservant";
-                        case "estate maidservant";
-                        case "hokonin";
-                        case "journeyman salvager";
+                        case "estate manservant":
+                        case "estate maidservant":
+                        case "hokonin":
+                        case "journeyman salvager":
                             $PLAddition = " (Housing)";
                         break;
                         case 'storm soldier': //MSQ
@@ -304,12 +303,6 @@ trait CsvParseTrait
                             $PLAddition = " (MSQ)";
                         break;
                          //Event
-                        case "saint's little helper":
-                        case 'enthralling illusionist':
-                        case 'royal handmaiden':
-                        case 'royal seneschal':
-                        case "mammet dispensator #012P";
-                        case "mammet interchanger #012T";
                             $PLAddition = " (Event)";
                         break;
                         case 'ferry skipper': //Unknowns
@@ -319,7 +312,7 @@ trait CsvParseTrait
                         case 'traveling merchant':
                         case 'seasoned adventurer':
                         case 'Enie':
-                        case "journeyman salvager";
+                        case "journeyman salvager":
                             $PLAddition = " (Unknown)";
                         break;
                         
@@ -329,24 +322,48 @@ trait CsvParseTrait
                     }
                 }
             break;
-            case "uncanny illusionist"; // events
-            case "untrustworthy illusionist";
-            case "unusual illusionist";
-            case "Yellow Moon admirer";
-            case "Starlight celebrant";
-            case "Starlight Celebration crier";
-            case "Starlight supplier";
-            case "Rising attendant";
-            case "Rising vendor";
-            case "royal handmaiden";
-            case "royal seneschal";
-            case "royal servant";
-            case "saint's little helper";
-            case "Moonfire Faire vendor";
-            case "Moonfire marine";
-            case "eggsaminer";
-            case "enthralling illusionist";
-            case "Faire crier";
+            case "saint's little helper":
+            case 'enthralling illusionist':
+            case 'royal handmaiden':
+            case 'royal seneschal':
+            case "mammet dispensator #012P":
+            case "mammet interchanger #012T":
+            case "uncanny illusionist": // event:
+            case "untrustworthy illusionist":
+            case "unusual illusionist":
+            case "Yellow Moon admirer":
+            case "Starlight celebrant":
+            case "Starlight Celebration crier":
+            case "Starlight supplier":
+            case "Rising attendant":
+            case "Rising vendor":
+            case "royal handmaiden":
+            case "royal seneschal":
+            case "royal servant":
+            case "saint's little helper":
+            case "Moonfire Faire vendor":
+            case "Moonfire marine":
+            case "Moonfire Faire chaperone":
+            case "enthralling illusionist":
+            case "Faire crier":
+            case "shady smock":
+            case "unsavory illusionist":
+            case "malevolent mummer":
+            case "long-haired pirate":
+            case "Gold Saucer attendant":
+            case 'Yellow Moon admirer':
+            case 'tournament registrar':
+            case 'Little Yang':
+            case 'Little Yin':
+            case 'inu doshin':
+            case 'inu doshin':
+            case 'Ethelia':
+            case 'campaign attendant':
+            case 'well-informed adventurer':
+            case 'House Valentione maid':
+            case 'House Valentione maidservant':
+            case 'magic pot':
+            case 'minion enthusiast':
                 $PLAddition = " (Event)";
                 if (!empty($PlaceNameLocation)) {
                     if (!empty($LGBArray[$NPCID]['festivalID'])) {
@@ -365,15 +382,11 @@ trait CsvParseTrait
                     }
                 }
             break;
-            case "malevolent mummer"; // race
-            case "long-haired pirate";
-            case "Gold Saucer attendant";
-            case 'Yellow Moon admirer':
-            case 'tournament registrar':
+            case "eggsaminer":
                 $RaceCsv = $this->csv('Race');
                 $nameRace = $RaceCsv->at($ENpcBaseCsv->at($NPCID)['Race'])['Masculine'];
                 $PLAddition = " ($nameRace)";
-            break;
+            //break;
             
             default:
                 # code...
@@ -387,12 +400,13 @@ trait CsvParseTrait
             $NameFormatted = implode('-', array_map('ucfirst', explode('-', $NameFormatted)));
         }
         $NameFormatted = ucwords($NameFormatted);
-        $NameFormatted = str_replace($IncorrectNames, $correctnames, $NameFormatted);
+        $NameFormatted = str_ireplace($IncorrectNames, $correctnames, $NameFormatted);
         $NameFormatted = iconv('UTF-8', 'ISO-8859-1//TRANSLIT//IGNORE', $NameFormatted);
+        $NameFormatted = str_ireplace($IncorrectNames, $correctnames, $NameFormatted);
         $output['Name'] = $NameFormatted."$PLAddition";
         $output['IsEnglish'] = $this->is_english($NameFormatted);
         if (stripos($NameFormatted,"�")){
-            $output['IsEnglish'] = false;
+            $output['IsEnglish'] = false; 
         }
         if (($NameFormatted === "A") || 
             ($NameFormatted === "B" )||
@@ -820,7 +834,7 @@ trait CsvParseTrait
                 $CompleteText = $this->getDefaultTalk($DefaultTalkCsv, $SpecialShopCsv, $SpecialShopID, "CompleteText", "");
                 $DenyText = $this->getDefaultTalk($DefaultTalkCsv, $SpecialShopCsv, $SpecialShopID, "NotCompleteText", "");
 
-                $DialogueOutput = "{{-start-}}\n'''". $NpcName ."/Dialogue'''\n";
+                $DialogueOutput = "{{-start-}}\n'''". $NpcName ."/Dialogue/Dialogue'''\n";
                 $DialogueOutput .= "{{Dialoguebox3|Intro={{check}} Granted Access|Dialogue=$CompleteText}}\n";
                 $DialogueOutput .= "{{Dialoguebox3|Intro={{x}} Denied Access|Dialogue=$DenyText}}\n";
                 $DialogueOutput .= "{{-stop-}}\n";
@@ -976,7 +990,7 @@ trait CsvParseTrait
                 $CompleteText = $this->getDefaultTalk($DefaultTalkCsv, $GilShopCsv, $SpecialShopID, "AcceptTalk", "");
                 $DenyText = $this->getDefaultTalk($DefaultTalkCsv, $GilShopCsv, $SpecialShopID, "FailTalk", "");
 
-                $DialogueOutput = "{{-start-}}\n'''". $NpcName ."/Dialogue'''\n";
+                $DialogueOutput = "{{-start-}}\n'''". $NpcName ."/Dialogue/Dialogue'''\n";
                 $DialogueOutput .= "{{Dialoguebox3|Intro={{check}} Granted Access|Dialogue=$CompleteText}}\n";
                 $DialogueOutput .= "{{Dialoguebox3|Intro={{x}} Denied Access|Dialogue=$DenyText}}\n";
                 $DialogueOutput .= "{{-stop-}}\n";
@@ -1074,6 +1088,194 @@ trait CsvParseTrait
                 $ShopOutputString .= "| Coordinates = $CoordLocation\n";
                 $ShopOutputString .= "| Total Items = $NumberItems\n";
                 $ShopOutputString .= "$GilShopRequiredQuest";
+                $ShopOutputString .= "| Shop = \n";
+                $ShopOutputString .= "{{Tabsells3\n";
+                
+                $ShopOutput["Shop"] = "\n$ShopOutputString\n$Weapons$Armor$Accessory$Other\n}}\n}}\n{{-stop-}}";
+                $ShopOutput["Number"] = $NumberItems;
+                $ShopOutput["Name"] = $ShopName;
+                return $ShopOutput;
+            break;
+            case 'DisposalShop':
+                $DataValue = $SpecialShopID;
+                $DisposalShopCsv = $this->csv('DisposalShop');
+                $DisposalShopItemCsv = $this->csv('DisposalShopItem');
+                $ShopName = $DisposalShopCsv->at($DataValue)['ShopName'];
+                if (empty($ShopName)) { 
+                    $ShopName = $SpecialShopID;
+                }
+
+                foreach(range(0,999) as $b) {
+                    $ShopSubArray = "". $DataValue . "." . $b ."";
+                    if (empty($DisposalShopItemCsv->at($ShopSubArray)['Item{Received}'])) break;
+                    $NumberItems = $b + 1;
+                    $CategoryPre = $ItemCsv->at($DisposalShopItemCsv->at($ShopSubArray)["Item{Received}"])["EquipSlotCategory"];
+                    $ShopSellsItem = $ItemCsv->at($DisposalShopItemCsv->at($ShopSubArray)["Item{Received}"])["Name"];
+                    $ShopSellsItemCost = $ItemCsv->at($DisposalShopItemCsv->at($ShopSubArray)["Item{Disposed}"])["Name"];
+                    $ShopSellsItemCostAmt = $DisposalShopItemCsv->at($ShopSubArray)["Quantity{Received}"];
+                    switch ($CategoryPre) {
+                        case '0':
+                            $Category = 4;
+                        break;
+                        case '1':
+                        case '2':
+                        case '13':
+                            $Category = 1;
+                        break;
+                        case '3':
+                        case '4':
+                        case '5':
+                        case '6':
+                        case '7':
+                        case '8':
+                        case '15':
+                        case '16':
+                        case '18':
+                        case '19':
+                        case '20':
+                        case '21':
+                            $Category = 2;
+                        break;
+                        case '9':
+                        case '10':
+                        case '11':
+                        case '12':
+                            $Category = 3;
+                        break;
+                        
+                        default:
+                            $Category = 4;
+                        break;
+                    }
+                    switch ($Category) {
+                        case 1:
+                            $WeaponArray[] = "{{Sells3|$ShopSellsItem|Quantity=$ShopSellsItemCostAmt|Cost1=$ShopSellsItemCost|Count1=1}}";
+                        break;
+                        case 2:
+                            $ArmorArray[] = "{{Sells3|$ShopSellsItem|Quantity=$ShopSellsItemCostAmt|Cost1=$ShopSellsItemCost|Count1=1}}";
+                        break;
+                        case 3:
+                            $AccessoryArray[] = "{{Sells3|$ShopSellsItem|Quantity=$ShopSellsItemCostAmt|Cost1=$ShopSellsItemCost|Count1=1}}";
+                        break;
+                        case 4:
+                            $OtherArray[] = "{{Sells3|$ShopSellsItem|Quantity=$ShopSellsItemCostAmt|Cost1=$ShopSellsItemCost|Count1=1}}";
+                        break;
+                    }
+                }
+                asort($WeaponArray);
+                asort($ArmorArray);
+                asort($AccessoryArray);
+                asort($OtherArray);
+                if (!empty($WeaponArray)) {
+                    $Weapons = "|Weapons = \n". implode("\n", $WeaponArray). "\n";
+                }
+                if (!empty($ArmorArray)) {
+                    $Armor = "|Armor = \n".implode("\n", $ArmorArray). "\n";
+                }
+                if (!empty($AccessoryArray)) {
+                    $Accessory = "|Accessory = \n".implode("\n", $AccessoryArray). "\n";
+                }
+                if (!empty($OtherArray)) {
+                    $Other = "|Misc = \n".implode("\n", $OtherArray). "\n";
+                }
+                $ShopOutputString = "{{-start-}}\n'''". $NpcName ."/". $ShopName ."'''\n";
+                $ShopOutputString .= "{{Shop\n";
+                $ShopOutputString .= "| Shop Name = $ShopName\n";
+                $ShopOutputString .= "| NPC Name = $NpcName\n";
+                $ShopOutputString .= "| Location = $NpcPlaceName\n";
+                $ShopOutputString .= "| Coordinates = $CoordLocation\n";
+                $ShopOutputString .= "| Total Items = $NumberItems\n";
+                $ShopOutputString .= "| Shop = \n";
+                $ShopOutputString .= "{{Tabsells3\n";
+                
+                $ShopOutput["Shop"] = "\n$ShopOutputString\n$Weapons$Armor$Accessory$Other\n}}\n}}\n{{-stop-}}";
+                $ShopOutput["Number"] = $NumberItems;
+                $ShopOutput["Name"] = $ShopName;
+                return $ShopOutput;
+            break;
+            case 'LotteryExchangeShop':
+                $DataValue = $SpecialShopID;
+                $LotteryExchangeShopCsv = $this->csv('LotteryExchangeShop');
+                $ShopName = $SpecialShopID;
+
+                foreach(range(0,23) as $b) {
+                    if (empty($ItemCsv->at($LotteryExchangeShopCsv->at($DataValue)["ItemAccepted[$b]"]))) continue;
+                    $NumberItems = $b + 1;
+                    $CategoryPre = $ItemCsv->at($LotteryExchangeShopCsv->at($DataValue)["ItemAccepted$b]"])["EquipSlotCategory"];
+                    $ShopAcceptsItem = $ItemCsv->at($LotteryExchangeShopCsv->at($DataValue)["ItemAccepted$b]"])["Name"];
+                    $ShopAcceptsItemAmt = $LotteryExchangeShopCsv->at($DataValue)["AmountAccepted[$b]"];
+                    switch ($CategoryPre) {
+                        case '0':
+                            $Category = 4;
+                        break;
+                        case '1':
+                        case '2':
+                        case '13':
+                            $Category = 1;
+                        break;
+                        case '3':
+                        case '4':
+                        case '5':
+                        case '6':
+                        case '7':
+                        case '8':
+                        case '15':
+                        case '16':
+                        case '18':
+                        case '19':
+                        case '20':
+                        case '21':
+                            $Category = 2;
+                        break;
+                        case '9':
+                        case '10':
+                        case '11':
+                        case '12':
+                            $Category = 3;
+                        break;
+                        
+                        default:
+                            $Category = 4;
+                        break;
+                    }
+                    switch ($Category) {
+                        case 1:
+                            $WeaponArray[] = "{{Unique Shop|$ShopAcceptsItem|Quantity=$ShopAcceptsItemAmt}}";
+                        break;
+                        case 2:
+                            $ArmorArray[] = "{{Unique Shop|$ShopAcceptsItem|Quantity=$ShopAcceptsItemAmt}}";
+                        break;
+                        case 3:
+                            $AccessoryArray[] = "{{Unique Shop|$ShopAcceptsItem|Quantity=$ShopAcceptsItemAmt}}";
+                        break;
+                        case 4:
+                            $OtherArray[] = "{{Unique Shop|$ShopAcceptsItem|Quantity=$ShopAcceptsItemAmt}}";
+                        break;
+                    }
+                }
+                asort($WeaponArray);
+                asort($ArmorArray);
+                asort($AccessoryArray);
+                asort($OtherArray);
+                if (!empty($WeaponArray)) {
+                    $Weapons = "|Weapons = \n". implode("\n", $WeaponArray). "\n";
+                }
+                if (!empty($ArmorArray)) {
+                    $Armor = "|Armor = \n".implode("\n", $ArmorArray). "\n";
+                }
+                if (!empty($AccessoryArray)) {
+                    $Accessory = "|Accessory = \n".implode("\n", $AccessoryArray). "\n";
+                }
+                if (!empty($OtherArray)) {
+                    $Other = "|Misc = \n".implode("\n", $OtherArray). "\n";
+                }
+                $ShopOutputString = "{{-start-}}\n'''". $NpcName ."/". $ShopName ."'''\n";
+                $ShopOutputString .= "{{Shop\n";
+                $ShopOutputString .= "| Shop Name = $ShopName\n";
+                $ShopOutputString .= "| NPC Name = $NpcName\n";
+                $ShopOutputString .= "| Location = $NpcPlaceName\n";
+                $ShopOutputString .= "| Coordinates = $CoordLocation\n";
+                $ShopOutputString .= "| Total Items = $NumberItems\n";
                 $ShopOutputString .= "| Shop = \n";
                 $ShopOutputString .= "{{Tabsells3\n";
                 
@@ -1208,10 +1410,10 @@ trait CsvParseTrait
                 $Model = false;
                 if ($NpcEquipCsv->at($EnpcBase->at($id)['NpcEquip'])["Model{{$ENPCOffset0}}"] != 0) {
                     $Base = $NpcEquipCsv->at($EnpcBase->at($id)['NpcEquip'])["Model{{$ENPCOffset0}}"];
-                    $DyeBase = $NpcEquipCsv->at($EnpcBase->at($id)['NpcEquip'])["Dye{{$ENPCOffset0}}"];
+                    $DyeBase = $StainCsv->at($NpcEquipCsv->at($EnpcBase->at($id)['NpcEquip'])["Dye{{$ENPCOffset0}}"])['Name'];
                 }
             }
-            if ($Base == 4294967295) {
+            if ($Base == 4294967295) { //HEX for FFFF,FFFF
                 $Model = false;
                 $Base = 0;
             }
@@ -1426,9 +1628,9 @@ trait CsvParseTrait
     }
 
     /**
-     * Converts SE icon "number" into a proper path
+     * Converts SE icon "number" into a proper path, use iconize($ImageID, true) for HR
      */
-    private function iconize($number, $hq = false)
+    private function iconize($number, $hr = false)
     {
         $number = intval($number);
         $extended = (strlen($number) >= 6);
@@ -1436,72 +1638,26 @@ trait CsvParseTrait
         if ($number == 0) {
             return null;
         }
-
+        $en = false;
         // create icon filename
         $icon = $extended ? str_pad($number, 5, "0", STR_PAD_LEFT) : '0' . str_pad($number, 5, "0", STR_PAD_LEFT);
-
-        // create icon path
-        $path = [];
-        $path[] = $extended ? $icon[0] . $icon[1] . $icon[2] .'000' : '0'. $icon[1] . $icon[2] .'000';
-
-        $path[] = $icon;
-
-        // combine
-        $icon = implode('/', $path) .'.png';
-
-        return $icon;
-    }
-
-    
-    /**
-     * Converts SE icon "number" into a proper path for /EN 
-     */
-    private function iconizeEN($number, $hq = false)
-    {
-        $number = intval($number);
-        $extended = (strlen($number) >= 6);
-
-        if ($number == 0) {
-            return null;
+        //var_dump($icon);
+        if (($icon > 120000) && ($icon < 130000)){
+            $en = true;
+        }
+        if (($icon > 150000) && ($icon < 182000)){
+            $en = true;
         }
 
-        // create icon filename
-        $icon = $extended ? str_pad($number, 5, "0", STR_PAD_LEFT) : '0' . str_pad($number, 5, "0", STR_PAD_LEFT);
-
         // create icon path
         $path = [];
         $path[] = $extended ? $icon[0] . $icon[1] . $icon[2] .'000' : '0'. $icon[1] . $icon[2] .'000';
 
         $path[] = $icon;
-
+        $encheck = $en ? "/en" : "";
+        $hrcheck = $hr ? "_hr1" : "";
         // combine
-        $icon = implode('/en/', $path) .'.png';
-
-        return $icon;
-    }
-    /**
-     * Converts SE icon "number" into a proper path for /EN 
-     */
-    private function iconizeHR($number, $hq = false)
-    {
-        $number = intval($number);
-        $extended = (strlen($number) >= 6);
-
-        if ($number == 0) {
-            return null;
-        }
-
-        // create icon filename
-        $icon = $extended ? str_pad($number, 5, "0", STR_PAD_LEFT) : '0' . str_pad($number, 5, "0", STR_PAD_LEFT);
-
-        // create icon path
-        $path = [];
-        $path[] = $extended ? $icon[0] . $icon[1] . $icon[2] .'000' : '0'. $icon[1] . $icon[2] .'000';
-
-        $path[] = $icon;
-
-        // combine
-        $icon = implode('/', $path) .'_hr1.png';
+        $icon = implode("$encheck/", $path) ."$hrcheck.png";
 
         return $icon;
     }
