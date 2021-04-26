@@ -651,7 +651,7 @@ class NpcsPagesAll implements ParseInterface
                     case ($DataValue > 1179000) && ($DataValue < 1179999): //CHOCOBOTAXISTAND
                         $ChocoboTaxiCheck[] = $DataValue.",";
                         $FuncDataValue = $DataValue;
-                        $GetPorterArray[] = $this->GetChocoboTaxi($ChocoboTaxiStandCsv, $ChocoboTaxiCsv, $FuncDataValue);
+                        $GetPorterArray[] = $this->GetChocoboTaxi($ChocoboTaxiStandCsv, $ChocoboTaxiCsv, $FuncDataValue, $NameFormatted);
                     break;
                     case ($DataValue > 1440000) && ($DataValue < 1449999): //GCSHOP// omitted
                     break;
@@ -806,6 +806,12 @@ class NpcsPagesAll implements ParseInterface
                                             $DescriptionTitle = $DescriptionCsv->at($ShopID)['Text[Long]'];
                                             $HowToCheck[] = $DescriptionTitle.",";
                                         break;
+                                        case ($ShopID > 3470000) && ($ShopID < 3479999): //DISPOSAL SHOP
+                                            $FuncShop = $this->getShop($NameFormatted, "DisposalShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $ShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation,"");
+                                            $ShopCheck[] = $FuncShop["Name"].",";
+                                            $ShopOutputArray[] = $FuncShop["Shop"];
+                                            $TotalItems[$NameFormatted][] = $FuncShop["Number"];
+                                        break;
 
                                         default:
                                         break;
@@ -888,6 +894,12 @@ class NpcsPagesAll implements ParseInterface
                                 $DescriptionTitle = $DescriptionCsv->at($ShopID)['Text[Long]'];
                                 $HowToCheck[] = $DescriptionTitle.",";
                             break;
+                            case ($ShopID > 3470000) && ($ShopID < 3479999): //DISPOSAL SHOP
+                                $FuncShop = $this->getShop($NameFormatted, "DisposalShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $ShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation,"");
+                                $ShopCheck[] = $FuncShop["Name"].",";
+                                $ShopOutputArray[] = $FuncShop["Shop"];
+                                $TotalItems[$NameFormatted][] = $FuncShop["Number"];
+                            break;
 
                             default:
                             break;
@@ -926,11 +938,7 @@ class NpcsPagesAll implements ParseInterface
             $dataarray[$NameFormatted][] = $dataout;
             
             if (!empty($GetPorterArray) ) {
-                $PorterArray[] = "{{-start-}}
-                '''". $NameFormatted ."/". $id ."/Porter'''
-                {{Porter". implode("\n", $GetPorterArray). "
-                }}
-                {{-stop-}}";
+                $PorterArray[] = implode("\n", $GetPorterArray);
             }
         
         }
