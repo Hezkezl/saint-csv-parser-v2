@@ -76,11 +76,14 @@ class Quests implements ParseInterface
         $MapCsv = $this->csv("Map");
         $paramGrowCsv = $this->csv("ParamGrow");
         $EObjNameCsv = $this->csv("EObjName");
+        $ENpcBaseCsv = $this->csv("ENpcBase");
 
         $this->io->progressStart($questCsv->total);
         
         $this->PatchCheck($Patch, "Quest", $questCsv);
         $PatchNumber = $this->getPatch("Quest");
+
+        $LGBArray = $this->getLGBArray();
 
         //sort instance content out
         $ContentArray = [];
@@ -403,7 +406,13 @@ class Quests implements ParseInterface
             if ($quest['Issuer{Start}'] > 2000000) {
                 $questgiver = str_replace($IncorrectNames, $correctnames, ucwords(strtolower($EObjNameCsv->at($quest['Issuer{Start}'])['Singular']))) . " (Object)";
             } else {
-                $questgiver = str_replace($IncorrectNames, $correctnames, ucwords(strtolower($ENpcResidentCsv->at($quest['Issuer{Start}'])['Singular'])));
+                $issuerid = $quest['Issuer{Start}'];
+                if (!empty($LGBArray[$issuerid]['NearestPlaceName'])){
+                    $subLocation = $LGBArray[$issuerid]['NearestPlaceName'];
+                } else {
+                    $subLocation = "";
+                }
+                $questgiver = $this->NameFormat($issuerid, $ENpcResidentCsv, $ENpcBaseCsv, $subLocation, $LGBArray)['Name'];
             }
 
             //Start Quest Objectives / Journal Entry / Dialogue code
@@ -511,7 +520,13 @@ class Quests implements ParseInterface
                         foreach (range(0, 31) as $key) {
                             if ($quest["Script{Instruction}[$i]"] == "ACTOR{$key}") {
                                 if (!empty($ENpcResidentCsv->at($quest["Script{Arg}[$i]"])['Singular'])) {
-                                    $npcname = str_replace($IncorrectNames, $correctnames, ucwords(strtolower($ENpcResidentCsv->at($quest["Script{Arg}[$i]"])['Singular'])));
+                                    $npcid = $quest["Script{Arg}[$i]"];
+                                    if (!empty($LGBArray[$npcid]['NearestPlaceName'])){
+                                        $subLocation = $LGBArray[$npcid]['NearestPlaceName'];
+                                    } else {
+                                        $subLocation = "";
+                                    }
+                                    $npcname = $this->NameFormat($npcid, $ENpcResidentCsv, $ENpcBaseCsv, $subLocation, $LGBArray)['Name'];
                                     $NpcsInvolved[] = $npcname;
                                     $npcloc[] = "{{QuestNPC|Name=$npcname|ID=". $quest["Script{Arg}[$i]"] ."|Quest=". $quest['Name'] ."}}\n";
                                 }
@@ -571,7 +586,7 @@ class Quests implements ParseInterface
                         }
 
                         // build icon input folder paths
-                        $questIcon = $this->getInputFolder() .'/icon/'. $this->iconizeHR($quest['Icon']);
+                        $questIcon = $this->getInputFolder() .'/icon/'. $this->iconize($quest['Icon'], true);
 
                         $questiconFileName = "{$QuestIconOutputDirectory}/{$quest['Icon']}.png";
 
@@ -588,7 +603,17 @@ class Quests implements ParseInterface
             } else {
                 $Location = $PlaceNameCsv->at($MapCsv->at($LevelCsv->at($quest['Issuer{Location}'])['Map'])['PlaceName'])['Name'];
             }
-
+            $endnpc = "";
+            if (!empty($ENpcResidentCsv->at($quest["Target{End}"])['Singular'])) {
+                $npcid = $quest["Target{End}"];
+                if (!empty($LGBArray[$npcid]['NearestPlaceName'])){
+                    $subLocation = $LGBArray[$npcid]['NearestPlaceName'];
+                } else {
+                    $subLocation = "";
+                }
+                $npcname = $this->NameFormat($npcid, $ENpcResidentCsv, $ENpcBaseCsv, $subLocation, $LGBArray)['Name'];
+                $endnpc = "{{QuestNPC|Name=". $npcname ."|ID=". $quest["Target{End}"] ."|Quest=". $quest['Name'] ."|Questend=True}}\n";
+            }
             //---------------------------------------------------------------------------------
 
             $data = [
@@ -634,9 +659,7 @@ class Quests implements ParseInterface
                 '{description}' => $description,
                 '{npcs}' => "\n\n|NPCs Involved = $NpcsInvolved",
                 '{npcloc}' => implode($npcloc),
-                '{npclocend}' => (!empty($ENpcResidentCsv->at($quest["Target{End}"])['Singular'])) ? "{{QuestNPC|Name=".
-                    str_replace($IncorrectNames, $correctnames, ucwords(strtolower($ENpcResidentCsv->at($quest["Target{End}"])['Singular']))) ."|ID=".
-                    $quest["Target{End}"] ."|Quest=". $quest['Name'] ."|Questend=True}}\n" : "",
+                '{npclocend}' => $endnpc,
                 '{Locks}' => $SpecialChar,
                 '{instancecontent1}' => $InstanceContent1 ? "\n|Dungeon Requirement = ". $InstanceContent1 : "",
                 '{instancecontent2}' => $InstanceContent2 ? ", ". $InstanceContent2 : "",
