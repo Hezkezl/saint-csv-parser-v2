@@ -147,7 +147,154 @@ trait CsvParseTrait
             return $PatchArray;
         }
     }
-
+    /**
+     * Get LGB Array
+     */
+    public function getLGBArray() {
+        $ini = parse_ini_file('config.ini');
+        $PatchID = file_get_contents("{$ini['MainPath']}\game\\ffxivgame.ver");
+        $ENpcResidentCsv = $this->csv('ENpcResident');
+        $LevelCsv = $this->csv('Level');
+        $TerritoryTypeCsv = $this->csv('TerritoryType');
+        $PlaceNameCsv = $this->csv('PlaceName');
+        $MapCsv = $this->csv('Map');
+        $this->io->text("Producing LGB Array for npc names and access, This may take a while.");
+        foreach($LevelCsv->data as $id => $Level) {
+            if ($Level['Type'] != 8) continue;
+            $NPCID = $Level['Object'];
+            $Festival = 0;
+            if (!empty($NpcFestivalQuestArray[$NPCID])){
+                $Festival = $NpcFestivalQuestArray[$NPCID];
+            }
+            $Name = "";
+            $LGBArray[$NPCID] = array(
+                'Territory' => $Level['Territory'],
+                'x' => $Level['X'],
+                'y' => $Level['Z'],
+                'id' => $id,
+                'festivalID' => $Festival,
+                'festivalName' => $Name
+            );
+        }
+        foreach ($TerritoryTypeCsv->data as $id => $teri) {  
+            $code = $teri['Name'];
+            if (empty($code)) continue;
+            foreach(range(0,3) as $range) {
+                if ($range == 0) {
+                    $url = "cache/$PatchID/lgb/". $code ."_planlive.lgb.json";
+                } elseif ($range == 1) {
+                    $url = "cache/$PatchID/lgb/". $code ."_planevent.lgb.json";
+                } elseif ($range == 2) {
+                    $url = "cache/$PatchID/lgb/". $code ."_planmap.lgb.json";
+                } elseif ($range == 3) {
+                    $url = "cache/$PatchID/lgb/". $code ."_planner.lgb.json";
+                }
+                if (!file_exists($url)) continue;
+                $jdata = file_get_contents($url);
+                $decodeJdata = json_decode($jdata);
+                $Festival = 0;
+                foreach ($decodeJdata as $lgb) {
+                    $LayerID = $lgb->LayerId;
+                    $Name = $lgb->Name;
+                    $InstanceObjects = $lgb->InstanceObjects;
+                    $Festival = $lgb->FestivalID;
+                    $AssetType = "";
+                    foreach($InstanceObjects as $Object) {
+                        $AssetType = $Object->AssetType;
+                        $InstanceID = "";
+                        if (!empty($Object->InstanceId)) {
+                            $InstanceID = $Object->InstanceId;
+                        }
+                        $BaseId = "";
+                        $x = "";
+                        $y = "";
+                        if ($AssetType == 8) {
+                            $BaseId = "". $Object->Object->ParentData->ParentData->BaseId ."";
+                            $x = $Object->Transform->Translation->x;
+                            $y = $Object->Transform->Translation->z;
+                            $NPCID = $BaseId;
+                            if (!empty($NpcFestivalQuestArray[$NPCID])){
+                                if ($Festival === "0") {
+                                    $Festival = $NpcFestivalQuestArray[$NPCID];
+                                }
+                            }
+                            $LGBArray[$NPCID] = array(
+                                'Territory' => $id,
+                                'x' => $x,
+                                'y' => $y,
+                                'id' => $InstanceID,
+                                'festivalID' => $Festival,
+                                'festivalName' => $Name
+                            );
+                        }
+                    }
+                }
+            }
+        }
+        foreach($TerritoryTypeCsv->data as $id => $TerritoryTypeData) {
+            $JSONMapRangeArray = [];
+            $code = substr($TerritoryTypeData['Bg'], -4);
+            if (file_exists('cache/'. $PatchID .'/lgb/'. $code .'_planmap.lgb.json')) {
+                $url = 'cache/'. $PatchID .'/lgb/'. $code .'_planmap.lgb.json';
+                $jdata = file_get_contents($url);
+                $decodeJdata = json_decode($jdata);
+                foreach ($decodeJdata as $lgb) {
+                    $InstanceObjects = $lgb->InstanceObjects;
+                    foreach($InstanceObjects as $Object) {
+                        $AssetType = $Object->AssetType;
+                        if ($AssetType != 43) continue;
+                        if ($Object->Object->PlaceNameEnabled == 0) continue;
+                        $x = $Object->Transform->Translation->x;
+                        $y = $Object->Transform->Translation->z;
+                        $NpcLocX = $this->GetLGBPos($x, $y, $id, $TerritoryTypeCsv, $MapCsv)["X"];
+                        $NpcLocY = $this->GetLGBPos($x, $y, $id, $TerritoryTypeCsv, $MapCsv)["Y"];
+                        $PlaceName = $PlaceNameCsv->at($Object->Object->PlaceNameSpot)['Name'];
+                        if (empty($PlaceName)) {
+                            $PlaceName = $PlaceNameCsv->at($Object->Object->PlaceNameBlock)['Name'];
+                        }
+                        $JSONMapRangeArray[] = array(
+                            'placename' => $PlaceName,
+                            'x' => $NpcLocX,
+                            'y' => $NpcLocY,
+                            'code' => $code,
+                            'id' => $id
+                        );
+                    }
+                }
+                $JSONTeriArray[$id] = $JSONMapRangeArray;
+            }
+        }
+        foreach ($ENpcResidentCsv->data as $id => $NPCs) {
+            $subLocation = "";
+            if (!empty($LGBArray[$id]['Territory'])){
+                $Territory = $LGBArray[$id]['Territory'];
+                $X = $this->GetLGBPos($LGBArray[$id]['x'], $LGBArray[$id]['y'], $LGBArray[$id]['Territory'], $TerritoryTypeCsv, $MapCsv)["X"];
+                $Y = $this->GetLGBPos($LGBArray[$id]['x'], $LGBArray[$id]['y'], $LGBArray[$id]['Territory'], $TerritoryTypeCsv, $MapCsv)["Y"];
+                $keyarray = [];
+                foreach (range(0, 1000) as $i) {
+                    if (empty($JSONTeriArray[$Territory][$i]["x"])) break;
+                    $calcA = ($X - $JSONTeriArray[$Territory][$i]["x"]); 
+                    $calcB = ($Y - $JSONTeriArray[$Territory][$i]["y"]);
+                    $calcX = $calcA * $calcB;
+                    $keyarray[] = abs($calcX);
+                }
+                asort($keyarray);
+                $smallestNumber = key($keyarray);
+                if (empty($JSONTeriArray[$Territory][$smallestNumber]["placename"])) {
+                    $subLocation = "";
+                } else {
+                    $subLocation = $JSONTeriArray[$Territory][$smallestNumber]["placename"];
+                }
+                if (empty($subLocation)){
+                    $subLocation = $PlaceNameCsv->at($TerritoryTypeCsv->at($Territory)['PlaceName'])['Name'];
+                }
+                $LGBArray[$id]['NearestPlaceName'] = $subLocation;
+            }
+        }
+        $this->io->text("Done.");
+        
+        return $LGBArray;
+    }
 
     /**
      * Format NPC Names for Wiki
@@ -163,14 +310,14 @@ trait CsvParseTrait
             "Kee-satt", "Lewto-sai", "Lue-reeq", "Mao-ladd", "Mei-tatch", "Moa-mosch", "Mosha-moa", "Moshei-lea", "Nunsi-lue", "O-app-pesi", "Qeshi-rae",
             "Rae-qesh", "Rae-satt", "Raya-o-senna", "Renda-sue", "Riqi-mao", "Roi-tatch", "Rua-hann", "Sai-lewq", "Sai-qesh", "Sasha-rae", "Shai-satt",
             "Shai-tistt", "Shee-tatch", "Shira-kee", "Shue-hann", "Sue-lewq", "Tao-tistt", "Tatcha-mei", "Tatcha-roi", "Tio-reeq", "Tista-bie", "Tui-shirr",
-            "Vroi-reeq", "Zao-mosc", "Zia-bostt", "Zoi-chorr", "Zumie-moa", "Zumie-shai", "“", "”", "é", "ö", "2B", "�", "#", "&");
+            "Vroi-reeq", "Zao-mosc", "Zia-bostt", "Zoi-chorr", "Zumie-moa", "Zumie-shai", "“", "”", "é", "ö", "2B", "�", "#", "—",);
         $correctnames = array(" de ", " bas ", " mal ", " van ", " cen ", " sas ", " tol ", " zos ", " yae ", " the ", " of the ", " of ",
             "A-Ruhn-Senna", "A-Towa-Cant", "Bea-Chorr", "Bie-Zumm", "Bosta-Bea", "Bosta-Loe", "Chai-Nuzz", "Chei-Ladd", "Chora-Kai", "Chora-Lue",
             "Chue-Zumm", "Dulia-Chai", "E-Sumi-Yan", "E-Una-Kotor", "Fae-Hann", "Hangi-Rua", "Hanji-Fae", "Kai-Shirr", "Kan-E-Senna", "Kee-Bostt",
             "Kee-Satt", "Lewto-Sai", "Lue-Reeq", "Mao-Ladd", "Mei-Tatch", "Moa-Mosch", "Mosha-Moa", "Moshei-Lea", "Nunsi-Lue", "O-App-Pesi", "Qeshi-Rae",
             "Rae-Qesh", "Rae-Satt", "Raya-O-Senna", "Renda-Sue", "Riqi-Mao", "Roi-Tatch", "Rua-Hann", "Sai-Lewq", "Sai-Qesh", "Sasha-Rae", "Shai-Satt",
             "Shai-Tistt", "Shee-Tatch", "Shira-Kee", "Shue-Hann", "Sue-Lewq", "Tao-Tistt", "Tatcha-Mei", "Tatcha-Roi", "Tio-Reeq", "Tista-Bie", "Tui-Shirr",
-            "Vroi-Reeq", "Zao-Mosc", "Zia-Bostt", "Zoi-Chorr", "Zumie-Moa", "Zumie-Shai", "\"", "\"", "e", "o", "2b", "", "", "and");
+            "Vroi-Reeq", "Zao-Mosc", "Zia-Bostt", "Zoi-Chorr", "Zumie-Moa", "Zumie-Shai", "\"", "\"", "e", "o", "2b", "", "", "");
         $PLAddition = "";
         switch ($NameFormatted) {
             case "airship ticketer":
@@ -262,7 +409,6 @@ trait CsvParseTrait
             case "wounded imperial":
             case "wounded Resistance fighter":
             case "wunthyll":
-            case "Enie":
             case "amarokeep":
             case "merchant & mender":
             case "Calamity salvager":
@@ -270,6 +416,10 @@ trait CsvParseTrait
             case "estate maidservant":
             case "hokonin":
             case "journeyman salvager":
+            case "Rowena's representative":
+            case "Allagan commerce node":
+            case "Ananta junkmonger":
+            case "Namazu junkmonger":
                 $PLAddition = " ($PlaceNameLocation)";
                 if (empty($PlaceNameLocation)){
                     switch ($NameFormatted) {
@@ -283,6 +433,9 @@ trait CsvParseTrait
                         case "estate maidservant":
                         case "hokonin":
                         case "journeyman salvager":
+                        case "Allagan commerce node":
+                        case "Ananta junkmonger":
+                        case "Namazu junkmonger":
                             $PLAddition = " (Housing)";
                         break;
                         case 'storm soldier': //MSQ
@@ -297,7 +450,7 @@ trait CsvParseTrait
                         case 'serpent private':
                         case 'storm private':
                         case 'flame soldier':
-                        case 'imperial centurion':
+                        case "Imperial centurion":
                         case 'flame recruit':
                         case 'wounded imperial':
                             $PLAddition = " (MSQ)";
@@ -311,14 +464,20 @@ trait CsvParseTrait
                         case 'expedition scholar':
                         case 'traveling merchant':
                         case 'seasoned adventurer':
-                        case 'Enie':
                         case "journeyman salvager":
+                        case "Sultansworn elite":
+                        case "suspicious Coerthan":
+                        case "Keeper of the Entwined Serpents":
+                        case "Saucer attendant":
+                        case "Haermaga":
+                        case "Resistance fighter":
+                        case "Sultansworn Elite":
                             $PLAddition = " (Unknown)";
                         break;
                         
                         default:
-                            # code...
-                            break;
+                            $PLAddition = " (Unknown)";
+                        break;
                     }
                 }
             break;
@@ -386,8 +545,14 @@ trait CsvParseTrait
                 $RaceCsv = $this->csv('Race');
                 $nameRace = $RaceCsv->at($ENpcBaseCsv->at($NPCID)['Race'])['Masculine'];
                 $PLAddition = " ($nameRace)";
-            //break;
-            
+            break;
+            case "Celestine ":
+            case "giant beaver ":
+            case "Komainu":
+            case "Lightning":
+            case "tender lamb":
+                $PLAddition = " (NPC)";
+            break;            
             default:
                 # code...
             break;
@@ -408,12 +573,8 @@ trait CsvParseTrait
         if (stripos($NameFormatted,"�")){
             $output['IsEnglish'] = false; 
         }
-        if (($NameFormatted === "A") || 
-            ($NameFormatted === "B" )||
-            ($NameFormatted ===  "C")||
-            ($NameFormatted ===  "D")||
-            ($NameFormatted ===  "E"))
-            {
+        $KillArray = array("Â", "Â (Unknown)", "—", "(A", "(B", "(Unknown)", "A", "B", "C", "D", "E", ":", "—C()", "—D()", "—()", "Â()");
+        if (in_array($NameFormatted, $KillArray)) {
             $output['IsEnglish'] = false;
         }
         return $output;
@@ -707,7 +868,7 @@ trait CsvParseTrait
     /**
      * Get Specialshop items and name
      */
-    public function getShop($NpcName, $ShopType, $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $SpecialShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation) {
+    public function getShop($NpcName, $ShopType, $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $SpecialShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation,$TopicSelect) {
         $WeaponArray = [];
         $ArmorArray = [];
         $AccessoryArray = [];
@@ -719,9 +880,15 @@ trait CsvParseTrait
         $Other = "";
         $ShopOutput = [];
         $NumberItems = 0;
+        $oldarray = array("/",",",);
+        $newarray = array(" and ","");
+        $TopicSelectName = "";
+        if (!empty($TopicSelect)){
+            $TopicSelectName = "$TopicSelect - ";
+        }
         switch ($ShopType) {
             case 'SpecialShop':  
-                $ShopName = $SpecialShopCsv->at($SpecialShopID)["Name"];
+                $ShopName = str_ireplace($oldarray,$newarray,"$TopicSelectName".$SpecialShopCsv->at($SpecialShopID)["Name"]);
                 if (empty($ShopName)) { 
                     $ShopName = $SpecialShopID;
                 }
@@ -809,16 +976,16 @@ trait CsvParseTrait
                 asort($AccessoryArray);
                 asort($OtherArray);
                 if (!empty($WeaponArray)) {
-                    $Weapons = "|Weapons = \n". implode("\n", $WeaponArray). "\n";
+                    $Weapons = "|Weapons = \n". implode("\n", str_ireplace("&","and", $WeaponArray)). "\n";
                 }
                 if (!empty($ArmorArray)) {
-                    $Armor = "|Armor = \n".implode("\n", $ArmorArray). "\n";
+                    $Armor = "|Armor = \n".implode("\n", str_ireplace("&","and", $ArmorArray)). "\n";
                 }
                 if (!empty($AccessoryArray)) {
-                    $Accessory = "|Accessory = \n".implode("\n", $AccessoryArray). "\n";
+                    $Accessory = "|Accessory = \n".implode("\n", str_ireplace("&","and", $AccessoryArray)). "\n";
                 }
                 if (!empty($OtherArray)) {
-                    $Other = "|Misc = \n".implode("\n", $OtherArray). "\n";
+                    $Other = "|Misc = \n".implode("\n", str_ireplace("&","and", $OtherArray)). "\n";
                 }
                 $ShopOutputString = "{{-start-}}\n'''". $NpcName ."/". $ShopName ."'''\n";
                 $ShopOutputString .= "{{Shop\n";
@@ -855,124 +1022,270 @@ trait CsvParseTrait
                 $CollectablesShopRewardItemCsv = $this->csv('CollectablesShopRewardItem');
                 $CollectablesShopRewardScripCsv = $this->csv('CollectablesShopRewardScrip');
                 $CollectablesShopRefineCsv = $this->csv('CollectablesShopRefine');
+                $CollectablesShopItemGroupCsv = $this->csv('CollectablesShopItemGroup');
                 $CurrencyArray = $this->GetCurrency();
                 $QuestRequired = "";
                 if (!empty($QuestCsv->at($CollectablesShopCsv->at($SpecialShopID)["Quest"])["Name"])) {
                     $QuestRequired = "|Requires Quest = ". $QuestCsv->at($CollectablesShopCsv->at($SpecialShopID)["Quest"])["Name"];
                 }
 
-                $ShopName = $CollectablesShopCsv->at($SpecialShopID)["Name"];
+                $ShopName = str_ireplace($oldarray,$newarray,"$TopicSelectName".$CollectablesShopCsv->at($SpecialShopID)["Name"]);
                 if (empty($ShopName)) { 
                     $ShopName = $SpecialShopID;
                 }
                 foreach (range(0, 10) as $i) {
+                    switch($i) {
+                        case 0:
+                            $Class = "Carpenter";
+                        break;
+                        case 1:
+                            $Class = "Blacksmith";
+                        break;
+                        case 2:
+                            $Class = "Armorer";
+                        break;
+                        case 3:
+                            $Class = "Goldsmith";
+                        break;
+                        case 4:
+                            $Class = "Leatherworker";
+                        break;
+                        case 5:
+                            $Class = "Weaver";
+                        break;
+                        case 6:
+                            $Class = "Alchemist";
+                        break;
+                        case 7:
+                            $Class = "Culinarian";
+                        break;
+                        case 8:
+                            $Class = "Miner";
+                        break;
+                        case 9:
+                            $Class = "Botanist";
+                        break;
+                        case 10:
+                            $Class = "Fisher";
+                        break;
+                    }
+                    $OtherArray = [];
                     $ShopItemID = $CollectablesShopCsv->at($SpecialShopID)["ShopItems[$i]"];
+                    $countarray = [];
+                    $CountCheck = false;
+                    foreach(range(0,999) as $e) {
+                        $SubDataValue = "". $ShopItemID .".". $e ."";
+                        if (empty($ItemCsv->at($CollectablesShopItemCsv->at($SubDataValue)['Item'])['Name'])) break;
+                        $countarray[] = $e;
+                    }
+                    $Count = count($countarray);
+                    $Count = ($Count * 3);
+                    if ($Count > 84){
+                        $CountCheck = true;
+                    }
                     foreach(range(0,999) as $b) {
                         $number = $b + 1;
                         $SubDataValue = "". $ShopItemID .".". $b ."";
+                        $GroupID = $CollectablesShopItemCsv->at($SubDataValue)['CollectablesShopItemGroup'];
                         if (empty($ItemCsv->at($CollectablesShopItemCsv->at($SubDataValue)['Item'])['Name'])) break;
                         $Item = $ItemCsv->at($CollectablesShopItemCsv->at($SubDataValue)['Item'])['Name'];
-                        foreach(range(0,2) as $a) {
+                        //special switch for collectable dealer:
+                        switch ($NpcName) {
+                            case 'Collectable Dealer':
+                                $shopswitch = true;
+                            break;
+                            default:
+                                $shopswitch = false;
+                            break;
+                        }
+                        if ($shopswitch === true) {
+                            $number = $number + 1;
                             //gather rewards script 
                             $RewardType = $CollectablesShopCsv->at($SpecialShopID)['RewardType'];
                             $CollectabilityLink = $CollectablesShopItemCsv->at($SubDataValue)['CollectablesShopRefine'];
                             if ($RewardType === "1") {
                                 $RewardSheetLink = $CollectablesShopItemCsv->at($SubDataValue)['CollectablesShopRewardScrip'];
                                 $Currency = $ItemCsv->at($CurrencyArray[$CollectablesShopRewardScripCsv->at($RewardSheetLink)['Currency']])['Name'];
-                                switch ($a) {
-                                    case 0:
-                                        $RewardAmt = $CollectablesShopRewardScripCsv->at($RewardSheetLink)['LowReward'];
-                                        $collect1 = $CollectablesShopRefineCsv->at($CollectabilityLink)['LowCollectability'];
-                                        $collect2 = intval($CollectablesShopRefineCsv->at($CollectabilityLink)['MidCollectability']);
-                                        if ($collect2 > 0){
-                                            $collect2Calc = $collect2 - 1;
-                                            $Collectability = "$collect1 - $collect2Calc";
-                                        }else {
-                                            $Collectability = "$collect1+";
-                                        }
-                                    break;
-                                    case 1:
-                                        $RewardAmt = $CollectablesShopRewardScripCsv->at($RewardSheetLink)['MidReward'];
-                                        $collect1 = $CollectablesShopRefineCsv->at($CollectabilityLink)['MidCollectability'];
-                                        $collect2 = intval($CollectablesShopRefineCsv->at($CollectabilityLink)['HighCollectability']);
-                                        if ($collect2 > 0){
-                                            $collect2Calc = $collect2 - 1;
-                                            $Collectability = "$collect1 - $collect2Calc";
-                                        }else {
-                                            $Collectability = "$collect1+";
-                                        }
-                                    break;
-                                    case 2:
-                                        $RewardAmt = $CollectablesShopRewardScripCsv->at($RewardSheetLink)['HighReward'];
-                                        $collect1 = $CollectablesShopRefineCsv->at($CollectabilityLink)['HighCollectability'];
-                                        $Collectability = "$collect1+";
-                                    break;
+                                $RewardAmt = $CollectablesShopRewardScripCsv->at($RewardSheetLink)['LowReward'];
+                                $Collectability = $CollectablesShopRefineCsv->at($CollectabilityLink)['LowCollectability'];
+                                if ($CountCheck === false){
+                                    $OtherArray[] = "{{Sells3|$Currency|Quantity=$RewardAmt+|Cost1=$Item|Count1=1$QuestRequired|Collectable=$Collectability+}}";
                                 }
-                                $OtherArray[] = "{{Sells3|$Currency|Quantity=$RewardAmt|Cost1=$Item|Count1=1$QuestRequired|Collectable=$Collectability}}";
+                                if ($CountCheck === true){
+                                    $OtherArray[$GroupID][] = "{{Sells3|$Currency|Quantity=$RewardAmt+|Cost1=$Item|Count1=1$QuestRequired|Collectable=$Collectability+}}";
+                                }
                             }
                             if ($RewardType === "2") {
                                 $RewardSheetLink = $CollectablesShopItemCsv->at($SubDataValue)['CollectablesShopRewardScrip'];
-                                switch ($a) {
-                                    case 0:
-                                        $RewardAmt = $CollectablesShopRewardItemCsv->at($RewardSheetLink)['RewardLow'];
-                                        $collect1 = $CollectablesShopRefineCsv->at($CollectabilityLink)['LowCollectability'];
-                                        $collect2 = intval($CollectablesShopRefineCsv->at($CollectabilityLink)['MidCollectability']);
-                                        if ($collect2 > 0){
-                                            $collect2Calc = $collect2 - 1;
-                                            $Collectability = "$collect1 - $collect2Calc";
-                                        }else {
-                                            $Collectability = "$collect1+";
-                                        }
-                                    break;
-                                    case 1:
-                                        $RewardAmt = $CollectablesShopRewardItemCsv->at($RewardSheetLink)['RewardMid'];
-                                        $collect1 = $CollectablesShopRefineCsv->at($CollectabilityLink)['MidCollectability'];
-                                        $collect2 = intval($CollectablesShopRefineCsv->at($CollectabilityLink)['HighCollectability']);
-                                        if ($collect2 > 0){
-                                            $collect2Calc = $collect2 - 1;
-                                            $Collectability = "$collect1 - $collect2Calc";
-                                        }else {
-                                            $Collectability = "$collect1+";
-                                        }
-                                    break;
-                                    case 2:
-                                        $RewardAmt = $CollectablesShopRewardItemCsv->at($RewardSheetLink)['RewardHigh'];
-                                        $collect1 = $CollectablesShopRefineCsv->at($CollectabilityLink)['HighCollectability'];
-                                        $Collectability = "$collect1+";
-                                    break;
-                                }
+                                $RewardAmt = $CollectablesShopRewardItemCsv->at($RewardSheetLink)['RewardLow'];
+                                $collect1 = $CollectablesShopRefineCsv->at($CollectabilityLink)['LowCollectability'];
                                 $ItemReward = $ItemCsv->at($CollectablesShopRewardItemCsv->at($RewardSheetLink)['Item'])['Name'];
-                                $OtherArray[] = "{{Sells3|$ItemReward|Quantity=$RewardAmt|Cost1=$Item|Count1=1$QuestRequired|Collectable=$Collectability}}";
+                                if ($CountCheck === false){
+                                    $OtherArray[] = "{{Sells3|$ItemReward|Quantity=$RewardAmt+|Cost1=$Item|Count1=1$QuestRequired|Collectable=$Collectability+}}";
+                                }
+                                if ($CountCheck === true){
+                                    $OtherArray[$GroupID][] = "{{Sells3|$ItemReward|Quantity=$RewardAmt+|Cost1=$Item|Count1=1$QuestRequired|Collectable=$Collectability+}}";
+                                }
+                            }
+
+                        } 
+                        if ($shopswitch === false) {
+                            foreach(range(0,2) as $a) {
+                                $number = $number + 1;
+                                //gather rewards script 
+                                $RewardType = $CollectablesShopCsv->at($SpecialShopID)['RewardType'];
+                                $CollectabilityLink = $CollectablesShopItemCsv->at($SubDataValue)['CollectablesShopRefine'];
+                                if ($RewardType === "1") {
+                                    $RewardSheetLink = $CollectablesShopItemCsv->at($SubDataValue)['CollectablesShopRewardScrip'];
+                                    $Currency = $ItemCsv->at($CurrencyArray[$CollectablesShopRewardScripCsv->at($RewardSheetLink)['Currency']])['Name'];
+                                    switch ($a) {
+                                        case 0:
+                                            $RewardAmt = $CollectablesShopRewardScripCsv->at($RewardSheetLink)['LowReward'];
+                                            $collect1 = $CollectablesShopRefineCsv->at($CollectabilityLink)['LowCollectability'];
+                                            $collect2 = intval($CollectablesShopRefineCsv->at($CollectabilityLink)['MidCollectability']);
+                                            if ($collect2 > 0){
+                                                $collect2Calc = $collect2 - 1;
+                                                $Collectability = "$collect1 - $collect2Calc";
+                                            }else {
+                                                $Collectability = "$collect1+";
+                                            }
+                                        break;
+                                        case 1:
+                                            $RewardAmt = $CollectablesShopRewardScripCsv->at($RewardSheetLink)['MidReward'];
+                                            $collect1 = $CollectablesShopRefineCsv->at($CollectabilityLink)['MidCollectability'];
+                                            $collect2 = intval($CollectablesShopRefineCsv->at($CollectabilityLink)['HighCollectability']);
+                                            if ($collect2 > 0){
+                                                $collect2Calc = $collect2 - 1;
+                                                $Collectability = "$collect1 - $collect2Calc";
+                                            }else {
+                                                $Collectability = "$collect1+";
+                                            }
+                                        break;
+                                        case 2:
+                                            $RewardAmt = $CollectablesShopRewardScripCsv->at($RewardSheetLink)['HighReward'];
+                                            $collect1 = $CollectablesShopRefineCsv->at($CollectabilityLink)['HighCollectability'];
+                                            $Collectability = "$collect1+";
+                                        break;
+                                    }
+                                    if ($CountCheck === false){
+                                        $OtherArray[] = "{{Sells3|$Currency|Quantity=$RewardAmt|Cost1=$Item|Count1=1$QuestRequired|Collectable=$Collectability}}";
+                                    }
+                                    if ($CountCheck === true){
+                                        $OtherArray[$GroupID][] = "{{Sells3|$Currency|Quantity=$RewardAmt|Cost1=$Item|Count1=1$QuestRequired|Collectable=$Collectability}}";
+                                    }
+                                }
+                                if ($RewardType === "2") {
+                                    $RewardSheetLink = $CollectablesShopItemCsv->at($SubDataValue)['CollectablesShopRewardScrip'];
+                                    switch ($a) {
+                                        case 0:
+                                            $RewardAmt = $CollectablesShopRewardItemCsv->at($RewardSheetLink)['RewardLow'];
+                                            $collect1 = $CollectablesShopRefineCsv->at($CollectabilityLink)['LowCollectability'];
+                                            $collect2 = intval($CollectablesShopRefineCsv->at($CollectabilityLink)['MidCollectability']);
+                                            if ($collect2 > 0){
+                                                $collect2Calc = $collect2 - 1;
+                                                $Collectability = "$collect1 - $collect2Calc";
+                                            }else {
+                                                $Collectability = "$collect1+";
+                                            }
+                                        break;
+                                        case 1:
+                                            $RewardAmt = $CollectablesShopRewardItemCsv->at($RewardSheetLink)['RewardMid'];
+                                            $collect1 = $CollectablesShopRefineCsv->at($CollectabilityLink)['MidCollectability'];
+                                            $collect2 = intval($CollectablesShopRefineCsv->at($CollectabilityLink)['HighCollectability']);
+                                            if ($collect2 > 0){
+                                                $collect2Calc = $collect2 - 1;
+                                                $Collectability = "$collect1 - $collect2Calc";
+                                            }else {
+                                                $Collectability = "$collect1+";
+                                            }
+                                        break;
+                                        case 2:
+                                            $RewardAmt = $CollectablesShopRewardItemCsv->at($RewardSheetLink)['RewardHigh'];
+                                            $collect1 = $CollectablesShopRefineCsv->at($CollectabilityLink)['HighCollectability'];
+                                            $Collectability = "$collect1+";
+                                        break;
+                                    }
+                                    $ItemReward = $ItemCsv->at($CollectablesShopRewardItemCsv->at($RewardSheetLink)['Item'])['Name'];
+                                    if ($CountCheck === false){
+                                        $OtherArray[] = "{{Sells3|$ItemReward|Quantity=$RewardAmt|Cost1=$Item|Count1=1$QuestRequired|Collectable=$Collectability}}";
+                                    }
+                                    if ($CountCheck === true){
+                                        $OtherArray[$GroupID][] = "{{Sells3|$ItemReward|Quantity=$RewardAmt|Cost1=$Item|Count1=1$QuestRequired|Collectable=$Collectability}}";
+                                    }
+                                }
+                            }
+
+                        }
+                        
+                    }
+                    if ($CountCheck === false){
+                        usort($OtherArray, function($a, $b) {
+                            $cmp = strcmp(preg_replace('/\d+/', '', $a), preg_replace('/\d+/', '', $b));
+                            if ($cmp) {
+                                return $cmp;
+                            } else {
+                                return strnatcmp($a, $b);
+                            }
+                        });
+                        if (!empty($OtherArray)) {
+                            $Other = "|Misc = \n".implode("\n", str_ireplace("&","and", $OtherArray)). "\n";
+                        }
+                        $ShopOutputString = "{{-start-}}\n'''". $NpcName ."/". $ShopName ."-$Class'''\n";
+                        $ShopOutputString .= "{{Shop\n";
+                        $ShopOutputString .= "| Shop Name = $ShopName-$Class\n";
+                        $ShopOutputString .= "| NPC Name = $NpcName\n";
+                        $ShopOutputString .= "| Location = $NpcPlaceName\n";
+                        $ShopOutputString .= "| Coordinates = $CoordLocation\n";
+                        $ShopOutputString .= "| Total Items = $number\n";
+                        $ShopOutputString .= "$QuestRequired\n";
+                        $ShopOutputString .= "| Shop = \n";
+                        $ShopOutputString .= "{{Tabsells3\n";
+                        $ShopOutputString .= "$Other\n";
+                        $ShopOutputString .= "\n}}\n}}\n{{-stop-}}";
+                        $ShopOutputArray[] = $ShopOutputString;
+                        $ShopOutputNamesArray[] = "$ShopName-$Class";
+                    }
+                    if ($CountCheck === true){
+                        $grouparrayoutput = [];
+                        foreach ($OtherArray as $key => $value) {
+                            if (!empty($value)) {
+                                usort($value, function($a, $b) {
+                                    $cmp = strcmp(preg_replace('/\d+/', '', $a), preg_replace('/\d+/', '', $b));
+                                    if ($cmp) {
+                                        return $cmp;
+                                    } else {
+                                        return strnatcmp($a, $b);
+                                    }
+                                });
+                                $CountNoItems = count($value);
+                                $grouparrayoutput = "|Misc = \n".implode("\n", str_ireplace("&","and", $value)). "\n";
+                                $Group = "UNKNOWNGROUPNAME";
+                                if (!empty($CollectablesShopItemGroupCsv->at($key)['Name'])){
+                                    $Group = $CollectablesShopItemGroupCsv->at($key)['Name'];
+                                }
+                                $ShopOutputString = "{{-start-}}\n'''". $NpcName ."/". $ShopName ."-$Class-$Group'''\n";
+                                $ShopOutputString .= "{{Shop\n";
+                                $ShopOutputString .= "| Shop Name = $ShopName-$Class-$Group\n";
+                                $ShopOutputString .= "| NPC Name = $NpcName\n";
+                                $ShopOutputString .= "| Location = $NpcPlaceName\n";
+                                $ShopOutputString .= "| Coordinates = $CoordLocation\n";
+                                $ShopOutputString .= "| Total Items = $CountNoItems\n";
+                                $ShopOutputString .= "$QuestRequired\n";
+                                $ShopOutputString .= "| Shop = \n";
+                                $ShopOutputString .= "{{Tabsells3\n";
+                                $ShopOutputString .= "$grouparrayoutput\n";
+                                $ShopOutputString .= "\n}}\n}}\n{{-stop-}}";
+                                $ShopOutputArray[] = $ShopOutputString;
+                                $ShopOutputNamesArray[] = "$ShopName-$Class-$Group";
                             }
                         }
                     }
                 }
-                //asort($OtherArray);
-                usort($OtherArray, function($a, $b) {
-                    $cmp = strcmp(preg_replace('/\d+/', '', $a), preg_replace('/\d+/', '', $b));
-                    if ($cmp) {
-                        return $cmp;
-                    } else {
-                        return strnatcmp($a, $b);
-                    }
-                });
-                if (!empty($OtherArray)) {
-                    $Other = "|Misc = \n".implode("\n", $OtherArray). "\n";
-                }
-                $ShopOutputString = "{{-start-}}\n'''". $NpcName ."/". $ShopName ."'''\n";
-                $ShopOutputString .= "{{Shop\n";
-                $ShopOutputString .= "| Shop Name = $ShopName\n";
-                $ShopOutputString .= "| NPC Name = $NpcName\n";
-                $ShopOutputString .= "| Location = $NpcPlaceName\n";
-                $ShopOutputString .= "| Coordinates = $CoordLocation\n";
-                $ShopOutputString .= "| Total Items = $number\n";
-                $ShopOutputString .= "| Requires Quest = $QuestRequired\n";
-                $ShopOutputString .= "| Shop = \n";
-                $ShopOutputString .= "{{Tabsells3\n";
-
+                $ShopOutputStringImp = implode("\n",$ShopOutputArray);
+                $ShopOutputNames = implode(",",$ShopOutputNamesArray);
                 $ShopOutput["Number"] = $number;
-                $ShopOutput["Shop"] = "\n$ShopOutputString\n$Other\n}}\n}}\n{{-stop-}}";
-                $ShopOutput["Name"] = $ShopName;
+                $ShopOutput["Shop"] = "$ShopOutputStringImp";
+                $ShopOutput["Name"] = $ShopOutputNames;
                 return $ShopOutput;
             break;
             case 'GilShop':
@@ -981,7 +1294,7 @@ trait CsvParseTrait
                 if (!empty($QuestCsv->at($GilShopCsv->at($DataValue)['Quest'])['Name'])) {
                     $GilShopRequiredQuest = "|Requires Quest =". $QuestCsv->at($GilShopCsv->at($DataValue)['Quest'])['Name']."\n";
                 }
-                $ShopName = $GilShopCsv->at($DataValue)['Name'];
+                $ShopName = str_ireplace($oldarray,$newarray,"$TopicSelectName".$GilShopCsv->at($DataValue)['Name']);
                 if (empty($ShopName)) { 
                     $ShopName = $SpecialShopID;
                 }
@@ -1006,10 +1319,14 @@ trait CsvParseTrait
                         $GilShopSellsItem = $ItemCsv->at($GilShopItemCsv->at($GilShopSubArray)["Item"])["Name"];
                         $GilShopSellsItemCost = $ItemCsv->at($GilShopItemCsv->at($GilShopSubArray)["Item"])["Price{Mid}"];
                         $RowRequiredArray = [];
-                        foreach(range(0,2) as $c) {
+                        foreach(range(0,1) as $c) {
                             if (empty($QuestCsv->at($GilShopItemCsv->at($GilShopSubArray)["Row{Required}[$c]"])["Name"])) continue;
                             $RequiredQuest = $QuestCsv->at($GilShopItemCsv->at($GilShopSubArray)["Row{Required}[$c]"])["Name"];
                             $RowRequiredArray[] = "|Requires Quest = ". $RequiredQuest;
+                        }
+                        if (!empty($AchievementCsv->at($GilShopItemCsv->at($GilShopSubArray)["Row{Required}[2]"])["Name"])){
+                            $Requiredachievement = $AchievementCsv->at($GilShopItemCsv->at($GilShopSubArray)["Row{Required}[$c]"])["Name"];
+                            $RowRequiredArray[] = "|Requires Achievement = ". $Requiredachievement;
                         }
                         $NumberItems = $b + 1;
                         $RowRequired = implode("\n", $RowRequiredArray);
@@ -1069,16 +1386,16 @@ trait CsvParseTrait
                 asort($AccessoryArray);
                 asort($OtherArray);
                 if (!empty($WeaponArray)) {
-                    $Weapons = "|Weapons = \n". implode("\n", $WeaponArray). "\n";
+                    $Weapons = "|Weapons = \n". implode("\n", str_ireplace("&","and", $WeaponArray)). "\n";
                 }
                 if (!empty($ArmorArray)) {
-                    $Armor = "|Armor = \n".implode("\n", $ArmorArray). "\n";
+                    $Armor = "|Armor = \n".implode("\n", str_ireplace("&","and", $ArmorArray)). "\n";
                 }
                 if (!empty($AccessoryArray)) {
-                    $Accessory = "|Accessory = \n".implode("\n", $AccessoryArray). "\n";
+                    $Accessory = "|Accessory = \n".implode("\n", str_ireplace("&","and", $AccessoryArray)). "\n";
                 }
                 if (!empty($OtherArray)) {
-                    $Other = "|Misc = \n".implode("\n", $OtherArray). "\n";
+                    $Other = "|Misc = \n".implode("\n", str_ireplace("&","and", $OtherArray)). "\n";
                 }
                 $ShopOutputString = "{{-start-}}\n'''". $NpcName ."/". $ShopName ."'''\n";
                 $ShopOutputString .= "{{Shop\n";
@@ -1100,7 +1417,7 @@ trait CsvParseTrait
                 $DataValue = $SpecialShopID;
                 $DisposalShopCsv = $this->csv('DisposalShop');
                 $DisposalShopItemCsv = $this->csv('DisposalShopItem');
-                $ShopName = $DisposalShopCsv->at($DataValue)['ShopName'];
+                $ShopName = str_ireplace($oldarray,$newarray,"$TopicSelectName".$DisposalShopCsv->at($DataValue)['ShopName']);
                 if (empty($ShopName)) { 
                     $ShopName = $SpecialShopID;
                 }
@@ -1167,16 +1484,16 @@ trait CsvParseTrait
                 asort($AccessoryArray);
                 asort($OtherArray);
                 if (!empty($WeaponArray)) {
-                    $Weapons = "|Weapons = \n". implode("\n", $WeaponArray). "\n";
+                    $Weapons = "|Weapons = \n". implode("\n", str_ireplace("&","and", $WeaponArray)). "\n";
                 }
                 if (!empty($ArmorArray)) {
-                    $Armor = "|Armor = \n".implode("\n", $ArmorArray). "\n";
+                    $Armor = "|Armor = \n".implode("\n", str_ireplace("&","and", $ArmorArray)). "\n";
                 }
                 if (!empty($AccessoryArray)) {
-                    $Accessory = "|Accessory = \n".implode("\n", $AccessoryArray). "\n";
+                    $Accessory = "|Accessory = \n".implode("\n", str_ireplace("&","and", $AccessoryArray)). "\n";
                 }
                 if (!empty($OtherArray)) {
-                    $Other = "|Misc = \n".implode("\n", $OtherArray). "\n";
+                    $Other = "|Misc = \n".implode("\n", str_ireplace("&","and", $OtherArray)). "\n";
                 }
                 $ShopOutputString = "{{-start-}}\n'''". $NpcName ."/". $ShopName ."'''\n";
                 $ShopOutputString .= "{{Shop\n";
@@ -1196,7 +1513,7 @@ trait CsvParseTrait
             case 'LotteryExchangeShop':
                 $DataValue = $SpecialShopID;
                 $LotteryExchangeShopCsv = $this->csv('LotteryExchangeShop');
-                $ShopName = $SpecialShopID;
+                $ShopName = "$TopicSelectName".$SpecialShopID;
 
                 foreach(range(0,23) as $b) {
                     if (empty($ItemCsv->at($LotteryExchangeShopCsv->at($DataValue)["ItemAccepted[$b]"]))) continue;
@@ -1258,16 +1575,16 @@ trait CsvParseTrait
                 asort($AccessoryArray);
                 asort($OtherArray);
                 if (!empty($WeaponArray)) {
-                    $Weapons = "|Weapons = \n". implode("\n", $WeaponArray). "\n";
+                    $Weapons = "|Weapons = \n". implode("\n", str_ireplace("&","and", $WeaponArray)). "\n";
                 }
                 if (!empty($ArmorArray)) {
-                    $Armor = "|Armor = \n".implode("\n", $ArmorArray). "\n";
+                    $Armor = "|Armor = \n".implode("\n", str_ireplace("&","and", $ArmorArray)). "\n";
                 }
                 if (!empty($AccessoryArray)) {
-                    $Accessory = "|Accessory = \n".implode("\n", $AccessoryArray). "\n";
+                    $Accessory = "|Accessory = \n".implode("\n", str_ireplace("&","and", $AccessoryArray)). "\n";
                 }
                 if (!empty($OtherArray)) {
-                    $Other = "|Misc = \n".implode("\n", $OtherArray). "\n";
+                    $Other = "|Misc = \n".implode("\n", str_ireplace("&","and", $OtherArray)). "\n";
                 }
                 $ShopOutputString = "{{-start-}}\n'''". $NpcName ."/". $ShopName ."'''\n";
                 $ShopOutputString .= "{{Shop\n";

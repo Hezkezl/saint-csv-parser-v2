@@ -88,6 +88,8 @@ class NpcsPagesAll implements ParseInterface
         $this->PatchCheck($Patch, "ENpcResident", $ENpcResidentCsv);
         $PatchNumber = $this->getPatch("ENpcResident");
         $NpcPatchArray = [];
+        //get mius ups and downs
+        $MiuUpsDownsArray = json_decode("https://raw.githubusercontent.com/ffxiv-teamcraft/ffxiv-teamcraft/staging/apps/client/src/assets/data/territory-layers.json");
 
         //Get Fesitval ID's
 
@@ -242,7 +244,6 @@ class NpcsPagesAll implements ParseInterface
             }
         }
         $this->io->progressFinish();
-        //var_dump($LGBArray['1034078']['Territory']);
 
         
             
@@ -251,11 +252,13 @@ class NpcsPagesAll implements ParseInterface
         foreach ($ENpcResidentCsv->data as $id => $NPCs) {
             $this->io->progressAdvance();
             $subLocation = "";
+            $keyarray = [];
             if (!empty($LGBArray[$id]['Territory'])){
                 $Territory = $LGBArray[$id]['Territory'];
-                $X = $LGBArray[$id]['x'];
-                $Y = $LGBArray[$id]['y'];
-                $keyarray = [];
+                //$X = $LGBArray[$id]['x'];
+                //$Y = $LGBArray[$id]['y'];
+                $X = $this->GetLGBPos($LGBArray[$id]['x'], $LGBArray[$id]['y'], $LGBArray[$id]['Territory'], $TerritoryTypeCsv, $MapCsv)["X"];
+                $Y = $this->GetLGBPos($LGBArray[$id]['x'], $LGBArray[$id]['y'], $LGBArray[$id]['Territory'], $TerritoryTypeCsv, $MapCsv)["Y"];
                 foreach (range(0, 1000) as $i) {
                     if (empty($JSONTeriArray[$Territory][$i]["x"])) break;
                     $calcA = ($X - $JSONTeriArray[$Territory][$i]["x"]); 
@@ -275,7 +278,7 @@ class NpcsPagesAll implements ParseInterface
                 }
             }
             $NameFormatted = $this->NameFormat($id, $ENpcResidentCsv, $ENpcBaseCsv, $subLocation, $LGBArray);
-            $NPCNameLocationArrray[$id] = $subLocation;
+            $NPCNameLocationArrray[$id] = str_replace("#","",$subLocation);
         }
         $this->io->progressFinish();
 
@@ -331,8 +334,8 @@ class NpcsPagesAll implements ParseInterface
             $subLocation = "";
             if (!empty($LGBArray[$id]['Territory'])){
                 $Territory = $LGBArray[$id]['Territory'];
-                $X = $LGBArray[$id]['x'];
-                $Y = $LGBArray[$id]['y'];
+                $X = $this->GetLGBPos($LGBArray[$id]['x'], $LGBArray[$id]['y'], $LGBArray[$id]['Territory'], $TerritoryTypeCsv, $MapCsv)["X"];
+                $Y = $this->GetLGBPos($LGBArray[$id]['x'], $LGBArray[$id]['y'], $LGBArray[$id]['Territory'], $TerritoryTypeCsv, $MapCsv)["Y"];
                 $keyarray = [];
                 foreach (range(0, 1000) as $i) {
                     if (empty($JSONTeriArray[$Territory][$i]["x"])) break;
@@ -371,13 +374,20 @@ class NpcsPagesAll implements ParseInterface
                     $sub = "";
                 }
                 $code = substr($NpcMapCodeName, 0, 4);
-                //if ($code == "z3e2") {
-                //    $NpcPlaceName = "The Prima Vista Tiring Room";
-                //}
-                $BasePlaceName = "$code - {$MapName}{$sub}";
-    
-                $LevelID = $LGBArray[$id]['id'];
-                $MapArray[] = $MapOutputString;
+                if ($code == "z3e2") {
+                    $NpcPlaceName = "The Prima Vista Tiring Room";
+                }
+                if ($code == "f1d9") {
+                    $NpcPlaceName = "The Haunted Manor";
+                }
+                if (empty($NpcPlaceName)) {
+                    if (!empty($MapName)){
+                        $NpcPlaceName = $MapName;
+                    }
+                    if (empty($MapName)){
+                        $NpcPlaceName = "";
+                    }
+                }
             }
             
             $NameFunc = $this->NameFormat($id, $ENpcResidentCsv, $ENpcBaseCsv, $NPCNameLocationArrray[$id], $LGBArray);
@@ -446,7 +456,7 @@ class NpcsPagesAll implements ParseInterface
                         $WarpPagesArray[] = $WarpString;
                     break;
                     case ($DataValue > 262100) && ($DataValue < 269999): //GILSHOP
-                        $FuncShop = $this->getShop($NameFormatted, "GilShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $DataValue, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
+                        $FuncShop = $this->getShop($NameFormatted, "GilShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $DataValue, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation,"");
                         $ShopOutputArray[] = $FuncShop["Shop"];
                         $ShopDialogueArray[] = $FuncShop["Dialogue"];
                         if(!empty($FuncShop["Dialogue"])){
@@ -491,7 +501,7 @@ class NpcsPagesAll implements ParseInterface
                     case ($DataValue > 720000) && ($DataValue < 729999): //CUSTOMTALK
                         $CollectableShopCheck = $CustomTalkCsv->at($DataValue)["SpecialLinks"];
                         if ($CollectableShopCheck >= 3866620 && $CollectableShopCheck < 3866999){//COLLECTABLESHOPS
-                            $FuncShop = $this->getShop($NameFormatted, "CollectablesShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $CollectableShopCheck, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
+                            $FuncShop = $this->getShop($NameFormatted, "CollectablesShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $CollectableShopCheck, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation,"");
                             $ShopCheck[] = $FuncShop["Name"].",";
                             $ShopOutputArray[] = $FuncShop["Shop"];
                             $TotalItems[$NameFormatted][] = $FuncShop["Number"];
@@ -511,14 +521,14 @@ class NpcsPagesAll implements ParseInterface
                                 case (strpos($Instruction, 'SHOP') !== false):
                                     switch (true) {
                                         case ($Argument > 262100) && ($Argument < 269999): //GILSHOP
-                                            $FuncShop = $this->getShop($NameFormatted, "GilShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $Argument, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
+                                            $FuncShop = $this->getShop($NameFormatted, "GilShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $Argument, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation,"");
                                             $ShopOutputArray[] = $FuncShop["Shop"];
                                             $ShopDialogueArray[] = $FuncShop["Dialogue"];
                                             $TotalItems[$NameFormatted][] = $FuncShop["Number"];
                                             $ShopCheck[] = $FuncShop["Name"].",";
                                         break;
                                         case ($Argument > 1769000) && ($Argument < 1779999)://SPECIALSHOP
-                                            $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $Argument, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
+                                            $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $Argument, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation,"");
                                             $ShopOutputArray[] = $FuncShop["Shop"];
                                             $ShopDialogueArray[] = $FuncShop["Dialogue"];
                                             $TotalItems[$NameFormatted][] = $FuncShop["Number"];
@@ -569,7 +579,7 @@ class NpcsPagesAll implements ParseInterface
                                 $NestDataValue = $CustomTalkNestHandlersCsv->at("". $DataValue. ".". $b ."")['NestHandler'];
                                 switch (true) {
                                     case ($NestDataValue > 262100) && ($NestDataValue < 269999)://Gilshop
-                                        $FuncShop = $this->getShop($NameFormatted, "GilShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $NestDataValue, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
+                                        $FuncShop = $this->getShop($NameFormatted, "GilShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $NestDataValue, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation,"");
                                         $ShopOutputArray[] = $FuncShop["Shop"];
                                         $ShopDialogueArray[] = $FuncShop["Dialogue"];
                                         if(!empty($FuncShop["Dialogue"])){
@@ -579,7 +589,7 @@ class NpcsPagesAll implements ParseInterface
                                         $ShopCheck[] = $FuncShop["Name"].",";
                                     break;
                                     case ($NestDataValue > 1769000) && ($NestDataValue < 1779999)://SPECIALSHOP
-                                        $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $NestDataValue, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
+                                        $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $NestDataValue, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation,"");
                                         $ShopOutputArray[] = $FuncShop["Shop"];
                                         $ShopDialogueArray[] = $FuncShop["Dialogue"];
                                         if(!empty($FuncShop["Dialogue"])){
@@ -589,13 +599,13 @@ class NpcsPagesAll implements ParseInterface
                                         $ShopCheck[] = $FuncShop["Name"].",";
                                     break;
                                     case ($NestDataValue > 3407872) && ($NestDataValue < 3409999)://LotteryExchangeShop
-                                        $FuncShop = $this->getShop($NameFormatted, "LotteryExchangeShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $NestDataValue, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
+                                        $FuncShop = $this->getShop($NameFormatted, "LotteryExchangeShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $NestDataValue, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation,"");
                                         $ShopCheck[] = $FuncShop["Name"].",";
                                         $ShopOutputArray[] = $FuncShop["Shop"];
                                         $TotalItems[$NameFormatted][] = $FuncShop["Number"];
                                     break;
                                     case ($NestDataValue > 3470000) && ($NestDataValue < 3479999)://disposal
-                                        $FuncShop = $this->getShop($NameFormatted, "DisposalShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $NestDataValue, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
+                                        $FuncShop = $this->getShop($NameFormatted, "DisposalShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $NestDataValue, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation,"");
                                         $ShopCheck[] = $FuncShop["Name"].",";
                                         $ShopOutputArray[] = $FuncShop["Shop"];
                                         $TotalItems[$NameFormatted][] = $FuncShop["Number"];
@@ -650,7 +660,7 @@ class NpcsPagesAll implements ParseInterface
                     case ($DataValue > 1570000) && ($DataValue < 1579999): //GUILDORDEROFFICER// omitted
                     break;
                     case ($DataValue > 1769000) && ($DataValue < 1779999)://SPECIALSHOP
-                        $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $DataValue, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
+                        $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $DataValue, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation,"");
                         $ShopOutputArray[] = $FuncShop["Shop"];
                         $ShopDialogueArray[] = $FuncShop["Dialogue"];
                         $TotalItems[$NameFormatted][] = $FuncShop["Number"];
@@ -732,9 +742,10 @@ class NpcsPagesAll implements ParseInterface
                         foreach(range(0,9) as $a) {
                             if ($TopicSelectCsv->at($DataValue)["Shop[$a]"] == 0) continue;
                             $ShopLink = $TopicSelectCsv->at($DataValue)["Shop[$a]"];
+                            $TopicSelectName = $TopicSelectCsv->at($DataValue)["Name"];
                             switch (true) {
                                 case ($ShopLink >= 262000 && $ShopLink < 264000): //gilshop
-                                    $FuncShop = $this->getShop($NameFormatted, "GilShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $ShopLink, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
+                                    $FuncShop = $this->getShop($NameFormatted, "GilShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $ShopLink, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation,$TopicSelectName);
                                     $ShopOutputArray[] = $FuncShop["Shop"];
                                     $ShopDialogueArray[] = $FuncShop["Dialogue"];
                                     $TotalItems[$NameFormatted][] = $FuncShop["Number"];
@@ -747,7 +758,7 @@ class NpcsPagesAll implements ParseInterface
                                     $ShopID = $PreHandlerCsv->at($ShopLink)["Target"];
                                     switch (true) {
                                         case ($ShopID > 262100 && $ShopID < 269999): //gilshop
-                                            $FuncShop = $this->getShop($NameFormatted, "GilShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $ShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
+                                            $FuncShop = $this->getShop($NameFormatted, "GilShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $ShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation,$TopicSelectName);
                                             $ShopOutputArray[] = $FuncShop["Shop"];
                                             $ShopDialogueArray[] = $FuncShop["Dialogue"];
                                             $TotalItems[$NameFormatted][] = $FuncShop["Number"];
@@ -757,7 +768,7 @@ class NpcsPagesAll implements ParseInterface
                                             $ShopCheck[] = $FuncShop["Name"].",";
                                         break;
                                         case ($ShopID >= 1769000 && $ShopID < 1779999): //specialshop
-                                            $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $ShopID, $DefaultTalkCsv, $ShopID, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
+                                            $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $ShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation,$TopicSelectName);
                                             $ShopOutputArray[] = $FuncShop["Shop"];
                                             $ShopDialogueArray[] = $FuncShop["Dialogue"];
                                             $TotalItems[$NameFormatted][] = $FuncShop["Number"];
@@ -767,7 +778,7 @@ class NpcsPagesAll implements ParseInterface
                                             $ShopCheck[] = $FuncShop["Name"].",";
                                         break;
                                         case ($ShopID >= 3866620 && $ShopID < 3866999): //COLLECTABLESHOPS
-                                            $FuncShop = $this->getShop($NameFormatted, "CollectablesShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $ShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
+                                            $FuncShop = $this->getShop($NameFormatted, "CollectablesShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $ShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation,$TopicSelectName);
                                             $ShopCheck[] = $FuncShop["Name"].",";
                                             $ShopOutputArray[] = $FuncShop["Shop"];
                                             $TotalItems[$NameFormatted][] = $FuncShop["Number"];
@@ -775,15 +786,19 @@ class NpcsPagesAll implements ParseInterface
                                         case ($ShopID >= 3801000 && $ShopID < 3809999): //InclusionShop
                                             foreach(range(0,29) as $b) {
                                                 if (empty($InclusionShopCategoryCsv->at($InclusionShopCsv->at($ShopID)["Category[$b]"])['Name'])) continue;
+                                                $ShopCat = $InclusionShopCategoryCsv->at($InclusionShopCsv->at($ShopID)["Category[$b]"])['Name'];
+                                                $SeriesID = $InclusionShopCategoryCsv->at($InclusionShopCsv->at($ShopID)["Category[$b]"])['InclusionShopSeries'];
                                                 foreach(range(0,20) as $c) {
-                                                    $SubDataValue = "". $ShopID .".". $c ."";
+                                                    $SubDataValue = "". $SeriesID .".". $c ."";
                                                     if (empty($InclusionShopSeriesCsv->at($SubDataValue)['SpecialShop'])) break;
                                                     $IncShopID = $InclusionShopSeriesCsv->at($SubDataValue)['SpecialShop'];
-                                                    $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $IncShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
+                                                    $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $IncShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation,$ShopCat);
                                                     $ShopOutputArray[] = $FuncShop["Shop"];
                                                     $ShopDialogueArray[] = $FuncShop["Dialogue"];
                                                     $TotalItems[$NameFormatted][] = $FuncShop["Number"];
-                                                    $ShopCheck[] = $FuncShop["Name"].",";
+                                                    if(!empty($FuncShop["Dialogue"])){
+                                                        $ShopCheck[] = "Dialogue,";
+                                                    }
                                                 }
                                             }
                                         break;
@@ -797,7 +812,7 @@ class NpcsPagesAll implements ParseInterface
                                     }
                                 break;
                                 case ($ShopLink >= 1769000 && $ShopLink < 1779999): //Specialshop
-                                    $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $ShopLink, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
+                                    $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $ShopLink, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation,"");
                                     $ShopOutputArray[] = $FuncShop["Shop"];
                                     $ShopDialogueArray[] = $FuncShop["Dialogue"];
                                     $TotalItems[$NameFormatted][] = $FuncShop["Number"];
@@ -814,7 +829,7 @@ class NpcsPagesAll implements ParseInterface
 
                     break;
                     case ($DataValue > 3470000) && ($DataValue < 3479999): //DISPOSAL SHOP
-                        $FuncShop = $this->getShop($NameFormatted, "DisposalShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $DataValue, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
+                        $FuncShop = $this->getShop($NameFormatted, "DisposalShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $DataValue, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation,"");
                         $ShopCheck[] = $FuncShop["Name"].",";
                         $ShopOutputArray[] = $FuncShop["Shop"];
                         $TotalItems[$NameFormatted][] = $FuncShop["Number"];
@@ -824,7 +839,7 @@ class NpcsPagesAll implements ParseInterface
                         $ShopID = $PreHandlerCsv->at($DataValue)["Target"];
                         switch (true) {
                             case ($ShopID > 262100 && $ShopID < 269999): //gilshop
-                                $FuncShop = $this->getShop($NameFormatted, "GilShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $ShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
+                                $FuncShop = $this->getShop($NameFormatted, "GilShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $ShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation,"");
                                 $ShopOutputArray[] = $FuncShop["Shop"];
                                 $ShopDialogueArray[] = $FuncShop["Dialogue"];
                                 $TotalItems[$NameFormatted][] = $FuncShop["Number"];
@@ -834,7 +849,7 @@ class NpcsPagesAll implements ParseInterface
                                 $ShopCheck[] = $FuncShop["Name"].",";
                             break;
                             case ($ShopID >= 1769000 && $ShopID < 1779999): //specialshop
-                                $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $ShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
+                                $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $ShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation,"");
                                 $ShopOutputArray[] = $FuncShop["Shop"];
                                 $ShopDialogueArray[] = $FuncShop["Dialogue"];
                                 $TotalItems[$NameFormatted][] = $FuncShop["Number"];
@@ -844,7 +859,7 @@ class NpcsPagesAll implements ParseInterface
                                 $ShopCheck[] = $FuncShop["Name"].",";
                             break;
                             case ($ShopID >= 3866620 && $ShopID < 3866999): //COLLECTABLESHOPS 
-                                $FuncShop = $this->getShop($NameFormatted, "CollectablesShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $ShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
+                                $FuncShop = $this->getShop($NameFormatted, "CollectablesShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $ShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation,"");
                                 $ShopCheck[] = $FuncShop["Name"].",";
                                 $ShopOutputArray[] = $FuncShop["Shop"];
                                 $TotalItems[$NameFormatted][] = $FuncShop["Number"];
@@ -852,11 +867,13 @@ class NpcsPagesAll implements ParseInterface
                             case ($ShopID >= 3801000 && $ShopID < 3809999): //InclusionShop
                                 foreach(range(0,29) as $b) {
                                     if (empty($InclusionShopCategoryCsv->at($InclusionShopCsv->at($ShopID)["Category[$b]"])['Name'])) continue;
+                                    $ShopCat = $InclusionShopCategoryCsv->at($InclusionShopCsv->at($ShopID)["Category[$b]"])['Name'];
+                                    $SeriesID = $InclusionShopCategoryCsv->at($InclusionShopCsv->at($ShopID)["Category[$b]"])['InclusionShopSeries'];
                                     foreach(range(0,20) as $c) {
-                                        $SubDataValue = "". $ShopID .".". $c ."";
+                                        $SubDataValue = "". $SeriesID .".". $c ."";
                                         if (empty($InclusionShopSeriesCsv->at($SubDataValue)['SpecialShop'])) break;
                                         $InclusionShopSpecialShopID = $InclusionShopSeriesCsv->at($SubDataValue)['SpecialShop'];
-                                        $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $InclusionShopSpecialShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
+                                        $FuncShop = $this->getShop($NameFormatted, "SpecialShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $InclusionShopSpecialShopID, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation,$ShopCat);
                                         $ShopOutputArray[] = $FuncShop["Shop"];
                                         $ShopDialogueArray[] = $FuncShop["Dialogue"];
                                         $TotalItems[$NameFormatted][] = $FuncShop["Number"];
@@ -881,7 +898,7 @@ class NpcsPagesAll implements ParseInterface
                         $HowToCheck[] = $DescriptionTitle.",";
                     break;
                     case ($DataValue >= 3866620 && $DataValue < 3866999): //COLLECTABLESHOPS 
-                        $FuncShop = $this->getShop($NameFormatted, "CollectablesShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $DataValue, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation);
+                        $FuncShop = $this->getShop($NameFormatted, "CollectablesShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $DataValue, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, $NpcPlaceName, $CoordLocation,"");
                         $ShopCheck[] = $FuncShop["Name"].",";
                         $ShopOutputArray[] = $FuncShop["Shop"];
                         $TotalItems[$NameFormatted][] = $FuncShop["Number"];
@@ -1140,12 +1157,14 @@ class NpcsPagesAll implements ParseInterface
                     $tribeCode = ($isMale == "true") ? 0 : 100;
                     $headIconIndex = ($isMale == "true") ? 5 : 6;
                     $headIcon = $CharaMakeTypeCsv->at($tribeKeyCalc)["SubMenuParam[$headIconIndex][$BaseFaceCalc]"];
+                    $IconArray[] = $headIcon;
                     $extraIcons = "|Face = ". $headIcon .".png". $warning ."";
                     break;
                 case 2: // Highlander
                     $tribeCode = ($isMale == "true") ? 200 : 300;
                     $headIconIndex = ($isMale == "true") ? 5 : 6;
                     $headIcon = $CharaMakeTypeCsv->at($tribeKeyCalc)["SubMenuParam[$headIconIndex][$BaseFaceCalc]"];
+                    $IconArray[] = $headIcon;
                     $extraIcons = "|Face = ". $headIcon .".png". $warning ."";
                     break;
                 case 3: // Wildwood
@@ -1154,6 +1173,7 @@ class NpcsPagesAll implements ParseInterface
                     $headIconIndex = ($isMale == "true") ? 4 : 5;
                     $headIcon = $CharaMakeTypeCsv->at($tribeKeyCalc)["SubMenuParam[$headIconIndex][$BaseFaceCalc]"];
                     $EarShape = $extraFeatureShape;
+                    $IconArray[] = $headIcon;
                     $extraIcons = "|Face = ". $headIcon .".png". $warning ."\n|Ear Shape = ". $EarShape ."";
                     break;
                 case 5: // Plainsfolks
@@ -1162,6 +1182,7 @@ class NpcsPagesAll implements ParseInterface
                     $headIconIndex = ($isMale == "true") ? 4 : 5;
                     $headIcon = $CharaMakeTypeCsv->at($tribeKeyCalc)["SubMenuParam[$headIconIndex][$BaseFaceCalc]"];
                     $EarShape = $extraFeatureShape;
+                    $IconArray[] = $headIcon;
                     $extraIcons = "|Face = ". $headIcon .".png". $warning ."\n|Ear Shape = ". $EarShape ."";
                     break;
                 case 7: // Seeker of the Sun
@@ -1171,6 +1192,8 @@ class NpcsPagesAll implements ParseInterface
                     $tailIconIndex = ($isMale == "true") ? 2 : 3;
                     $headIcon = $CharaMakeTypeCsv->at($tribeKeyCalc)["SubMenuParam[$headIconIndex][$BaseFaceCalc]"];
                     $tailIcon = $CharaMakeTypeCsv->at($tribeKeyCalc)["SubMenuParam[$tailIconIndex][$tailOrEarShape]"];
+                    $IconArray[] = $headIcon;
+                    $IconArray[] = $tailIcon;
                     $extraIcons = "|Face = ". $headIcon .".png". $warning ."\n|Tail Shape = ". $tailIcon .".png";
                     break;
                 case 9: // Sea Wolf
@@ -1178,6 +1201,7 @@ class NpcsPagesAll implements ParseInterface
                     $tribeCode = ($isMale == "true") ? 1000 : 1100;
                     $headIconIndex = ($isMale == "true") ? 5 : 6;
                     $headIcon = $CharaMakeTypeCsv->at($tribeKeyCalc)["SubMenuParam[$headIconIndex][$BaseFaceCalc]"];
+                    $IconArray[] = $headIcon;
                     $extraIcons = "|Face = ". $headIcon .".png". $warning ."";
                     break;
                 case 11: // Raen
@@ -1187,6 +1211,8 @@ class NpcsPagesAll implements ParseInterface
                     $tailIconIndex = ($isMale == "true") ? 2 : 3;
                     $headIcon = $CharaMakeTypeCsv->at($tribeKeyCalc)["SubMenuParam[$headIconIndex][$BaseFaceCalc]"];
                     $tailIcon = $CharaMakeTypeCsv->at($tribeKeyCalc)["SubMenuParam[$tailIconIndex][$tailOrEarShape]"];
+                    $IconArray[] = $headIcon;
+                    $IconArray[] = $tailIcon;
                     $extraIcons = "|Face = ". $headIcon .".png". $warning ."\n|Tail Shape = ". $tailIcon .".png";
                     break;
 
@@ -1198,7 +1224,9 @@ class NpcsPagesAll implements ParseInterface
                     $furIconIndex = 2;
                     $tailIconIndex = 4;
                     $furIcon = $CharaMakeTypeCsv->at($tribeKeyCalc)["SubMenuParam[$furIconIndex][$BaseFaceCalc]"];
+                    $IconArray[] = $furIcon;
                     $tailIcon = $CharaMakeTypeCsv->at($tribeKeyCalc)["SubMenuParam[$tailIconIndex][$tailOrEarShape]"];
+                    $IconArray[] = $tailIcon;
                     $extraIcons = "|Fur Type = ". $furIcon .".png\n|Tail Shape = ". $tailIcon .".png";
                     break;
                 case 15: // Rava
@@ -1207,6 +1235,7 @@ class NpcsPagesAll implements ParseInterface
                     $headIconIndex = 5;
                     $earIconIndex = 14;
                     $headIcon = $CharaMakeTypeCsv->at($tribeKeyCalc)["SubMenuParam[$headIconIndex][$BaseFaceCalc]"];
+                    $IconArray[] = $headIcon;
                     $earIcon = $CharaMakeTypeCsv->at($tribeKeyCalc)["SubMenuParam[$earIconIndex][$tailOrEarShape]"];
                     $extraIcons = "|Face = ". $headIcon .".png". $warning ."\n|Ear Shape = ". $earIcon .".png";
                     break;
@@ -1234,6 +1263,7 @@ class NpcsPagesAll implements ParseInterface
             }
             $hairStyleRaw = $hairStyles[$tribeCode][$hairStyleBase];
             $hairStyleIcon = "".$hairStyleRaw['Icon'] .".png".$warningHair ."";
+            $IconArray[] = $hairStyleRaw['Icon'];
             //Skin Colour
             $listIndex = ($tribeKey * 2 + $GenderValue) * 5 + 3;
             $skinIndex = $listIndex * 256;
@@ -1458,6 +1488,7 @@ class NpcsPagesAll implements ParseInterface
                 for ($i=0; $i < 5; $i++) {
                     if ($facialFeatureArray[$i] == 1) {
                         $facialFeatureIcon[$i] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
+                        $IconArray[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
                     }
                 }
             } elseif ($face > 6) {
@@ -1484,11 +1515,13 @@ class NpcsPagesAll implements ParseInterface
                                 $facialFeatureExtraPre = "\n|Tattoos = ";
                                 $facialFeatureExtraColor = "\n|Tattoo Color = ". $facialFeatureColor ."";
                                 $facialFeatureExtra[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
+                                $IconArray[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
                                 break;
                             case 3: // Wildwood
                                 $facialFeatureExtraPre = "\n|Ear Clasp = ";
                                 $facialFeatureExtraColor = "\n|Ear Clasp Color = ". $facialFeatureColor ."";
                                 $facialFeatureExtra[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
+                                $IconArray[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
                                 break;
                             case 4: // Duskwight
                             case 5: // Plainsfolks
@@ -1497,16 +1530,19 @@ class NpcsPagesAll implements ParseInterface
                                 $facialFeatureExtraPre = "\n|Tattoos = ";
                                 $facialFeatureExtraColor = "\n|Tattoo Color = ". $facialFeatureColor ."";
                                 $facialFeatureExtra[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
+                                $IconArray[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
                                 break;
                             case 8: // Keeper of the Moon
                                 if ($GenderCalc == 0) {
                                     $facialFeatureExtraPre = "\n|Tattoos = ";
                                     $facialFeatureExtraColor = "\n|Tattoo Color = ". $facialFeatureColor ."";
                                     $facialFeatureExtra[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
+                                    $IconArray[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
                                 } elseif ($GenderCalc == 1) {
                                     $facialFeatureExtraPre = "\n|Ear Clasp = ";
                                     $facialFeatureExtraColor = "\n|Ear Clasp Color = ". $facialFeatureColor ."";
                                     $facialFeatureExtra[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
+                                    $IconArray[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
                                 }
                                 break;
                             case 9: // Sea Wolf
@@ -1514,24 +1550,28 @@ class NpcsPagesAll implements ParseInterface
                                 $facialFeatureExtraPre = "\n|Tattoos = ";
                                 $facialFeatureExtraColor = "\n|Tattoo Color = ". $facialFeatureColor ."";
                                 $facialFeatureExtra[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
+                                $IconArray[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
                                 break;
                             case 11: // Raen
                             case 12: // Xaela
                                 $facialFeatureExtraPre = "\n|Limbal Rings = ";
                                 $facialFeatureExtraColor = "\n|Limbal Ring Color = ". $facialFeatureColor ."";
                                 $facialFeatureExtra[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
+                                $IconArray[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
                                 break;
                             case 13: // Helions
                             case 14: // The Lost
                                 $facialFeatureExtraPre = "\n|Tattoos = ";
                                 $facialFeatureExtraColor = false;
                                 $facialFeatureExtra[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
+                                $IconArray[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
                                 break;
                             case 15: // Rava
                             case 16: // Veena
                                 $facialFeatureExtraPre = "\n|Tattoos = ";
                                 $facialFeatureExtraColor = "\n|Tattoo Color = ". $facialFeatureColor ."";
                                 $facialFeatureExtra[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
+                                $IconArray[] = $CharaMakeTypeCsv->at($tribeKeyCalc)["FacialFeatureOption[$facialFace][$i]"];
                                 break;
                         }
                     }
@@ -1634,6 +1674,31 @@ class NpcsPagesAll implements ParseInterface
 
 
         }
+        // output icons for face/hair pictures
+        $IconArray = array_unique($IconArray);
+        $this->io->text('Copying Appearance Icons ...');
+        if (!empty($IconArray)) {
+            foreach ($IconArray as $value){
+                $IconID = sprintf("%06d", $value);
+                if (!file_exists($this->getOutputFolder() ."/$PatchID/AppearanceIcons/$IconID.png")) {
+                    // ensure output directory exists
+                    $IconOutputDirectory = $this->getOutputFolder() ."/$PatchID/AppearanceIcons/";
+                    if (!is_dir($IconOutputDirectory)) {
+                        mkdir($IconOutputDirectory, 0777, true);
+                    }
+    
+                    // build icon input folder paths
+                    if ($IconID === "000000") continue;
+                    $GetIcon = $this->getInputFolder() .'/icon/'. $this->iconize($IconID, true);
+    
+                    $iconFileName = "{$IconOutputDirectory}/$IconID.png";
+    
+                    // copy the input icon to the output filename
+                    copy($GetIcon, $iconFileName);
+                }
+            }
+        }
+        $this->io->text('Done ...');
         $NPCUniqueApperanceIDs = [];
         $EquipmentarrayUnique = [];
         foreach ($NPCEquipmentArray as $key => $value) {
@@ -1691,8 +1756,8 @@ class NpcsPagesAll implements ParseInterface
             $subLocation = "";
             if (!empty($LGBArray[$id]['Territory'])){
                 $Territory = $LGBArray[$id]['Territory'];
-                $X = $LGBArray[$id]['x'];
-                $Y = $LGBArray[$id]['y'];
+                $X = $this->GetLGBPos($LGBArray[$id]['x'], $LGBArray[$id]['y'], $LGBArray[$id]['Territory'], $TerritoryTypeCsv, $MapCsv)["X"];
+                $Y = $this->GetLGBPos($LGBArray[$id]['x'], $LGBArray[$id]['y'], $LGBArray[$id]['Territory'], $TerritoryTypeCsv, $MapCsv)["Y"];
                 $keyarray = [];
                 foreach (range(0, 1000) as $i) {
                     if (empty($JSONTeriArray[$Territory][$i]["x"])) break;
@@ -1730,7 +1795,7 @@ class NpcsPagesAll implements ParseInterface
                 }
                 $code = substr($NpcMapCodeName, 0, 4);
                 if ($code == "z3e2") {
-                    $NpcPlaceName = "The Prima Vista Tiring Room";
+                    $MapName = "The Prima Vista Tiring Room";
                 }
                 if ($code == "f1d9") {
                     $MapName = "The Haunted Manor";
@@ -1765,7 +1830,7 @@ class NpcsPagesAll implements ParseInterface
                 $MapOutputString .= "  | patch = $Patch\n";
                 $MapOutputString .= "  | Sublocation = $SubLocation\n";
                 $MapOutputString .= "$MapFestival";
-                $MapOutputString .= "}}\n";
+                $MapOutputString .= "}}{{MapUpdate}}\n";
                 $MapOutputString .= "{{-stop-}}\n";
                 $MapArray[] = $MapOutputString;
             }
@@ -1838,6 +1903,8 @@ class NpcsPagesAll implements ParseInterface
             $NpcPlayerDataString .= "|Notes = \n";
             $NpcPlayerDataString .= "|Images = \n";
             $NpcPlayerDataString .= "|Pre-Calamity Dialogue =\n";
+            $NpcPlayerDataString .= "|Disambig =\n";
+            $NpcPlayerDataString .= "|Footer =\n";
             $NpcPlayerDataString .= "}}\n";
             $NpcPlayerDataString .= "{{-stop-}}\n";
             $NpcPlayerDataArray[$NameFormatted][0] = $NpcPlayerDataString;
