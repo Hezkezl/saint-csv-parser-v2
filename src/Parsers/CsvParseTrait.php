@@ -153,29 +153,76 @@ trait CsvParseTrait
     public function getLGBArray() {
         $ini = parse_ini_file('config.ini');
         $PatchID = file_get_contents("{$ini['MainPath']}\game\\ffxivgame.ver");
-        $ENpcResidentCsv = $this->csv('ENpcResident');
-        $LevelCsv = $this->csv('Level');
-        $TerritoryTypeCsv = $this->csv('TerritoryType');
-        $PlaceNameCsv = $this->csv('PlaceName');
-        $MapCsv = $this->csv('Map');
-        $this->io->text("Producing LGB Array for npc names and access, This may take a while.");
-        foreach($LevelCsv->data as $id => $Level) {
-            if ($Level['Type'] != 8) continue;
-            $NPCID = $Level['Object'];
-            $Festival = 0;
-            if (!empty($NpcFestivalQuestArray[$NPCID])){
-                $Festival = $NpcFestivalQuestArray[$NPCID];
+        $TerritoryTypeCsv = $this->csv("TerritoryType");
+        $QuestCsv = $this->csv("Quest");
+        $LevelCsv = $this->csv("Level");
+        $ENpcResidentCsv = $this->csv("ENpcResident");
+        $MapCsv = $this->csv("Map");
+        $PlaceNameCsv = $this->csv("PlaceName");
+        //bad subdivisions:
+        $BadSubs = array("192", "193", "194", "365");
+        //levellocations:
+        $this->io->text('Producing lists of wiki correct names, This may take a while initially ...');
+        foreach($TerritoryTypeCsv->data as $id => $TerritoryTypeData) {
+            $JSONMapRangeArray = [];
+            $code = substr($TerritoryTypeData['Bg'], -4);
+            if (file_exists('cache/'. $PatchID .'/lgb/'. $code .'_planmap.lgb.json')) {
+                $url = 'cache/'. $PatchID .'/lgb/'. $code .'_planmap.lgb.json';
+                $jdata = file_get_contents($url);
+                $decodeJdata = json_decode($jdata);
+                foreach ($decodeJdata as $lgb) {
+                    $InstanceObjects = $lgb->InstanceObjects;
+                    foreach($InstanceObjects as $Object) {
+                        $AssetType = $Object->AssetType;
+                        if ($AssetType != 43) continue;
+                        if ($Object->Object->PlaceNameEnabled == 0) continue;
+                        $x = $Object->Transform->Translation->x;
+                        $y = $Object->Transform->Translation->z;
+                        $NpcLocX = $this->GetLGBPos($x, $y, $id, $TerritoryTypeCsv, $MapCsv)["X"];
+                        $NpcLocY = $this->GetLGBPos($x, $y, $id, $TerritoryTypeCsv, $MapCsv)["Y"];
+                        $PlaceName = $PlaceNameCsv->at($Object->Object->PlaceNameSpot)['Name'];
+                        if (empty($PlaceName)) {
+                            $PlaceName = $PlaceNameCsv->at($Object->Object->PlaceNameBlock)['Name'];
+                        }
+                        if (stripos($PlaceName, "Subdivision")) continue;
+                        $JSONMapRangeArray[] = array(
+                            'placename' => $PlaceName,
+                            'x' => $NpcLocX,
+                            'y' => $NpcLocY,
+                            'code' => $code,
+                            'id' => $id
+                        );
+                    }
+                }
+                $JSONTeriArray[$id] = $JSONMapRangeArray;
             }
-            $Name = "";
-            $LGBArray[$NPCID] = array(
-                'Territory' => $Level['Territory'],
-                'x' => $Level['X'],
-                'y' => $Level['Z'],
-                'id' => $id,
-                'festivalID' => $Festival,
-                'festivalName' => $Name
-            );
         }
+        foreach($QuestCsv->data as $id => $Quest) {
+            if ($Quest['Festival'] === "0") continue;
+            $QuestFestival = $Quest['Festival'];
+            $Issuer = $Quest['Issuer{Start}'];
+            if (!empty($ENpcResidentCsv->at($Issuer)['Singular'])) {
+                $NpcFestivalQuestArray[$Issuer] = $QuestFestival;
+            }
+            foreach(range(0,49) as $i) {
+                $Npc = $Quest["Script{Arg}[$i]"];
+                if (($Npc > 1000000) && ($Npc < 1100000)) {
+                    if (empty($ENpcResidentCsv->at($Npc)['Singular'])) continue;
+                    $NpcFestivalQuestArray[$Npc] = $QuestFestival; 
+                }
+            }
+            foreach(range(0,63) as $i) {
+                $Npc = $Quest["Listener[$i]"];
+                if (($Npc > 1000000) && ($Npc < 1100000)) {
+                    if (empty($ENpcResidentCsv->at($Npc)['Singular'])) continue;
+                    $NpcFestivalQuestArray[$Npc] = $QuestFestival; 
+                }
+            }
+        }
+
+        $Festivaljdata = file_get_contents("Patch/FestivalNames.json");
+        $FestivalArray = json_decode($Festivaljdata, true);
+        //gather lgb from LGB.json
         foreach ($TerritoryTypeCsv->data as $id => $teri) {  
             $code = $teri['Name'];
             if (empty($code)) continue;
@@ -213,6 +260,11 @@ trait CsvParseTrait
                             $x = $Object->Transform->Translation->x;
                             $y = $Object->Transform->Translation->z;
                             $NPCID = $BaseId;
+                            if (empty($NpcFestivalQuestArray[$NPCID])){
+                                if(!empty($Festival)){
+                                    $NpcFestivalQuestArray[$NPCID] = $Festival;
+                                }
+                            }
                             if (!empty($NpcFestivalQuestArray[$NPCID])){
                                 if ($Festival === "0") {
                                     $Festival = $NpcFestivalQuestArray[$NPCID];
@@ -231,46 +283,38 @@ trait CsvParseTrait
                 }
             }
         }
-        foreach($TerritoryTypeCsv->data as $id => $TerritoryTypeData) {
-            $JSONMapRangeArray = [];
-            $code = substr($TerritoryTypeData['Bg'], -4);
-            if (file_exists('cache/'. $PatchID .'/lgb/'. $code .'_planmap.lgb.json')) {
-                $url = 'cache/'. $PatchID .'/lgb/'. $code .'_planmap.lgb.json';
-                $jdata = file_get_contents($url);
-                $decodeJdata = json_decode($jdata);
-                foreach ($decodeJdata as $lgb) {
-                    $InstanceObjects = $lgb->InstanceObjects;
-                    foreach($InstanceObjects as $Object) {
-                        $AssetType = $Object->AssetType;
-                        if ($AssetType != 43) continue;
-                        if ($Object->Object->PlaceNameEnabled == 0) continue;
-                        $x = $Object->Transform->Translation->x;
-                        $y = $Object->Transform->Translation->z;
-                        $NpcLocX = $this->GetLGBPos($x, $y, $id, $TerritoryTypeCsv, $MapCsv)["X"];
-                        $NpcLocY = $this->GetLGBPos($x, $y, $id, $TerritoryTypeCsv, $MapCsv)["Y"];
-                        $PlaceName = $PlaceNameCsv->at($Object->Object->PlaceNameSpot)['Name'];
-                        if (empty($PlaceName)) {
-                            $PlaceName = $PlaceNameCsv->at($Object->Object->PlaceNameBlock)['Name'];
-                        }
-                        $JSONMapRangeArray[] = array(
-                            'placename' => $PlaceName,
-                            'x' => $NpcLocX,
-                            'y' => $NpcLocY,
-                            'code' => $code,
-                            'id' => $id
-                        );
-                    }
-                }
-                $JSONTeriArray[$id] = $JSONMapRangeArray;
+
+        
+        //gather lgb from level.exd
+        foreach($LevelCsv->data as $id => $Level) {
+            if ($Level['Type'] != 8) continue;
+            $NPCID = $Level['Object'];
+            $Festival = 0;
+            if (!empty($NpcFestivalQuestArray[$NPCID])){
+                $Festival = $NpcFestivalQuestArray[$NPCID];
             }
+            $Name = "";
+            if (in_array($Level['Map'], $BadSubs)) continue;
+            $LGBArray[$NPCID] = array(
+                'Territory' => $Level['Territory'],
+                'x' => $Level['X'],
+                'y' => $Level['Z'],
+                'id' => $id,
+                'festivalID' => $Festival,
+                'festivalName' => $Name
+            );
         }
         foreach ($ENpcResidentCsv->data as $id => $NPCs) {
             $subLocation = "";
+            $keyarray = [];
+            $Zone = "";
             if (!empty($LGBArray[$id]['Territory'])){
                 $Territory = $LGBArray[$id]['Territory'];
+                $Zone = $PlaceNameCsv->at($TerritoryTypeCsv->at($Territory)['PlaceName'])['Name'];
+                //$X = $LGBArray[$id]['x'];
+                //$Y = $LGBArray[$id]['y'];
                 $X = $this->GetLGBPos($LGBArray[$id]['x'], $LGBArray[$id]['y'], $LGBArray[$id]['Territory'], $TerritoryTypeCsv, $MapCsv)["X"];
                 $Y = $this->GetLGBPos($LGBArray[$id]['x'], $LGBArray[$id]['y'], $LGBArray[$id]['Territory'], $TerritoryTypeCsv, $MapCsv)["Y"];
-                $keyarray = [];
                 foreach (range(0, 1000) as $i) {
                     if (empty($JSONTeriArray[$Territory][$i]["x"])) break;
                     $calcA = ($X - $JSONTeriArray[$Territory][$i]["x"]); 
@@ -288,8 +332,9 @@ trait CsvParseTrait
                 if (empty($subLocation)){
                     $subLocation = $PlaceNameCsv->at($TerritoryTypeCsv->at($Territory)['PlaceName'])['Name'];
                 }
-                $LGBArray[$id]['NearestPlaceName'] = $subLocation;
             }
+            $LGBArray["PlaceName"][$id]["PlaceName"] = str_replace("#","",$subLocation);
+            $LGBArray["PlaceName"][$id]["Territory"] = str_replace("#","",$Zone);
         }
         $this->io->text("Done.");
         
@@ -297,20 +342,43 @@ trait CsvParseTrait
     }
 
     /**
+     * produce a list of potential npc errors
+     */
+    public function NameChecker($EventItemCsv, $ItemCsv) {
+        
+        $NameArray = [];
+        foreach($EventItemCsv->data as $id => $EItem) {
+            if (empty($EItem['Name'])) continue;
+            $Name = strtolower($EItem['Name']);
+            $NameArray[$Name] = "0";
+        }
+        foreach($ItemCsv->data as $id => $Item) {
+            if (empty($Item['Name'])) continue;
+            $Name = strtolower($Item['Name']);
+            $NameArray[$Name] = "0";
+        }
+
+        return $NameArray;
+    }
+
+    /**
      * Format NPC Names for Wiki
      */
-    public function NameFormat($NPCID, $ENpcResidentCsv, $ENpcBaseCsv, $PlaceNameLocation, $LGBArray) {
-        
+    public function NameFormat($NPCID, $ENpcResidentCsv, $ENpcBaseCsv, $NpcLocationArray, $LGBArray, $BadNames) {
+        $NPCSwitch = "";
+        // loop through our sequences
         $Festivaljdata = file_get_contents("Patch/FestivalNames.json");
         $FestivaldecodeJdata = json_decode($Festivaljdata, true);        
         $NameFormatted = $ENpcResidentCsv->at($NPCID)['Singular'];
+        $PlaceNameLocation = $NpcLocationArray['PlaceName'];
+        $ZoneLocation = $NpcLocationArray['Territory'];
         $IncorrectNames = array(" De ", " Bas ", " Mal ", " Van ", " Cen ", " Sas ", " Tol ", " Zos ", " Yae ", " The ", " Of The ", " Of ",
             "A-ruhn-senna", "A-towa-cant", "Bea-chorr", "Bie-zumm", "Bosta-bea", "Bosta-loe", "Chai-nuzz", "Chei-ladd", "Chora-kai", "Chora-lue",
             "Chue-zumm", "Dulia-chai", "E-sumi-yan", "E-una-kotor", "Fae-hann", "Hangi-rua", "Hanji-fae", "Kai-shirr", "Kan-e-senna", "Kee-bostt",
             "Kee-satt", "Lewto-sai", "Lue-reeq", "Mao-ladd", "Mei-tatch", "Moa-mosch", "Mosha-moa", "Moshei-lea", "Nunsi-lue", "O-app-pesi", "Qeshi-rae",
             "Rae-qesh", "Rae-satt", "Raya-o-senna", "Renda-sue", "Riqi-mao", "Roi-tatch", "Rua-hann", "Sai-lewq", "Sai-qesh", "Sasha-rae", "Shai-satt",
             "Shai-tistt", "Shee-tatch", "Shira-kee", "Shue-hann", "Sue-lewq", "Tao-tistt", "Tatcha-mei", "Tatcha-roi", "Tio-reeq", "Tista-bie", "Tui-shirr",
-            "Vroi-reeq", "Zao-mosc", "Zia-bostt", "Zoi-chorr", "Zumie-moa", "Zumie-shai", "“", "”", "é", "ö", "�", "#", "—",);
+            "Vroi-reeq", "Zao-mosc", "Zia-bostt", "Zoi-chorr", "Zumie-moa", "Zumie-shai", "“", "”", "é", "ö", "�", "#", "—");
         $correctnames = array(" de ", " bas ", " mal ", " van ", " cen ", " sas ", " tol ", " zos ", " yae ", " the ", " of the ", " of ",
             "A-Ruhn-Senna", "A-Towa-Cant", "Bea-Chorr", "Bie-Zumm", "Bosta-Bea", "Bosta-Loe", "Chai-Nuzz", "Chei-Ladd", "Chora-Kai", "Chora-Lue",
             "Chue-Zumm", "Dulia-Chai", "E-Sumi-Yan", "E-Una-Kotor", "Fae-Hann", "Hangi-Rua", "Hanji-Fae", "Kai-Shirr", "Kan-E-Senna", "Kee-Bostt",
@@ -319,6 +387,10 @@ trait CsvParseTrait
             "Shai-Tistt", "Shee-Tatch", "Shira-Kee", "Shue-Hann", "Sue-Lewq", "Tao-Tistt", "Tatcha-Mei", "Tatcha-Roi", "Tio-Reeq", "Tista-Bie", "Tui-Shirr",
             "Vroi-Reeq", "Zao-Mosc", "Zia-Bostt", "Zoi-Chorr", "Zumie-Moa", "Zumie-Shai", "\"", "\"", "e", "o", "", "", "");
         $PLAddition = "";
+        $NameFormattedLower = strtolower($NameFormatted);
+        if (isset($BadNames[$NameFormattedLower])){
+            $NPCSwitch = " (NPC)";
+        }
         switch ($NameFormatted) {
             case "airship ticketer":
             case "Ala Mhigan Resistance gate guard":
@@ -333,9 +405,6 @@ trait CsvParseTrait
             case "chocobokeep":
             case "collectable appraiser":
             case "concerned mother":
-            case "expedition artisan":
-            case "expedition birdwatcher":
-            case "expedition scholar":
             case "ferry skipper":
             case "flame officer":
             case "flame private":
@@ -365,8 +434,6 @@ trait CsvParseTrait
             case "junkmonger":
             case "Keeper of the Entwined Serpents":
             case "local merchant":
-            case "mammet dispensator #012P":
-            case "mammet dispensator #012T":
             case "materia melder":
             case "material supplier":
             case "mender":
@@ -388,16 +455,12 @@ trait CsvParseTrait
             case "serpent private":
             case "serpent recruit":
             case "serpent scout":
-            case "splendors vendor":
-            case "spoils collector":
             case "spoils trader":
             case "steersman":
             case "storm captain":
             case "storm officer":
             case "storm recruit":
             case "storm soldier":
-            case "storm private":
-            case "storm sergeant":
             case "Sultansworn elite":
             case "suspicious Coerthan":
             case "the Smith":
@@ -421,6 +484,7 @@ trait CsvParseTrait
             case "Ananta junkmonger":
             case "Namazu junkmonger":
             case "falcon porter":
+            case "housing merchant":
                 $PLAddition = " ($PlaceNameLocation)";
                 if (empty($PlaceNameLocation)){
                     switch ($NameFormatted) {
@@ -437,7 +501,8 @@ trait CsvParseTrait
                         case "Allagan commerce node":
                         case "Ananta junkmonger":
                         case "Namazu junkmonger":
-                            $PLAddition = " (Housing)";
+                        case "housing merchant":
+                            $PLAddition = " (Player Housing)";
                         break;
                         case 'storm soldier': //MSQ
                         case 'flame officer':
@@ -449,7 +514,6 @@ trait CsvParseTrait
                         case 'flame sergeant':
                         case 'serpent lieutenant':
                         case 'serpent private':
-                        case 'storm private':
                         case 'flame soldier':
                         case "Imperial centurion":
                         case 'flame recruit':
@@ -484,29 +548,18 @@ trait CsvParseTrait
             break;
             case "saint's little helper":
             case 'enthralling illusionist':
-            case 'royal handmaiden':
             case 'royal seneschal':
-            case "mammet dispensator #012P":
-            case "mammet interchanger #012T":
             case "uncanny illusionist": // event:
             case "untrustworthy illusionist":
             case "unusual illusionist":
             case "Yellow Moon admirer":
-            case "Starlight celebrant":
-            case "Starlight Celebration crier":
-            case "Starlight supplier":
-            case "Rising attendant":
-            case "Rising vendor":
-            case "royal handmaiden":
             case "royal seneschal":
             case "royal servant":
             case "saint's little helper":
-            case "Moonfire Faire vendor":
             case "Moonfire marine":
             case "Moonfire Faire chaperone":
             case "enthralling illusionist":
             case "Faire crier":
-            case "shady smock":
             case "unsavory illusionist":
             case "malevolent mummer":
             case "long-haired pirate":
@@ -534,6 +587,76 @@ trait CsvParseTrait
                     }
                 }
                 if (empty($PlaceNameLocation)){
+                    if (!empty($LGBArray[$NPCID]['festivalID'])) {
+                        $FestivalNameAddition = $LGBArray[$NPCID]['festivalID'];
+                        $splitfes = explode("_", $FestivaldecodeJdata[$FestivalNameAddition]);
+                        $fesYear = $splitfes[1];
+                        $PLAddition = " ($splitfes[1])";
+                    }
+                }
+            break;
+            //title 
+            case "storm sergeant":
+            case "storm private":
+                if (!empty($ENpcResidentCsv->at($NPCID)['Title'])){
+                    $Title = $ENpcResidentCsv->at($NPCID)['Title'];
+                    $PLAddition = " ($Title)";
+                }
+            break;
+            //just set year
+            case "Rising vendor":
+            case "Moonfire Faire vendor":
+            case 'royal handmaiden':
+            case "shady smock":
+                if (!empty($LGBArray[$NPCID]['festivalID'])){
+                    $FestivalNameAddition = $LGBArray[$NPCID]['festivalID'];
+                    $splitfes = explode("_", $FestivaldecodeJdata[$FestivalNameAddition]);
+                    $fesYear = $splitfes[1];
+                    $PLAddition = " ($splitfes[1])";
+                }
+            break; 
+                //Set placename to zone
+            case "Starlight celebrant":
+            case "Starlight Celebration crier":
+            case "Starlight supplier":
+            case "Rising attendant":
+            case "resident caretaker":
+            case "splendors vendor":
+            case "expedition birdwatcher":
+            case "expedition artisan":
+            case "expedition scholar":
+            case "spoils collector":
+            case "spoils collector":
+            case "Resistance supplier":
+            case "recompense officer":
+                $oldzone = array("Ul'dah - Steps of Nald",
+                "Limsa Lominsa Upper Decks",
+                "Old Gridania",
+                "Shirogane Shores",
+                "The Lavender Beds",
+                "Limsa Lominsa Lower Decks",
+                "Eureka "
+                );
+                $newzone = array("Ul'dah",
+                "Limsa Lominsa",
+                "Gridania",
+                "Shirogane",
+                "Lavender Beds",
+                "Limsa Lominsa",
+                ""
+                );
+                if (!empty($ZoneLocation)) {
+                    if (!empty($LGBArray[$NPCID]['festivalID'])) {
+                        $FestivalNameAddition = $LGBArray[$NPCID]['festivalID'];
+                        $splitfes = explode("_", $FestivaldecodeJdata[$FestivalNameAddition]);
+                        $fesYear = $splitfes[1];
+                        $PLAddition = " ($splitfes[1]) (".str_ireplace($oldzone, $newzone, $ZoneLocation).")";
+                    }
+                    if (empty($LGBArray[$NPCID]['festivalID'])) {;
+                        $PLAddition = " (".str_ireplace($oldzone, $newzone, $ZoneLocation).")";
+                    }
+                }
+                if (empty($ZoneLocation)){
                     if (!empty($LGBArray[$NPCID]['festivalID'])) {
                         $FestivalNameAddition = $LGBArray[$NPCID]['festivalID'];
                         $splitfes = explode("_", $FestivaldecodeJdata[$FestivalNameAddition]);
@@ -570,7 +693,7 @@ trait CsvParseTrait
         $NameFormatted = str_ireplace($IncorrectNames, $correctnames, $NameFormatted);
         $NameFormatted = iconv('UTF-8', 'ISO-8859-1//TRANSLIT//IGNORE', $NameFormatted);
         $NameFormatted = str_ireplace($IncorrectNames, $correctnames, $NameFormatted);
-        $output['Name'] = $NameFormatted."$PLAddition";
+        $output['Name'] = $NameFormatted."$PLAddition$NPCSwitch";
         $output['IsEnglish'] = $this->is_english($NameFormatted);
         if (stripos($NameFormatted,"�")){
             $output['IsEnglish'] = false; 
@@ -902,7 +1025,7 @@ trait CsvParseTrait
                 }
                 $QuestUnlock = "";
                 if (!empty($QuestCsv->at($SpecialShopCsv->at($SpecialShopID)["Quest{Unlock}"])['Name'])) {
-                    $QuestUnlock = "|Requires Quest = ". $QuestCsv->at($SpecialShopCsv->at($SpecialShopID)["Quest{Unlock}"])['Name']."\n";
+                    $QuestUnlock = "| Requires Quest = ". $QuestCsv->at($SpecialShopCsv->at($SpecialShopID)["Quest{Unlock}"])['Name']."\n";
                 }
                 foreach(range(0,59) as $specialshopc) {
                     if (empty($ItemCsv->at($SpecialShopCsv->at($SpecialShopID)["Item{Cost}[$specialshopc][0]"])['Name'])) continue;
@@ -953,10 +1076,12 @@ trait CsvParseTrait
                             }
                             $Category = $SpecialShopCsv->at($SpecialShopID)["SpecialShopItemCategory[$specialshopc][$specialshopb]"];
                             $Additional = "";
+                            $AdditionalQty = "";
                             if ($specialshopb == 1) {
                                 $Additional = "|Additional=";
+                                $AdditionalQty = "Additional";
                             }
-                            $ItemInputArray[] = "$Additional$ItemReceive$ItemReceiveHQ|Quantity=$ItemReceiveAmount";
+                            $ItemInputArray[] = "$Additional$ItemReceive$ItemReceiveHQ|".$AdditionalQty."Quantity=$ItemReceiveAmount";
                         }
                     }
                     $ItemInput = implode("", $ItemInputArray);
@@ -1034,7 +1159,7 @@ trait CsvParseTrait
                 $CurrencyArray = $this->GetCurrency();
                 $QuestRequired = "";
                 if (!empty($QuestCsv->at($CollectablesShopCsv->at($SpecialShopID)["Quest"])["Name"])) {
-                    $QuestRequired = "|Requires Quest = ". $QuestCsv->at($CollectablesShopCsv->at($SpecialShopID)["Quest"])["Name"];
+                    $QuestRequired = "| Requires Quest = ". $QuestCsv->at($CollectablesShopCsv->at($SpecialShopID)["Quest"])["Name"];
                 }
 
                 $ShopName = str_ireplace($oldarray,$newarray,"$TopicSelectName".$CollectablesShopCsv->at($SpecialShopID)["Name"]);
@@ -1329,15 +1454,21 @@ trait CsvParseTrait
                         $RowRequiredArray = [];
                         foreach(range(0,1) as $c) {
                             if (empty($QuestCsv->at($GilShopItemCsv->at($GilShopSubArray)["Row{Required}[$c]"])["Name"])) continue;
-                            $RequiredQuest = $QuestCsv->at($GilShopItemCsv->at($GilShopSubArray)["Row{Required}[$c]"])["Name"];
-                            $RowRequiredArray[] = "|Requires Quest = ". $RequiredQuest;
+                            if ($c === 0) {
+                                $RequiredQuest = $QuestCsv->at($GilShopItemCsv->at($GilShopSubArray)["Row{Required}[$c]"])["Name"];
+                                $RowRequiredArray[] = "|Requires Quest = ". $RequiredQuest;
+                            }
+                            if ($c === 1) {
+                                $RequiredQuest = $QuestCsv->at($GilShopItemCsv->at($GilShopSubArray)["Row{Required}[$c]"])["Name"];
+                                $RowRequiredArray[] = ",". $RequiredQuest;
+                            }
                         }
                         if (!empty($AchievementCsv->at($GilShopItemCsv->at($GilShopSubArray)["Row{Required}[2]"])["Name"])){
-                            $Requiredachievement = $AchievementCsv->at($GilShopItemCsv->at($GilShopSubArray)["Row{Required}[$c]"])["Name"];
+                            $Requiredachievement = $AchievementCsv->at($GilShopItemCsv->at($GilShopSubArray)["Row{Required}[2]"])["Name"];
                             $RowRequiredArray[] = "|Requires Achievement = ". $Requiredachievement;
                         }
                         $NumberItems = $b + 1;
-                        $RowRequired = implode("\n", $RowRequiredArray);
+                        $RowRequired = implode("", $RowRequiredArray);
                         $CategoryPre = $ItemCsv->at($GilShopItemCsv->at($GilShopSubArray)["Item"])["EquipSlotCategory"];
                         switch ($CategoryPre) {
                             case '0':
@@ -1870,7 +2001,7 @@ trait CsvParseTrait
         $data = preg_replace("/(QuestReward.*)\n\n(?!\\|Issuing NPC)/", "$1\n", $data);
         $data = preg_replace("/(QuestReward.*)\n(\\|Issuing NPC.*)/", "$1\n\n$2", $data);
         $data = preg_replace("/\s*|\s*/", null, $data);
-        $data = preg_replace("/<Emphasis>|<\\/Emphasis>/", "''", $data);
+        $data = preg_replace("/<Emphasis>|<\\/Emphasis>/", "", $data);
         $data = preg_replace("/<If\\(LessThan\\(PlayerParameter\\(11\\),12\\)\\)><If\\(LessThan\\(PlayerParameter\\(11\\),4\\)\\)>([^>]+)<Else\\/>([^>]+)<\\/If><Else\\/><If\\(LessThan\\(PlayerParameter\\(11\\),17\\)\\)>([^>]+)<Else\\/>([^>]+)<\\/If><\\/If>/", "{{Loremtextconditional|$1|or '$2' or '$3', depending on the time of day.}}", $data);
         $data = preg_replace("/{{Loremquote\\|Q\d+\\|link=y\\|(.*)}}/","\n{| class=\"datatable-GEtable\"\n|+$1\n|Place an answer Here <!--(Not all questions have answers and thus don't need a table, please evaluate and delete this if necessary.)-->\n|}\n", $data);
         $data = preg_replace("/{{Loremquote\\|A\d+\\|link=y\\|(.*)}}/","!<!--Answer to copy into table above--> $1", $data);

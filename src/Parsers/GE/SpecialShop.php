@@ -55,9 +55,17 @@ class SpecialShop implements ParseInterface
             $this->data[] = $data;
             $console->overwrite(" > Completed Shop: {$id} --> }");
         }
-
         // save
         $console->writeln(" Saving... ");
         $info = $this->save("SpecialShops.txt", 999999);
+        foreach($GilShopCsv->data as $id => $GilShop) {
+            $FuncShop = $this->getShop($id, "GilShop", $ItemCsv, $AchievementCsv, $QuestCsv, $SpecialShopCsv, $id, $DefaultTalkCsv, $GilShopCsv, $GilShopItemCsv, "", "","");
+            $ShopOutput = $FuncShop["Shop"];
+            $ShopDialogue = $FuncShop["Dialogue"];
+            $GilshopOutputArray[] = "$ShopOutput\n$ShopDialogue";
+        }
+        $GilShopOutput = implode("\n",$GilshopOutputArray);
+        $this->saveExtra("GilShops.txt", $GilShopOutput);
+
     }
 }
